@@ -2,801 +2,2922 @@
   {
     "id": "eval_001",
     "category": "Core Concepts & Data Flow",
+    "question_type": "how-to",
     "question": "How does Streamlit's execution model handle script re-runs?",
     "answer": "Streamlit executes the entire Python script from top to bottom whenever a user interacts with a widget or when code changes in the script.",
-    "source_file": "corpus/docs/execution_model.md",
-    "source_passage": "Streamlit's architecture is based on a clean execution loop. Whenever a user interacts with a UI widget (e.g., clicking a button, dragging a slider, or entering text) or whenever the source code file is updated on disk, Streamlit reruns the entire Python script from top to bottom. This ensures the user interface strictly reflects the current state of the script."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "get-started__fundamentals__main-concepts.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/get-started/fundamentals/main-concepts",
+    "source_file": "corpus/docs/get-started__fundamentals__main-concepts.md",
+    "gold_chunk_ids": [
+      1527
+    ],
+    "section": "Data flow",
+    "source_passage": "To unlock this, Streamlit apps have a unique data flow: by\ndefault, when something must be updated on the screen, Streamlit reruns your\nentire Python script from top to bottom.\n\nBy default, a full-script rerun happens in two situations:\n\n- Whenever you modify your app's source code.\n\n- Whenever a user interacts with widgets in the app.",
+    "match": {
+      "cosine": 0.897,
+      "passage_overlap": 0.7,
+      "answer_support": 0.83,
+      "span_words": 57,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/execution_model.md",
+    "original_passage": "Streamlit's architecture is based on a clean execution loop. Whenever a user interacts with a UI widget (e.g., clicking a button, dragging a slider, or entering text) or whenever the source code file is updated on disk, Streamlit reruns the entire Python script from top to bottom. This ensures the user interface strictly reflects the current state of the script."
   },
   {
     "id": "eval_002",
     "category": "Core Concepts & Data Flow",
+    "question_type": "how-to",
     "question": "How can you persist state across user interactions in Streamlit?",
     "answer": "By using st.session_state, which allows key-value pairs to persist across script reruns for a given user session.",
-    "source_file": "corpus/docs/session_state.md",
-    "source_passage": "Session State provides a dictionary-like API (st.session_state) that lets you store and access values that persist across reruns for an individual user browser session. You can read, update, or assign new keys to st.session_state dynamically throughout your app script."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "get-started__fundamentals__advanced-concepts.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/get-started/fundamentals/advanced-concepts",
+    "source_file": "corpus/docs/get-started__fundamentals__advanced-concepts.md",
+    "gold_chunk_ids": [
+      1517
+    ],
+    "section": "Session State",
+    "source_passage": "Session State provides a dictionary-like interface where you can save information that is preserved between script reruns. Use `st.session_state` with key or attribute notation to store and recall values.",
+    "match": {
+      "cosine": 0.898,
+      "passage_overlap": 0.51,
+      "answer_support": 0.33,
+      "span_words": 29,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/session_state.md",
+    "original_passage": "Session State provides a dictionary-like API (st.session_state) that lets you store and access values that persist across reruns for an individual user browser session. You can read, update, or assign new keys to st.session_state dynamically throughout your app script."
   },
   {
     "id": "eval_003",
     "category": "Core Concepts & Data Flow",
+    "question_type": "conceptual",
     "question": "What is the purpose of st.cache_data?",
     "answer": "st.cache_data is used to cache computations that return data (e.g., DataFrames, API responses, database queries, string outputs). It creates a new copy of data upon each call to ensure immutability.",
-    "source_file": "corpus/docs/caching.md",
-    "source_passage": "st.cache_data is the recommended decorator for caching functions that return data structures such as Pandas DataFrames, API responses, numerical arrays, or SQL query results. Each time a cached function decorated with @st.cache_data is called, Streamlit creates a fresh copy of the return value, preventing accidental state mutations."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "get-started__fundamentals__advanced-concepts.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/get-started/fundamentals/advanced-concepts",
+    "source_file": "corpus/docs/get-started__fundamentals__advanced-concepts.md",
+    "gold_chunk_ids": [
+      1515
+    ],
+    "section": "Caching",
+    "source_passage": "- `st.cache_data` is the recommended way to cache computations that return data. Use `st.cache_data` when you use a function that returns a serializable data object (e.g. str, int, float, DataFrame, dict, list). **It creates a new copy of the data at each function call**, making it safe against [mutations and race conditions](/develop/concepts/architecture/caching#mutation-and-concurrency-issues).",
+    "match": {
+      "cosine": 0.906,
+      "passage_overlap": 0.56,
+      "answer_support": 0.53,
+      "span_words": 52,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/caching.md",
+    "original_passage": "st.cache_data is the recommended decorator for caching functions that return data structures such as Pandas DataFrames, API responses, numerical arrays, or SQL query results. Each time a cached function decorated with @st.cache_data is called, Streamlit creates a fresh copy of the return value, preventing accidental state mutations."
   },
   {
     "id": "eval_004",
     "category": "Core Concepts & Data Flow",
+    "question_type": "conceptual",
     "question": "When should you use st.cache_resource instead of st.cache_data?",
     "answer": "Use st.cache_resource for global non-serializable objects or shared connections, such as database connections, ML models, or TensorFlow/PyTorch sessions.",
-    "source_file": "corpus/docs/caching.md",
-    "source_passage": "Use @st.cache_resource to cache global, non-serializable objects or stateful resources that should be shared across all user sessions and app reruns. Typical use cases include database connection pools, machine learning model objects, and network socket connections."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__architecture__caching.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/architecture/caching",
+    "source_file": "corpus/docs/develop__concepts__architecture__caching.md",
+    "gold_chunk_ids": [
+      600
+    ],
+    "section": "st.cache_resource",
+    "source_passage": "`st.cache_resource` is the right command to cache “resources\" that should be available globally across all users, sessions, and reruns. It has more limited use cases than `st.cache_data`, especially for caching database connections and ML models. Within each user session, an `@st.cache_resource`-decorated function returns the cached instance of the return value (if the value is already cached). Therefore, objects cached by `st.cache_resource` act like singletons and can mutate.",
+    "match": {
+      "cosine": 0.909,
+      "passage_overlap": 0.54,
+      "answer_support": 0.5,
+      "span_words": 67,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/caching.md",
+    "original_passage": "Use @st.cache_resource to cache global, non-serializable objects or stateful resources that should be shared across all user sessions and app reruns. Typical use cases include database connection pools, machine learning model objects, and network socket connections."
   },
   {
     "id": "eval_005",
     "category": "Core Concepts & Data Flow",
+    "question_type": "how-to",
     "question": "How do you manually trigger a rerun of a Streamlit script?",
     "answer": "By calling st.rerun().",
-    "source_file": "corpus/docs/execution_model.md",
-    "source_passage": "To manually force Streamlit to interrupt current script execution and immediately start a fresh rerun from line 1, call st.rerun(). This is commonly used inside callback functions or conditionally after processing asynchronous events."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "issue-8488",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/8488",
+    "source_file": "corpus/issues/issue-8488.json",
+    "gold_chunk_ids": [
+      3187,
+      3188
+    ],
+    "section": "Discussion",
+    "source_passage": "Also, despite what said Medium post claims, calling `asyncio.get_running_loop` **definitely does not** return Streamlit's own event",
+    "match": {
+      "cosine": 0.838,
+      "passage_overlap": 0.47,
+      "answer_support": 0.5,
+      "span_words": 16,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/execution_model.md",
+    "original_passage": "To manually force Streamlit to interrupt current script execution and immediately start a fresh rerun from line 1, call st.rerun(). This is commonly used inside callback functions or conditionally after processing asynchronous events."
   },
   {
     "id": "eval_006",
     "category": "Core Concepts & Data Flow",
+    "question_type": "conceptual",
     "question": "What is the function of st.fragment?",
     "answer": "st.fragment allows a user to define a section of the app that reruns independently without triggering a full top-to-bottom rerun of the entire script.",
-    "source_file": "corpus/docs/fragments.md",
-    "source_passage": "The @st.fragment decorator allows you to isolate a specific function as a fragment. When widgets inside a fragment change, only the code within that fragment reruns, leaving the rest of the application unchanged. This greatly improves performance for complex layouts."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "develop__concepts__architecture__fragments.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/architecture/fragments",
+    "source_file": "corpus/docs/develop__concepts__architecture__fragments.md",
+    "gold_chunk_ids": [
+      644
+    ],
+    "section": "Defining and calling a fragment",
+    "source_passage": "Streamlit provides a decorator ([`st.fragment`](/develop/api-reference/execution-flow/st.fragment)) to turn any function into a fragment function. When you call a fragment function that contains a widget function, a user triggers a _fragment rerun_ instead of a full rerun when they interact with that fragment's widget. During a fragment rerun, only your fragment function is re-executed. Anything within the main body of your fragment is updated on the frontend, while the rest of your app remains the same.",
+    "match": {
+      "cosine": 0.843,
+      "passage_overlap": 0.48,
+      "answer_support": 0.29,
+      "span_words": 74,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/fragments.md",
+    "original_passage": "The @st.fragment decorator allows you to isolate a specific function as a fragment. When widgets inside a fragment change, only the code within that fragment reruns, leaving the rest of the application unchanged. This greatly improves performance for complex layouts."
   },
   {
     "id": "eval_007",
     "category": "Widgets & User Inputs",
+    "question_type": "conceptual",
     "question": "Which widget provides a numeric input field with increment/decrement buttons?",
     "answer": "st.number_input().",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.number_input displays a numeric input widget with +/- step buttons. It supports float and integer types, as well as configurable min_value, max_value, step, and format strings."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-16773",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/16773",
+    "source_file": "corpus/issues/issue-16773.json",
+    "gold_chunk_ids": [
+      2599
+    ],
+    "section": "Discussion",
+    "source_passage": "Workarounds for an empty integer input:\n\n```python\nnumber = st.number_input(\"Input number\", value=default_value, step=1)\n# or min_value=0 / max_value=...",
+    "match": {
+      "cosine": 0.854,
+      "passage_overlap": 0.57,
+      "answer_support": 1.0,
+      "span_words": 18,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.number_input displays a numeric input widget with +/- step buttons. It supports float and integer types, as well as configurable min_value, max_value, step, and format strings."
   },
   {
     "id": "eval_008",
     "category": "Widgets & User Inputs",
+    "question_type": "how-to",
     "question": "How can users upload files in a Streamlit app?",
     "answer": "Using st.file_uploader().",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.file_uploader displays a file upload widget. It returns an UploadedFile object (a BytesIO subclass) which can be passed directly to libraries like Pandas, PIL, or PyPDF for processing."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-7869",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/7869",
+    "source_file": "corpus/issues/issue-7869.json",
+    "gold_chunk_ids": [
+      3114
+    ],
+    "section": "Discussion",
+    "source_passage": "This might help you currently: https://discuss.streamlit.io/t/using-st-markdown-to-show-embedded-pdf-file-gets-page-not-found/35527/5 in particular - base64 encoding\n\nIt would be nice to add parameter to he st.file_uploader widget instead of using another widget.",
+    "match": {
+      "cosine": 0.769,
+      "passage_overlap": 0.5,
+      "answer_support": 1.0,
+      "span_words": 27,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.file_uploader displays a file upload widget. It returns an UploadedFile object (a BytesIO subclass) which can be passed directly to libraries like Pandas, PIL, or PyPDF for processing."
   },
   {
     "id": "eval_009",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you divide the main Streamlit interface into side-by-side columns?",
     "answer": "Using st.columns() (e.g., col1, col2 = st.columns(2)).",
-    "source_file": "corpus/docs/layouts.md",
-    "source_passage": "st.columns layout container divides the main app area into side-by-side columns. Pass an integer to create equal-width columns or a list of relative numerical weights to create variable-width columns."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__app-design__layouts-and-containers.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/design/layouts-and-containers",
+    "source_file": "corpus/docs/develop__concepts__app-design__layouts-and-containers.md",
+    "gold_chunk_ids": [
+      514
+    ],
+    "section": "`st.columns`",
+    "source_passage": "Each column gets a fixed share of the available width. Pass the number of equal columns or a list of relative widths:\n\n```python try\nimport streamlit as st\n\ncol1, col2, col3 = st.columns(3)\ncol1.metric(\"Revenue\", \"$12K\", \"8%\")\ncol2.metric(\"Users\", \"1,204\", \"12%\")\ncol3.metric(\"Latency\", \"42ms\", \"-3%\")\n```",
+    "match": {
+      "cosine": 0.843,
+      "passage_overlap": 0.56,
+      "answer_support": 0.75,
+      "span_words": 43,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/layouts.md",
+    "original_passage": "st.columns layout container divides the main app area into side-by-side columns. Pass an integer to create equal-width columns or a list of relative numerical weights to create variable-width columns."
   },
   {
     "id": "eval_010",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you render collapsible content blocks in Streamlit?",
     "answer": "Using st.expander(\"Title\").",
-    "source_file": "corpus/docs/layouts.md",
-    "source_passage": "st.expander creates a collapsible container widget. Users can click the header to expand or collapse the container to hide detailed logs, control panels, or secondary information."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-16027",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/16027",
+    "source_file": "corpus/issues/issue-16027.json",
+    "gold_chunk_ids": [
+      2358
+    ],
+    "section": "Description",
+    "source_passage": "- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nAfter certain sequences of expanding and collapsing multiple `st.expander`s\non a long page, one expander can end up **permanently clipped**: it shows\npart of its content and cuts off the rest, and the page cannot scroll to\nthe hidden remainder.",
+    "match": {
+      "cosine": 0.753,
+      "passage_overlap": 0.39,
+      "answer_support": 0.67,
+      "span_words": 66,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/layouts.md",
+    "original_passage": "st.expander creates a collapsible container widget. Users can click the header to expand or collapse the container to hide detailed logs, control panels, or secondary information."
   },
   {
     "id": "eval_011",
     "category": "Data Visualization & Formatting",
+    "question_type": "conceptual",
     "question": "Which component allows users to edit tabular data directly inside the UI?",
     "answer": "st.data_editor().",
-    "source_file": "corpus/docs/data_display.md",
-    "source_passage": "st.data_editor displays an editable data table widget. Users can add, edit, or delete rows and cells directly within the interface, and the modified data is returned as a Pandas DataFrame or dictionary."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__app-design__dataframes.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/design/dataframes",
+    "source_file": "corpus/docs/develop__concepts__app-design__dataframes.md",
+    "gold_chunk_ids": [
+      493
+    ],
+    "section": "Edit data with st.data_editor",
+    "source_passage": "Check out its API in [st.data_editor](/develop/api-reference/data/st.data_editor). It shows the dataframe in a table, similar to `st.dataframe`. But in contrast to `st.dataframe`, this table isn't static! The user can click on cells and edit them.",
+    "match": {
+      "cosine": 0.882,
+      "passage_overlap": 0.52,
+      "answer_support": 1.0,
+      "span_words": 34,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/data_display.md",
+    "original_passage": "st.data_editor displays an editable data table widget. Users can add, edit, or delete rows and cells directly within the interface, and the modified data is returned as a Pandas DataFrame or dictionary."
   },
   {
     "id": "eval_012",
     "category": "Data Visualization & Formatting",
+    "question_type": "how-to",
     "question": "How do you render a key metric indicator with a delta value?",
     "answer": "st.metric(label=\"Revenue\", value=\"$12,000\", delta=\"+5%\").",
-    "source_file": "corpus/docs/data_display.md",
-    "source_passage": "st.metric renders a card-style key metric display with a large bold value, an optional label, and a colored delta indicator showing changes over time."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-16539",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/16539",
+    "source_file": "corpus/issues/issue-16539.json",
+    "gold_chunk_ids": [
+      2480
+    ],
+    "section": "Description",
+    "source_passage": "with col1:\n        st.metric(\n            label=\"Metric 1\",\n            value=metric_val,\n            delta=delta_val,\n            delta_color=\"normal\",\n            chart_data=chart_1 if chart_1 else None,\n            chart_type=\"bar\",\n            border=True,\n        )",
+    "match": {
+      "cosine": 0.646,
+      "passage_overlap": 0.43,
+      "answer_support": 0.8,
+      "span_words": 16,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/data_display.md",
+    "original_passage": "st.metric renders a card-style key metric display with a large bold value, an optional label, and a colored delta indicator showing changes over time."
   },
   {
     "id": "eval_013",
     "category": "Configuration, Security & Deployment",
+    "question_type": "conceptual",
     "question": "Where should API keys and database credentials be stored in a Streamlit project?",
     "answer": "In .streamlit/secrets.toml.",
-    "source_file": "corpus/docs/configuration.md",
-    "source_passage": "Sensitive environment variables, database credentials, and secret keys should be stored locally inside .streamlit/secrets.toml. Streamlit automatically parses this TOML file into the st.secrets dictionary object."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-10543",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/10543",
+    "source_file": "corpus/issues/issue-10543.json",
+    "gold_chunk_ids": [
+      1679
+    ],
+    "section": "Discussion",
+    "source_passage": "I started [writing a spec on how we could support environment variables in `st.secrets`](https://github.com/streamlit/streamlit/pull/13717). I would love to get some feedback! Would [Option A](https://issues.streamlit.app/spec_renderer?pr=13717#option-a-placeholder-substitution-in-secrets-toml) work for your usecases?",
+    "match": {
+      "cosine": 0.867,
+      "passage_overlap": 0.52,
+      "answer_support": 1.0,
+      "span_words": 28,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/configuration.md",
+    "original_passage": "Sensitive environment variables, database credentials, and secret keys should be stored locally inside .streamlit/secrets.toml. Streamlit automatically parses this TOML file into the st.secrets dictionary object."
   },
   {
     "id": "eval_014",
     "category": "Configuration, Security & Deployment",
+    "question_type": "conceptual",
     "question": "What command must be called first before any other Streamlit calls in a script?",
     "answer": "st.set_page_config().",
-    "source_file": "corpus/docs/configuration.md",
-    "source_passage": "st.set_page_config configures page layout, title, icon, and sidebar default state. It MUST be the very first Streamlit command executed in your Python script; calling it after other Streamlit elements will raise a StreamlitAPIException."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-1770",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/1770",
+    "source_file": "corpus/issues/issue-1770.json",
+    "gold_chunk_ids": [
+      2793
+    ],
+    "section": "Discussion",
+    "source_passage": "For anybody who arrived here and is looking for the fix:\r\n\r\n**streamlit.set_page_config(page_title=None, page_icon=None, layout='centered', initial_sidebar_state='auto')**\r\n\r\nConfigures the default settings of the page.\r\nNote: This must be the first Streamlit command used in your app, and must only be set once.",
+    "match": {
+      "cosine": 0.869,
+      "passage_overlap": 0.66,
+      "answer_support": 1.0,
+      "span_words": 40,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/configuration.md",
+    "original_passage": "st.set_page_config configures page layout, title, icon, and sidebar default state. It MUST be the very first Streamlit command executed in your Python script; calling it after other Streamlit elements will raise a StreamlitAPIException."
   },
   {
     "id": "eval_015",
     "category": "Configuration, Security & Deployment",
+    "question_type": "conceptual",
     "question": "What CLI command runs a Streamlit application locally?",
     "answer": "streamlit run app.py.",
-    "source_file": "corpus/docs/deployment.md",
-    "source_passage": "To launch your Streamlit web application server locally, open your terminal and execute `streamlit run <your_script.py>`. This starts a local HTTP server defaults to port 8501."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__architecture__run-your-app.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/architecture/run-your-app",
+    "source_file": "corpus/docs/develop__concepts__architecture__run-your-app.md",
+    "gold_chunk_ids": [
+      659
+    ],
+    "section": "Run your Streamlit app",
+    "source_passage": "```bash\nstreamlit run your_script.py\n```\n\nAs soon as you run the script as shown above, a local Streamlit server will spin up and your app will open in a new tab in your default web browser.",
+    "match": {
+      "cosine": 0.812,
+      "passage_overlap": 0.57,
+      "answer_support": 1.0,
+      "span_words": 36,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/deployment.md",
+    "original_passage": "To launch your Streamlit web application server locally, open your terminal and execute `streamlit run <your_script.py>`. This starts a local HTTP server defaults to port 8501."
   },
   {
     "id": "eval_016",
     "category": "Core Concepts & Data Flow",
+    "question_type": "how-to",
     "question": "How do you run a function when a widget's value changes or a button is clicked?",
     "answer": "Pass a function to the widget's on_change or on_click parameter. The callback runs before the script reruns.",
-    "source_file": "corpus/docs/callbacks.md",
-    "source_passage": "Widgets accept an on_change or on_click callback parameter. When the user interacts with the widget, Streamlit executes the callback first and then reruns the script from top to bottom, so state updated in the callback is already available in the rerun."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "get-started__fundamentals__main-concepts.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/get-started/fundamentals/main-concepts",
+    "source_file": "corpus/docs/get-started__fundamentals__main-concepts.md",
+    "gold_chunk_ids": [
+      1527
+    ],
+    "section": "Data flow",
+    "source_passage": "Some widgets accept `on_change=\"ignore\"` to update without triggering a rerun;\nPython receives the new value on the next rerun. You can also use\n[forms](/develop/concepts/architecture/forms) to batch widget input until\nsubmission or [fragments](/develop/concepts/architecture/fragments) to rerun\nonly part of your app.\n\nWhenever a callback is passed to a widget via the `on_change` (or `on_click`) parameter, the callback will always run before the rest of your script.",
+    "match": {
+      "cosine": 0.864,
+      "passage_overlap": 0.82,
+      "answer_support": 0.73,
+      "span_words": 64,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/callbacks.md",
+    "original_passage": "Widgets accept an on_change or on_click callback parameter. When the user interacts with the widget, Streamlit executes the callback first and then reruns the script from top to bottom, so state updated in the callback is already available in the rerun."
   },
   {
     "id": "eval_017",
     "category": "Core Concepts & Data Flow",
+    "question_type": "conceptual",
     "question": "What does the key parameter do on a Streamlit widget?",
     "answer": "It assigns a unique identifier to the widget, lets you read its value through st.session_state[key], and distinguishes otherwise identical widgets.",
-    "source_file": "corpus/docs/session_state.md",
-    "source_passage": "Every widget can be given a key. The key uniquely identifies the widget and links its current value to st.session_state[key]. Two widgets with identical parameters must have different keys to avoid a DuplicateWidgetID error."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__architecture__widget-behavior.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/architecture/widget-behavior",
+    "source_file": "corpus/docs/develop__concepts__architecture__widget-behavior.md",
+    "gold_chunk_ids": [
+      680
+    ],
+    "section": "Keys help distinguish widgets and access their values",
+    "source_passage": "Widget keys serve three purposes:\n\n1. Distinguishing two otherwise identical widgets.",
+    "match": {
+      "cosine": 0.837,
+      "passage_overlap": 0.57,
+      "answer_support": 0.54,
+      "span_words": 11,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/session_state.md",
+    "original_passage": "Every widget can be given a key. The key uniquely identifies the widget and links its current value to st.session_state[key]. Two widgets with identical parameters must have different keys to avoid a DuplicateWidgetID error."
   },
   {
     "id": "eval_018",
     "category": "Core Concepts & Data Flow",
+    "question_type": "multi-part",
     "question": "How can you prevent a script rerun on every widget interaction and instead submit several inputs at once?",
     "answer": "Wrap the widgets in st.form and add an st.form_submit_button. The script only reruns when the submit button is clicked.",
-    "source_file": "corpus/docs/forms.md",
-    "source_passage": "st.form creates a container that batches elements together with a submit button. Widget values inside a form are not sent to Streamlit until the user clicks st.form_submit_button, which triggers a single rerun."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__architecture__forms.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/architecture/forms",
+    "source_file": "corpus/docs/develop__concepts__architecture__forms.md",
+    "gold_chunk_ids": [
+      637
+    ],
+    "section": "Processing form submissions",
+    "source_passage": "When the updated widget's function is executed during the rerun, it outputs the new value.\n\nFor widgets inside a form, any changes made by a user (step 1) do not get passed to the Python backend (step 2) until the form is submitted. Furthermore, the only widget inside a form that can have a callback function is the `st.form_submit_button`.",
+    "match": {
+      "cosine": 0.844,
+      "passage_overlap": 0.55,
+      "answer_support": 0.6,
+      "span_words": 59,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/forms.md",
+    "original_passage": "st.form creates a container that batches elements together with a submit button. Widget values inside a form are not sent to Streamlit until the user clicks st.form_submit_button, which triggers a single rerun."
   },
   {
     "id": "eval_019",
     "category": "Core Concepts & Data Flow",
+    "question_type": "how-to",
     "question": "How do you make a cached result expire after a certain amount of time?",
     "answer": "Use the ttl (time-to-live) parameter, for example @st.cache_data(ttl=3600) to expire entries after one hour.",
-    "source_file": "corpus/docs/caching.md",
-    "source_passage": "Both st.cache_data and st.cache_resource accept a ttl parameter that sets the maximum lifetime of a cached entry. After ttl seconds (or a timedelta) have passed, the entry is evicted and the function is executed again on the next call."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__architecture__caching.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/architecture/caching",
+    "source_file": "corpus/docs/develop__concepts__architecture__caching.md",
+    "gold_chunk_ids": [
+      606
+    ],
+    "section": "Controlling cache size and duration",
+    "source_passage": "```python\n@st.cache_data(ttl=3600)  # 👈 Cache data for 1 hour (=3600 seconds)\ndef get_api_data():\n    data = api.get(...)\n    return data\n```\n\nTip: You can also set `ttl` values using `timedelta`, e.g., `ttl=datetime.timedelta(hours=1)`.\n\n**The `max_entries` parameter**\n\n`max_entries` sets the maximum number of entries in the cache.",
+    "match": {
+      "cosine": 0.86,
+      "passage_overlap": 0.71,
+      "answer_support": 0.8,
+      "span_words": 43,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/caching.md",
+    "original_passage": "Both st.cache_data and st.cache_resource accept a ttl parameter that sets the maximum lifetime of a cached entry. After ttl seconds (or a timedelta) have passed, the entry is evicted and the function is executed again on the next call."
   },
   {
     "id": "eval_020",
     "category": "Core Concepts & Data Flow",
+    "question_type": "how-to",
     "question": "How do you programmatically clear all values cached by st.cache_data?",
     "answer": "Call st.cache_data.clear().",
-    "source_file": "corpus/docs/caching.md",
-    "source_passage": "To remove all entries stored by st.cache_data, call st.cache_data.clear(). To clear the cache of a single function, call the clear() method on that function, for example my_function.clear()."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__caching-and-state__cache-resource.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/caching-and-state/st.cache_resource",
+    "source_file": "corpus/docs/develop__api-reference__caching-and-state__cache-resource.md",
+    "gold_chunk_ids": [
+      192
+    ],
+    "section": "",
+    "source_passage": "<Autofunction function=\"streamlit.cache_resource.clear\" oldName=\"streamlit.experimental_singleton.clear\" />\n\nExample\nIn the example below, pressing the \"Clear All\" button will clear _all_ cache_resource caches.",
+    "match": {
+      "cosine": 0.783,
+      "passage_overlap": 0.55,
+      "answer_support": 0.33,
+      "span_words": 19,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/caching.md",
+    "original_passage": "To remove all entries stored by st.cache_data, call st.cache_data.clear(). To clear the cache of a single function, call the clear() method on that function, for example my_function.clear()."
   },
   {
     "id": "eval_021",
     "category": "Core Concepts & Data Flow",
+    "question_type": "how-to",
     "question": "How can you limit the number of entries kept in a Streamlit cache?",
     "answer": "Use the max_entries parameter of st.cache_data or st.cache_resource.",
-    "source_file": "corpus/docs/caching.md",
-    "source_passage": "The max_entries parameter sets the maximum number of items to keep in the cache. When the limit is exceeded, the oldest entries are removed first."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__architecture__caching.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/architecture/caching",
+    "source_file": "corpus/docs/develop__concepts__architecture__caching.md",
+    "gold_chunk_ids": [
+      606
+    ],
+    "section": "Controlling cache size and duration",
+    "source_passage": "```python\n@st.cache_data(ttl=3600)  # 👈 Cache data for 1 hour (=3600 seconds)\ndef get_api_data():\n    data = api.get(...)\n    return data\n```\n\nTip: You can also set `ttl` values using `timedelta`, e.g., `ttl=datetime.timedelta(hours=1)`.\n\n**The `max_entries` parameter**\n\n`max_entries` sets the maximum number of entries in the cache.",
+    "match": {
+      "cosine": 0.761,
+      "passage_overlap": 0.76,
+      "answer_support": 0.75,
+      "span_words": 43,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/caching.md",
+    "original_passage": "The max_entries parameter sets the maximum number of items to keep in the cache. When the limit is exceeded, the oldest entries are removed first."
   },
   {
     "id": "eval_022",
     "category": "Core Concepts & Data Flow",
+    "question_type": "how-to",
     "question": "How do you exclude an argument from being hashed in a cached function?",
     "answer": "Prefix the argument name with an underscore, such as _connection.",
-    "source_file": "corpus/docs/caching.md",
-    "source_passage": "Streamlit hashes the arguments of a cached function to build the cache key. If an argument cannot be hashed or should not influence the cache key, prefix its name with an underscore (for example _db_connection) and Streamlit will ignore it."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__architecture__caching.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/architecture/caching",
+    "source_file": "corpus/docs/develop__concepts__architecture__caching.md",
+    "gold_chunk_ids": [
+      608
+    ],
+    "section": "Excluding input parameters",
+    "source_passage": "Simply prepend the parameter name with an underscore (e.g., `_param1`), and it will not be used for caching. Even if it changes, Streamlit will return a cached result if all the other parameters match up.\n\nHere's an example:\n\n```python\n@st.cache_data\ndef fetch_data(_db_connection, num_rows):  # 👈 Don't hash _db_connection\n    data = _db_connection.fetch(num_rows)\n    return data",
+    "match": {
+      "cosine": 0.865,
+      "passage_overlap": 0.68,
+      "answer_support": 0.33,
+      "span_words": 53,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/caching.md",
+    "original_passage": "Streamlit hashes the arguments of a cached function to build the cache key. If an argument cannot be hashed or should not influence the cache key, prefix its name with an underscore (for example _db_connection) and Streamlit will ignore it."
   },
   {
     "id": "eval_023",
     "category": "Core Concepts & Data Flow",
+    "question_type": "error-message",
     "question": "How do you halt the execution of a Streamlit script at a certain point without raising an error?",
     "answer": "Call st.stop().",
-    "source_file": "corpus/docs/execution_model.md",
-    "source_passage": "st.stop() stops the script execution immediately at that line. Elements rendered before the call remain visible, and nothing after it runs. It is often used to wait for required user input."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-9405",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/9405",
+    "source_file": "corpus/issues/issue-9405.json",
+    "gold_chunk_ids": [
+      3317
+    ],
+    "section": "Description",
+    "source_passage": "The dialog should close immediately after the user submits their input, regardless of any blocking operation that follows, so that the UI responds promptly to the user's action.",
+    "match": {
+      "cosine": 0.769,
+      "passage_overlap": 0.43,
+      "answer_support": 0.0,
+      "span_words": 28,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/execution_model.md",
+    "original_passage": "st.stop() stops the script execution immediately at that line. Elements rendered before the call remain visible, and nothing after it runs. It is often used to wait for required user input."
   },
   {
     "id": "eval_024",
     "category": "Core Concepts & Data Flow",
+    "question_type": "conceptual",
     "question": "What is the recommended pattern for initializing a value in st.session_state only once?",
     "answer": "Check whether the key already exists, e.g. if 'count' not in st.session_state: st.session_state.count = 0.",
-    "source_file": "corpus/docs/session_state.md",
-    "source_passage": "Because the script reruns on every interaction, initialize values only if they do not exist yet: if 'count' not in st.session_state: st.session_state.count = 0. This prevents the value from being reset on each rerun."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "get-started__fundamentals__advanced-concepts.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/get-started/fundamentals/advanced-concepts",
+    "source_file": "corpus/docs/get-started__fundamentals__advanced-concepts.md",
+    "gold_chunk_ids": [
+      1519
+    ],
+    "section": "Examples of using Session State",
+    "source_passage": "Every time you click the button, the script will rerun.\n\n```python\nimport streamlit as st\n\nif \"counter\" not in st.session_state:\n    st.session_state.counter = 0",
+    "match": {
+      "cosine": 0.818,
+      "passage_overlap": 0.52,
+      "answer_support": 0.33,
+      "span_words": 23,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/session_state.md",
+    "original_passage": "Because the script reruns on every interaction, initialize values only if they do not exist yet: if 'count' not in st.session_state: st.session_state.count = 0. This prevents the value from being reset on each rerun."
   },
   {
     "id": "eval_025",
     "category": "Core Concepts & Data Flow",
+    "question_type": "multi-part",
     "question": "How do you read and set URL query parameters in a Streamlit app?",
     "answer": "Use st.query_params, which behaves like a dictionary (e.g. st.query_params['page'] = 'home').",
-    "source_file": "corpus/docs/query_params.md",
-    "source_passage": "st.query_params provides a dictionary-like interface to the query parameters in the browser URL. You can read values, assign new ones, delete keys, or call clear() to remove all parameters."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__caching-and-state__query_params.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/caching-and-state/st.query_params",
+    "source_file": "corpus/docs/develop__api-reference__caching-and-state__query_params.md",
+    "gold_chunk_ids": [
+      197
+    ],
+    "section": "st.query_params",
+    "source_passage": "`st.query_params` provides a dictionary-like interface to access query parameters in your app's URL and is available as of Streamlit 1.30.0. It behaves similarly to `st.session_state` with the notable exception that keys may be repeated in an app's URL.",
+    "match": {
+      "cosine": 0.884,
+      "passage_overlap": 0.71,
+      "answer_support": 0.67,
+      "span_words": 38,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/query_params.md",
+    "original_passage": "st.query_params provides a dictionary-like interface to the query parameters in the browser URL. You can read values, assign new ones, delete keys, or call clear() to remove all parameters."
   },
   {
     "id": "eval_026",
     "category": "Core Concepts & Data Flow",
+    "question_type": "how-to",
     "question": "How can a fragment automatically rerun on a timer?",
     "answer": "Pass the run_every parameter to @st.fragment, such as @st.fragment(run_every='10s').",
-    "source_file": "corpus/docs/fragments.md",
-    "source_passage": "The run_every parameter of @st.fragment makes the fragment rerun automatically at a fixed interval, given as a number of seconds, a timedelta, or a string like '10s'. This is useful for live-updating dashboards."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__architecture__fragments.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/architecture/fragments",
+    "source_file": "corpus/docs/develop__concepts__architecture__fragments.md",
+    "gold_chunk_ids": [
+      653
+    ],
+    "section": "Automate fragment reruns",
+    "source_passage": "`st.fragment` includes a convenient `run_every` parameter that causes the fragment to rerun automatically at the specified time interval.",
+    "match": {
+      "cosine": 0.912,
+      "passage_overlap": 0.66,
+      "answer_support": 0.6,
+      "span_words": 18,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/fragments.md",
+    "original_passage": "The run_every parameter of @st.fragment makes the fragment rerun automatically at a fixed interval, given as a number of seconds, a timedelta, or a string like '10s'. This is useful for live-updating dashboards."
   },
   {
     "id": "eval_027",
     "category": "Core Concepts & Data Flow",
+    "question_type": "conceptual",
     "question": "What happens to a widget's state if the widget is not rendered during a script run?",
     "answer": "Streamlit discards the widget's state, so its value is reset the next time it appears.",
-    "source_file": "corpus/docs/session_state.md",
-    "source_passage": "If a widget is not rendered in a script run, Streamlit deletes its associated state. When the widget is displayed again, it starts from its default value unless you store the value in a separate session state key."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__architecture__widget-behavior.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/architecture/widget-behavior",
+    "source_file": "corpus/docs/develop__concepts__architecture__widget-behavior.md",
+    "gold_chunk_ids": [
+      693
+    ],
+    "section": "Widget clean-up process",
+    "source_passage": "When Streamlit gets to the end of a script run, it will delete the data for any widgets it has in memory that were not rendered on the screen, unless `persist_state` is set. Most importantly, that means Streamlit will delete all key-value pairs in `st.session_state` associated with a widget not currently on screen.",
+    "match": {
+      "cosine": 0.894,
+      "passage_overlap": 0.69,
+      "answer_support": 0.44,
+      "span_words": 53,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/session_state.md",
+    "original_passage": "If a widget is not rendered in a script run, Streamlit deletes its associated state. When the widget is displayed again, it starts from its default value unless you store the value in a separate session state key."
   },
   {
     "id": "eval_028",
     "category": "Core Concepts & Data Flow",
+    "question_type": "how-to",
     "question": "How do you show a loading indicator while a long-running operation executes?",
     "answer": "Wrap the code in a with st.spinner('Loading...'): block.",
-    "source_file": "corpus/docs/status.md",
-    "source_passage": "st.spinner temporarily displays a message with a spinning animation while the code inside its with block executes. The message disappears when the block finishes."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__status___index.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/status",
+    "source_file": "corpus/docs/develop__api-reference__status___index.md",
+    "gold_chunk_ids": [
+      360
+    ],
+    "section": "Display progress and status",
+    "source_passage": "<h4>Spinner</h4>\n\nTemporarily displays a message while executing a block of code.",
+    "match": {
+      "cosine": 0.73,
+      "passage_overlap": 0.63,
+      "answer_support": 0.8,
+      "span_words": 11,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/status.md",
+    "original_passage": "st.spinner temporarily displays a message with a spinning animation while the code inside its with block executes. The message disappears when the block finishes."
   },
   {
     "id": "eval_029",
     "category": "Core Concepts & Data Flow",
+    "question_type": "conceptual",
     "question": "Does st.cache_resource return a copy of the cached object on each call?",
     "answer": "No. It returns the same object every time, so mutations affect all sessions that use it.",
-    "source_file": "corpus/docs/caching.md",
-    "source_passage": "Unlike st.cache_data, st.cache_resource does not create a copy of the returned object. The same instance is shared across all reruns and sessions, so it must be thread-safe if it can be mutated."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "develop__concepts__architecture__caching.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/architecture/caching",
+    "source_file": "corpus/docs/develop__concepts__architecture__caching.md",
+    "gold_chunk_ids": [
+      602
+    ],
+    "section": "Behavior",
+    "source_passage": "- `st.cache_resource` does **not** create a copy of the cached return value but instead stores the object itself in the cache. All mutations on the function's return value directly affect the object in the cache, so you must ensure that mutations from multiple sessions do not cause problems. In short, the return value must be thread-safe.",
+    "match": {
+      "cosine": 0.939,
+      "passage_overlap": 0.68,
+      "answer_support": 0.5,
+      "span_words": 56,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/caching.md",
+    "original_passage": "Unlike st.cache_data, st.cache_resource does not create a copy of the returned object. The same instance is shared across all reruns and sessions, so it must be thread-safe if it can be mutated."
   },
   {
     "id": "eval_030",
     "category": "Core Concepts & Data Flow",
+    "question_type": "conceptual",
     "question": "What happens if you try to modify st.session_state for a widget key after the widget has been instantiated in the same run?",
     "answer": "Streamlit raises a StreamlitAPIException.",
-    "source_file": "corpus/docs/session_state.md",
-    "source_passage": "A widget's session state value cannot be set after the widget with that key has been created in the current script run. Doing so raises a StreamlitAPIException. Update the value in a callback or before the widget is instantiated."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__architecture__widget-behavior.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/architecture/widget-behavior",
+    "source_file": "corpus/docs/develop__concepts__architecture__widget-behavior.md",
+    "gold_chunk_ids": [
+      691
+    ],
+    "section": "Calling a widget command when the widget doesn't already exist",
+    "source_passage": "Streamlit will build the frontend and backend parts of the widget, using its default value.\n2. If the widget has been assigned a key, Streamlit will check if that key already exists in Session State.",
+    "match": {
+      "cosine": 0.809,
+      "passage_overlap": 0.61,
+      "answer_support": 0.33,
+      "span_words": 35,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/session_state.md",
+    "original_passage": "A widget's session state value cannot be set after the widget with that key has been created in the current script run. Doing so raises a StreamlitAPIException. Update the value in a callback or before the widget is instantiated."
   },
   {
     "id": "eval_031",
     "category": "Widgets & User Inputs",
+    "question_type": "conceptual",
     "question": "Which widget displays a clickable button that returns True when clicked?",
     "answer": "st.button().",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.button displays a button widget. It returns True for the single script run immediately after the user clicks it, and False otherwise."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__app-design__button-behavior-and-examples.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/design/buttons",
+    "source_file": "corpus/docs/develop__concepts__app-design__button-behavior-and-examples.md",
+    "gold_chunk_ids": [
+      457
+    ],
+    "section": "Summary",
+    "source_passage": "They return `True` on the script rerun resulting from their click and immediately return to `False` on the next script rerun. If a displayed element is nested inside `if st.button('Click me'):`, the element will be visible when the button is clicked and disappear as soon as the user takes their next action.",
+    "match": {
+      "cosine": 0.845,
+      "passage_overlap": 0.55,
+      "answer_support": 1.0,
+      "span_words": 52,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.button displays a button widget. It returns True for the single script run immediately after the user clicks it, and False otherwise."
   },
   {
     "id": "eval_032",
     "category": "Widgets & User Inputs",
+    "question_type": "how-to",
     "question": "How do you display a checkbox in Streamlit?",
     "answer": "Using st.checkbox(), which returns True when checked and False when unchecked.",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.checkbox displays a checkbox widget with a label. It returns a boolean indicating whether the box is checked, and accepts a value argument to set its initial state."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "develop__concepts__custom-components__components-v2__examples___index.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/custom-components/components-v2/examples",
+    "source_file": "corpus/docs/develop__concepts__custom-components__components-v2__examples___index.md",
+    "gold_chunk_ids": [
+      797
+    ],
+    "section": "Simple checkbox",
+    "source_passage": "false;\n\n        checkbox.onchange = () => {\n            setStateValue(\"checked\", checkbox.checked);\n        };\n    }\n    \"\"\",\n)\n\ninitial_state = True",
+    "match": {
+      "cosine": 0.764,
+      "passage_overlap": 0.48,
+      "answer_support": 0.71,
+      "span_words": 15,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.checkbox displays a checkbox widget with a label. It returns a boolean indicating whether the box is checked, and accepts a value argument to set its initial state."
   },
   {
     "id": "eval_033",
     "category": "Widgets & User Inputs",
+    "question_type": "conceptual",
     "question": "Which widget provides an on/off switch?",
     "answer": "st.toggle().",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.toggle displays a toggle switch widget that returns True when on and False when off. It behaves like a checkbox with a switch-style appearance."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__app-design__button-behavior-and-examples.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/design/buttons",
+    "source_file": "corpus/docs/develop__concepts__app-design__button-behavior-and-examples.md",
+    "gold_chunk_ids": [
+      461
+    ],
+    "section": "Toggle button",
+    "source_passage": "If you want a button to work like a toggle switch, consider using [`st.checkbox`](/develop/api-reference/widgets/st.checkbox).",
+    "match": {
+      "cosine": 0.799,
+      "passage_overlap": 0.62,
+      "answer_support": 1.0,
+      "span_words": 14,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.toggle displays a toggle switch widget that returns True when on and False when off. It behaves like a checkbox with a switch-style appearance."
   },
   {
     "id": "eval_034",
     "category": "Widgets & User Inputs",
+    "question_type": "how-to",
     "question": "How do you let users pick exactly one option from a short list displayed as radio buttons?",
     "answer": "Using st.radio().",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.radio displays a group of radio buttons from which the user can select exactly one option. It returns the selected option, and the index parameter sets the default selection."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-16841",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/16841",
+    "source_file": "corpus/issues/issue-16841.json",
+    "gold_chunk_ids": [
+      2605,
+      2606
+    ],
+    "section": "Discussion",
+    "source_passage": "In 1.49.1 the first filtered option carried `aria-selected=\"true\"` while typing, so what regressed is specifically that a screen reader can no longer",
+    "match": {
+      "cosine": 0.716,
+      "passage_overlap": 0.68,
+      "answer_support": 0.0,
+      "span_words": 22,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.radio displays a group of radio buttons from which the user can select exactly one option. It returns the selected option, and the index parameter sets the default selection."
   },
   {
     "id": "eval_035",
     "category": "Widgets & User Inputs",
+    "question_type": "conceptual",
     "question": "Which widget displays a dropdown for selecting a single option?",
     "answer": "st.selectbox().",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.selectbox displays a select widget as a dropdown. The user can type to filter the options, and the widget returns the selected value, or None if no selection is made and index is set to None."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-7187",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/7187",
+    "source_file": "corpus/issues/issue-7187.json",
+    "gold_chunk_ids": [
+      3044
+    ],
+    "section": "Discussion",
+    "source_passage": "> I expect select boxes to at least optionally be read-only (my 90% default is read-only)\r\n\r\nSelectbox is read-only, always. You can type to filter items, but you can't add new value currently, unless I missed something.",
+    "match": {
+      "cosine": 0.806,
+      "passage_overlap": 0.68,
+      "answer_support": 1.0,
+      "span_words": 37,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.selectbox displays a select widget as a dropdown. The user can type to filter the options, and the widget returns the selected value, or None if no selection is made and index is set to None."
   },
   {
     "id": "eval_036",
     "category": "Widgets & User Inputs",
+    "question_type": "how-to",
     "question": "How do you allow users to select multiple options from a list?",
     "answer": "Using st.multiselect(), which returns a list of the selected options.",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.multiselect displays a multiselect widget that lets the user choose zero or more options. It returns the selected values as a list."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-12644",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/12644",
+    "source_file": "corpus/issues/issue-12644.json",
+    "gold_chunk_ids": [
+      1849
+    ],
+    "section": "Description",
+    "source_passage": "If you select many options in `st.multiselect`, they wrap to multiple lines. This makes the widget grow in height and can make layouts look bad:\n\n<img width=\"479\" height=\"390\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/6d764080-9d35-4739-bd8d-e5cc971de700\" />",
+    "match": {
+      "cosine": 0.797,
+      "passage_overlap": 0.55,
+      "answer_support": 0.5,
+      "span_words": 31,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.multiselect displays a multiselect widget that lets the user choose zero or more options. It returns the selected values as a list."
   },
   {
     "id": "eval_037",
     "category": "Widgets & User Inputs",
+    "question_type": "conceptual",
     "question": "Which widget lets users choose a numeric value or range by dragging a handle?",
     "answer": "st.slider(). Passing a tuple as the value creates a range slider.",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.slider displays a slider widget for selecting numbers, dates, or times. If value is given as a tuple of two values, the slider becomes a range slider and returns a tuple."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-15529",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/15529",
+    "source_file": "corpus/issues/issue-15529.json",
+    "gold_chunk_ids": [
+      2228
+    ],
+    "section": "Discussion",
+    "source_passage": "This is a typing bug in the `st.slider` `[USER]` definitions in `lib/streamlit/elements/widgets/slider.py`. The overloads decide between scalar (e.g. `int`) and range (e.g. `tuple[int, int]`) return types based on the `value`, `min_value`, and `max_value` parameters.",
+    "match": {
+      "cosine": 0.765,
+      "passage_overlap": 0.6,
+      "answer_support": 0.67,
+      "span_words": 34,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.slider displays a slider widget for selecting numbers, dates, or times. If value is given as a tuple of two values, the slider becomes a range slider and returns a tuple."
   },
   {
     "id": "eval_038",
     "category": "Widgets & User Inputs",
+    "question_type": "conceptual",
     "question": "Which widget is a slider that selects from a list of arbitrary, possibly non-numeric, options?",
     "answer": "st.select_slider().",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.select_slider displays a slider that lets the user select from an ordered list of options, such as strings or numbers. A tuple of two values creates a range selection."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "develop__concepts__app-design__custom-classes.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/design/custom-classes",
+    "source_file": "corpus/docs/develop__concepts__app-design__custom-classes.md",
+    "gold_chunk_ids": [
+      484
+    ],
+    "section": "How Streamlit widgets store options",
+    "source_passage": "Several Streamlit UI elements, such as `st.selectbox` or `st.radio`, accept multiple-choice options via an `options` argument. The user of your application can typically select one or more of these options.",
+    "match": {
+      "cosine": 0.727,
+      "passage_overlap": 0.59,
+      "answer_support": 0.0,
+      "span_words": 30,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.select_slider displays a slider that lets the user select from an ordered list of options, such as strings or numbers. A tuple of two values creates a range selection."
   },
   {
     "id": "eval_039",
     "category": "Widgets & User Inputs",
+    "question_type": "how-to",
     "question": "How do you create a single-line text input that hides the typed characters, such as for passwords?",
     "answer": "Use st.text_input() with type='password'.",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.text_input displays a single-line text input widget. Setting type='password' masks the characters the user enters. The widget returns the current text as a string."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "develop__api-reference__widgets___index.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/widgets",
+    "source_file": "corpus/docs/develop__api-reference__widgets___index.md",
+    "gold_chunk_ids": [
+      406
+    ],
+    "section": "Text input elements",
+    "source_passage": "<RefCard href=\"/develop/api-reference/widgets/st.text_input\">\n\n<h4>Text input</h4>\n\nDisplay a single-line text input widget.",
+    "match": {
+      "cosine": 0.756,
+      "passage_overlap": 0.48,
+      "answer_support": 0.33,
+      "span_words": 10,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.text_input displays a single-line text input widget. Setting type='password' masks the characters the user enters. The widget returns the current text as a string."
   },
   {
     "id": "eval_040",
     "category": "Widgets & User Inputs",
+    "question_type": "conceptual",
     "question": "Which widget accepts multi-line text input?",
     "answer": "st.text_area().",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.text_area displays a multi-line text input widget. The height parameter controls the visible height of the box, and the return value is the entered string."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__widgets__text_input.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/widgets/st.text_input",
+    "source_file": "corpus/docs/develop__api-reference__widgets__text_input.md",
+    "gold_chunk_ids": [
+      438
+    ],
+    "section": "",
+    "source_passage": "with col1:\n    st.checkbox(\"Disable text input widget\", key=\"disabled\")\n    st.radio(\n        \"Set text input label visibility 👉\",\n        key=\"visibility\",\n        options=[\"visible\", \"hidden\", \"collapsed\"],\n    )\n    st.text_input(\n        \"Placeholder for the other text input widget\",\n        \"This is a placeholder\",\n        key=\"placeholder\",\n    )\n\nwith col2:\n    text_input = st.text_input(\n        \"Enter some text 👇\",\n        label_visibility=st.session_state.visibility,\n        disabled=st.session_state.disabled,\n        placeholder=st.session_state.placeholder,\n    )\n\n    if text_input:\n        st.write(\"You entered: \", text_input)\n```\n\n<Cloud name=\"doc-text-input1\" height=\"400px\" />",
+    "match": {
+      "cosine": 0.758,
+      "passage_overlap": 0.64,
+      "answer_support": 0.0,
+      "span_words": 57,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.text_area displays a multi-line text input widget. The height parameter controls the visible height of the box, and the return value is the entered string."
   },
   {
     "id": "eval_041",
     "category": "Widgets & User Inputs",
+    "question_type": "how-to",
     "question": "How do you let a user pick a date from a calendar?",
     "answer": "Using st.date_input().",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.date_input displays a date input widget with a calendar popup. It returns a datetime.date object, or a tuple of dates when a range is selected."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-9946",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/9946",
+    "source_file": "corpus/issues/issue-9946.json",
+    "gold_chunk_ids": [
+      3383
+    ],
+    "section": "Description",
+    "source_passage": "a = st.selectbox(\"A\", [\"today\", \"2024-10-01\", date(2024,9,1), datetime(2024,8,1,12,0,0,0), None])\nb = st.selectbox(\"B\", [\"today\", \"2024-10-01\", date(2024,9,1), datetime(2024,8,1,12,0,0,0), None])\n\nx = st.date_input(\"Two-list\", [a,b])\nx\ny = st.date_input(\"One-list\", [a])\ny\nz = st.date_input(\"Empty-list\", [])\nz\n```\n\n### Why?\n\nPresumably, it would look better to show placeholder text for the end date when only the initial date of a range is selected.",
+    "match": {
+      "cosine": 0.808,
+      "passage_overlap": 0.64,
+      "answer_support": 0.5,
+      "span_words": 57,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.date_input displays a date input widget with a calendar popup. It returns a datetime.date object, or a tuple of dates when a range is selected."
   },
   {
     "id": "eval_042",
     "category": "Widgets & User Inputs",
+    "question_type": "conceptual",
     "question": "Which widget allows the user to select a time of day?",
     "answer": "st.time_input().",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.time_input displays a time input widget and returns a datetime.time object. The step parameter sets the interval, in seconds, between selectable times."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-6423",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/6423",
+    "source_file": "corpus/issues/issue-6423.json",
+    "gold_chunk_ids": [
+      2996
+    ],
+    "section": "Discussion",
+    "source_passage": "`st.time_input` will get a step parameter that will let you specify the step between consecutive times.",
+    "match": {
+      "cosine": 0.815,
+      "passage_overlap": 0.52,
+      "answer_support": 1.0,
+      "span_words": 16,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.time_input displays a time input widget and returns a datetime.time object. The step parameter sets the interval, in seconds, between selectable times."
   },
   {
     "id": "eval_043",
     "category": "Widgets & User Inputs",
+    "question_type": "how-to",
     "question": "How do you show a color picker widget?",
     "answer": "Using st.color_picker(), which returns the chosen color as a hex string.",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.color_picker displays a color picker widget. The return value is the selected color as a hex string, such as '#00f900'."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__widgets___index.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/widgets",
+    "source_file": "corpus/docs/develop__api-reference__widgets___index.md",
+    "gold_chunk_ids": [
+      404
+    ],
+    "section": "Selection elements",
+    "source_passage": "Display a checkbox widget.\n\n```python\nselected = st.checkbox(\"I agree\")\n```\n\n</RefCard>\n<RefCard href=\"/develop/api-reference/widgets/st.color_picker\">\n\n<h4>Color picker</h4>",
+    "match": {
+      "cosine": 0.785,
+      "passage_overlap": 0.53,
+      "answer_support": 0.33,
+      "span_words": 15,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.color_picker displays a color picker widget. The return value is the selected color as a hex string, such as '#00f900'."
   },
   {
     "id": "eval_044",
     "category": "Widgets & User Inputs",
+    "question_type": "how-to",
     "question": "How can users download data generated by your app?",
     "answer": "Using st.download_button(), which takes the data, a file name, and an optional MIME type.",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.download_button displays a button that lets the user download a file. Pass the data as a string, bytes, or file-like object, along with file_name and mime to control how the browser saves it."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "issue-9003",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/9003",
+    "source_file": "corpus/issues/issue-9003.json",
+    "gold_chunk_ids": [
+      3274
+    ],
+    "section": "Discussion",
+    "source_passage": "The following workaround works for me for a case where there is only one download_button.\n\n```python\nimport streamlit as st\n\nclass DownloadButton(object): # Singleton (only be created once) class to hold inputs to download button\n    def __new__(cls, label=None, data=None, file_name=None, mime=None):\n        # Note: I only set this up to handle inputs that I'm using but it can obviously be extended\n        if not hasattr(cls, 'instance'):\n            cls.instance = super(DownloadButton, cls).__new__(cls) # Create singleton if it does not exist\n            cls.instance.value = False",
+    "match": {
+      "cosine": 0.83,
+      "passage_overlap": 0.63,
+      "answer_support": 0.56,
+      "span_words": 79,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.download_button displays a button that lets the user download a file. Pass the data as a string, bytes, or file-like object, along with file_name and mime to control how the browser saves it."
   },
   {
     "id": "eval_045",
     "category": "Widgets & User Inputs",
+    "question_type": "conceptual",
     "question": "Which widget captures a photo from the user's webcam?",
     "answer": "st.camera_input().",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.camera_input displays a widget to capture images from the user's webcam. It returns an UploadedFile object that can be processed like an uploaded image."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "develop__api-reference__widgets__camera_input.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/widgets/st.camera_input",
+    "source_file": "corpus/docs/develop__api-reference__widgets__camera_input.md",
+    "gold_chunk_ids": [
+      410
+    ],
+    "section": "",
+    "source_passage": "Important: `st.camera_input` returns an object of the `UploadedFile` class, which a subclass of BytesIO. Therefore it is a \"file-like\" object.",
+    "match": {
+      "cosine": 0.812,
+      "passage_overlap": 0.52,
+      "answer_support": 1.0,
+      "span_words": 20,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.camera_input displays a widget to capture images from the user's webcam. It returns an UploadedFile object that can be processed like an uploaded image."
   },
   {
     "id": "eval_046",
     "category": "Widgets & User Inputs",
+    "question_type": "conceptual",
     "question": "Which widget provides a chat message input box fixed at the bottom of the app?",
     "answer": "st.chat_input().",
-    "source_file": "corpus/docs/chat.md",
-    "source_passage": "st.chat_input displays a chat input widget that is pinned to the bottom of the page when used in the main area. It returns the submitted text, or None if nothing has been entered."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-16977",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/16977",
+    "source_file": "corpus/issues/issue-16977.json",
+    "gold_chunk_ids": [
+      2625
+    ],
+    "section": "Discussion",
+    "source_passage": "- [#8363](https://github.com/streamlit/streamlit/issues/8363) — Open report of unexpected main-area scroll interaction when `st.chat_input` / `st.chat_message` are present (jitter rather than a one-shot jump to the bottom).",
+    "match": {
+      "cosine": 0.824,
+      "passage_overlap": 0.61,
+      "answer_support": 1.0,
+      "span_words": 25,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/chat.md",
+    "original_passage": "st.chat_input displays a chat input widget that is pinned to the bottom of the page when used in the main area. It returns the submitted text, or None if nothing has been entered."
   },
   {
     "id": "eval_047",
     "category": "Widgets & User Inputs",
+    "question_type": "conceptual",
     "question": "Which element displays chat messages with an avatar for a given role such as 'user' or 'assistant'?",
     "answer": "st.chat_message().",
-    "source_file": "corpus/docs/chat.md",
-    "source_passage": "st.chat_message inserts a chat message container into the app. Pass a name such as 'user' or 'assistant' to display a matching avatar, and use it as a context manager to add elements inside the message."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__tutorials__llms__conversational-apps.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/tutorials/chat-and-llm-apps/build-conversational-apps",
+    "source_file": "corpus/docs/develop__tutorials__llms__conversational-apps.md",
+    "gold_chunk_ids": [
+      1435
+    ],
+    "section": "st.chat_message",
+    "source_passage": "`st.chat_message` lets you insert a multi-element chat message container into your app. The returned container can contain any Streamlit element, including charts, tables, text, and more. To add elements to the returned container, you can use `with` notation.\n\n`st.chat_message`'s first parameter is the `name` of the message author, which can be either `\"user\"` or `\"assistant\"` to enable preset styling and avatars, like in the demo above.",
+    "match": {
+      "cosine": 0.885,
+      "passage_overlap": 0.76,
+      "answer_support": 1.0,
+      "span_words": 66,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/chat.md",
+    "original_passage": "st.chat_message inserts a chat message container into the app. Pass a name such as 'user' or 'assistant' to display a matching avatar, and use it as a context manager to add elements inside the message."
   },
   {
     "id": "eval_048",
     "category": "Widgets & User Inputs",
+    "question_type": "conceptual",
     "question": "Which widget lets users record audio from their microphone?",
     "answer": "st.audio_input().",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.audio_input displays a widget that allows the user to record audio from their microphone. It returns an UploadedFile-like object containing the recording in WAV format."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference___index.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference",
+    "source_file": "corpus/docs/develop__api-reference___index.md",
+    "gold_chunk_ids": [
+      169,
+      170
+    ],
+    "section": "Input widgets",
+    "source_passage": "</RefCard>\n<RefCard href=\"/develop/api-reference/widgets/st.audio_input\">\n\n<h4>Audio input</h4>\n\nDisplay a widget that allows users to record with their microphone.",
+    "match": {
+      "cosine": 0.825,
+      "passage_overlap": 0.46,
+      "answer_support": 1.0,
+      "span_words": 16,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.audio_input displays a widget that allows the user to record audio from their microphone. It returns an UploadedFile-like object containing the recording in WAV format."
   },
   {
     "id": "eval_049",
     "category": "Widgets & User Inputs",
+    "question_type": "how-to",
     "question": "How do you make a widget non-interactive?",
     "answer": "Set the disabled=True parameter on the widget.",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "Most input widgets accept a disabled parameter. When set to True, the widget is displayed in a greyed-out state and the user cannot interact with it."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__widgets__text_input.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/widgets/st.text_input",
+    "source_file": "corpus/docs/develop__api-reference__widgets__text_input.md",
+    "gold_chunk_ids": [
+      438
+    ],
+    "section": "",
+    "source_passage": "If \"hidden\", the label doesn’t show but there is still empty space for it above the widget (equivalent to `label=\"\"`). If \"collapsed\", both the label and the space are removed. Default is \"visible\". Text input widgets can also be disabled with the `disabled` parameter, and can display an optional placeholder text when the text input is empty using the `placeholder` parameter:",
+    "match": {
+      "cosine": 0.736,
+      "passage_overlap": 0.64,
+      "answer_support": 0.75,
+      "span_words": 61,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "Most input widgets accept a disabled parameter. When set to True, the widget is displayed in a greyed-out state and the user cannot interact with it."
   },
   {
     "id": "eval_050",
     "category": "Widgets & User Inputs",
+    "question_type": "how-to",
     "question": "How can you hide or collapse a widget's label while keeping it accessible?",
     "answer": "Use the label_visibility parameter with the value 'hidden' or 'collapsed'.",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "The label_visibility parameter controls how a widget label is displayed. It accepts 'visible', 'hidden' (label is invisible but takes up space), or 'collapsed' (label is invisible and takes up no space)."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__widgets__text_input.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/widgets/st.text_input",
+    "source_file": "corpus/docs/develop__api-reference__widgets__text_input.md",
+    "gold_chunk_ids": [
+      438
+    ],
+    "section": "",
+    "source_passage": "Text input widgets can customize how to hide their labels with the `label_visibility` parameter. If \"hidden\", the label doesn’t show but there is still empty space for it above the widget (equivalent to `label=\"\"`). If \"collapsed\", both the label and the space are removed. Default is \"visible\".",
+    "match": {
+      "cosine": 0.833,
+      "passage_overlap": 0.65,
+      "answer_support": 1.0,
+      "span_words": 47,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "The label_visibility parameter controls how a widget label is displayed. It accepts 'visible', 'hidden' (label is invisible but takes up space), or 'collapsed' (label is invisible and takes up no space)."
   },
   {
     "id": "eval_051",
     "category": "Widgets & User Inputs",
+    "question_type": "how-to",
     "question": "How do you add a tooltip to a widget?",
     "answer": "Use the help parameter, which displays the text in a tooltip next to the label.",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "Widgets accept a help parameter containing a string. The string is shown as a tooltip when the user hovers over the question-mark icon next to the widget label."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-15211",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/15211",
+    "source_file": "corpus/issues/issue-15211.json",
+    "gold_chunk_ids": [
+      2104
+    ],
+    "section": "Discussion",
+    "source_passage": "- [#6718 - Widget help parameter should accept an html string](https://github.com/streamlit/streamlit/issues/6718) — Related interaction between the `help` parameter and HTML, though the direction is reversed (HTML inside `help`). - [#8322 - Alignment issue with help tooltips inside st.popover](https://github.com/streamlit/streamlit/issues/8322) — A different but adjacent bug about help-tooltip rendering quirks; relevant if a fix touches the shared tooltip/help-icon rendering pipeline.",
+    "match": {
+      "cosine": 0.77,
+      "passage_overlap": 0.52,
+      "answer_support": 0.57,
+      "span_words": 58,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "Widgets accept a help parameter containing a string. The string is shown as a tooltip when the user hovers over the question-mark icon next to the widget label."
   },
   {
     "id": "eval_052",
     "category": "Widgets & User Inputs",
+    "question_type": "how-to",
     "question": "How do you render a button that opens an external URL?",
     "answer": "Using st.link_button('Label', url).",
-    "source_file": "corpus/docs/widgets.md",
-    "source_passage": "st.link_button displays a button that opens a specified URL in a new browser tab when clicked. It does not trigger a script rerun."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-13963",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/13963",
+    "source_file": "corpus/issues/issue-13963.json",
+    "gold_chunk_ids": [
+      1989
+    ],
+    "section": "Description",
+    "source_passage": "- On using the forwards and backwards buttons in the browser, the URL changes as expected, but calls to `st.query_params` see only the final version of the URL.\n    - This only happens if `st.navigation` is used - if the app is single-page, the forwards and backwards buttons don't trigger a rerun of the back end at all (as in #13853).",
+    "match": {
+      "cosine": 0.755,
+      "passage_overlap": 0.57,
+      "answer_support": 0.33,
+      "span_words": 60,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/widgets.md",
+    "original_passage": "st.link_button displays a button that opens a specified URL in a new browser tab when clicked. It does not trigger a script rerun."
   },
   {
     "id": "eval_053",
     "category": "Layouts & Media Display",
+    "question_type": "multi-part",
     "question": "How do you place widgets and content in the sidebar?",
     "answer": "Use st.sidebar, either as a prefix (st.sidebar.selectbox(...)) or as a context manager (with st.sidebar:).",
-    "source_file": "corpus/docs/layouts.md",
-    "source_passage": "st.sidebar adds a collapsible panel on the left side of the app. Elements can be added with the object notation st.sidebar.element() or by using with st.sidebar: as a context manager."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "develop__api-reference__layout__sidebar.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/layout/st.sidebar",
+    "source_file": "corpus/docs/develop__api-reference__layout__sidebar.md",
+    "gold_chunk_ids": [
+      345
+    ],
+    "section": "Add widgets to sidebar",
+    "source_passage": "# Using object notation\nadd_selectbox = st.sidebar.selectbox(\n    \"How would you like to be contacted?\",\n    (\"Email\", \"Home phone\", \"Mobile phone\")\n)",
+    "match": {
+      "cosine": 0.826,
+      "passage_overlap": 0.65,
+      "answer_support": 0.33,
+      "span_words": 20,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/layouts.md",
+    "original_passage": "st.sidebar adds a collapsible panel on the left side of the app. Elements can be added with the object notation st.sidebar.element() or by using with st.sidebar: as a context manager."
   },
   {
     "id": "eval_054",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you organize content into tabs?",
     "answer": "Using st.tabs(['Tab 1', 'Tab 2']), which returns a list of containers to add content to.",
-    "source_file": "corpus/docs/layouts.md",
-    "source_passage": "st.tabs inserts a number of multi-element containers as tabs. It takes a list of tab labels and returns a list of container objects. All tab contents are computed on every rerun, even when a tab is not selected."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-15892",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/15892",
+    "source_file": "corpus/issues/issue-15892.json",
+    "gold_chunk_ids": [
+      2305
+    ],
+    "section": "Description",
+    "source_passage": "**Regression in 1.59.0** (1.58.0 is fine): when a widget inside an `st.tabs` tab triggers a rerun, the tab bar disappears and the content of **all** tabs renders stacked vertically down the page, as if the tabs container no longer exists.",
+    "match": {
+      "cosine": 0.762,
+      "passage_overlap": 0.48,
+      "answer_support": 0.33,
+      "span_words": 40,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/layouts.md",
+    "original_passage": "st.tabs inserts a number of multi-element containers as tabs. It takes a list of tab labels and returns a list of container objects. All tab contents are computed on every rerun, even when a tab is not selected."
   },
   {
     "id": "eval_055",
     "category": "Layouts & Media Display",
+    "question_type": "conceptual",
     "question": "What is st.container used for?",
     "answer": "It creates an invisible container that holds multiple elements, allowing you to insert content out of order or group elements together.",
-    "source_file": "corpus/docs/layouts.md",
-    "source_passage": "st.container inserts a multi-element container. You can add elements to it at any point in your script, which makes it possible to render content in a different order from the order in which the code runs."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__app-design__layouts-and-containers.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/design/layouts-and-containers",
+    "source_file": "corpus/docs/develop__concepts__app-design__layouts-and-containers.md",
+    "gold_chunk_ids": [
+      513
+    ],
+    "section": "`st.container`",
+    "source_passage": "A plain container groups elements together. On its own, a container is invisible — it doesn't add any visual boundary. Its primary purpose is letting you write elements out of order.",
+    "match": {
+      "cosine": 0.836,
+      "passage_overlap": 0.45,
+      "answer_support": 0.42,
+      "span_words": 31,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/layouts.md",
+    "original_passage": "st.container inserts a multi-element container. You can add elements to it at any point in your script, which makes it possible to render content in a different order from the order in which the code runs."
   },
   {
     "id": "eval_056",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you create a placeholder that can be replaced or cleared later?",
     "answer": "Use st.empty(), which creates a single-element container whose content can be overwritten or removed.",
-    "source_file": "corpus/docs/layouts.md",
-    "source_passage": "st.empty inserts a container into the app that can hold a single element. Writing a new element to it replaces the previous one, and calling .empty() on it clears its content."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__app-design__animate-elements.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/design/animate",
+    "source_file": "corpus/docs/develop__concepts__app-design__animate-elements.md",
+    "gold_chunk_ids": [
+      451
+    ],
+    "section": "Container commands",
+    "source_passage": "`st.empty` is a special container that holds only one element at a time. Each write to an `st.empty` object replaces the previous content.",
+    "match": {
+      "cosine": 0.854,
+      "passage_overlap": 0.69,
+      "answer_support": 0.44,
+      "span_words": 23,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/layouts.md",
+    "original_passage": "st.empty inserts a container into the app that can hold a single element. Writing a new element to it replaces the previous one, and calling .empty() on it clears its content."
   },
   {
     "id": "eval_057",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you create a button that reveals a small floating container of content when clicked?",
     "answer": "Using st.popover('Label').",
-    "source_file": "corpus/docs/layouts.md",
-    "source_passage": "st.popover inserts a popover container. It is displayed as a button, and clicking it opens a floating panel that can hold other widgets and elements."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-16005",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/16005",
+    "source_file": "corpus/issues/issue-16005.json",
+    "gold_chunk_ids": [
+      2353
+    ],
+    "section": "Description",
+    "source_passage": "When an `st.popover` is used inside an `st.dialog`, the popover opens but its body\nis rendered underneath the dialog's interaction layer. Widgets inside the popover\n(e.g. a `selectbox`) cannot be interacted with, and clicking them lands on the\ndialog's dismissable overlay — which can close the dialog.",
+    "match": {
+      "cosine": 0.804,
+      "passage_overlap": 0.57,
+      "answer_support": 0.33,
+      "span_words": 47,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/layouts.md",
+    "original_passage": "st.popover inserts a popover container. It is displayed as a button, and clicking it opens a floating panel that can hold other widgets and elements."
   },
   {
     "id": "eval_058",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you show a modal dialog in Streamlit?",
     "answer": "Decorate a function with @st.dialog('Title') and call it to open the modal.",
-    "source_file": "corpus/docs/dialogs.md",
-    "source_passage": "The @st.dialog decorator turns a function into a modal dialog. Calling the function opens the dialog, and the elements inside the function are rendered within the modal overlay."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "issue-16005",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/16005",
+    "source_file": "corpus/issues/issue-16005.json",
+    "gold_chunk_ids": [
+      2353
+    ],
+    "section": "Description",
+    "source_passage": "- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen an `st.popover` is used inside an `st.dialog`, the popover opens but its body\nis rendered underneath the dialog's interaction layer.",
+    "match": {
+      "cosine": 0.754,
+      "passage_overlap": 0.56,
+      "answer_support": 0.43,
+      "span_words": 47,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/dialogs.md",
+    "original_passage": "The @st.dialog decorator turns a function into a modal dialog. Calling the function opens the dialog, and the elements inside the function are rendered within the modal overlay."
   },
   {
     "id": "eval_059",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you display an image in a Streamlit app?",
     "answer": "Using st.image(), which accepts a file path, URL, numpy array, or PIL image.",
-    "source_file": "corpus/docs/media.md",
-    "source_passage": "st.image displays an image or list of images. It accepts URLs, file paths, bytes, numpy arrays, and PIL images, and the caption parameter adds a text caption below."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-8563",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/8563",
+    "source_file": "corpus/issues/issue-8563.json",
+    "gold_chunk_ids": [
+      3232
+    ],
+    "section": "Discussion",
+    "source_passage": "The relationship between `st.image`'s existing `caption` parameter and the new alt text would need to be defined (caption is visual, alt text is for screen readers).",
+    "match": {
+      "cosine": 0.73,
+      "passage_overlap": 0.48,
+      "answer_support": 0.14,
+      "span_words": 26,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/media.md",
+    "original_passage": "st.image displays an image or list of images. It accepts URLs, file paths, bytes, numpy arrays, and PIL images, and the caption parameter adds a text caption below."
   },
   {
     "id": "eval_060",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you embed a video player?",
     "answer": "Using st.video(), which accepts a file path, URL, or bytes (including YouTube URLs).",
-    "source_file": "corpus/docs/media.md",
-    "source_passage": "st.video displays a video player. The data can be a local file path, a URL, raw bytes, or a YouTube link, and start_time sets the position at which playback begins."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "get-started__fundamentals__additional-features.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/get-started/fundamentals/additional-features",
+    "source_file": "corpus/docs/get-started__fundamentals__additional-features.md",
+    "gold_chunk_ids": [
+      1512
+    ],
+    "section": "Static file serving",
+    "source_passage": "When you use `st.image(<path-to-image>)` your Streamlit server will access the file and handle the necessary hosting so your app viewers can see it.",
+    "match": {
+      "cosine": 0.668,
+      "passage_overlap": 0.42,
+      "answer_support": 0.22,
+      "span_words": 23,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/media.md",
+    "original_passage": "st.video displays a video player. The data can be a local file path, a URL, raw bytes, or a YouTube link, and start_time sets the position at which playback begins."
   },
   {
     "id": "eval_061",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you play audio in a Streamlit app?",
     "answer": "Using st.audio().",
-    "source_file": "corpus/docs/media.md",
-    "source_passage": "st.audio displays an audio player. It accepts a file path, URL, or raw bytes, and format specifies the MIME type such as 'audio/mp3'."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__media___index.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/media",
+    "source_file": "corpus/docs/develop__api-reference__media___index.md",
+    "gold_chunk_ids": [
+      348
+    ],
+    "section": "Media elements",
+    "source_passage": "Display an audio player.\n\n```python\nst.audio(numpy_array)\nst.audio(audio_bytes)\nst.audio(file)\nst.audio(\"https://example.com/myaudio.mp3\", format=\"audio/mp3\")\n```",
+    "match": {
+      "cosine": 0.713,
+      "passage_overlap": 0.52,
+      "answer_support": 0.5,
+      "span_words": 11,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/media.md",
+    "original_passage": "st.audio displays an audio player. It accepts a file path, URL, or raw bytes, and format specifies the MIME type such as 'audio/mp3'."
   },
   {
     "id": "eval_062",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you insert a horizontal line to visually separate content?",
     "answer": "Using st.divider().",
-    "source_file": "corpus/docs/text.md",
-    "source_passage": "st.divider displays a horizontal rule in the app. It is a lightweight way to visually separate sections of content."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__text__divider.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/text/st.divider",
+    "source_file": "corpus/docs/develop__api-reference__text__divider.md",
+    "gold_chunk_ids": [
+      388
+    ],
+    "section": "",
+    "source_passage": "st.divider()  # 👈 Draws a horizontal rule",
+    "match": {
+      "cosine": 0.823,
+      "passage_overlap": 0.53,
+      "answer_support": 0.5,
+      "span_words": 7,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/text.md",
+    "original_passage": "st.divider displays a horizontal rule in the app. It is a lightweight way to visually separate sections of content."
   },
   {
     "id": "eval_063",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you control the spacing between columns created with st.columns?",
     "answer": "Use the gap parameter with values like 'small', 'medium', or 'large'.",
-    "source_file": "corpus/docs/layouts.md",
-    "source_passage": "st.columns accepts a gap parameter that sets the amount of horizontal space between columns. Allowed values are 'small', 'medium' (default), and 'large'."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-13005",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/13005",
+    "source_file": "corpus/issues/issue-13005.json",
+    "gold_chunk_ids": [
+      1903
+    ],
+    "section": "Description",
+    "source_passage": "`st.container` and `st.columns` both have a `gap` parameter but it's only possible to specify small/medium/large/None.",
+    "match": {
+      "cosine": 0.846,
+      "passage_overlap": 0.55,
+      "answer_support": 0.83,
+      "span_words": 15,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/layouts.md",
+    "original_passage": "st.columns accepts a gap parameter that sets the amount of horizontal space between columns. Allowed values are 'small', 'medium' (default), and 'large'."
   },
   {
     "id": "eval_064",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How can you draw a visible border around a group of elements?",
     "answer": "Use st.container(border=True).",
-    "source_file": "corpus/docs/layouts.md",
-    "source_passage": "Setting border=True on st.container draws a thin border around the container and its contents. This is useful for visually grouping related elements, such as a card."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__app-design__layouts-and-containers.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/design/layouts-and-containers",
+    "source_file": "corpus/docs/develop__concepts__app-design__layouts-and-containers.md",
+    "gold_chunk_ids": [
+      513
+    ],
+    "section": "`st.container`",
+    "source_passage": "with st.container(border=True):\n    st.write(\"This has a border around it.\")\n```",
+    "match": {
+      "cosine": 0.834,
+      "passage_overlap": 0.56,
+      "answer_support": 1.0,
+      "span_words": 9,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/layouts.md",
+    "original_passage": "Setting border=True on st.container draws a thin border around the container and its contents. This is useful for visually grouping related elements, such as a card."
   },
   {
     "id": "eval_065",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you make the app content use the full width of the browser window?",
     "answer": "Call st.set_page_config(layout='wide').",
-    "source_file": "corpus/docs/configuration.md",
-    "source_passage": "The layout argument of st.set_page_config accepts 'centered' (default) or 'wide'. With 'wide', the app content uses the full width of the browser window."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-1770",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/1770",
+    "source_file": "corpus/issues/issue-1770.json",
+    "gold_chunk_ids": [
+      2793
+    ],
+    "section": "Discussion",
+    "source_passage": "• layout (\"centered\" or \"wide\") – How the page content should be laid out. Defaults to “centered”, which constrains the elements into a centered column of fixed width;\r\n“wide” uses the entire screen.",
+    "match": {
+      "cosine": 0.79,
+      "passage_overlap": 0.79,
+      "answer_support": 0.75,
+      "span_words": 33,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/configuration.md",
+    "original_passage": "The layout argument of st.set_page_config accepts 'centered' (default) or 'wide'. With 'wide', the app content uses the full width of the browser window."
   },
   {
     "id": "eval_066",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you create a simple multipage app using a folder structure?",
     "answer": "Place additional Python scripts in a pages/ directory next to the main script; Streamlit automatically builds the page navigation.",
-    "source_file": "corpus/docs/multipage.md",
-    "source_passage": "To create a multipage app, add a pages/ directory next to your entrypoint file and put one Python script per page inside it. Streamlit detects these files and adds them to the sidebar navigation automatically."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "get-started__fundamentals__additional-features.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/get-started/fundamentals/additional-features",
+    "source_file": "corpus/docs/get-started__fundamentals__additional-features.md",
+    "gold_chunk_ids": [
+      1509
+    ],
+    "section": "Pages",
+    "source_passage": "```python\nimport streamlit as st\n\nst.markdown(\"# Page 3 🎉\")\nst.sidebar.markdown(\"# Page 3 🎉\")\n```\n\nNow run `streamlit run streamlit_app.py` and view your shiny new multipage app! The navigation menu will automatically appear, allowing users to switch between pages.",
+    "match": {
+      "cosine": 0.881,
+      "passage_overlap": 0.65,
+      "answer_support": 0.57,
+      "span_words": 38,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/multipage.md",
+    "original_passage": "To create a multipage app, add a pages/ directory next to your entrypoint file and put one Python script per page inside it. Streamlit detects these files and adds them to the sidebar navigation automatically."
   },
   {
     "id": "eval_067",
     "category": "Layouts & Media Display",
+    "question_type": "conceptual",
     "question": "Which functions let you define custom page navigation programmatically?",
     "answer": "st.Page() to define pages and st.navigation() to build the navigation menu and run the selected page.",
-    "source_file": "corpus/docs/multipage.md",
-    "source_passage": "For full control over navigation, define each page with st.Page and pass the list to st.navigation. The returned page object has a run() method that executes the selected page."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__multipage-apps__page-and-navigation.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/multipage-apps/page-and-navigation",
+    "source_file": "corpus/docs/develop__concepts__multipage-apps__page-and-navigation.md",
+    "gold_chunk_ids": [
+      928
+    ],
+    "section": "App structure",
+    "source_passage": "In this case, you can think of your entrypoint file like a picture frame around each of your pages.\n\nYou can only call `st.navigation` once per app run and you must call it from your entrypoint file. When a user selects a page in navigation (or is routed through a command like `st.switch_page`), `st.navigation` returns the selected page. You must manually execute that page with the `.run()` method.",
+    "match": {
+      "cosine": 0.842,
+      "passage_overlap": 0.54,
+      "answer_support": 0.71,
+      "span_words": 68,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/multipage.md",
+    "original_passage": "For full control over navigation, define each page with st.Page and pass the list to st.navigation. The returned page object has a run() method that executes the selected page."
   },
   {
     "id": "eval_068",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How do you programmatically switch to another page in a multipage app?",
     "answer": "Call st.switch_page().",
-    "source_file": "corpus/docs/multipage.md",
-    "source_passage": "st.switch_page programmatically navigates to another page of a multipage app. The target can be a file path relative to the entrypoint or an st.Page object."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-16611",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/16611",
+    "source_file": "corpus/issues/issue-16611.json",
+    "gold_chunk_ids": [
+      2502
+    ],
+    "section": "Discussion",
+    "source_passage": "- [#10572](https://github.com/streamlit/streamlit/issues/10572) — `st.switch_page` / `st.page_link` identify pages by `url_path` and can silently land on the wrong page instead of erroring. Same identity/fallback pattern as this AppTest hash mismatch.\n- [#8154](https://github.com/streamlit/streamlit/issues/8154) — AppTest page-path resolution (relative `st.page_link` paths). Related AppTest multipage-path handling, not a duplicate.",
+    "match": {
+      "cosine": 0.782,
+      "passage_overlap": 0.68,
+      "answer_support": 0.5,
+      "span_words": 45,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/multipage.md",
+    "original_passage": "st.switch_page programmatically navigates to another page of a multipage app. The target can be a file path relative to the entrypoint or an st.Page object."
   },
   {
     "id": "eval_069",
     "category": "Layouts & Media Display",
+    "question_type": "how-to",
     "question": "How can you render raw HTML inside st.markdown?",
     "answer": "Pass unsafe_allow_html=True to st.markdown().",
-    "source_file": "corpus/docs/text.md",
-    "source_passage": "By default, HTML tags in st.markdown are escaped. Setting unsafe_allow_html=True allows raw HTML to be rendered, but it should only be used with trusted content."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "issue-15211",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/15211",
+    "source_file": "corpus/issues/issue-15211.json",
+    "gold_chunk_ids": [
+      2101
+    ],
+    "section": "Description",
+    "source_passage": "st.markdown(\"<p>an example</p>\", unsafe_allow_html=True, help=\"test\")\n```\n\n2. Look at rendered output.",
+    "match": {
+      "cosine": 0.838,
+      "passage_overlap": 0.56,
+      "answer_support": 0.75,
+      "span_words": 10,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/text.md",
+    "original_passage": "By default, HTML tags in st.markdown are escaped. Setting unsafe_allow_html=True allows raw HTML to be rendered, but it should only be used with trusted content."
   },
   {
     "id": "eval_070",
     "category": "Layouts & Media Display",
+    "question_type": "conceptual",
     "question": "Which function displays a section header in the app?",
     "answer": "st.header(), with st.title() and st.subheader() for other heading levels.",
-    "source_file": "corpus/docs/text.md",
-    "source_passage": "Streamlit provides st.title, st.header, and st.subheader for headings of decreasing size. Each can optionally render a divider line beneath the text using the divider parameter."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-7501",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/7501",
+    "source_file": "corpus/issues/issue-7501.json",
+    "gold_chunk_ids": [
+      3085
+    ],
+    "section": "Discussion",
+    "source_passage": "You can do that by using e.g. `st.title(\"foo\", anchor=None)`, see docs [here](https://docs.streamlit.io/library/api-reference/text/st.title). The same works for `st.header` and `st.subheader`.",
+    "match": {
+      "cosine": 0.773,
+      "passage_overlap": 0.58,
+      "answer_support": 0.5,
+      "span_words": 19,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/text.md",
+    "original_passage": "Streamlit provides st.title, st.header, and st.subheader for headings of decreasing size. Each can optionally render a divider line beneath the text using the divider parameter."
   },
   {
     "id": "eval_071",
     "category": "Data Visualization & Formatting",
+    "question_type": "conceptual",
     "question": "Which function displays an interactive, sortable dataframe?",
     "answer": "st.dataframe().",
-    "source_file": "corpus/docs/data_display.md",
-    "source_passage": "st.dataframe displays a dataframe as an interactive table. Users can sort columns, resize them, search within the table, and download the data as CSV."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__app-design__dataframes.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/design/dataframes",
+    "source_file": "corpus/docs/develop__concepts__app-design__dataframes.md",
+    "gold_chunk_ids": [
+      491
+    ],
+    "section": "`st.dataframe` UI features",
+    "source_passage": "`st.dataframe` provides additional functionality by using [glide-data-grid](https://github.com/glideapps/glide-data-grid) under the hood:\n\n- **Column sorting**: To sort columns, select their headers, or select \"**Sort ascending**\" or \"**Sort descending**\" from the header menu ().\n- **Column resizing**: To resize columns, drag and drop column header borders, or select \"**Autosize**\" from the header menu.",
+    "match": {
+      "cosine": 0.829,
+      "passage_overlap": 0.71,
+      "answer_support": 1.0,
+      "span_words": 50,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/data_display.md",
+    "original_passage": "st.dataframe displays a dataframe as an interactive table. Users can sort columns, resize them, search within the table, and download the data as CSV."
   },
   {
     "id": "eval_072",
     "category": "Data Visualization & Formatting",
+    "question_type": "multi-part",
     "question": "What is the difference between st.table and st.dataframe?",
     "answer": "st.table renders a static table without interactivity, while st.dataframe renders an interactive, scrollable table.",
-    "source_file": "corpus/docs/data_display.md",
-    "source_passage": "st.table displays a static table. Unlike st.dataframe, it is not interactive, cannot be sorted or scrolled, and renders all rows directly on the page."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__data__table.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/data/st.table",
+    "source_file": "corpus/docs/develop__api-reference__data__table.md",
+    "gold_chunk_ids": [
+      335
+    ],
+    "section": "",
+    "source_passage": "Tip: Static tables with `st.table` are the most basic way to display dataframes. For the majority of cases, we recommend using [`st.dataframe`](/develop/api-reference/data/st.dataframe) to display interactive dataframes, and [`st.data_editor`](/develop/api-reference/data/st.data_editor) to let users edit dataframes.",
+    "match": {
+      "cosine": 0.885,
+      "passage_overlap": 0.29,
+      "answer_support": 0.44,
+      "span_words": 33,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/data_display.md",
+    "original_passage": "st.table displays a static table. Unlike st.dataframe, it is not interactive, cannot be sorted or scrolled, and renders all rows directly on the page."
   },
   {
     "id": "eval_073",
     "category": "Data Visualization & Formatting",
+    "question_type": "how-to",
     "question": "How do you quickly draw a line chart from a DataFrame?",
     "answer": "Using st.line_chart(df).",
-    "source_file": "corpus/docs/charts.md",
-    "source_passage": "st.line_chart displays a line chart from a dataframe or array. It is built on Altair and offers simple parameters such as x, y, color, and use_container_width."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__charts__altair_chart.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/charts/st.altair_chart",
+    "source_file": "corpus/docs/develop__api-reference__charts__altair_chart.md",
+    "gold_chunk_ids": [
+      212
+    ],
+    "section": "",
+    "source_passage": "Theming\nAltair charts are displayed using the Streamlit theme by default. This theme is sleek, user-friendly, and incorporates Streamlit's color palette.",
+    "match": {
+      "cosine": 0.786,
+      "passage_overlap": 0.6,
+      "answer_support": 0.5,
+      "span_words": 21,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/charts.md",
+    "original_passage": "st.line_chart displays a line chart from a dataframe or array. It is built on Altair and offers simple parameters such as x, y, color, and use_container_width."
   },
   {
     "id": "eval_074",
     "category": "Data Visualization & Formatting",
+    "question_type": "conceptual",
     "question": "Which function creates a simple bar chart?",
     "answer": "st.bar_chart().",
-    "source_file": "corpus/docs/charts.md",
-    "source_passage": "st.bar_chart displays a bar chart. Use the horizontal parameter to flip the orientation, and the stack parameter to control stacked or grouped bars."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-2090",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/2090",
+    "source_file": "corpus/issues/issue-2090.json",
+    "gold_chunk_ids": [
+      2800
+    ],
+    "section": "Discussion",
+    "source_passage": "Zooming in a categorical chart probably isn't all that useful anyway so you could probably disable interactions completely. \n\nI've found functionality in horizontal zooming.",
+    "match": {
+      "cosine": 0.753,
+      "passage_overlap": 0.5,
+      "answer_support": 0.0,
+      "span_words": 24,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/charts.md",
+    "original_passage": "st.bar_chart displays a bar chart. Use the horizontal parameter to flip the orientation, and the stack parameter to control stacked or grouped bars."
   },
   {
     "id": "eval_075",
     "category": "Data Visualization & Formatting",
+    "question_type": "conceptual",
     "question": "Which function creates a filled area chart?",
     "answer": "st.area_chart().",
-    "source_file": "corpus/docs/charts.md",
-    "source_passage": "st.area_chart displays an area chart from a dataframe or array. Multiple series are stacked by default."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__data___index.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/data",
+    "source_file": "corpus/docs/develop__api-reference__data___index.md",
+    "gold_chunk_ids": [
+      304
+    ],
+    "section": "Data elements",
+    "source_passage": "<RefCard href=\"/develop/api-reference/data/st.dataframe\">",
+    "match": {
+      "cosine": 0.731,
+      "passage_overlap": 0.47,
+      "answer_support": 0.0,
+      "span_words": 2,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/charts.md",
+    "original_passage": "st.area_chart displays an area chart from a dataframe or array. Multiple series are stacked by default."
   },
   {
     "id": "eval_076",
     "category": "Data Visualization & Formatting",
+    "question_type": "how-to",
     "question": "How do you create a scatter plot using Streamlit's native chart elements?",
     "answer": "Using st.scatter_chart().",
-    "source_file": "corpus/docs/charts.md",
-    "source_passage": "st.scatter_chart displays a scatter plot. The x and y parameters select the columns for each axis, and size and color can map additional columns to point size and color."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__charts__plotly_chart.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/charts/st.plotly_chart",
+    "source_file": "corpus/docs/develop__api-reference__charts__plotly_chart.md",
+    "gold_chunk_ids": [
+      222
+    ],
+    "section": "",
+    "source_passage": "Theming\nPlotly charts are displayed using the Streamlit theme by default. This theme is sleek, user-friendly, and incorporates Streamlit's color palette.",
+    "match": {
+      "cosine": 0.708,
+      "passage_overlap": 0.52,
+      "answer_support": 0.5,
+      "span_words": 21,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/charts.md",
+    "original_passage": "st.scatter_chart displays a scatter plot. The x and y parameters select the columns for each axis, and size and color can map additional columns to point size and color."
   },
   {
     "id": "eval_077",
     "category": "Data Visualization & Formatting",
+    "question_type": "how-to",
     "question": "How do you display geographic points on a map?",
     "answer": "Using st.map() with a DataFrame that has latitude and longitude columns.",
-    "source_file": "corpus/docs/charts.md",
-    "source_passage": "st.map displays a map with scatterplot overlays. The data must contain columns named 'lat' or 'latitude' and 'lon' or 'longitude', or you can specify the columns explicitly."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "get-started__fundamentals__main-concepts.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/get-started/fundamentals/main-concepts",
+    "source_file": "corpus/docs/get-started__fundamentals__main-concepts.md",
+    "gold_chunk_ids": [
+      1533
+    ],
+    "section": "Plot a map",
+    "source_passage": "map_data = pd.DataFrame(\n    np.random.randn(1000, 2) / [50, 50] + [37.76, -122.4],\n    columns=['lat', 'lon'])",
+    "match": {
+      "cosine": 0.804,
+      "passage_overlap": 0.48,
+      "answer_support": 0.4,
+      "span_words": 13,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/charts.md",
+    "original_passage": "st.map displays a map with scatterplot overlays. The data must contain columns named 'lat' or 'latitude' and 'lon' or 'longitude', or you can specify the columns explicitly."
   },
   {
     "id": "eval_078",
     "category": "Data Visualization & Formatting",
+    "question_type": "how-to",
     "question": "How do you display a Matplotlib figure in Streamlit?",
     "answer": "Pass the figure to st.pyplot(fig).",
-    "source_file": "corpus/docs/charts.md",
-    "source_passage": "st.pyplot displays a matplotlib.pyplot figure. Pass an explicit Figure object to avoid thread-safety issues that can occur with the global pyplot state."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__charts__pyplot.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/charts/st.pyplot",
+    "source_file": "corpus/docs/develop__api-reference__charts__pyplot.md",
+    "gold_chunk_ids": [
+      225
+    ],
+    "section": "",
+    "source_passage": "Note: Always pass a Matplotlib `Figure` to `st.pyplot`.",
+    "match": {
+      "cosine": 0.847,
+      "passage_overlap": 0.41,
+      "answer_support": 1.0,
+      "span_words": 8,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/charts.md",
+    "original_passage": "st.pyplot displays a matplotlib.pyplot figure. Pass an explicit Figure object to avoid thread-safety issues that can occur with the global pyplot state."
   },
   {
     "id": "eval_079",
     "category": "Data Visualization & Formatting",
+    "question_type": "how-to",
     "question": "How do you render an interactive Plotly chart?",
     "answer": "Using st.plotly_chart(fig).",
-    "source_file": "corpus/docs/charts.md",
-    "source_passage": "st.plotly_chart displays an interactive Plotly chart. It supports selection events through the on_select parameter and the use_container_width option."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__charts__plotly_chart.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/charts/st.plotly_chart",
+    "source_file": "corpus/docs/develop__api-reference__charts__plotly_chart.md",
+    "gold_chunk_ids": [
+      222
+    ],
+    "section": "",
+    "source_passage": "<Autofunction function=\"streamlit.plotly_chart\" />\n\nChart selections\n<Autofunction function=\"PlotlyState\" />\n\n<Autofunction function=\"PlotlySelectionState\" />\n\nTheming\nPlotly charts are displayed using the Streamlit theme by default.",
+    "match": {
+      "cosine": 0.831,
+      "passage_overlap": 0.61,
+      "answer_support": 1.0,
+      "span_words": 22,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/charts.md",
+    "original_passage": "st.plotly_chart displays an interactive Plotly chart. It supports selection events through the on_select parameter and the use_container_width option."
   },
   {
     "id": "eval_080",
     "category": "Data Visualization & Formatting",
+    "question_type": "how-to",
     "question": "How do you render an Altair chart?",
     "answer": "Using st.altair_chart(chart).",
-    "source_file": "corpus/docs/charts.md",
-    "source_passage": "st.altair_chart displays a chart created with the Altair library. By default it uses the Streamlit theme, which can be disabled by setting theme=None."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__charts__altair_chart.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/charts/st.altair_chart",
+    "source_file": "corpus/docs/develop__api-reference__charts__altair_chart.md",
+    "gold_chunk_ids": [
+      212
+    ],
+    "section": "",
+    "source_passage": "st.altair_chart(chart, theme=None, use_container_width=True)\n```\n\nClick the tabs in the interactive app below to see the charts with the Streamlit theme enabled and disabled.\n\n<Cloud name=\"doc-altair-chart\" height=\"500px\" />",
+    "match": {
+      "cosine": 0.892,
+      "passage_overlap": 0.73,
+      "answer_support": 1.0,
+      "span_words": 27,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/charts.md",
+    "original_passage": "st.altair_chart displays a chart created with the Altair library. By default it uses the Streamlit theme, which can be disabled by setting theme=None."
   },
   {
     "id": "eval_081",
     "category": "Data Visualization & Formatting",
+    "question_type": "how-to",
     "question": "How do you display a Python dict or list as an expandable JSON tree?",
     "answer": "Using st.json().",
-    "source_file": "corpus/docs/data_display.md",
-    "source_passage": "st.json displays an object or string as a pretty-printed, interactive JSON tree. The expanded parameter controls whether the tree is initially expanded."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference___index.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference",
+    "source_file": "corpus/docs/develop__api-reference___index.md",
+    "gold_chunk_ids": [
+      166
+    ],
+    "section": "Data elements",
+    "source_passage": "Display object or string as a pretty-printed JSON string.",
+    "match": {
+      "cosine": 0.672,
+      "passage_overlap": 0.6,
+      "answer_support": 0.5,
+      "span_words": 9,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/data_display.md",
+    "original_passage": "st.json displays an object or string as a pretty-printed, interactive JSON tree. The expanded parameter controls whether the tree is initially expanded."
   },
   {
     "id": "eval_082",
     "category": "Data Visualization & Formatting",
+    "question_type": "how-to",
     "question": "How do you customize how individual columns are displayed in st.dataframe or st.data_editor?",
     "answer": "Use the column_config parameter with st.column_config helpers such as NumberColumn or LinkColumn.",
-    "source_file": "corpus/docs/data_display.md",
-    "source_passage": "The column_config parameter lets you configure the display and editing behavior of individual columns. Use helpers from st.column_config, such as TextColumn, NumberColumn, CheckboxColumn, and LinkColumn."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "develop__concepts__app-design__dataframes.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/design/dataframes",
+    "source_file": "corpus/docs/develop__concepts__app-design__dataframes.md",
+    "gold_chunk_ids": [
+      502
+    ],
+    "section": "Configuring columns",
+    "source_passage": "You can configure the display and editing behavior of columns in `st.dataframe` and `st.data_editor` via the [Column configuration API](/develop/api-reference/data/st.column_config).",
+    "match": {
+      "cosine": 0.854,
+      "passage_overlap": 0.57,
+      "answer_support": 0.17,
+      "span_words": 19,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/data_display.md",
+    "original_passage": "The column_config parameter lets you configure the display and editing behavior of individual columns. Use helpers from st.column_config, such as TextColumn, NumberColumn, CheckboxColumn, and LinkColumn."
   },
   {
     "id": "eval_083",
     "category": "Data Visualization & Formatting",
+    "question_type": "how-to",
     "question": "How do you display a progress bar?",
     "answer": "Using st.progress(value), where value is an integer from 0 to 100 or a float from 0.0 to 1.0.",
-    "source_file": "corpus/docs/status.md",
-    "source_passage": "st.progress displays a progress bar. The value is an int between 0 and 100 or a float between 0.0 and 1.0, and the bar can be updated by calling update() on the returned object."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "develop__concepts__app-design__animate-elements.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/design/animate",
+    "source_file": "corpus/docs/develop__concepts__app-design__animate-elements.md",
+    "gold_chunk_ids": [
+      455
+    ],
+    "section": "`st.progress`",
+    "source_passage": "Update a progress bar by calling `.progress()` on the returned object.",
+    "match": {
+      "cosine": 0.794,
+      "passage_overlap": 0.58,
+      "answer_support": 0.2,
+      "span_words": 11,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/status.md",
+    "original_passage": "st.progress displays a progress bar. The value is an int between 0 and 100 or a float between 0.0 and 1.0, and the bar can be updated by calling update() on the returned object."
   },
   {
     "id": "eval_084",
     "category": "Data Visualization & Formatting",
+    "question_type": "multi-part",
     "question": "What is the 'magic' command in Streamlit and what does st.write do?",
     "answer": "st.write is a versatile function that renders many types of objects (text, DataFrames, charts, dicts, etc.). The magic feature automatically renders variables or literals on their own line as if they were passed to st.write.",
-    "source_file": "corpus/docs/text.md",
-    "source_passage": "st.write is the Swiss Army knife of Streamlit commands: it accepts strings, dataframes, charts, dicts, and more, and picks a suitable display for each. With magic, any variable or literal on a line by itself is automatically displayed as if passed to st.write."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "get-started__fundamentals__main-concepts.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/get-started/fundamentals/main-concepts",
+    "source_file": "corpus/docs/get-started__fundamentals__main-concepts.md",
+    "gold_chunk_ids": [
+      1530
+    ],
+    "section": "Write a data frame",
+    "source_passage": "Along with [magic commands](/develop/api-reference/write-magic/magic),\n[`st.write()`](/develop/api-reference/write-magic/st.write) is Streamlit's \"Swiss Army knife\". You\ncan pass almost anything to [`st.write()`](/develop/api-reference/write-magic/st.write):\ntext, data, Matplotlib figures, Altair charts, and more.",
+    "match": {
+      "cosine": 0.868,
+      "passage_overlap": 0.6,
+      "answer_support": 0.24,
+      "span_words": 25,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/text.md",
+    "original_passage": "st.write is the Swiss Army knife of Streamlit commands: it accepts strings, dataframes, charts, dicts, and more, and picks a suitable display for each. With magic, any variable or literal on a line by itself is automatically displayed as if passed to st.write."
   },
   {
     "id": "eval_085",
     "category": "Data Visualization & Formatting",
+    "question_type": "how-to",
     "question": "How do you display a formatted code block with syntax highlighting?",
     "answer": "Using st.code(code, language='python').",
-    "source_file": "corpus/docs/text.md",
-    "source_passage": "st.code displays a code block with syntax highlighting and a built-in copy button. The language parameter selects the highlighting, and line_numbers adds a line number gutter."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__text___index.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/text",
+    "source_file": "corpus/docs/develop__api-reference__text___index.md",
+    "gold_chunk_ids": [
+      383
+    ],
+    "section": "Formatted text",
+    "source_passage": "Display a code block with optional syntax highlighting.\n\n```python\nst.code(\"a = 1234\")\n```",
+    "match": {
+      "cosine": 0.707,
+      "passage_overlap": 0.45,
+      "answer_support": 0.5,
+      "span_words": 13,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/text.md",
+    "original_passage": "st.code displays a code block with syntax highlighting and a built-in copy button. The language parameter selects the highlighting, and line_numbers adds a line number gutter."
   },
   {
     "id": "eval_086",
     "category": "Configuration, Security & Deployment",
+    "question_type": "conceptual",
     "question": "Where is the Streamlit configuration file located for a project?",
     "answer": ".streamlit/config.toml in the project directory (or ~/.streamlit/config.toml for global settings).",
-    "source_file": "corpus/docs/configuration.md",
-    "source_passage": "Streamlit reads configuration options from .streamlit/config.toml in the current working directory and from ~/.streamlit/config.toml for global settings. Project-level options take precedence over global ones."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__configuration__options.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/configuration/options",
+    "source_file": "corpus/docs/develop__concepts__configuration__options.md",
+    "gold_chunk_ids": [
+      703
+    ],
+    "section": "Working with configuration options",
+    "source_passage": "command line flags take precedence over environment variables when the same configuration option is provided multiple times.\n\nNote: If you change theme settings in `.streamlit/config.toml` _while_ the app is running, these changes will reflect immediately.",
+    "match": {
+      "cosine": 0.844,
+      "passage_overlap": 0.68,
+      "answer_support": 0.86,
+      "span_words": 35,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/configuration.md",
+    "original_passage": "Streamlit reads configuration options from .streamlit/config.toml in the current working directory and from ~/.streamlit/config.toml for global settings. Project-level options take precedence over global ones."
   },
   {
     "id": "eval_087",
     "category": "Configuration, Security & Deployment",
+    "question_type": "how-to",
     "question": "How do you run a Streamlit app on a port other than 8501?",
     "answer": "Use the --server.port flag, e.g. streamlit run app.py --server.port 8080.",
-    "source_file": "corpus/docs/configuration.md",
-    "source_passage": "The server.port option sets the port on which the app is served. It can be set in config.toml or passed on the command line, for example streamlit run app.py --server.port 8080."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-7426",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/7426",
+    "source_file": "corpus/issues/issue-7426.json",
+    "gold_chunk_ids": [
+      3053
+    ],
+    "section": "Description",
+    "source_passage": "# The port where the server will listen for browser connections.\n\n# Default: 8501\n# The value below was set in /[HOME]/.streamlit/config.toml\nport = 8501\n\n# The base path for the URL where Streamlit should be served from.",
+    "match": {
+      "cosine": 0.776,
+      "passage_overlap": 0.85,
+      "answer_support": 0.6,
+      "span_words": 38,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/configuration.md",
+    "original_passage": "The server.port option sets the port on which the app is served. It can be set in config.toml or passed on the command line, for example streamlit run app.py --server.port 8080."
   },
   {
     "id": "eval_088",
     "category": "Configuration, Security & Deployment",
+    "question_type": "how-to",
     "question": "How do you access a secret value in your app code?",
     "answer": "Use st.secrets, e.g. st.secrets['db_password'] or st.secrets.db_password.",
-    "source_file": "corpus/docs/configuration.md",
-    "source_passage": "Values defined in secrets.toml are available through the st.secrets object. Access them with dictionary syntax, such as st.secrets['api_key'], or with attribute notation."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__connections__secrets.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/connections/st.secrets",
+    "source_file": "corpus/docs/develop__api-reference__connections__secrets.md",
+    "gold_chunk_ids": [
+      277
+    ],
+    "section": "st.secrets",
+    "source_passage": "`st.secrets` provides a dictionary-like interface to access secrets stored in a `secrets.toml` file. It behaves similarly to `st.session_state`. `st.secrets` can be used with both key and attribute notation.",
+    "match": {
+      "cosine": 0.85,
+      "passage_overlap": 0.45,
+      "answer_support": 0.5,
+      "span_words": 28,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/configuration.md",
+    "original_passage": "Values defined in secrets.toml are available through the st.secrets object. Access them with dictionary syntax, such as st.secrets['api_key'], or with attribute notation."
   },
   {
     "id": "eval_089",
     "category": "Configuration, Security & Deployment",
+    "question_type": "how-to",
     "question": "How do you provide secrets to an app deployed on Streamlit Community Cloud?",
     "answer": "Paste the contents of secrets.toml into the app's Secrets settings in the Community Cloud dashboard.",
-    "source_file": "corpus/docs/deployment.md",
-    "source_passage": "Community Cloud does not read secrets from your repository. Open the app's Settings, choose Secrets, and paste your secrets in TOML format; they are then exposed through st.secrets."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "deploy__community-cloud__deploy-your-app__secrets-management.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/secrets-management",
+    "source_file": "corpus/docs/deploy__community-cloud__deploy-your-app__secrets-management.md",
+    "gold_chunk_ids": [
+      19
+    ],
+    "section": "How to use secrets management",
+    "source_passage": "Community Cloud lets you save your secrets within your app's settings. When developing locally, you can use `st.secrets` in your code to read secrets from a `.streamlit/secrets.toml` file. However, this `secrets.toml` file should never be committed to your repository. Instead, when you deploy your app, you can paste the contents of your `secrets.toml` file into the \"**Advanced settings**\" dialog.",
+    "match": {
+      "cosine": 0.916,
+      "passage_overlap": 0.65,
+      "answer_support": 0.89,
+      "span_words": 59,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/deployment.md",
+    "original_passage": "Community Cloud does not read secrets from your repository. Open the app's Settings, choose Secrets, and paste your secrets in TOML format; they are then exposed through st.secrets."
   },
   {
     "id": "eval_090",
     "category": "Configuration, Security & Deployment",
+    "question_type": "how-to",
     "question": "How can you customize the app's color theme?",
     "answer": "Add a [theme] section to .streamlit/config.toml with options such as primaryColor, backgroundColor, secondaryBackgroundColor, textColor, and font.",
-    "source_file": "corpus/docs/theming.md",
-    "source_passage": "Theme options are defined under the [theme] section of config.toml. Available options include primaryColor, backgroundColor, secondaryBackgroundColor, textColor, and font."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__configuration__config-toml.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/configuration/config.toml",
+    "source_file": "corpus/docs/develop__api-reference__configuration__config-toml.md",
+    "gold_chunk_ids": [
+      260
+    ],
+    "section": "Theme",
+    "source_passage": "# Any theme options defined in the app's config.toml file will override\n# those defined in the TOML theme file.\nbase =\n\n# Primary accent color.\nprimaryColor =",
+    "match": {
+      "cosine": 0.83,
+      "passage_overlap": 0.83,
+      "answer_support": 0.92,
+      "span_words": 28,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/theming.md",
+    "original_passage": "Theme options are defined under the [theme] section of config.toml. Available options include primaryColor, backgroundColor, secondaryBackgroundColor, textColor, and font."
   },
   {
     "id": "eval_091",
     "category": "Configuration, Security & Deployment",
+    "question_type": "conceptual",
     "question": "What does st.connection provide?",
     "answer": "It creates or retrieves a cached connection object to a data source such as a SQL database, configured through secrets.toml.",
-    "source_file": "corpus/docs/connections.md",
-    "source_passage": "st.connection creates and returns a connection to an external data source, such as a SQL database or Snowflake. Connections are cached automatically and read their credentials from the [connections] section of secrets.toml."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__connections__connecting-to-data.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/connections/connecting-to-data",
+    "source_file": "corpus/docs/develop__concepts__connections__connecting-to-data.md",
+    "gold_chunk_ids": [
+      753
+    ],
+    "section": "Advanced SQLConnection configuration",
+    "source_passage": "It will take a single URL argument or attempt to construct a URL from several parts (username, database, host, and so on) using [`SQLAlchemy.engine.URL.create()`](https://docs.sqlalchemy.org/en/20/core/engines.html#sqlalchemy.engine.URL.create).\n\nSeveral popular SQLAlchemy dialects, such as Snowflake and Google BigQuery, can be configured using additional arguments to `create_engine()` besides the URL. These can be passed as `**kwargs` to the [st.connection](/develop/api-reference/connections/st.connection) call directly or specified in an additional secrets section called `create_engine_kwargs`.",
+    "match": {
+      "cosine": 0.761,
+      "passage_overlap": 0.63,
+      "answer_support": 0.46,
+      "span_words": 65,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/connections.md",
+    "original_passage": "st.connection creates and returns a connection to an external data source, such as a SQL database or Snowflake. Connections are cached automatically and read their credentials from the [connections] section of secrets.toml."
   },
   {
     "id": "eval_092",
     "category": "Configuration, Security & Deployment",
+    "question_type": "conceptual",
     "question": "What is required to deploy an app on Streamlit Community Cloud?",
     "answer": "The app code must be in a GitHub repository, and you select the repo, branch, and main file when deploying.",
-    "source_file": "corpus/docs/deployment.md",
-    "source_passage": "To deploy on Community Cloud, push your app to a GitHub repository, then choose the repository, branch, and entrypoint file in the deployment dialog."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "deploy__community-cloud__deploy-your-app__deploy.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy",
+    "source_file": "corpus/docs/deploy__community-cloud__deploy-your-app__deploy.md",
+    "gold_chunk_ids": [
+      10
+    ],
+    "section": "Deploy your app on Community Cloud",
+    "source_passage": "Fill in your repository, branch, and file path. Alternatively, to paste a link directly to `your_app.py` on GitHub, click \"**Paste GitHub URL**.\"\n1. Optional: In the \"App URL\" field, choose a subdomain for your new app.\n\n   Every Community Cloud app is deployed to a subdomain on `streamlit.app`, but you can change your app's subdomain at any time.",
+    "match": {
+      "cosine": 0.872,
+      "passage_overlap": 0.81,
+      "answer_support": 0.5,
+      "span_words": 57,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/deployment.md",
+    "original_passage": "To deploy on Community Cloud, push your app to a GitHub repository, then choose the repository, branch, and entrypoint file in the deployment dialog."
   },
   {
     "id": "eval_093",
     "category": "Configuration, Security & Deployment",
+    "question_type": "how-to",
     "question": "How do you specify the Python dependencies for a deployed Streamlit app?",
     "answer": "List them in a requirements.txt file at the root of the repository.",
-    "source_file": "corpus/docs/deployment.md",
-    "source_passage": "Streamlit Community Cloud installs the packages listed in requirements.txt before starting your app. Place this file in the repository root or in the same directory as your entrypoint file."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "deploy__community-cloud__deploy-your-app__app-dependencies.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/app-dependencies",
+    "source_file": "corpus/docs/deploy__community-cloud__deploy-your-app__app-dependencies.md",
+    "gold_chunk_ids": [
+      5
+    ],
+    "section": "App dependencies for your Community Cloud app",
+    "source_passage": "Optional: To manage any external dependencies, add a `packages.txt` file.\n\nNote: Python requirements files should be placed either in the root of your repository or in the same\ndirectory as your app's entrypoint file.",
+    "match": {
+      "cosine": 0.828,
+      "passage_overlap": 0.75,
+      "answer_support": 0.67,
+      "span_words": 34,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/deployment.md",
+    "original_passage": "Streamlit Community Cloud installs the packages listed in requirements.txt before starting your app. Place this file in the repository root or in the same directory as your entrypoint file."
   },
   {
     "id": "eval_094",
     "category": "Configuration, Security & Deployment",
+    "question_type": "how-to",
     "question": "How do you prevent Streamlit from automatically opening a browser tab when the server starts?",
     "answer": "Set server.headless = true, for example with --server.headless true.",
-    "source_file": "corpus/docs/configuration.md",
-    "source_passage": "When server.headless is set to true, Streamlit does not try to open a browser window on startup. This is the default when running in environments without a display, such as a container."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "kb__deployments__remote-start.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/knowledge-base/deploy/remote-start",
+    "source_file": "corpus/docs/kb__deployments__remote-start.md",
+    "gold_chunk_ids": [
+      1623
+    ],
+    "section": "Symptom #1: The app never loads",
+    "source_passage": "Below are three example\nfixes:\n\n- **Try port 80:** Some hosts expose port 80 by default. To\n  set Streamlit to use that port, start Streamlit with the `--server.port`\n  option:",
+    "match": {
+      "cosine": 0.779,
+      "passage_overlap": 0.57,
+      "answer_support": 0.5,
+      "span_words": 29,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/configuration.md",
+    "original_passage": "When server.headless is set to true, Streamlit does not try to open a browser window on startup. This is the default when running in environments without a display, such as a container."
   },
   {
     "id": "eval_095",
     "category": "Configuration, Security & Deployment",
+    "question_type": "version",
     "question": "How do you avoid committing secrets to version control?",
     "answer": "Add .streamlit/secrets.toml to your .gitignore file.",
-    "source_file": "corpus/docs/configuration.md",
-    "source_passage": "Never commit secrets.toml to source control. Add .streamlit/secrets.toml to your .gitignore so that credentials stay on your machine."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "develop__concepts__connections__secrets-management.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/connections/secrets-management",
+    "source_file": "corpus/docs/develop__concepts__connections__secrets-management.md",
+    "gold_chunk_ids": [
+      759
+    ],
+    "section": "Develop locally and set up secrets",
+    "source_passage": "In a **per-project secrets file** at `$CWD/.streamlit/secrets.toml`, where `$CWD` is the folder you're running Streamlit from. If both a global secrets file and a per-project secrets file exist, _secrets in the per-project file overwrite those defined in the global file_.\n\nImportant: Add this file to your `.gitignore` so you don't commit your secrets!",
+    "match": {
+      "cosine": 0.829,
+      "passage_overlap": 0.53,
+      "answer_support": 1.0,
+      "span_words": 53,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/configuration.md",
+    "original_passage": "Never commit secrets.toml to source control. Add .streamlit/secrets.toml to your .gitignore so that credentials stay on your machine."
   },
   {
     "id": "eval_096",
     "category": "Configuration, Security & Deployment",
+    "question_type": "how-to",
     "question": "How do you add user authentication to a Streamlit app using OpenID Connect?",
     "answer": "Configure an [auth] section in secrets.toml with your identity provider details, then use st.login() and st.logout() and read user info from st.user.",
-    "source_file": "corpus/docs/authentication.md",
-    "source_passage": "To authenticate users with an OpenID Connect provider, configure the [auth] section in secrets.toml, call st.login() to start the sign-in flow, and read the user's identity from st.user. Use st.logout() to end the session."
+    "answerable": true,
+    "split": "test",
+    "doc_id": "develop__concepts__connections__authentication.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/connections/authentication",
+    "source_file": "corpus/docs/develop__concepts__connections__authentication.md",
+    "gold_chunk_ids": [
+      744
+    ],
+    "section": "A simple example",
+    "source_passage": "If you use Google Identity as your identity provider, a basic configuration for local development will look like the following TOML file:\n\n`.streamlit/secrets.toml`:\n\n```toml\n[auth]\nredirect_uri = \"http://localhost:8501/oauth2callback\"\ncookie_secret = \"xxx\"\nclient_id = \"xxx\"\nclient_secret = \"xxx\"\nserver_metadata_url = \"https://accounts.google.com/.well-known/openid-configuration\"\n```",
+    "match": {
+      "cosine": 0.801,
+      "passage_overlap": 0.58,
+      "answer_support": 0.57,
+      "span_words": 41,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/authentication.md",
+    "original_passage": "To authenticate users with an OpenID Connect provider, configure the [auth] section in secrets.toml, call st.login() to start the sign-in flow, and read the user's identity from st.user. Use st.logout() to end the session."
   },
   {
     "id": "eval_097",
     "category": "Configuration, Security & Deployment",
+    "question_type": "conceptual",
     "question": "Which server option enables protection against cross-site request forgery?",
     "answer": "server.enableXsrfProtection, which is enabled by default.",
-    "source_file": "corpus/docs/configuration.md",
-    "source_passage": "The server.enableXsrfProtection option enables cross-site request forgery protection for the app. It is true by default and should only be disabled if you understand the security implications."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "issue-9397",
+    "source_type": "issue",
+    "url": "https://github.com/streamlit/streamlit/issues/9397",
+    "source_file": "corpus/issues/issue-9397.json",
+    "gold_chunk_ids": [
+      3314,
+      3315
+    ],
+    "section": "Discussion",
+    "source_passage": "sorry, I had a typo in previous comment\r\n\r\nDid you try \r\n\r\n```toml\r\n[server]\r\nenableCORS = false\r\nenableXsrfProtection = false\r\n```\r\n\r\n?",
+    "match": {
+      "cosine": 0.815,
+      "passage_overlap": 0.56,
+      "answer_support": 0.5,
+      "span_words": 21,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/configuration.md",
+    "original_passage": "The server.enableXsrfProtection option enables cross-site request forgery protection for the app. It is true by default and should only be disabled if you understand the security implications."
   },
   {
     "id": "eval_098",
     "category": "Configuration, Security & Deployment",
+    "question_type": "conceptual",
     "question": "What endpoint can be used for health checks when deploying Streamlit in a container?",
     "answer": "/_stcore/health, which returns 'ok' when the server is running.",
-    "source_file": "corpus/docs/deployment.md",
-    "source_passage": "When running Streamlit in Docker or behind a load balancer, you can use the /_stcore/health endpoint as a health check. It responds with ok when the server is healthy."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__api-reference__configuration__config-toml.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/api-reference/configuration/config.toml",
+    "source_file": "corpus/docs/develop__api-reference__configuration__config-toml.md",
+    "gold_chunk_ids": [
+      257
+    ],
+    "section": "Server",
+    "source_passage": "# If True, Streamlit will use a recursive object graph traversal to\n# calculate memory usage statistics for the /_stcore/metrics endpoint.",
+    "match": {
+      "cosine": 0.763,
+      "passage_overlap": 0.73,
+      "answer_support": 0.6,
+      "span_words": 21,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/deployment.md",
+    "original_passage": "When running Streamlit in Docker or behind a load balancer, you can use the /_stcore/health endpoint as a health check. It responds with ok when the server is healthy."
   },
   {
     "id": "eval_099",
     "category": "Configuration, Security & Deployment",
+    "question_type": "how-to",
     "question": "How can you write automated tests for a Streamlit app without a browser?",
     "answer": "Use Streamlit's AppTest framework (streamlit.testing.v1.AppTest), which runs the script headlessly and lets you simulate widget interactions.",
-    "source_file": "corpus/docs/testing.md",
-    "source_passage": "AppTest simulates a running Streamlit app without a browser. Create one with AppTest.from_file('app.py'), call run(), interact with widgets such as at.button[0].click(), and assert on the resulting elements."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "develop__concepts__app-testing__get-started.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/develop/concepts/app-testing/get-started",
+    "source_file": "corpus/docs/develop__concepts__app-testing__get-started.md",
+    "gold_chunk_ids": [
+      565,
+      570
+    ],
+    "section": "How to initialize and run a simulated app",
+    "source_passage": "```python\n\"\"\"test_app.py\"\"\"\nfrom streamlit.testing.v1 import AppTest\n\ndef test_increment_and_add():\n    \"\"\"A user increments the number input, then clicks Add\"\"\"\n    at = AppTest.from_file(\"app.py\").run()\n    at.number_input[0].increment().run()\n    at.button[0].click().run()\n    assert at.markdown[0].value == \"Beans counted: 1\"\n```",
+    "match": {
+      "cosine": 0.879,
+      "passage_overlap": 0.66,
+      "answer_support": 0.36,
+      "span_words": 29,
+      "needs_review": true
+    },
+    "original_source_file": "corpus/docs/testing.md",
+    "original_passage": "AppTest simulates a running Streamlit app without a browser. Create one with AppTest.from_file('app.py'), call run(), interact with widgets such as at.button[0].click(), and assert on the resulting elements."
   },
   {
     "id": "eval_100",
     "category": "Configuration, Security & Deployment",
+    "question_type": "multi-part",
     "question": "What is the default maximum size for files uploaded with st.file_uploader, and how can it be changed?",
     "answer": "The default limit is 200 MB per file. Change it with the server.maxUploadSize configuration option or the --server.maxUploadSize flag.",
-    "source_file": "corpus/docs/configuration.md",
-    "source_passage": "The server.maxUploadSize option sets the maximum size, in megabytes, of files uploaded through st.file_uploader. The default value is 200."
+    "answerable": true,
+    "split": "dev",
+    "doc_id": "kb__deployments__increase-upload-limit-cloud.md",
+    "source_type": "doc",
+    "url": "https://docs.streamlit.io/knowledge-base/deploy/increase-file-uploader-limit-streamlit-cloud",
+    "source_file": "corpus/docs/kb__deployments__increase-upload-limit-cloud.md",
+    "gold_chunk_ids": [
+      1617
+    ],
+    "section": "Overview",
+    "source_passage": "By default, files uploaded using [`st.file_uploader()`](/develop/api-reference/widgets/st.file_uploader) are limited to 200MB. You can configure this using the `server.maxUploadSize` config option.\n\nStreamlit provides [four different ways to set configuration options](/develop/concepts/configuration):",
+    "match": {
+      "cosine": 0.803,
+      "passage_overlap": 0.74,
+      "answer_support": 0.67,
+      "span_words": 28,
+      "needs_review": false
+    },
+    "original_source_file": "corpus/docs/configuration.md",
+    "original_passage": "The server.maxUploadSize option sets the maximum size, in megabytes, of files uploaded through st.file_uploader. The default value is 200."
+  },
+  {
+    "id": "eval_101",
+    "category": "Other library",
+    "question_type": "unanswerable",
+    "question": "How do I limit the number of concurrent requests in Gradio's queue?",
+    "answer": "I don't know.",
+    "answerable": false,
+    "split": "dev",
+    "doc_id": null,
+    "source_type": null,
+    "url": null,
+    "source_file": null,
+    "gold_chunk_ids": [],
+    "source_passage": "",
+    "match": {
+      "needs_review": true
+    }
+  },
+  {
+    "id": "eval_102",
+    "category": "Other library",
+    "question_type": "unanswerable",
+    "question": "How do I define a callback with the @app.callback decorator in Dash?",
+    "answer": "I don't know.",
+    "answerable": false,
+    "split": "dev",
+    "doc_id": null,
+    "source_type": null,
+    "url": null,
+    "source_file": null,
+    "gold_chunk_ids": [],
+    "source_passage": "",
+    "match": {
+      "needs_review": true
+    }
+  },
+  {
+    "id": "eval_103",
+    "category": "Other library",
+    "question_type": "unanswerable",
+    "question": "How do I run database migrations in Django?",
+    "answer": "I don't know.",
+    "answerable": false,
+    "split": "dev",
+    "doc_id": null,
+    "source_type": null,
+    "url": null,
+    "source_file": null,
+    "gold_chunk_ids": [],
+    "source_passage": "",
+    "match": {
+      "needs_review": true
+    }
+  },
+  {
+    "id": "eval_104",
+    "category": "Other library",
+    "question_type": "unanswerable",
+    "question": "How do I register a Blueprint in Flask?",
+    "answer": "I don't know.",
+    "answerable": false,
+    "split": "test",
+    "doc_id": null,
+    "source_type": null,
+    "url": null,
+    "source_file": null,
+    "gold_chunk_ids": [],
+    "source_passage": "",
+    "match": {
+      "needs_review": true
+    }
+  },
+  {
+    "id": "eval_105",
+    "category": "Other library",
+    "question_type": "unanswerable",
+    "question": "What does the num_workers argument of PyTorch's DataLoader do?",
+    "answer": "I don't know.",
+    "answerable": false,
+    "split": "dev",
+    "doc_id": null,
+    "source_type": null,
+    "url": null,
+    "source_file": null,
+    "gold_chunk_ids": [],
+    "source_passage": "",
+    "match": {
+      "needs_review": true
+    }
+  },
+  {
+    "id": "eval_106",
+    "category": "Other library",
+    "question_type": "unanswerable",
+    "question": "How do I fine-tune a model with the Hugging Face Trainer class?",
+    "answer": "I don't know.",
+    "answerable": false,
+    "split": "dev",
+    "doc_id": null,
+    "source_type": null,
+    "url": null,
+    "source_file": null,
+    "gold_chunk_ids": [],
+    "source_passage": "",
+    "match": {
+      "needs_review": true
+    }
+  },
+  {
+    "id": "eval_107",
+    "category": "Out of scope",
+    "question_type": "unanswerable",
+    "question": "How do I create a virtual environment with conda and pin the Python version?",
+    "answer": "I don't know.",
+    "answerable": false,
+    "split": "test",
+    "doc_id": null,
+    "source_type": null,
+    "url": null,
+    "source_file": null,
+    "gold_chunk_ids": [],
+    "source_passage": "",
+    "match": {
+      "needs_review": true
+    }
+  },
+  {
+    "id": "eval_108",
+    "category": "Out of scope",
+    "question_type": "unanswerable",
+    "question": "What is the monthly price of the Streamlit Enterprise plan in euros?",
+    "answer": "I don't know.",
+    "answerable": false,
+    "split": "dev",
+    "doc_id": null,
+    "source_type": null,
+    "url": null,
+    "source_file": null,
+    "gold_chunk_ids": [],
+    "source_passage": "",
+    "match": {
+      "needs_review": true
+    }
+  },
+  {
+    "id": "eval_109",
+    "category": "Nonexistent feature",
+    "question_type": "unanswerable",
+    "question": "How do I connect Streamlit to a Kafka topic with the built-in st.kafka_stream function?",
+    "answer": "I don't know.",
+    "answerable": false,
+    "split": "dev",
+    "doc_id": null,
+    "source_type": null,
+    "url": null,
+    "source_file": null,
+    "gold_chunk_ids": [],
+    "source_passage": "",
+    "match": {
+      "needs_review": true
+    }
+  },
+  {
+    "id": "eval_110",
+    "category": "Nonexistent feature",
+    "question_type": "unanswerable",
+    "question": "Which st.* function exports a page directly to PowerPoint?",
+    "answer": "I don't know.",
+    "answerable": false,
+    "split": "dev",
+    "doc_id": null,
+    "source_type": null,
+    "url": null,
+    "source_file": null,
+    "gold_chunk_ids": [],
+    "source_passage": "",
+    "match": {
+      "needs_review": true
+    }
+  },
+  {
+    "id": "eval_111",
+    "category": "Nonexistent feature",
+    "question_type": "unanswerable",
+    "question": "How do I configure a GPU quota for Streamlit apps in the config.toml [gpu] section?",
+    "answer": "I don't know.",
+    "answerable": false,
+    "split": "test",
+    "doc_id": null,
+    "source_type": null,
+    "url": null,
+    "source_file": null,
+    "gold_chunk_ids": [],
+    "source_passage": "",
+    "match": {
+      "needs_review": true
+    }
+  },
+  {
+    "id": "eval_112",
+    "category": "Nonexistent feature",
+    "question_type": "unanswerable",
+    "question": "What is the maximum number of rows st.table can display before it throws an error?",
+    "answer": "I don't know.",
+    "answerable": false,
+    "split": "dev",
+    "doc_id": null,
+    "source_type": null,
+    "url": null,
+    "source_file": null,
+    "gold_chunk_ids": [],
+    "source_passage": "",
+    "match": {
+      "needs_review": true
+    }
   }
 ]

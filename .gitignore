@@ -7,5 +7,8 @@ venv/
 _docs_clone/
 __pycache__/
 
+data/eval_review.json
+eval_problems.json
+
 # corpus/ and index/ are intentionally NOT ignored: commit them as a frozen snapshot
 # (check sizes first; if they grow past ~50 MB, move them to Git LFS or a GitHub release)

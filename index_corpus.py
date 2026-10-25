@@ -11,7 +11,7 @@ Output (in --out, default ./index):
     bm25.pkl          keyword index
     config.json       chunk size, overlap, model: so every result is reproducible
 """
-import argparse, json, pickle, re, time
+import argparse, html, json, pickle, re, time
 from pathlib import Path
 
 import numpy as np
@@ -19,6 +19,7 @@ import numpy as np
 MODEL = "BAAI/bge-small-en-v1.5"
 QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
 DOCS_BASE = "https://docs.streamlit.io"
+ADMONITIONS = "Note|Important|Tip|Warning|Caution"
 
 
 # ---------------- chunking ----------------
@@ -108,9 +109,82 @@ def front_matter(text):
     return meta, text
 
 
+
+# ---------------- cleaning (MDX/JSX noise) ----------------
+def _attr(attrs, name):
+    m = re.search(name + r'="([^"]*)"', attrs)
+    return m.group(1) if m else ""
+
+
+def _clean_prose(t):
+    codes = []                                           # protect inline `code`
+    def keep(m):
+        codes.append(m.group(0)); return f"\x00{len(codes) - 1}\x00"
+    t = re.sub(r"`[^`\n]+`", keep, t)
+
+    t = re.sub(r"(?m)^[ \t]+(?=</?[A-Za-z])", "", t)                # dedent JSX/HTML lines
+    t = re.sub(r"!\[[^\]]*\]\([^)]*\)", "", t)                       # markdown images
+    t = re.sub(r"<Image\b.*?/>", "", t, flags=re.S)                  # <Image ... />
+    t = re.sub(r"<InlineCallout\b(.*?)>(.*?)</InlineCallout>",       # keep the callout text
+               lambda m: f"{_attr(m.group(1), 'bold')} {m.group(2).strip()}\n".lstrip(), t, flags=re.S)
+    t = re.sub(r"<Tile\b(.*?)/>",
+               lambda m: f"{_attr(m.group(1), 'title')}: {_attr(m.group(1), 'text')}\n", t, flags=re.S)
+    t = re.sub(r"<i\b[^>]*>.*?</i>", "", t, flags=re.S)              # icon tags
+    t = re.sub(r"</t[dh]>\s*", " | ", t)                             # tables -> "a | b |"
+    t = re.sub(r"</tr>", "\n", t)
+    t = re.sub(rf"<({ADMONITIONS})\b[^>]*>\s*", lambda m: f"{m.group(1)}: ", t)
+    t = re.sub(rf"\s*</({ADMONITIONS})>", "\n", t)
+    t = re.sub(r"<a\b[^>]*>(.*?)</a>", r"\1", t, flags=re.S)         # links/anchors -> text
+    t = re.sub(r"<code>(.*?)</code>", r"`\1`", t, flags=re.S)
+    t = re.sub(r"\{/\*.*?\*/\}", "", t, flags=re.S)                  # JSX comments
+    t = re.sub(r"</?(?:div|span|Flex|table|tbody|thead|tr|td|th|sup|sub|br|p|img|center|details|"
+               r"summary|iframe|YouTube|Video|TileContainer|InlineCalloutContainer|Tile|Image|"
+               r"InlineCallout)\b[^>]*/?>", "", t, flags=re.S)
+    t = html.unescape(t)                                             # &mdash; &dagger; ...
+    t = re.sub(r"\x00(\d+)\x00", lambda m: codes[int(m.group(1))], t)
+    t = re.sub(r"(?m)^[ \t]*\|[ \t]*\n?", "", t)                  # lines that are just "|"
+    t = re.sub(r"(?m)[ \t]+$", "", t)                              # trailing spaces
+    return re.sub(r"\n{3,}", "\n\n", t)
+
+
+def clean_mdx(text):
+    """Strip JSX/HTML noise but never touch fenced code blocks."""
+    parts = re.split(r"(```.*?```)", text, flags=re.S)
+    for i in range(0, len(parts), 2):
+        parts[i] = _clean_prose(parts[i])
+    return re.sub(r"\n{3,}", "\n\n", "".join(parts)).strip()
+
+
+def combine(a, b):
+    extra = b["text"] if a["section"] == b["section"] else f"{b['section']}\n{b['text']}"
+    return {**a, "text": a["text"] + "\n\n" + extra}
+
+
+def merge_small(chunks, min_words, max_words):
+    """Merge chunks shorter than min_words into a neighbour of the same document."""
+    out, carry = [], None
+    for c in chunks:
+        if carry is not None:
+            if carry["doc_id"] == c["doc_id"]:
+                c, carry = combine(carry, c), None
+            else:
+                out.append(carry); carry = None
+        if words(c["text"]) < min_words:
+            if out and out[-1]["doc_id"] == c["doc_id"] and words(out[-1]["text"]) + words(c["text"]) <= max_words:
+                out[-1] = combine(out[-1], c)
+            else:
+                carry = c
+        else:
+            out.append(c)
+    if carry is not None:
+        out.append(carry)
+    return out
+
+
 # ---------------- loading + chunking per source ----------------
-def doc_chunks(path, size, overlap):
+def doc_chunks(path, size, overlap, clean=True):
     meta, body = front_matter(path.read_text(encoding="utf-8", errors="ignore"))
+    body = clean_mdx(body) if clean else body
     title = meta.get("title") or path.stem
     slug = meta.get("slug")
     url = DOCS_BASE + slug if slug else DOCS_BASE
@@ -132,22 +206,24 @@ def issue_chunks(path, size, overlap):
                        url=d["url"], date=d["closed_at"], text=c)
 
 
-def release_chunks(path, size, overlap):
+def release_chunks(path, size, overlap, clean=True):
     d = json.loads(path.read_text(encoding="utf-8"))
-    for head, sec in split_sections("## Notes\n" + (d["body"] or "")):
+    notes = clean_mdx(d["body"] or "") if clean else (d["body"] or "")
+    for head, sec in split_sections("## Notes\n" + notes):
         for c in pack(split_blocks(sec), size, overlap):
             yield dict(doc_id=d["id"], type="release", title=d["title"], section=head,
                        url=d["url"], date=d["date"], text=c)
 
 
-def build_chunks(corpus, size, overlap):
-    chunks = []
+def build_chunks(corpus, size, overlap, min_words=40, clean=True):
+    chunks, cap = [], size
     for p in sorted((corpus / "docs").glob("*.md")):
-        chunks += doc_chunks(p, size, overlap)
+        chunks += merge_small(list(doc_chunks(p, size, overlap, clean)), min_words, cap)
     for p in sorted((corpus / "issues").glob("*.json")):
-        chunks += issue_chunks(p, size, overlap)
+        chunks += list(issue_chunks(p, size, overlap))
     for p in sorted((corpus / "releases").glob("*.json")):
-        chunks += release_chunks(p, size, overlap)
+        chunks += merge_small(list(release_chunks(p, size, overlap, clean)), min_words, cap)
+    chunks = [c for c in chunks if words(c["text"]) >= 3]       # drop empty leftovers
     for i, c in enumerate(chunks):
         c["id"] = i
     return chunks
@@ -212,6 +288,8 @@ if __name__ == "__main__":
     ap.add_argument("--out", default="index")
     ap.add_argument("--chunk-size", type=int, default=250, help="target words per chunk")
     ap.add_argument("--overlap", type=int, default=40, help="words carried to next chunk")
+    ap.add_argument("--min-words", type=int, default=40, help="merge doc/release chunks shorter than this")
+    ap.add_argument("--no-clean", action="store_true", help="skip MDX/JSX cleaning (for ablations)")
     ap.add_argument("--model", default=MODEL)
     ap.add_argument("--query", help="skip building; search an existing index")
     a = ap.parse_args()
@@ -219,6 +297,7 @@ if __name__ == "__main__":
     if a.query:
         search(out, a.query)
     else:
-        chunks = build_chunks(Path(a.corpus), a.chunk_size, a.overlap)
+        chunks = build_chunks(Path(a.corpus), a.chunk_size, a.overlap, a.min_words, not a.no_clean)
         print(f"{len(chunks)} chunks")
-        build_index(chunks, out, a.model, {"chunk_size": a.chunk_size, "overlap": a.overlap})
+        build_index(chunks, out, a.model, {"chunk_size": a.chunk_size, "overlap": a.overlap,
+                                           "min_words": a.min_words, "clean_mdx": not a.no_clean})
