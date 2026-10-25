@@ -3,3 +3,7 @@ python-dotenv
 numpy
 sentence-transformers
 rank-bm25
+openai
+fastapi
+uvicorn
+huggingface_hub

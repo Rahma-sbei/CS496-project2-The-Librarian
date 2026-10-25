@@ -9,6 +9,14 @@ __pycache__/
 
 data/eval_review.json
 eval_problems.json
+results/*smoke*
+
+# experiment indexes (chunk-size test), local tool settings
+index_*/
+.claude/
 
 # corpus/ and index/ are intentionally NOT ignored: commit them as a frozen snapshot
 # (check sizes first; if they grow past ~50 MB, move them to Git LFS or a GitHub release)
+# request and feedback logs contain user questions: never commit
+logs/
+.fastembed_cache/

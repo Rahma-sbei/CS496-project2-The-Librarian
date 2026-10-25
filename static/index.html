@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Librarian</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <h1>The Librarian</h1>
+      <p class="tagline">Answers about Streamlit from its docs, GitHub issues and release notes. Every claim cites its source; if the sources don't say, it says "I don't know".</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="empty" class="empty">
+      <p>Try one of these:</p>
+      <div class="chips">
+        <button class="chip">How do I keep a value between reruns?</button>
+        <button class="chip">Why do I get a DuplicateWidgetID error?</button>
+        <button class="chip">Which release introduced st.context?</button>
+        <button class="chip">How do I give my deployed app its secrets on Community Cloud?</button>
+        <button class="chip">Deploying fails with a GZipResponder TypeError. What's the workaround?</button>
+      </div>
+    </section>
+    <section id="thread" class="thread" aria-live="polite"></section>
+  </main>
+
+  <form id="ask" class="composer">
+    <div class="wrap composer-inner">
+      <textarea id="question" rows="1" maxlength="1000" placeholder="Ask a question about Streamlit…" aria-label="Your question" required></textarea>
+      <button id="send" type="submit">Ask</button>
+    </div>
+    <div class="wrap options">
+      <span class="opts">
+        <label>Search in
+          <select id="types">
+            <option value="">everything</option>
+            <option value="doc">documentation</option>
+            <option value="issue">GitHub issues</option>
+            <option value="release">release notes</option>
+          </select>
+        </label>
+        <label><input type="checkbox" id="rewrite"> Rewrite vague questions</label>
+      </span>
+      <span class="hint">Enter to send, Shift+Enter for a new line</span>
+    </div>
+  </form>
+
+  <template id="turn-tpl">
+    <article class="turn">
+      <p class="q"></p>
+      <div class="a">
+        <div class="status"><span class="spinner"></span> Searching docs, issues and releases…</div>
+      </div>
+    </article>
+  </template>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

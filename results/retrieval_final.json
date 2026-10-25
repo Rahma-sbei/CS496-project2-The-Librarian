@@ -1,0 +1,9203 @@
+{
+  "config": {
+    "chunk_size": 250,
+    "overlap": 40,
+    "min_words": 40,
+    "clean_mdx": true,
+    "model": "BAAI/bge-small-en-v1.5",
+    "n_chunks": 3562,
+    "build_seconds": 294.8,
+    "avg_words": 147.0,
+    "split": "all",
+    "n_questions": 100,
+    "n_unanswerable": 12,
+    "no_gold_in_index": [],
+    "rerank_model": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+    "rerank_pool": 30,
+    "tag": "final"
+  },
+  "summary": {
+    "bm25": {
+      "recall@1": 0.29,
+      "recall@3": 0.55,
+      "recall@5": 0.69,
+      "recall@10": 0.78,
+      "recall@20": 0.89,
+      "doc_recall@1": 0.44,
+      "doc_recall@3": 0.64,
+      "doc_recall@5": 0.74,
+      "doc_recall@10": 0.81,
+      "doc_recall@20": 0.93,
+      "mrr@10": 0.43810714285714303,
+      "latency_ms_p50": 12.579249974805862,
+      "latency_ms_p95": 21.913220020360313
+    },
+    "vector": {
+      "recall@1": 0.47,
+      "recall@3": 0.67,
+      "recall@5": 0.7,
+      "recall@10": 0.82,
+      "recall@20": 0.85,
+      "doc_recall@1": 0.62,
+      "doc_recall@3": 0.74,
+      "doc_recall@5": 0.79,
+      "doc_recall@10": 0.88,
+      "doc_recall@20": 0.89,
+      "mrr@10": 0.5798690476190479,
+      "latency_ms_p50": 23.390550020849332,
+      "latency_ms_p95": 27.57342496770434
+    },
+    "hybrid": {
+      "recall@1": 0.38,
+      "recall@3": 0.69,
+      "recall@5": 0.8,
+      "recall@10": 0.86,
+      "recall@20": 0.9,
+      "doc_recall@1": 0.54,
+      "doc_recall@3": 0.75,
+      "doc_recall@5": 0.84,
+      "doc_recall@10": 0.9,
+      "doc_recall@20": 0.93,
+      "mrr@10": 0.5533730158730159,
+      "latency_ms_p50": 40.53060003207065,
+      "latency_ms_p95": 57.843795005464926
+    },
+    "rerank": {
+      "recall@1": 0.43,
+      "recall@3": 0.74,
+      "recall@5": 0.79,
+      "recall@10": 0.88,
+      "recall@20": 0.93,
+      "doc_recall@1": 0.6,
+      "doc_recall@3": 0.8,
+      "doc_recall@5": 0.83,
+      "doc_recall@10": 0.9,
+      "doc_recall@20": 0.95,
+      "mrr@10": 0.5972738095238096,
+      "latency_ms_p50": 2098.0986999929883,
+      "latency_ms_p95": 2339.163690037094
+    }
+  },
+  "idk_threshold_sweep": [
+    {
+      "min_score": 0.55,
+      "unanswerable_refused": 0.0,
+      "answerable_refused": 0.0
+    },
+    {
+      "min_score": 0.6,
+      "unanswerable_refused": 0.0,
+      "answerable_refused": 0.0
+    },
+    {
+      "min_score": 0.65,
+      "unanswerable_refused": 0.16666666666666666,
+      "answerable_refused": 0.0
+    },
+    {
+      "min_score": 0.7,
+      "unanswerable_refused": 0.4166666666666667,
+      "answerable_refused": 0.04
+    },
+    {
+      "min_score": 0.75,
+      "unanswerable_refused": 0.9166666666666666,
+      "answerable_refused": 0.15
+    },
+    {
+      "min_score": 0.8,
+      "unanswerable_refused": 1.0,
+      "answerable_refused": 0.42
+    }
+  ],
+  "per_question": [
+    {
+      "id": "eval_001",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        1527,
+        1539
+      ],
+      "retrieved": [
+        3167,
+        446,
+        3009,
+        1374,
+        1539,
+        527,
+        281,
+        642,
+        1193,
+        1650
+      ],
+      "first_hit_rank": 5
+    },
+    {
+      "id": "eval_002",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        200,
+        661,
+        1517
+      ],
+      "retrieved": [
+        661,
+        2980,
+        200,
+        2977,
+        909,
+        884,
+        2308,
+        2972,
+        858,
+        1650
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_003",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        595,
+        1515
+      ],
+      "retrieved": [
+        1515,
+        625,
+        191,
+        594,
+        626,
+        621,
+        1557,
+        595,
+        1352,
+        1282
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_004",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        594,
+        1515
+      ],
+      "retrieved": [
+        3149,
+        625,
+        600,
+        605,
+        1515,
+        1290,
+        622,
+        1282,
+        602,
+        629
+      ],
+      "first_hit_rank": 5
+    },
+    {
+      "id": "eval_005",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        281,
+        948
+      ],
+      "retrieved": [
+        1389,
+        646,
+        2120,
+        1374,
+        3213,
+        579,
+        3211,
+        1526,
+        3190,
+        3206
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_006",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        281,
+        644
+      ],
+      "retrieved": [
+        644,
+        3211,
+        1388,
+        2954,
+        3221,
+        1379,
+        3206,
+        3286,
+        3214,
+        3207
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_008",
+      "mode": "bm25",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        1650
+      ],
+      "retrieved": [
+        1650,
+        1627,
+        2568,
+        3115,
+        1635,
+        3113,
+        1617,
+        3114,
+        973,
+        976
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_009",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        336,
+        514
+      ],
+      "retrieved": [
+        518,
+        2898,
+        514,
+        2375,
+        2815,
+        1537,
+        3136,
+        1327,
+        3249,
+        509
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_010",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        336,
+        514
+      ],
+      "retrieved": [
+        1919,
+        1697,
+        769,
+        3556,
+        2742,
+        514,
+        2037,
+        112,
+        715,
+        3355
+      ],
+      "first_hit_rank": 6
+    },
+    {
+      "id": "eval_011",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        166,
+        169,
+        170,
+        493
+      ],
+      "retrieved": [
+        489,
+        3121,
+        448,
+        1230,
+        496,
+        1036,
+        494,
+        828,
+        1906,
+        780
+      ],
+      "first_hit_rank": 18
+    },
+    {
+      "id": "eval_012",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        166
+      ],
+      "retrieved": [
+        2480,
+        2479,
+        2639,
+        2640,
+        166,
+        2484,
+        304,
+        2067,
+        2644,
+        2641
+      ],
+      "first_hit_rank": 5
+    },
+    {
+      "id": "eval_013",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        758,
+        759
+      ],
+      "retrieved": [
+        751,
+        758,
+        136,
+        3018,
+        1262,
+        1254,
+        1593,
+        1270,
+        1329,
+        1328
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_014",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        118,
+        122,
+        1634
+      ],
+      "retrieved": [
+        2793,
+        122,
+        1546,
+        527,
+        118,
+        2210,
+        88,
+        255,
+        991,
+        3053
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_015",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        659
+      ],
+      "retrieved": [
+        2860,
+        1598,
+        153,
+        233,
+        232,
+        2568,
+        252,
+        3001,
+        2619,
+        2863
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_016",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        679,
+        683,
+        1527
+      ],
+      "retrieved": [
+        637,
+        466,
+        691,
+        460,
+        2951,
+        683,
+        853,
+        458,
+        674,
+        678
+      ],
+      "first_hit_rank": 6
+    },
+    {
+      "id": "eval_017",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        680,
+        681
+      ],
+      "retrieved": [
+        681,
+        2946,
+        2951,
+        2866,
+        694,
+        649,
+        2983,
+        698,
+        1627,
+        3001
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_018",
+      "mode": "bm25",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        634,
+        637
+      ],
+      "retrieved": [
+        634,
+        3211,
+        3213,
+        2957,
+        2952,
+        679,
+        3167,
+        1539,
+        3206,
+        2709
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_019",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        606
+      ],
+      "retrieved": [
+        754,
+        601,
+        1558,
+        1559,
+        1442,
+        256,
+        740,
+        624,
+        1516,
+        611
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_020",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        190
+      ],
+      "retrieved": [
+        952,
+        190,
+        189,
+        583,
+        1073,
+        3156,
+        602,
+        192,
+        1558,
+        595
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_021",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        606,
+        607
+      ],
+      "retrieved": [
+        2829,
+        2830,
+        2831,
+        606,
+        3001,
+        1865,
+        256,
+        484,
+        784,
+        1618
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_022",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        608
+      ],
+      "retrieved": [
+        611,
+        608,
+        868,
+        616,
+        2027,
+        256,
+        869,
+        1558,
+        617,
+        624
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_023",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        281,
+        948
+      ],
+      "retrieved": [
+        3206,
+        1389,
+        256,
+        1780,
+        1878,
+        3167,
+        3190,
+        1526,
+        2926,
+        2863
+      ],
+      "first_hit_rank": 12
+    },
+    {
+      "id": "eval_024",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        1519
+      ],
+      "retrieved": [
+        208,
+        2777,
+        2950,
+        3207,
+        1902,
+        2659,
+        687,
+        938,
+        839,
+        868
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_025",
+      "mode": "bm25",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        197
+      ],
+      "retrieved": [
+        197,
+        188,
+        1310,
+        1315,
+        1992,
+        694,
+        679,
+        1990,
+        693,
+        1989
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_026",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        281,
+        653
+      ],
+      "retrieved": [
+        653,
+        2071,
+        1381,
+        655,
+        2399,
+        2398,
+        1694,
+        1688,
+        1665,
+        1389
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_027",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        688,
+        693
+      ],
+      "retrieved": [
+        2951,
+        2972,
+        693,
+        2657,
+        466,
+        2980,
+        691,
+        688,
+        2659,
+        1539
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_028",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        360,
+        953
+      ],
+      "retrieved": [
+        2251,
+        3317,
+        3010,
+        2992,
+        3005,
+        360,
+        1538,
+        1559,
+        3316,
+        3190
+      ],
+      "first_hit_rank": 6
+    },
+    {
+      "id": "eval_029",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        602,
+        625
+      ],
+      "retrieved": [
+        602,
+        1515,
+        625,
+        594,
+        480,
+        626,
+        192,
+        3149,
+        600,
+        952
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_030",
+      "mode": "bm25",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        208
+      ],
+      "retrieved": [
+        466,
+        2975,
+        2671,
+        2670,
+        2780,
+        1407,
+        208,
+        2657,
+        942,
+        941
+      ],
+      "first_hit_rank": 7
+    },
+    {
+      "id": "eval_039",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        990,
+        1451
+      ],
+      "retrieved": [
+        2039,
+        406,
+        3165,
+        2103,
+        1426,
+        2341,
+        2913,
+        2613,
+        2548,
+        504
+      ],
+      "first_hit_rank": 12
+    },
+    {
+      "id": "eval_044",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        1630
+      ],
+      "retrieved": [
+        1749,
+        1748,
+        3180,
+        3178,
+        3177,
+        1630,
+        1750,
+        1631,
+        117,
+        1025
+      ],
+      "first_hit_rank": 6
+    },
+    {
+      "id": "eval_046",
+      "mode": "bm25",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        338
+      ],
+      "retrieved": [
+        338,
+        636,
+        2622,
+        2759,
+        1763,
+        2625,
+        2777,
+        2425,
+        1650,
+        689
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_047",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        1435
+      ],
+      "retrieved": [
+        1446,
+        1440,
+        1445,
+        1435,
+        1406,
+        1443,
+        1433,
+        2777,
+        3164,
+        1403
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_049",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        430,
+        438
+      ],
+      "retrieved": [
+        3377,
+        1627,
+        3190,
+        2976,
+        2623,
+        2800,
+        939,
+        967,
+        673,
+        2973
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_050",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        430,
+        438
+      ],
+      "retrieved": [
+        1535,
+        438,
+        434,
+        674,
+        430,
+        675,
+        2992,
+        2678,
+        1460,
+        2676
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_053",
+      "mode": "bm25",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        345,
+        512
+      ],
+      "retrieved": [
+        1537,
+        918,
+        345,
+        647,
+        920,
+        449,
+        715,
+        2756,
+        3049,
+        2193
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_054",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        336,
+        515
+      ],
+      "retrieved": [
+        515,
+        510,
+        1807,
+        448,
+        345,
+        2308,
+        2212,
+        1509,
+        2307,
+        2305
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_055",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        172,
+        513
+      ],
+      "retrieved": [
+        1439,
+        1807,
+        3350,
+        2778,
+        2387,
+        1763,
+        1440,
+        3226,
+        3136,
+        1435
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_056",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        517
+      ],
+      "retrieved": [
+        510,
+        1632,
+        517,
+        881,
+        1237,
+        454,
+        1679,
+        1627,
+        784,
+        3190
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_057",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        516
+      ],
+      "retrieved": [
+        1380,
+        460,
+        2898,
+        1903,
+        516,
+        2044,
+        458,
+        518,
+        3118,
+        471
+      ],
+      "first_hit_rank": 5
+    },
+    {
+      "id": "eval_058",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        180,
+        281,
+        948
+      ],
+      "retrieved": [
+        3322,
+        3211,
+        3213,
+        3320,
+        2288,
+        336,
+        3212,
+        1821,
+        2667,
+        3321
+      ],
+      "first_hit_rank": 12
+    },
+    {
+      "id": "eval_063",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        519
+      ],
+      "retrieved": [
+        519,
+        2896,
+        2375,
+        1913,
+        2898,
+        514,
+        1016,
+        2897,
+        1537,
+        3156
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_064",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        513
+      ],
+      "retrieved": [
+        513,
+        722,
+        2248,
+        940,
+        1797,
+        1924,
+        1433,
+        1432,
+        721,
+        1922
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_065",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        580,
+        1634
+      ],
+      "retrieved": [
+        2791,
+        2407,
+        1442,
+        921,
+        991,
+        2778,
+        1443,
+        2793,
+        3369,
+        2866
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_066",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        920,
+        936
+      ],
+      "retrieved": [
+        1545,
+        1541,
+        1547,
+        914,
+        1509,
+        1548,
+        938,
+        1551,
+        1792,
+        936
+      ],
+      "first_hit_rank": 10
+    },
+    {
+      "id": "eval_067",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        927,
+        928
+      ],
+      "retrieved": [
+        354,
+        179,
+        1464,
+        934,
+        1470,
+        930,
+        927,
+        926,
+        1067,
+        1509
+      ],
+      "first_hit_rank": 7
+    },
+    {
+      "id": "eval_068",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        926,
+        948
+      ],
+      "retrieved": [
+        354,
+        179,
+        2951,
+        926,
+        939,
+        936,
+        1509,
+        938,
+        1081,
+        919
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_069",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        769,
+        770,
+        780
+      ],
+      "retrieved": [
+        1237,
+        783,
+        110,
+        769,
+        910,
+        768,
+        771,
+        770,
+        115,
+        112
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_072",
+      "mode": "bm25",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        166,
+        335
+      ],
+      "retrieved": [
+        3119,
+        304,
+        3156,
+        493,
+        3257,
+        1530,
+        3030,
+        2385,
+        489,
+        2387
+      ],
+      "first_hit_rank": 12
+    },
+    {
+      "id": "eval_073",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        1532
+      ],
+      "retrieved": [
+        1532,
+        442,
+        1531,
+        1358,
+        1359,
+        2826,
+        2825,
+        3119,
+        3120,
+        1372
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_077",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        1533
+      ],
+      "retrieved": [
+        1533,
+        210,
+        167,
+        2803,
+        633,
+        3306,
+        1442,
+        1562,
+        1033,
+        1505
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_082",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        166,
+        502
+      ],
+      "retrieved": [
+        329,
+        331,
+        502,
+        3156,
+        1627,
+        493,
+        1635,
+        497,
+        3177,
+        3092
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_083",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        360,
+        455
+      ],
+      "retrieved": [
+        1538,
+        360,
+        953,
+        455,
+        174,
+        307,
+        1919,
+        1047,
+        3092,
+        210
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_084",
+      "mode": "bm25",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        442,
+        443
+      ],
+      "retrieved": [
+        443,
+        202,
+        1560,
+        444,
+        381,
+        3190,
+        449,
+        991,
+        621,
+        191
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_086",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        252
+      ],
+      "retrieved": [
+        15,
+        703,
+        275,
+        1617,
+        1450,
+        2963,
+        759,
+        252,
+        861,
+        568
+      ],
+      "first_hit_rank": 8
+    },
+    {
+      "id": "eval_087",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        257,
+        1623
+      ],
+      "retrieved": [
+        148,
+        2429,
+        1623,
+        3052,
+        1611,
+        1612,
+        140,
+        1610,
+        143,
+        925
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_088",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        760
+      ],
+      "retrieved": [
+        1213,
+        758,
+        760,
+        1204,
+        1253,
+        140,
+        151,
+        497,
+        136,
+        3190
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_089",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        20,
+        762
+      ],
+      "retrieved": [
+        762,
+        1523,
+        1288,
+        1218,
+        1207,
+        1610,
+        1331,
+        20,
+        1261,
+        1351
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_090",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        252,
+        711,
+        733,
+        734
+      ],
+      "retrieved": [
+        731,
+        700,
+        580,
+        711,
+        223,
+        811,
+        2468,
+        734,
+        212,
+        260
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_091",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        754
+      ],
+      "retrieved": [
+        754,
+        1324,
+        181,
+        1294,
+        1347,
+        1303,
+        1298,
+        1310,
+        1315,
+        1333
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_092",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        10
+      ],
+      "retrieved": [
+        1453,
+        22,
+        584,
+        33,
+        10,
+        1299,
+        38,
+        1218,
+        40,
+        14
+      ],
+      "first_hit_rank": 5
+    },
+    {
+      "id": "eval_093",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        6,
+        135
+      ],
+      "retrieved": [
+        1605,
+        1619,
+        135,
+        1526,
+        1610,
+        1613,
+        10,
+        1453,
+        12,
+        133
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_094",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        257
+      ],
+      "retrieved": [
+        740,
+        1640,
+        527,
+        1539,
+        661,
+        1924,
+        1650,
+        2048,
+        1968,
+        1683
+      ],
+      "first_hit_rank": 17
+    },
+    {
+      "id": "eval_095",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        759,
+        763
+      ],
+      "retrieved": [
+        136,
+        762,
+        1683,
+        763,
+        736,
+        558,
+        1647,
+        549,
+        1676,
+        760
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_096",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        738,
+        744,
+        745,
+        746,
+        953
+      ],
+      "retrieved": [
+        738,
+        741,
+        746,
+        736,
+        1193,
+        1194,
+        1195,
+        1215,
+        745,
+        1279
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_097",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        257,
+        1625
+      ],
+      "retrieved": [
+        257,
+        982,
+        1625,
+        2453,
+        3312,
+        2940,
+        1178,
+        2082,
+        3315,
+        3053
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_098",
+      "mode": "bm25",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        143,
+        147,
+        148
+      ],
+      "retrieved": [
+        2590,
+        2589,
+        1627,
+        1613,
+        1950,
+        2448,
+        1763,
+        136,
+        132,
+        2829
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_099",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        374,
+        537
+      ],
+      "retrieved": [
+        537,
+        374,
+        3272,
+        1513,
+        564,
+        957,
+        2558,
+        540,
+        544,
+        2533
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_100",
+      "mode": "bm25",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        257,
+        1617
+      ],
+      "retrieved": [
+        1635,
+        3113,
+        1650,
+        1627,
+        3115,
+        2568,
+        973,
+        3057,
+        3114,
+        1617
+      ],
+      "first_hit_rank": 10
+    },
+    {
+      "id": "eval_113",
+      "mode": "bm25",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        469,
+        682
+      ],
+      "retrieved": [
+        682,
+        1627,
+        1652,
+        2992,
+        1704,
+        3273,
+        2946,
+        3151,
+        1952,
+        3085
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_114",
+      "mode": "bm25",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        528
+      ],
+      "retrieved": [
+        528,
+        532,
+        530,
+        2837,
+        3187,
+        2455,
+        2833,
+        443,
+        531,
+        3188
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_115",
+      "mode": "bm25",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        608,
+        609,
+        610
+      ],
+      "retrieved": [
+        611,
+        616,
+        610,
+        2864,
+        612,
+        3151,
+        3153,
+        2829,
+        1724,
+        3348
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_116",
+      "mode": "bm25",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1644
+      ],
+      "retrieved": [
+        1644,
+        206,
+        670,
+        207,
+        671,
+        669,
+        672,
+        497,
+        208,
+        1627
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_117",
+      "mode": "bm25",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1607
+      ],
+      "retrieved": [
+        1607,
+        1604,
+        1610,
+        3270,
+        17,
+        784,
+        3302,
+        2225,
+        1635,
+        120
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_118",
+      "mode": "bm25",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1608
+      ],
+      "retrieved": [
+        1608,
+        1604,
+        1620,
+        133,
+        39,
+        2471,
+        1,
+        1897,
+        2143,
+        21
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_119",
+      "mode": "bm25",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        590
+      ],
+      "retrieved": [
+        590,
+        1893,
+        1892,
+        3018,
+        2909,
+        1995,
+        2512,
+        702,
+        1997,
+        2619
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_120",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1097
+      ],
+      "retrieved": [
+        3115,
+        631,
+        2872,
+        3114,
+        2484,
+        2363,
+        1650,
+        2043,
+        1627,
+        3207
+      ],
+      "first_hit_rank": 17
+    },
+    {
+      "id": "eval_121",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1073
+      ],
+      "retrieved": [
+        1066,
+        283,
+        3395,
+        1073,
+        3320,
+        3213,
+        3212,
+        1528,
+        1464,
+        3211
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_122",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1064
+      ],
+      "retrieved": [
+        2816,
+        3124,
+        2122,
+        3011,
+        3101,
+        991,
+        3319,
+        1362,
+        2013,
+        2669
+      ],
+      "first_hit_rank": 18
+    },
+    {
+      "id": "eval_123",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1076
+      ],
+      "retrieved": [
+        520,
+        482,
+        656,
+        1993,
+        2217,
+        642,
+        1693,
+        2427,
+        2722,
+        2070
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_124",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1041
+      ],
+      "retrieved": [
+        759,
+        751,
+        1322,
+        761,
+        275,
+        274,
+        1523,
+        19,
+        136,
+        1678
+      ],
+      "first_hit_rank": 13
+    },
+    {
+      "id": "eval_125",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1016
+      ],
+      "retrieved": [
+        1905,
+        1903,
+        1016,
+        519,
+        2893,
+        1106,
+        3450,
+        1047,
+        2898,
+        2375
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_126",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1132
+      ],
+      "retrieved": [
+        1815,
+        621,
+        191,
+        193,
+        2724,
+        2720,
+        2723,
+        2722,
+        2792,
+        3549
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_127",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1188
+      ],
+      "retrieved": [
+        1188,
+        1127,
+        1947,
+        3560,
+        2373,
+        1952,
+        2370,
+        1949,
+        2627,
+        1957
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_128",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1141
+      ],
+      "retrieved": [
+        2595,
+        3544,
+        2450,
+        1693,
+        2186,
+        2077,
+        2605,
+        2079,
+        1999,
+        2846
+      ],
+      "first_hit_rank": 20
+    },
+    {
+      "id": "eval_129",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "release",
+      "gold": [
+        3486,
+        3487
+      ],
+      "retrieved": [
+        2758,
+        2780,
+        3486,
+        1087,
+        582,
+        2783,
+        2762,
+        1662,
+        2784,
+        1959
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_130",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "release",
+      "gold": [
+        3528
+      ],
+      "retrieved": [
+        1903,
+        1905,
+        519,
+        3528,
+        1156,
+        1904,
+        2266,
+        2199,
+        611,
+        2467
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_131",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "release",
+      "gold": [
+        3528
+      ],
+      "retrieved": [
+        1806,
+        2265,
+        1810,
+        1808,
+        1173,
+        2293,
+        1807,
+        1903,
+        1937,
+        3451
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_132",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        2575
+      ],
+      "retrieved": [
+        2568,
+        2575,
+        2573,
+        2569,
+        2570,
+        2574,
+        2571,
+        2572,
+        2398,
+        2386
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_133",
+      "mode": "bm25",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2435
+      ],
+      "retrieved": [
+        2435,
+        2433,
+        2436,
+        2434,
+        2437,
+        2438,
+        2589,
+        1,
+        39,
+        2387
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_134",
+      "mode": "bm25",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2164
+      ],
+      "retrieved": [
+        2162,
+        2164,
+        2163,
+        2167,
+        2165,
+        2166,
+        2399,
+        2398,
+        2072,
+        2217
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_135",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "issue",
+      "gold": [
+        2304
+      ],
+      "retrieved": [
+        2299,
+        2301,
+        2300,
+        2302,
+        2304,
+        2303,
+        2131,
+        2356,
+        2355,
+        2345
+      ],
+      "first_hit_rank": 5
+    },
+    {
+      "id": "eval_136",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "issue",
+      "gold": [
+        2283,
+        2284
+      ],
+      "retrieved": [
+        2278,
+        2282,
+        2283,
+        2284,
+        2279,
+        2098,
+        2208,
+        2094,
+        2207,
+        2097
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_137",
+      "mode": "bm25",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1162,
+        2066
+      ],
+      "retrieved": [
+        2079,
+        2062,
+        2080,
+        2187,
+        2205,
+        2064,
+        2207,
+        2188,
+        2065,
+        2208
+      ],
+      "first_hit_rank": 14
+    },
+    {
+      "id": "eval_138",
+      "mode": "bm25",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2444
+      ],
+      "retrieved": [
+        2443,
+        2444,
+        1649,
+        2810,
+        2433,
+        2821,
+        2454,
+        1995,
+        1588,
+        3065
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_139",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        1752
+      ],
+      "retrieved": [
+        1751,
+        159,
+        1752,
+        160,
+        971,
+        2921,
+        1997,
+        3237,
+        2020,
+        2522
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_140",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        1732
+      ],
+      "retrieved": [
+        1731,
+        1732,
+        1728,
+        1442,
+        3165,
+        1386,
+        784,
+        1089,
+        1387,
+        634
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_141",
+      "mode": "bm25",
+      "question_type": "version",
+      "source_type": "issue",
+      "gold": [
+        1698
+      ],
+      "retrieved": [
+        1697,
+        1161,
+        1698,
+        1720,
+        1723,
+        1719,
+        2218,
+        1781,
+        3080,
+        1721
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_142",
+      "mode": "bm25",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2387
+      ],
+      "retrieved": [
+        2385,
+        2386,
+        2387,
+        2388,
+        3303,
+        1913,
+        2832,
+        2575,
+        2838,
+        2873
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_143",
+      "mode": "bm25",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        1803,
+        3486
+      ],
+      "retrieved": [
+        2504,
+        518,
+        1803,
+        1802,
+        1809,
+        2898,
+        2505,
+        2778,
+        2044,
+        521
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_001",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        1527,
+        1539
+      ],
+      "retrieved": [
+        1527,
+        1539,
+        281,
+        642,
+        483,
+        3187,
+        1374,
+        577,
+        2953,
+        970
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_002",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        200,
+        661,
+        1517
+      ],
+      "retrieved": [
+        661,
+        2980,
+        200,
+        2973,
+        2983,
+        2984,
+        2972,
+        2951,
+        2975,
+        2947
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_003",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        595,
+        1515
+      ],
+      "retrieved": [
+        595,
+        594,
+        189,
+        600,
+        602,
+        622,
+        190,
+        598,
+        625,
+        619
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_004",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        594,
+        1515
+      ],
+      "retrieved": [
+        600,
+        602,
+        594,
+        595,
+        604,
+        3149,
+        622,
+        189,
+        629,
+        631
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_005",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        281,
+        948
+      ],
+      "retrieved": [
+        1389,
+        1525,
+        2957,
+        1392,
+        3190,
+        2953,
+        3187,
+        2952,
+        1381,
+        659
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_006",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        281,
+        644
+      ],
+      "retrieved": [
+        287,
+        644,
+        3217,
+        2427,
+        2668,
+        3208,
+        2425,
+        3215,
+        643,
+        1665
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_008",
+      "mode": "vector",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        1650
+      ],
+      "retrieved": [
+        1650,
+        423,
+        1635,
+        1819,
+        2573,
+        2571,
+        1096,
+        2569,
+        2575,
+        3115
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_009",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        336,
+        514
+      ],
+      "retrieved": [
+        336,
+        514,
+        1537,
+        947,
+        509,
+        1106,
+        3465,
+        3136,
+        3435,
+        524
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_010",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        336,
+        514
+      ],
+      "retrieved": [
+        509,
+        783,
+        945,
+        3424,
+        768,
+        769,
+        784,
+        176,
+        721,
+        3204
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_011",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        166,
+        169,
+        170,
+        493
+      ],
+      "retrieved": [
+        489,
+        494,
+        909,
+        1036,
+        815,
+        784,
+        1044,
+        1094,
+        765,
+        910
+      ],
+      "first_hit_rank": 15
+    },
+    {
+      "id": "eval_012",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        166
+      ],
+      "retrieved": [
+        2067,
+        2480,
+        2639,
+        2068,
+        2642,
+        2644,
+        2483,
+        2641,
+        2479,
+        2643
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_013",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        758,
+        759
+      ],
+      "retrieved": [
+        1330,
+        1292,
+        751,
+        1301,
+        1679,
+        1254,
+        758,
+        1287,
+        1523,
+        759
+      ],
+      "first_hit_rank": 7
+    },
+    {
+      "id": "eval_014",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        118,
+        122,
+        1634
+      ],
+      "retrieved": [
+        1634,
+        1595,
+        122,
+        2715,
+        924,
+        398,
+        578,
+        2494,
+        1546,
+        1600
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_015",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        659
+      ],
+      "retrieved": [
+        233,
+        232,
+        239,
+        245,
+        3338,
+        1753,
+        242,
+        2863,
+        1589,
+        659
+      ],
+      "first_hit_rank": 10
+    },
+    {
+      "id": "eval_016",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        679,
+        683,
+        1527
+      ],
+      "retrieved": [
+        634,
+        683,
+        679,
+        461,
+        452,
+        469,
+        1653,
+        575,
+        467,
+        460
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_017",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        680,
+        681
+      ],
+      "retrieved": [
+        681,
+        692,
+        686,
+        2973,
+        691,
+        3376,
+        2981,
+        2972,
+        942,
+        1534
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_018",
+      "mode": "vector",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        634,
+        637
+      ],
+      "retrieved": [
+        634,
+        2952,
+        2957,
+        2953,
+        2954,
+        469,
+        2955,
+        282,
+        2693,
+        637
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_019",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        606
+      ],
+      "retrieved": [
+        606,
+        754,
+        2963,
+        2964,
+        2962,
+        2999,
+        1725,
+        1515,
+        592,
+        2959
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_020",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        190
+      ],
+      "retrieved": [
+        190,
+        595,
+        189,
+        594,
+        598,
+        191,
+        192,
+        2999,
+        952,
+        622
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_021",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        606,
+        607
+      ],
+      "retrieved": [
+        2829,
+        2830,
+        2842,
+        592,
+        1724,
+        1727,
+        1515,
+        607,
+        1626,
+        2843
+      ],
+      "first_hit_rank": 8
+    },
+    {
+      "id": "eval_022",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        608
+      ],
+      "retrieved": [
+        609,
+        608,
+        610,
+        614,
+        611,
+        2028,
+        2024,
+        612,
+        615,
+        2489
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_023",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        281,
+        948
+      ],
+      "retrieved": [
+        2833,
+        2838,
+        3190,
+        3336,
+        3005,
+        1381,
+        2263,
+        2834,
+        281,
+        532
+      ],
+      "first_hit_rank": 9
+    },
+    {
+      "id": "eval_024",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        1519
+      ],
+      "retrieved": [
+        201,
+        663,
+        664,
+        202,
+        289,
+        2031,
+        1520,
+        1519,
+        669,
+        208
+      ],
+      "first_hit_rank": 8
+    },
+    {
+      "id": "eval_025",
+      "mode": "vector",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        197
+      ],
+      "retrieved": [
+        2030,
+        199,
+        1162,
+        197,
+        1075,
+        1137,
+        3489,
+        696,
+        1990,
+        2031
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_026",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        281,
+        653
+      ],
+      "retrieved": [
+        653,
+        3215,
+        1692,
+        3214,
+        3209,
+        3216,
+        3206,
+        1389,
+        3221,
+        3220
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_027",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        688,
+        693
+      ],
+      "retrieved": [
+        688,
+        2976,
+        2948,
+        685,
+        2980,
+        683,
+        2972,
+        2949,
+        2978,
+        2984
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_028",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        360,
+        953
+      ],
+      "retrieved": [
+        521,
+        3005,
+        3009,
+        1538,
+        3004,
+        3008,
+        1902,
+        3006,
+        3373,
+        360
+      ],
+      "first_hit_rank": 10
+    },
+    {
+      "id": "eval_029",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        602,
+        625
+      ],
+      "retrieved": [
+        602,
+        600,
+        625,
+        629,
+        622,
+        594,
+        3149,
+        598,
+        624,
+        193
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_030",
+      "mode": "vector",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        208
+      ],
+      "retrieved": [
+        466,
+        2671,
+        2976,
+        3278,
+        2670,
+        2975,
+        2980,
+        2982,
+        2946,
+        941
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_039",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        990,
+        1451
+      ],
+      "retrieved": [
+        438,
+        2870,
+        951,
+        2871,
+        945,
+        406,
+        2882,
+        2614,
+        3249,
+        2874
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_044",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        1630
+      ],
+      "retrieved": [
+        1555,
+        3179,
+        1556,
+        3274,
+        115,
+        1366,
+        2601,
+        72,
+        1205,
+        1553
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_046",
+      "mode": "vector",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        338
+      ],
+      "retrieved": [
+        338,
+        2625,
+        2622,
+        2623,
+        1437,
+        1959,
+        1763,
+        1761,
+        2013,
+        1762
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_047",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        1435
+      ],
+      "retrieved": [
+        3025,
+        1435,
+        229,
+        1446,
+        1440,
+        3027,
+        3026,
+        2625,
+        1436,
+        173
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_049",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        430,
+        438
+      ],
+      "retrieved": [
+        2955,
+        2957,
+        2952,
+        2883,
+        697,
+        2954,
+        403,
+        2953,
+        2976,
+        2698
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_050",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        430,
+        438
+      ],
+      "retrieved": [
+        430,
+        434,
+        438,
+        2945,
+        2946,
+        2979,
+        2949,
+        675,
+        687,
+        2948
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_053",
+      "mode": "vector",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        345,
+        512
+      ],
+      "retrieved": [
+        345,
+        512,
+        1537,
+        3366,
+        2194,
+        3310,
+        3311,
+        3049,
+        734,
+        510
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_054",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        336,
+        515
+      ],
+      "retrieved": [
+        515,
+        524,
+        510,
+        2211,
+        2305,
+        1808,
+        2203,
+        2309,
+        1809,
+        937
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_055",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        172,
+        513
+      ],
+      "retrieved": [
+        513,
+        451,
+        3350,
+        341,
+        518,
+        510,
+        1843,
+        277,
+        3352,
+        3351
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_056",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        517
+      ],
+      "retrieved": [
+        517,
+        454,
+        450,
+        451,
+        3127,
+        2777,
+        3383,
+        34,
+        633,
+        510
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_057",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        516
+      ],
+      "retrieved": [
+        468,
+        823,
+        1238,
+        822,
+        510,
+        832,
+        516,
+        806,
+        1376,
+        2716
+      ],
+      "first_hit_rank": 7
+    },
+    {
+      "id": "eval_058",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        180,
+        281,
+        948
+      ],
+      "retrieved": [
+        1857,
+        1927,
+        773,
+        2635,
+        1074,
+        1921,
+        3397,
+        3418,
+        1182,
+        2771
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_063",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        519
+      ],
+      "retrieved": [
+        519,
+        514,
+        2895,
+        2896,
+        2894,
+        2375,
+        1903,
+        2815,
+        2374,
+        2898
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_064",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        513
+      ],
+      "retrieved": [
+        513,
+        721,
+        722,
+        176,
+        2916,
+        509,
+        2914,
+        1378,
+        1376,
+        336
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_065",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        580,
+        1634
+      ],
+      "retrieved": [
+        580,
+        1802,
+        2791,
+        585,
+        2505,
+        2990,
+        2989,
+        581,
+        1716,
+        2793
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_066",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        920,
+        936
+      ],
+      "retrieved": [
+        935,
+        918,
+        1545,
+        1455,
+        919,
+        1541,
+        1548,
+        936,
+        1544,
+        1547
+      ],
+      "first_hit_rank": 8
+    },
+    {
+      "id": "eval_067",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        927,
+        928
+      ],
+      "retrieved": [
+        1457,
+        927,
+        934,
+        930,
+        926,
+        355,
+        920,
+        1456,
+        1458,
+        354
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_068",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        926,
+        948
+      ],
+      "retrieved": [
+        926,
+        179,
+        354,
+        938,
+        920,
+        1545,
+        3184,
+        919,
+        935,
+        940
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_069",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        769,
+        770,
+        780
+      ],
+      "retrieved": [
+        114,
+        111,
+        2853,
+        2854,
+        110,
+        769,
+        783,
+        109,
+        2855,
+        112
+      ],
+      "first_hit_rank": 6
+    },
+    {
+      "id": "eval_072",
+      "mode": "vector",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        166,
+        335
+      ],
+      "retrieved": [
+        335,
+        489,
+        490,
+        492,
+        493,
+        491,
+        2385,
+        2201,
+        1042,
+        330
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_073",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        1532
+      ],
+      "retrieved": [
+        1532,
+        1531,
+        1365,
+        456,
+        1363,
+        1530,
+        1369,
+        304,
+        490,
+        1533
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_077",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        1533
+      ],
+      "retrieved": [
+        1533,
+        2824,
+        2826,
+        2803,
+        1562,
+        2823,
+        2825,
+        3306,
+        2820,
+        1360
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_082",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        166,
+        502
+      ],
+      "retrieved": [
+        329,
+        331,
+        506,
+        493,
+        502,
+        489,
+        494,
+        335,
+        508,
+        3156
+      ],
+      "first_hit_rank": 5
+    },
+    {
+      "id": "eval_083",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        360,
+        455
+      ],
+      "retrieved": [
+        360,
+        1538,
+        953,
+        455,
+        1919,
+        512,
+        174,
+        1920,
+        1548,
+        1372
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_084",
+      "mode": "vector",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        442,
+        443
+      ],
+      "retrieved": [
+        444,
+        442,
+        443,
+        441,
+        1529,
+        1530,
+        389,
+        381,
+        965,
+        1528
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_086",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        252
+      ],
+      "retrieved": [
+        2795,
+        252,
+        703,
+        275,
+        279,
+        156,
+        240,
+        144,
+        145,
+        15
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_087",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        257,
+        1623
+      ],
+      "retrieved": [
+        3052,
+        150,
+        1623,
+        1612,
+        2921,
+        142,
+        3055,
+        2430,
+        1950,
+        1611
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_088",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        760
+      ],
+      "retrieved": [
+        760,
+        549,
+        1213,
+        276,
+        280,
+        547,
+        548,
+        84,
+        1309,
+        1681
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_089",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        20,
+        762
+      ],
+      "retrieved": [
+        762,
+        84,
+        1272,
+        1255,
+        1,
+        20,
+        1566,
+        11,
+        82,
+        1207
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_090",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        252,
+        711,
+        733,
+        734
+      ],
+      "retrieved": [
+        1508,
+        734,
+        700,
+        711,
+        260,
+        2968,
+        261,
+        1855,
+        811,
+        778
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_091",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        754
+      ],
+      "retrieved": [
+        754,
+        603,
+        600,
+        602,
+        594,
+        1515,
+        622,
+        272,
+        1522,
+        597
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_092",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        10
+      ],
+      "retrieved": [
+        584,
+        39,
+        10,
+        1,
+        22,
+        1566,
+        2,
+        42,
+        1272,
+        1577
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_093",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        6,
+        135
+      ],
+      "retrieved": [
+        134,
+        132,
+        6,
+        135,
+        133,
+        74,
+        100,
+        5,
+        3332,
+        1643
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_094",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        257
+      ],
+      "retrieved": [
+        1624,
+        2920,
+        2311,
+        2312,
+        3260,
+        1387,
+        1111,
+        2956,
+        3552,
+        1381
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_095",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        759,
+        763
+      ],
+      "retrieved": [
+        763,
+        136,
+        1682,
+        548,
+        759,
+        19,
+        1678,
+        18,
+        182,
+        1331
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_096",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        738,
+        744,
+        745,
+        746,
+        953
+      ],
+      "retrieved": [
+        738,
+        1194,
+        743,
+        742,
+        741,
+        739,
+        1292,
+        746,
+        1280,
+        1301
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_097",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        257,
+        1625
+      ],
+      "retrieved": [
+        2741,
+        2447,
+        2446,
+        2453,
+        3315,
+        2452,
+        3314,
+        2740,
+        2738,
+        2451
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_098",
+      "mode": "vector",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        143,
+        147,
+        148
+      ],
+      "retrieved": [
+        148,
+        2590,
+        54,
+        150,
+        1950,
+        1045,
+        2448,
+        1940,
+        160,
+        51
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_099",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        374,
+        537
+      ],
+      "retrieved": [
+        537,
+        540,
+        1513,
+        374,
+        546,
+        2932,
+        2929,
+        562,
+        557,
+        1598
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_100",
+      "mode": "vector",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        257,
+        1617
+      ],
+      "retrieved": [
+        1617,
+        1618,
+        1650,
+        987,
+        1096,
+        2570,
+        2571,
+        423,
+        2573,
+        2829
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_113",
+      "mode": "vector",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        469,
+        682
+      ],
+      "retrieved": [
+        682,
+        851,
+        1696,
+        1694,
+        2665,
+        1695,
+        3278,
+        2779,
+        2212,
+        469
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_114",
+      "mode": "vector",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        528
+      ],
+      "retrieved": [
+        528,
+        2775,
+        1141,
+        2770,
+        532,
+        3402,
+        3062,
+        3190,
+        3063,
+        3070
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_115",
+      "mode": "vector",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        608,
+        609,
+        610
+      ],
+      "retrieved": [
+        609,
+        608,
+        611,
+        610,
+        612,
+        598,
+        1707,
+        3090,
+        1706,
+        2024
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_116",
+      "mode": "vector",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1644
+      ],
+      "retrieved": [
+        207,
+        671,
+        670,
+        1066,
+        206,
+        2054,
+        2775,
+        3402,
+        1644,
+        1132
+      ],
+      "first_hit_rank": 9
+    },
+    {
+      "id": "eval_117",
+      "mode": "vector",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1607
+      ],
+      "retrieved": [
+        1607,
+        2433,
+        5,
+        1604,
+        7,
+        3268,
+        1930,
+        2472,
+        1932,
+        3267
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_118",
+      "mode": "vector",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1608
+      ],
+      "retrieved": [
+        1608,
+        5,
+        10,
+        6,
+        97,
+        4,
+        2433,
+        14,
+        33,
+        3
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_119",
+      "mode": "vector",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        590
+      ],
+      "retrieved": [
+        1625,
+        1878,
+        1859,
+        1892,
+        2937,
+        1884,
+        1886,
+        1891,
+        1141,
+        1879
+      ],
+      "first_hit_rank": 19
+    },
+    {
+      "id": "eval_120",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1097
+      ],
+      "retrieved": [
+        352,
+        1065,
+        978,
+        1124,
+        1602,
+        1056,
+        964,
+        1018,
+        1543,
+        1003
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_121",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1073
+      ],
+      "retrieved": [
+        1073,
+        283,
+        1057,
+        956,
+        1064,
+        2635,
+        2668,
+        3211,
+        1076,
+        2637
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_122",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1064
+      ],
+      "retrieved": [
+        964,
+        1003,
+        975,
+        998,
+        1007,
+        1065,
+        1001,
+        965,
+        997,
+        1602
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_123",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1076
+      ],
+      "retrieved": [
+        1375,
+        642,
+        1164,
+        1063,
+        3193,
+        1381,
+        1695,
+        1694,
+        287,
+        644
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_124",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1041
+      ],
+      "retrieved": [
+        274,
+        278,
+        1678,
+        759,
+        19,
+        275,
+        262,
+        182,
+        1331,
+        1277
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_125",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1016
+      ],
+      "retrieved": [
+        1903,
+        1905,
+        1904,
+        519,
+        1016,
+        2374,
+        340,
+        1014,
+        2182,
+        1047
+      ],
+      "first_hit_rank": 5
+    },
+    {
+      "id": "eval_126",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1132
+      ],
+      "retrieved": [
+        1132,
+        1056,
+        1124,
+        1731,
+        1050,
+        1114,
+        1065,
+        1830,
+        193,
+        1110
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_127",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1188
+      ],
+      "retrieved": [
+        1188,
+        2169,
+        1127,
+        2170,
+        2372,
+        2168,
+        2371,
+        2373,
+        2367,
+        1947
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_128",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1141
+      ],
+      "retrieved": [
+        1141,
+        3544,
+        1117,
+        1066,
+        1670,
+        1145,
+        2772,
+        1115,
+        1178,
+        2550
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_129",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "release",
+      "gold": [
+        3486,
+        3487
+      ],
+      "retrieved": [
+        2784,
+        3487,
+        3385,
+        1113,
+        2758,
+        1662,
+        1035,
+        1021,
+        1661,
+        2760
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_130",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "release",
+      "gold": [
+        3528
+      ],
+      "retrieved": [
+        1903,
+        1905,
+        1904,
+        2025,
+        2183,
+        2027,
+        2184,
+        2866,
+        3528,
+        2182
+      ],
+      "first_hit_rank": 9
+    },
+    {
+      "id": "eval_131",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "release",
+      "gold": [
+        3528
+      ],
+      "retrieved": [
+        1806,
+        1808,
+        1809,
+        1810,
+        1807,
+        1016,
+        2314,
+        2265,
+        3126,
+        1189
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_132",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        2575
+      ],
+      "retrieved": [
+        2568,
+        2574,
+        2569,
+        2570,
+        2571,
+        2573,
+        2575,
+        2572,
+        2920,
+        2917
+      ],
+      "first_hit_rank": 7
+    },
+    {
+      "id": "eval_133",
+      "mode": "vector",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2435
+      ],
+      "retrieved": [
+        2433,
+        2438,
+        2435,
+        2434,
+        2437,
+        2436,
+        5,
+        2145,
+        11,
+        2143
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_134",
+      "mode": "vector",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2164
+      ],
+      "retrieved": [
+        2163,
+        2164,
+        2162,
+        2167,
+        2166,
+        2165,
+        2399,
+        2398,
+        2400,
+        3207
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_135",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "issue",
+      "gold": [
+        2304
+      ],
+      "retrieved": [
+        2299,
+        2301,
+        2304,
+        2300,
+        2303,
+        2302,
+        3043,
+        3519,
+        2130,
+        3040
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_136",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "issue",
+      "gold": [
+        2283,
+        2284
+      ],
+      "retrieved": [
+        2284,
+        2278,
+        2282,
+        2283,
+        2279,
+        2208,
+        2146,
+        1950,
+        1939,
+        1179
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_137",
+      "mode": "vector",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1162,
+        2066
+      ],
+      "retrieved": [
+        2062,
+        2080,
+        2208,
+        2207,
+        2209,
+        2205,
+        2065,
+        2064,
+        2206,
+        2077
+      ],
+      "first_hit_rank": 13
+    },
+    {
+      "id": "eval_138",
+      "mode": "vector",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2444
+      ],
+      "retrieved": [
+        2443,
+        2444,
+        2485,
+        2808,
+        2814,
+        2366,
+        2846,
+        2812,
+        2921,
+        1950
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_139",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        1752
+      ],
+      "retrieved": [
+        1751,
+        1752,
+        743,
+        2287,
+        738,
+        402,
+        745,
+        1679,
+        2285,
+        400
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_140",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        1732
+      ],
+      "retrieved": [
+        1731,
+        1732,
+        2920,
+        2263,
+        1141,
+        3424,
+        3402,
+        1387,
+        3400,
+        389
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_141",
+      "mode": "vector",
+      "question_type": "version",
+      "source_type": "issue",
+      "gold": [
+        1698
+      ],
+      "retrieved": [
+        1698,
+        1697,
+        221,
+        209,
+        1161,
+        3484,
+        176,
+        1011,
+        1054,
+        1084
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_142",
+      "mode": "vector",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2387
+      ],
+      "retrieved": [
+        2388,
+        2386,
+        2387,
+        2385,
+        1136,
+        3308,
+        2746,
+        2837,
+        2521,
+        2138
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_143",
+      "mode": "vector",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        1803,
+        3486
+      ],
+      "retrieved": [
+        1803,
+        1802,
+        2505,
+        1808,
+        518,
+        1810,
+        3351,
+        1843,
+        1809,
+        3352
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_001",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        1527,
+        1539
+      ],
+      "retrieved": [
+        1539,
+        281,
+        1374,
+        642,
+        577,
+        527,
+        3190,
+        3009,
+        1514,
+        592
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_002",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        200,
+        661,
+        1517
+      ],
+      "retrieved": [
+        661,
+        2980,
+        200,
+        2973,
+        2972,
+        2951,
+        2984,
+        2975,
+        2981,
+        3263
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_003",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        595,
+        1515
+      ],
+      "retrieved": [
+        594,
+        595,
+        625,
+        1515,
+        191,
+        602,
+        621,
+        600,
+        3149,
+        619
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_004",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        594,
+        1515
+      ],
+      "retrieved": [
+        600,
+        3149,
+        602,
+        622,
+        625,
+        629,
+        1515,
+        594,
+        631,
+        605
+      ],
+      "first_hit_rank": 7
+    },
+    {
+      "id": "eval_005",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        281,
+        948
+      ],
+      "retrieved": [
+        1389,
+        3190,
+        1381,
+        1374,
+        2120,
+        2952,
+        3213,
+        3206,
+        1527,
+        3211
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_006",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        281,
+        644
+      ],
+      "retrieved": [
+        644,
+        3217,
+        3215,
+        1388,
+        3286,
+        3207,
+        3208,
+        1665,
+        2424,
+        3206
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_008",
+      "mode": "hybrid",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        1650
+      ],
+      "retrieved": [
+        1650,
+        1635,
+        3115,
+        2568,
+        3113,
+        3114,
+        2575,
+        2573,
+        1617,
+        2572
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_009",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        336,
+        514
+      ],
+      "retrieved": [
+        514,
+        1537,
+        336,
+        509,
+        3136,
+        2815,
+        2898,
+        3140,
+        518,
+        947
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_010",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        336,
+        514
+      ],
+      "retrieved": [
+        769,
+        784,
+        2311,
+        1802,
+        2777,
+        509,
+        1919,
+        783,
+        1697,
+        945
+      ],
+      "first_hit_rank": 15
+    },
+    {
+      "id": "eval_011",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        166,
+        169,
+        170,
+        493
+      ],
+      "retrieved": [
+        489,
+        494,
+        1036,
+        496,
+        448,
+        499,
+        335,
+        854,
+        3042,
+        3121
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_012",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        166
+      ],
+      "retrieved": [
+        2480,
+        2639,
+        2067,
+        2479,
+        2644,
+        2640,
+        2484,
+        2483,
+        2641,
+        2642
+      ],
+      "first_hit_rank": 20
+    },
+    {
+      "id": "eval_013",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        758,
+        759
+      ],
+      "retrieved": [
+        751,
+        758,
+        1254,
+        1330,
+        759,
+        136,
+        1301,
+        1522,
+        1328,
+        1253
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_014",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        118,
+        122,
+        1634
+      ],
+      "retrieved": [
+        122,
+        1546,
+        2793,
+        118,
+        2715,
+        929,
+        1807,
+        1634,
+        1595,
+        527
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_015",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        659
+      ],
+      "retrieved": [
+        233,
+        232,
+        2860,
+        2863,
+        239,
+        1598,
+        1570,
+        1588,
+        1589,
+        3336
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_016",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        679,
+        683,
+        1527
+      ],
+      "retrieved": [
+        683,
+        460,
+        1653,
+        466,
+        634,
+        674,
+        678,
+        637,
+        461,
+        679
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_017",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        680,
+        681
+      ],
+      "retrieved": [
+        681,
+        2973,
+        686,
+        2983,
+        691,
+        692,
+        694,
+        693,
+        2972,
+        674
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_018",
+      "mode": "hybrid",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        634,
+        637
+      ],
+      "retrieved": [
+        634,
+        2952,
+        2957,
+        2953,
+        3213,
+        679,
+        2954,
+        3211,
+        3167,
+        2693
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_019",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        606
+      ],
+      "retrieved": [
+        754,
+        606,
+        2964,
+        1515,
+        1516,
+        1559,
+        2962,
+        1558,
+        624,
+        2868
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_020",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        190
+      ],
+      "retrieved": [
+        190,
+        189,
+        952,
+        595,
+        192,
+        191,
+        602,
+        1558,
+        598,
+        600
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_021",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        606,
+        607
+      ],
+      "retrieved": [
+        2829,
+        2830,
+        2831,
+        3001,
+        607,
+        2842,
+        1724,
+        1038,
+        2845,
+        3153
+      ],
+      "first_hit_rank": 5
+    },
+    {
+      "id": "eval_022",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        608
+      ],
+      "retrieved": [
+        608,
+        611,
+        609,
+        610,
+        616,
+        615,
+        2027,
+        617,
+        624,
+        952
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_023",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        281,
+        948
+      ],
+      "retrieved": [
+        3190,
+        1389,
+        281,
+        2838,
+        2863,
+        1381,
+        3191,
+        1780,
+        1527,
+        3010
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_024",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        1519
+      ],
+      "retrieved": [
+        208,
+        202,
+        3207,
+        2659,
+        2975,
+        669,
+        2950,
+        687,
+        2670,
+        3346
+      ],
+      "first_hit_rank": 20
+    },
+    {
+      "id": "eval_025",
+      "mode": "hybrid",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        197
+      ],
+      "retrieved": [
+        197,
+        1990,
+        2030,
+        696,
+        1989,
+        1991,
+        2031,
+        1132,
+        1294,
+        1324
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_026",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        281,
+        653
+      ],
+      "retrieved": [
+        653,
+        1381,
+        3206,
+        1389,
+        2071,
+        1688,
+        3215,
+        649,
+        3221,
+        1665
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_027",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        688,
+        693
+      ],
+      "retrieved": [
+        688,
+        2972,
+        2980,
+        2976,
+        2951,
+        2949,
+        691,
+        2948,
+        2984,
+        674
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_028",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        360,
+        953
+      ],
+      "retrieved": [
+        3005,
+        1538,
+        3010,
+        360,
+        3004,
+        3009,
+        3372,
+        3317,
+        3374,
+        3008
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_029",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        602,
+        625
+      ],
+      "retrieved": [
+        602,
+        625,
+        594,
+        600,
+        629,
+        3149,
+        622,
+        1515,
+        192,
+        624
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_030",
+      "mode": "hybrid",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        208
+      ],
+      "retrieved": [
+        466,
+        2671,
+        2975,
+        2670,
+        941,
+        3278,
+        2946,
+        2950,
+        2659,
+        208
+      ],
+      "first_hit_rank": 10
+    },
+    {
+      "id": "eval_039",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        990,
+        1451
+      ],
+      "retrieved": [
+        406,
+        1426,
+        3165,
+        2613,
+        438,
+        2341,
+        840,
+        2101,
+        2039,
+        2870
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_044",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        1630
+      ],
+      "retrieved": [
+        3274,
+        1556,
+        3178,
+        3179,
+        72,
+        1630,
+        596,
+        1520,
+        1505,
+        1929
+      ],
+      "first_hit_rank": 6
+    },
+    {
+      "id": "eval_046",
+      "mode": "hybrid",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        338
+      ],
+      "retrieved": [
+        338,
+        2622,
+        2625,
+        1763,
+        2759,
+        2777,
+        1761,
+        636,
+        337,
+        950
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_047",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        1435
+      ],
+      "retrieved": [
+        1446,
+        1435,
+        1440,
+        1433,
+        3025,
+        1443,
+        1406,
+        2777,
+        1439,
+        1436
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_049",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        430,
+        438
+      ],
+      "retrieved": [
+        2976,
+        673,
+        3377,
+        2973,
+        677,
+        688,
+        1987,
+        2946,
+        2955,
+        2957
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_050",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        430,
+        438
+      ],
+      "retrieved": [
+        434,
+        438,
+        430,
+        675,
+        674,
+        3174,
+        2976,
+        681,
+        2975,
+        2951
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_053",
+      "mode": "hybrid",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        345,
+        512
+      ],
+      "retrieved": [
+        345,
+        1537,
+        3049,
+        2793,
+        2742,
+        512,
+        2505,
+        2504,
+        2407,
+        1663
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_054",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        336,
+        515
+      ],
+      "retrieved": [
+        515,
+        510,
+        2305,
+        1808,
+        2307,
+        2212,
+        2309,
+        2308,
+        2306,
+        2203
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_055",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        172,
+        513
+      ],
+      "retrieved": [
+        3350,
+        451,
+        1803,
+        513,
+        3136,
+        3351,
+        1808,
+        3352,
+        2425,
+        3128
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_056",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        517
+      ],
+      "retrieved": [
+        517,
+        454,
+        510,
+        1632,
+        3383,
+        3129,
+        89,
+        450,
+        451,
+        881
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_057",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        516
+      ],
+      "retrieved": [
+        516,
+        1807,
+        523,
+        468,
+        1380,
+        823,
+        460,
+        1238,
+        2898,
+        822
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_058",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        180,
+        281,
+        948
+      ],
+      "retrieved": [
+        3322,
+        2635,
+        3320,
+        1921,
+        2634,
+        1857,
+        1927,
+        3211,
+        773,
+        3213
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_063",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        519
+      ],
+      "retrieved": [
+        519,
+        2896,
+        514,
+        2375,
+        2898,
+        2815,
+        2893,
+        2376,
+        2895,
+        1651
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_064",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        513
+      ],
+      "retrieved": [
+        513,
+        722,
+        721,
+        2916,
+        450,
+        1378,
+        2914,
+        510,
+        449,
+        1863
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_065",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        580,
+        1634
+      ],
+      "retrieved": [
+        2791,
+        2793,
+        2505,
+        1802,
+        581,
+        857,
+        2038,
+        2307,
+        580,
+        2407
+      ],
+      "first_hit_rank": 9
+    },
+    {
+      "id": "eval_066",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        920,
+        936
+      ],
+      "retrieved": [
+        1545,
+        1541,
+        918,
+        1547,
+        1548,
+        936,
+        938,
+        1551,
+        935,
+        1509
+      ],
+      "first_hit_rank": 6
+    },
+    {
+      "id": "eval_067",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        927,
+        928
+      ],
+      "retrieved": [
+        934,
+        927,
+        930,
+        354,
+        926,
+        1457,
+        1464,
+        179,
+        928,
+        929
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_068",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        926,
+        948
+      ],
+      "retrieved": [
+        354,
+        179,
+        926,
+        938,
+        919,
+        920,
+        940,
+        1545,
+        918,
+        1509
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_069",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        769,
+        770,
+        780
+      ],
+      "retrieved": [
+        110,
+        783,
+        769,
+        2853,
+        114,
+        112,
+        771,
+        768,
+        115,
+        109
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_072",
+      "mode": "hybrid",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        166,
+        335
+      ],
+      "retrieved": [
+        493,
+        489,
+        335,
+        2385,
+        3257,
+        1530,
+        2386,
+        2387,
+        2201,
+        3030
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_073",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        1532
+      ],
+      "retrieved": [
+        1532,
+        1531,
+        1530,
+        1358,
+        1369,
+        442,
+        456,
+        1359,
+        304,
+        210
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_077",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        1533
+      ],
+      "retrieved": [
+        1533,
+        2803,
+        1562,
+        167,
+        3306,
+        210,
+        3247,
+        633,
+        1359,
+        1563
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_082",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        166,
+        502
+      ],
+      "retrieved": [
+        329,
+        331,
+        502,
+        493,
+        3156,
+        506,
+        489,
+        494,
+        166,
+        497
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_083",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        360,
+        455
+      ],
+      "retrieved": [
+        360,
+        1538,
+        953,
+        455,
+        1919,
+        174,
+        1548,
+        3092,
+        307,
+        361
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_084",
+      "mode": "hybrid",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        442,
+        443
+      ],
+      "retrieved": [
+        443,
+        444,
+        381,
+        1530,
+        442,
+        441,
+        193,
+        621,
+        191,
+        965
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_086",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        252
+      ],
+      "retrieved": [
+        703,
+        275,
+        252,
+        15,
+        240,
+        865,
+        759,
+        2109,
+        241,
+        14
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_087",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        257,
+        1623
+      ],
+      "retrieved": [
+        3052,
+        1623,
+        1612,
+        2429,
+        148,
+        1611,
+        150,
+        142,
+        2430,
+        140
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_088",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        760
+      ],
+      "retrieved": [
+        760,
+        1213,
+        549,
+        136,
+        758,
+        561,
+        276,
+        1204,
+        280,
+        1253
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_089",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        20,
+        762
+      ],
+      "retrieved": [
+        762,
+        20,
+        1207,
+        1255,
+        1331,
+        1218,
+        1288,
+        1272,
+        1,
+        1566
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_090",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        252,
+        711,
+        733,
+        734
+      ],
+      "retrieved": [
+        700,
+        711,
+        734,
+        260,
+        811,
+        580,
+        261,
+        735,
+        778,
+        733
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_091",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        754
+      ],
+      "retrieved": [
+        754,
+        603,
+        1522,
+        181,
+        952,
+        3149,
+        599,
+        2139,
+        592,
+        756
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_092",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        10
+      ],
+      "retrieved": [
+        584,
+        22,
+        10,
+        1453,
+        38,
+        33,
+        39,
+        1207,
+        1566,
+        1272
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_093",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        6,
+        135
+      ],
+      "retrieved": [
+        135,
+        1605,
+        133,
+        6,
+        134,
+        132,
+        5,
+        1610,
+        1609,
+        7
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_094",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        257
+      ],
+      "retrieved": [
+        1640,
+        2311,
+        3168,
+        257,
+        2210,
+        3053,
+        1623,
+        1878,
+        2736,
+        1624
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_095",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        759,
+        763
+      ],
+      "retrieved": [
+        136,
+        763,
+        19,
+        1683,
+        549,
+        278,
+        1676,
+        1281,
+        11,
+        1339
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_096",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        738,
+        744,
+        745,
+        746,
+        953
+      ],
+      "retrieved": [
+        738,
+        741,
+        1194,
+        746,
+        2284,
+        1215,
+        1193,
+        742,
+        1321,
+        745
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_097",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        257,
+        1625
+      ],
+      "retrieved": [
+        2453,
+        982,
+        3315,
+        2452,
+        3312,
+        257,
+        2451,
+        2940,
+        2738,
+        1625
+      ],
+      "first_hit_rank": 6
+    },
+    {
+      "id": "eval_098",
+      "mode": "hybrid",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        143,
+        147,
+        148
+      ],
+      "retrieved": [
+        2590,
+        1950,
+        2448,
+        148,
+        2589,
+        144,
+        1613,
+        2938,
+        147,
+        3017
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_099",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        374,
+        537
+      ],
+      "retrieved": [
+        537,
+        374,
+        1513,
+        540,
+        543,
+        2932,
+        546,
+        1546,
+        2924,
+        447
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_100",
+      "mode": "hybrid",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        257,
+        1617
+      ],
+      "retrieved": [
+        1650,
+        1617,
+        1635,
+        3113,
+        2568,
+        2573,
+        1618,
+        3058,
+        3114,
+        2570
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_113",
+      "mode": "hybrid",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        469,
+        682
+      ],
+      "retrieved": [
+        682,
+        469,
+        1652,
+        3346,
+        851,
+        1627,
+        1696,
+        1694,
+        2992,
+        2665
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_114",
+      "mode": "hybrid",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        528
+      ],
+      "retrieved": [
+        528,
+        532,
+        3190,
+        3063,
+        3070,
+        530,
+        3071,
+        3067,
+        2054,
+        3078
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_115",
+      "mode": "hybrid",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        608,
+        609,
+        610
+      ],
+      "retrieved": [
+        611,
+        610,
+        612,
+        608,
+        616,
+        3153,
+        615,
+        624,
+        625,
+        614
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_116",
+      "mode": "hybrid",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1644
+      ],
+      "retrieved": [
+        207,
+        670,
+        671,
+        206,
+        1644,
+        3402,
+        664,
+        1132,
+        1520,
+        672
+      ],
+      "first_hit_rank": 5
+    },
+    {
+      "id": "eval_117",
+      "mode": "hybrid",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1607
+      ],
+      "retrieved": [
+        1607,
+        1604,
+        2433,
+        3267,
+        2472,
+        17,
+        1609,
+        2471,
+        3268,
+        1
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_118",
+      "mode": "hybrid",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1608
+      ],
+      "retrieved": [
+        1608,
+        1604,
+        1,
+        10,
+        39,
+        133,
+        2433,
+        584,
+        3,
+        1609
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_119",
+      "mode": "hybrid",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        590
+      ],
+      "retrieved": [
+        1892,
+        590,
+        2937,
+        1893,
+        3017,
+        257,
+        1625,
+        1878,
+        1859,
+        3018
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_120",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1097
+      ],
+      "retrieved": [
+        352,
+        3115,
+        1065,
+        631,
+        978,
+        2872,
+        1124,
+        3114,
+        1602,
+        2484
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_121",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1073
+      ],
+      "retrieved": [
+        283,
+        1073,
+        3211,
+        3213,
+        1066,
+        1057,
+        3395,
+        956,
+        1064,
+        3320
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_122",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1064
+      ],
+      "retrieved": [
+        1112,
+        1064,
+        3136,
+        964,
+        2816,
+        1003,
+        3124,
+        975,
+        2122,
+        998
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_123",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1076
+      ],
+      "retrieved": [
+        642,
+        656,
+        1375,
+        2070,
+        2840,
+        3203,
+        1376,
+        3200,
+        520,
+        482
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_124",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1041
+      ],
+      "retrieved": [
+        759,
+        274,
+        275,
+        1678,
+        19,
+        751,
+        262,
+        1523,
+        761,
+        1322
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_125",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1016
+      ],
+      "retrieved": [
+        1903,
+        1905,
+        1016,
+        519,
+        1904,
+        2893,
+        1047,
+        2375,
+        2898,
+        2815
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_126",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1132
+      ],
+      "retrieved": [
+        193,
+        2204,
+        1132,
+        1815,
+        1056,
+        621,
+        1124,
+        191,
+        1731,
+        1050
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_127",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1188
+      ],
+      "retrieved": [
+        1188,
+        1127,
+        1947,
+        2373,
+        2370,
+        1957,
+        2371,
+        2662,
+        3560,
+        1952
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_128",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1141
+      ],
+      "retrieved": [
+        3544,
+        1141,
+        1063,
+        2596,
+        2846,
+        2077,
+        2595,
+        1117,
+        2450,
+        1066
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_129",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "release",
+      "gold": [
+        3486,
+        3487
+      ],
+      "retrieved": [
+        2758,
+        2784,
+        1662,
+        3487,
+        3486,
+        2760,
+        1959,
+        1087,
+        3385,
+        1021
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_130",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "release",
+      "gold": [
+        3528
+      ],
+      "retrieved": [
+        1903,
+        1905,
+        1904,
+        3528,
+        519,
+        2027,
+        2467,
+        2184,
+        2613,
+        3283
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_131",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "release",
+      "gold": [
+        3528
+      ],
+      "retrieved": [
+        1806,
+        1808,
+        1810,
+        2265,
+        1807,
+        1809,
+        1016,
+        2293,
+        2202,
+        2294
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_132",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        2575
+      ],
+      "retrieved": [
+        2568,
+        2569,
+        2574,
+        2575,
+        2573,
+        2570,
+        2571,
+        2572,
+        2398,
+        591
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_133",
+      "mode": "hybrid",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2435
+      ],
+      "retrieved": [
+        2433,
+        2435,
+        2438,
+        2434,
+        2436,
+        2437,
+        1,
+        1609,
+        2142,
+        1577
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_134",
+      "mode": "hybrid",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2164
+      ],
+      "retrieved": [
+        2163,
+        2162,
+        2164,
+        2167,
+        2166,
+        2165,
+        2399,
+        2398,
+        2069,
+        2400
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_135",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "issue",
+      "gold": [
+        2304
+      ],
+      "retrieved": [
+        2299,
+        2301,
+        2300,
+        2304,
+        2302,
+        2303,
+        2351,
+        3497,
+        484,
+        3519
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_136",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "issue",
+      "gold": [
+        2283,
+        2284
+      ],
+      "retrieved": [
+        2278,
+        2284,
+        2282,
+        2283,
+        2279,
+        2208,
+        2207,
+        1942,
+        2188,
+        1179
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_137",
+      "mode": "hybrid",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1162,
+        2066
+      ],
+      "retrieved": [
+        2062,
+        2080,
+        2207,
+        2205,
+        2208,
+        2079,
+        2064,
+        2065,
+        2188,
+        2077
+      ],
+      "first_hit_rank": 11
+    },
+    {
+      "id": "eval_138",
+      "mode": "hybrid",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2444
+      ],
+      "retrieved": [
+        2443,
+        2444,
+        2433,
+        1649,
+        2808,
+        2846,
+        238,
+        1575,
+        1998,
+        2485
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_139",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        1752
+      ],
+      "retrieved": [
+        1751,
+        1752,
+        738,
+        2080,
+        402,
+        743,
+        159,
+        746,
+        399,
+        3237
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_140",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        1732
+      ],
+      "retrieved": [
+        1731,
+        1732,
+        1387,
+        3165,
+        1386,
+        441,
+        2920,
+        1728,
+        2263,
+        1442
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_141",
+      "mode": "hybrid",
+      "question_type": "version",
+      "source_type": "issue",
+      "gold": [
+        1698
+      ],
+      "retrieved": [
+        1697,
+        1698,
+        1161,
+        1011,
+        1071,
+        221,
+        209,
+        1720,
+        1723,
+        3484
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_142",
+      "mode": "hybrid",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2387
+      ],
+      "retrieved": [
+        2386,
+        2388,
+        2385,
+        2387,
+        2837,
+        3303,
+        2838,
+        3302,
+        1735,
+        2832
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_143",
+      "mode": "hybrid",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        1803,
+        3486
+      ],
+      "retrieved": [
+        1803,
+        1802,
+        518,
+        2505,
+        1809,
+        2504,
+        1810,
+        3226,
+        2898,
+        1808
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_001",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        1527,
+        1539
+      ],
+      "retrieved": [
+        592,
+        1539,
+        1374,
+        642,
+        281,
+        282,
+        256,
+        3167,
+        446,
+        577
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_002",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        200,
+        661,
+        1517
+      ],
+      "retrieved": [
+        200,
+        661,
+        592,
+        2951,
+        2980,
+        2977,
+        2974,
+        2984,
+        697,
+        2947
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_003",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        595,
+        1515
+      ],
+      "retrieved": [
+        594,
+        595,
+        600,
+        189,
+        598,
+        622,
+        625,
+        191,
+        602,
+        1515
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_004",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        594,
+        1515
+      ],
+      "retrieved": [
+        629,
+        600,
+        3149,
+        622,
+        625,
+        602,
+        3152,
+        631,
+        3153,
+        594
+      ],
+      "first_hit_rank": 10
+    },
+    {
+      "id": "eval_005",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        281,
+        948
+      ],
+      "retrieved": [
+        1389,
+        1392,
+        1374,
+        661,
+        1527,
+        1390,
+        2120,
+        2692,
+        1381,
+        579
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_006",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        281,
+        644
+      ],
+      "retrieved": [
+        644,
+        287,
+        1388,
+        1762,
+        3206,
+        1379,
+        3207,
+        3286,
+        288,
+        3211
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_008",
+      "mode": "rerank",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        1650
+      ],
+      "retrieved": [
+        1650,
+        1635,
+        2568,
+        3113,
+        423,
+        3114,
+        2575,
+        2574,
+        3115,
+        1819
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_009",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        336,
+        514
+      ],
+      "retrieved": [
+        514,
+        1537,
+        336,
+        518,
+        509,
+        2898,
+        2375,
+        512,
+        947,
+        1651
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_010",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        336,
+        514
+      ],
+      "retrieved": [
+        1919,
+        509,
+        514,
+        2777,
+        2039,
+        2742,
+        2037,
+        2311,
+        112,
+        3204
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_011",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        166,
+        169,
+        170,
+        493
+      ],
+      "retrieved": [
+        489,
+        496,
+        494,
+        1036,
+        1044,
+        3435,
+        499,
+        493,
+        854,
+        335
+      ],
+      "first_hit_rank": 8
+    },
+    {
+      "id": "eval_012",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        166
+      ],
+      "retrieved": [
+        2480,
+        2484,
+        2067,
+        2641,
+        2068,
+        2642,
+        2481,
+        2479,
+        2483,
+        2644
+      ],
+      "first_hit_rank": 20
+    },
+    {
+      "id": "eval_013",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        758,
+        759
+      ],
+      "retrieved": [
+        1254,
+        758,
+        1330,
+        1275,
+        136,
+        1322,
+        751,
+        1262,
+        1276,
+        1328
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_014",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        118,
+        122,
+        1634
+      ],
+      "retrieved": [
+        122,
+        1595,
+        1634,
+        2793,
+        1546,
+        924,
+        118,
+        1600,
+        929,
+        2731
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_015",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        659
+      ],
+      "retrieved": [
+        232,
+        233,
+        587,
+        1570,
+        239,
+        3336,
+        242,
+        252,
+        153,
+        659
+      ],
+      "first_hit_rank": 10
+    },
+    {
+      "id": "eval_016",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        679,
+        683,
+        1527
+      ],
+      "retrieved": [
+        634,
+        679,
+        683,
+        687,
+        637,
+        460,
+        1653,
+        678,
+        458,
+        691
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_017",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        680,
+        681
+      ],
+      "retrieved": [
+        681,
+        694,
+        850,
+        693,
+        686,
+        687,
+        692,
+        942,
+        691,
+        3376
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_018",
+      "mode": "rerank",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        634,
+        637
+      ],
+      "retrieved": [
+        634,
+        2954,
+        2952,
+        282,
+        3167,
+        2953,
+        637,
+        3211,
+        1430,
+        3213
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_019",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        606
+      ],
+      "retrieved": [
+        754,
+        2963,
+        2999,
+        2964,
+        2962,
+        606,
+        1725,
+        1315,
+        1310,
+        1558
+      ],
+      "first_hit_rank": 6
+    },
+    {
+      "id": "eval_020",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        190
+      ],
+      "retrieved": [
+        190,
+        192,
+        952,
+        583,
+        595,
+        2999,
+        600,
+        189,
+        594,
+        1558
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_021",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        606,
+        607
+      ],
+      "retrieved": [
+        2829,
+        2830,
+        2831,
+        607,
+        3001,
+        1626,
+        2842,
+        606,
+        1558,
+        608
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_022",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        608
+      ],
+      "retrieved": [
+        608,
+        609,
+        616,
+        611,
+        610,
+        617,
+        614,
+        615,
+        619,
+        612
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_023",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        281,
+        948
+      ],
+      "retrieved": [
+        1381,
+        1780,
+        281,
+        3167,
+        256,
+        2838,
+        2833,
+        1374,
+        3005,
+        532
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_024",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        1519
+      ],
+      "retrieved": [
+        1386,
+        201,
+        2659,
+        663,
+        208,
+        687,
+        2975,
+        1519,
+        3346,
+        202
+      ],
+      "first_hit_rank": 8
+    },
+    {
+      "id": "eval_025",
+      "mode": "rerank",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        197
+      ],
+      "retrieved": [
+        197,
+        1315,
+        1310,
+        110,
+        1334,
+        694,
+        1298,
+        1294,
+        1303,
+        2030
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_026",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        281,
+        653
+      ],
+      "retrieved": [
+        653,
+        1381,
+        649,
+        1389,
+        1395,
+        3215,
+        3221,
+        2634,
+        3209,
+        644
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_027",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        688,
+        693
+      ],
+      "retrieved": [
+        688,
+        693,
+        685,
+        2948,
+        2980,
+        691,
+        2976,
+        692,
+        466,
+        2658
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_028",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        360,
+        953
+      ],
+      "retrieved": [
+        3005,
+        3004,
+        3010,
+        3006,
+        3009,
+        1538,
+        3007,
+        1624,
+        2582,
+        3008
+      ],
+      "first_hit_rank": 13
+    },
+    {
+      "id": "eval_029",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        602,
+        625
+      ],
+      "retrieved": [
+        625,
+        602,
+        594,
+        600,
+        595,
+        630,
+        1515,
+        622,
+        629,
+        627
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_030",
+      "mode": "rerank",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        208
+      ],
+      "retrieved": [
+        466,
+        2975,
+        3278,
+        2659,
+        687,
+        941,
+        208,
+        2657,
+        683,
+        2950
+      ],
+      "first_hit_rank": 7
+    },
+    {
+      "id": "eval_039",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        990,
+        1451
+      ],
+      "retrieved": [
+        438,
+        951,
+        406,
+        1451,
+        2341,
+        2103,
+        3012,
+        1426,
+        2101,
+        2875
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_044",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        1630
+      ],
+      "retrieved": [
+        1556,
+        1366,
+        1520,
+        1357,
+        1213,
+        1555,
+        596,
+        3274,
+        1748,
+        3179
+      ],
+      "first_hit_rank": 12
+    },
+    {
+      "id": "eval_046",
+      "mode": "rerank",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        338
+      ],
+      "retrieved": [
+        338,
+        337,
+        1762,
+        2622,
+        2759,
+        2625,
+        1763,
+        950,
+        1409,
+        2762
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_047",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        1435
+      ],
+      "retrieved": [
+        1435,
+        1433,
+        1446,
+        1440,
+        1406,
+        1409,
+        173,
+        229,
+        3025,
+        1443
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_049",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        430,
+        438
+      ],
+      "retrieved": [
+        939,
+        3377,
+        673,
+        2307,
+        2623,
+        688,
+        2954,
+        2957,
+        469,
+        677
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_050",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        430,
+        438
+      ],
+      "retrieved": [
+        434,
+        430,
+        438,
+        674,
+        675,
+        2944,
+        1535,
+        681,
+        2975,
+        2979
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_053",
+      "mode": "rerank",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        345,
+        512
+      ],
+      "retrieved": [
+        1537,
+        345,
+        510,
+        940,
+        512,
+        3049,
+        3366,
+        647,
+        3367,
+        734
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_054",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        336,
+        515
+      ],
+      "retrieved": [
+        515,
+        510,
+        1509,
+        345,
+        2306,
+        2305,
+        2307,
+        882,
+        1807,
+        2308
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_055",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        172,
+        513
+      ],
+      "retrieved": [
+        510,
+        513,
+        451,
+        337,
+        3351,
+        3350,
+        3138,
+        1808,
+        3352,
+        341
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_056",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        517
+      ],
+      "retrieved": [
+        510,
+        454,
+        517,
+        1632,
+        881,
+        3129,
+        3127,
+        450,
+        438,
+        3383
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_057",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        516
+      ],
+      "retrieved": [
+        516,
+        523,
+        518,
+        460,
+        510,
+        468,
+        517,
+        2719,
+        458,
+        1380
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_058",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        172,
+        180,
+        281,
+        948
+      ],
+      "retrieved": [
+        3320,
+        281,
+        3322,
+        1927,
+        3213,
+        1822,
+        2288,
+        3211,
+        336,
+        1921
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_063",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        519
+      ],
+      "retrieved": [
+        519,
+        2896,
+        2375,
+        514,
+        2897,
+        2376,
+        2898,
+        1913,
+        2894,
+        2893
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_064",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        513
+      ],
+      "retrieved": [
+        513,
+        722,
+        721,
+        2916,
+        450,
+        510,
+        1472,
+        1924,
+        345,
+        1797
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_065",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        580,
+        1634
+      ],
+      "retrieved": [
+        2793,
+        581,
+        857,
+        580,
+        2407,
+        582,
+        2791,
+        991,
+        3473,
+        921
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_066",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        920,
+        936
+      ],
+      "retrieved": [
+        936,
+        919,
+        1545,
+        1547,
+        938,
+        1541,
+        935,
+        1548,
+        1551,
+        920
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_067",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        927,
+        928
+      ],
+      "retrieved": [
+        1458,
+        926,
+        934,
+        1470,
+        1459,
+        929,
+        931,
+        927,
+        1464,
+        928
+      ],
+      "first_hit_rank": 8
+    },
+    {
+      "id": "eval_068",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        926,
+        948
+      ],
+      "retrieved": [
+        926,
+        940,
+        936,
+        354,
+        1081,
+        179,
+        920,
+        1457,
+        939,
+        3184
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_069",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        769,
+        770,
+        780
+      ],
+      "retrieved": [
+        115,
+        769,
+        114,
+        909,
+        771,
+        773,
+        110,
+        783,
+        770,
+        1482
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_072",
+      "mode": "rerank",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        166,
+        335
+      ],
+      "retrieved": [
+        335,
+        493,
+        489,
+        490,
+        2385,
+        492,
+        3029,
+        3033,
+        2387,
+        2386
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_073",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        1532
+      ],
+      "retrieved": [
+        1532,
+        1382,
+        1372,
+        304,
+        1531,
+        456,
+        442,
+        1787,
+        1365,
+        1358
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_077",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        1533
+      ],
+      "retrieved": [
+        1533,
+        210,
+        167,
+        633,
+        3306,
+        3247,
+        1562,
+        2824,
+        304,
+        2803
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_082",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        166,
+        502
+      ],
+      "retrieved": [
+        331,
+        506,
+        502,
+        329,
+        494,
+        491,
+        3156,
+        505,
+        493,
+        1906
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_083",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        360,
+        455
+      ],
+      "retrieved": [
+        1538,
+        360,
+        953,
+        174,
+        455,
+        1919,
+        361,
+        1047,
+        1548,
+        502
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_084",
+      "mode": "rerank",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        442,
+        443
+      ],
+      "retrieved": [
+        441,
+        443,
+        444,
+        381,
+        1530,
+        442,
+        1529,
+        965,
+        1528,
+        1558
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_086",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        252
+      ],
+      "retrieved": [
+        252,
+        275,
+        2795,
+        15,
+        240,
+        251,
+        241,
+        1512,
+        2109,
+        279
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_087",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        257,
+        1623
+      ],
+      "retrieved": [
+        150,
+        1611,
+        142,
+        148,
+        1940,
+        1612,
+        1623,
+        925,
+        3052,
+        143
+      ],
+      "first_hit_rank": 7
+    },
+    {
+      "id": "eval_088",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        760
+      ],
+      "retrieved": [
+        760,
+        1213,
+        84,
+        19,
+        136,
+        549,
+        1215,
+        276,
+        1204,
+        758
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_089",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        20,
+        762
+      ],
+      "retrieved": [
+        1255,
+        1293,
+        1339,
+        20,
+        1346,
+        1288,
+        1277,
+        762,
+        1281,
+        1351
+      ],
+      "first_hit_rank": 4
+    },
+    {
+      "id": "eval_090",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        252,
+        711,
+        733,
+        734
+      ],
+      "retrieved": [
+        735,
+        811,
+        1508,
+        700,
+        711,
+        731,
+        260,
+        243,
+        580,
+        734
+      ],
+      "first_hit_rank": 5
+    },
+    {
+      "id": "eval_091",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        754
+      ],
+      "retrieved": [
+        754,
+        603,
+        1298,
+        1315,
+        1310,
+        1303,
+        1294,
+        1333,
+        1347,
+        1324
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_092",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        10
+      ],
+      "retrieved": [
+        1453,
+        1566,
+        42,
+        584,
+        1207,
+        1218,
+        1,
+        22,
+        40,
+        33
+      ],
+      "first_hit_rank": 13
+    },
+    {
+      "id": "eval_093",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        6,
+        135
+      ],
+      "retrieved": [
+        135,
+        1605,
+        6,
+        133,
+        7,
+        1619,
+        134,
+        132,
+        3332,
+        145
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_094",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        257
+      ],
+      "retrieved": [
+        740,
+        1640,
+        2523,
+        1623,
+        661,
+        527,
+        1111,
+        1539,
+        1381,
+        1878
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_095",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        759,
+        763
+      ],
+      "retrieved": [
+        136,
+        763,
+        1339,
+        1351,
+        1281,
+        760,
+        548,
+        19,
+        1346,
+        2016
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_096",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        738,
+        744,
+        745,
+        746,
+        953
+      ],
+      "retrieved": [
+        1194,
+        738,
+        741,
+        1193,
+        746,
+        743,
+        1215,
+        23,
+        745,
+        739
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_097",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        257,
+        1625
+      ],
+      "retrieved": [
+        982,
+        1625,
+        1178,
+        2453,
+        2451,
+        1997,
+        2452,
+        3315,
+        2940,
+        2737
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_098",
+      "mode": "rerank",
+      "question_type": "conceptual",
+      "source_type": "doc",
+      "gold": [
+        143,
+        147,
+        148
+      ],
+      "retrieved": [
+        148,
+        2590,
+        147,
+        160,
+        1940,
+        144,
+        150,
+        1045,
+        3388,
+        2449
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_099",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "doc",
+      "gold": [
+        374,
+        537
+      ],
+      "retrieved": [
+        540,
+        374,
+        537,
+        570,
+        1513,
+        546,
+        544,
+        562,
+        447,
+        3272
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_100",
+      "mode": "rerank",
+      "question_type": "multi-part",
+      "source_type": "doc",
+      "gold": [
+        257,
+        1617
+      ],
+      "retrieved": [
+        1617,
+        987,
+        1618,
+        2570,
+        2573,
+        3113,
+        1635,
+        2829,
+        2575,
+        2568
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_113",
+      "mode": "rerank",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        469,
+        682
+      ],
+      "retrieved": [
+        682,
+        469,
+        851,
+        466,
+        1696,
+        1652,
+        2669,
+        2859,
+        3346,
+        1694
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_114",
+      "mode": "rerank",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        528
+      ],
+      "retrieved": [
+        528,
+        532,
+        530,
+        3063,
+        2838,
+        3071,
+        3070,
+        3073,
+        3078,
+        3062
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_115",
+      "mode": "rerank",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        608,
+        609,
+        610
+      ],
+      "retrieved": [
+        611,
+        610,
+        616,
+        612,
+        1706,
+        609,
+        3090,
+        1708,
+        2028,
+        598
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_116",
+      "mode": "rerank",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1644
+      ],
+      "retrieved": [
+        1644,
+        206,
+        207,
+        670,
+        671,
+        208,
+        669,
+        528,
+        497,
+        672
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_117",
+      "mode": "rerank",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1607
+      ],
+      "retrieved": [
+        1607,
+        5,
+        1609,
+        2433,
+        2472,
+        1604,
+        7,
+        100,
+        2142,
+        3270
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_118",
+      "mode": "rerank",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1608
+      ],
+      "retrieved": [
+        1608,
+        1609,
+        1604,
+        1620,
+        97,
+        33,
+        10,
+        2433,
+        6,
+        584
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_119",
+      "mode": "rerank",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        590
+      ],
+      "retrieved": [
+        590,
+        1892,
+        1625,
+        1893,
+        3018,
+        1997,
+        591,
+        2937,
+        257,
+        2002
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_120",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1097
+      ],
+      "retrieved": [
+        631,
+        1003,
+        991,
+        2858,
+        3114,
+        2484,
+        2043,
+        964,
+        3115,
+        1065
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_121",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1073
+      ],
+      "retrieved": [
+        1073,
+        996,
+        1057,
+        1076,
+        3395,
+        1066,
+        1131,
+        1064,
+        283,
+        3211
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_122",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1064
+      ],
+      "retrieved": [
+        1064,
+        1112,
+        1164,
+        998,
+        1003,
+        975,
+        2122,
+        1001,
+        997,
+        3444
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_123",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1076
+      ],
+      "retrieved": [
+        1164,
+        642,
+        287,
+        2427,
+        1836,
+        1694,
+        2070,
+        1063,
+        1375,
+        3203
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_124",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1041
+      ],
+      "retrieved": [
+        274,
+        751,
+        1322,
+        759,
+        278,
+        761,
+        275,
+        19,
+        251,
+        1215
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_125",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1016
+      ],
+      "retrieved": [
+        1016,
+        1903,
+        1905,
+        519,
+        3451,
+        1904,
+        1051,
+        1106,
+        999,
+        2898
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_126",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1132
+      ],
+      "retrieved": [
+        1132,
+        2723,
+        2722,
+        3549,
+        621,
+        3550,
+        191,
+        2720,
+        1542,
+        193
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_127",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1188
+      ],
+      "retrieved": [
+        1188,
+        1127,
+        1947,
+        2371,
+        2662,
+        3557,
+        2370,
+        2158,
+        2373,
+        2137
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_128",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "doc",
+      "gold": [
+        1141
+      ],
+      "retrieved": [
+        1141,
+        1145,
+        3544,
+        2079,
+        3020,
+        1063,
+        2450,
+        2550,
+        3402,
+        2595
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_129",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "release",
+      "gold": [
+        3486,
+        3487
+      ],
+      "retrieved": [
+        1662,
+        2758,
+        2760,
+        2783,
+        2784,
+        3487,
+        2762,
+        3486,
+        2780,
+        3385
+      ],
+      "first_hit_rank": 6
+    },
+    {
+      "id": "eval_130",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "release",
+      "gold": [
+        3528
+      ],
+      "retrieved": [
+        1905,
+        1903,
+        3528,
+        519,
+        1904,
+        2183,
+        1093,
+        2182,
+        1048,
+        2266
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_131",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "release",
+      "gold": [
+        3528
+      ],
+      "retrieved": [
+        1806,
+        1808,
+        3451,
+        3459,
+        1807,
+        1809,
+        1810,
+        1016,
+        1813,
+        2265
+      ],
+      "first_hit_rank": null
+    },
+    {
+      "id": "eval_132",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        2575
+      ],
+      "retrieved": [
+        2568,
+        2575,
+        2570,
+        2573,
+        2569,
+        2574,
+        2571,
+        2572,
+        2398,
+        2920
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_133",
+      "mode": "rerank",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2435
+      ],
+      "retrieved": [
+        2435,
+        2433,
+        2437,
+        2438,
+        2434,
+        2436,
+        1609,
+        2589,
+        2142,
+        2143
+      ],
+      "first_hit_rank": 1
+    },
+    {
+      "id": "eval_134",
+      "mode": "rerank",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2164
+      ],
+      "retrieved": [
+        2162,
+        2164,
+        2163,
+        2165,
+        2167,
+        2399,
+        2398,
+        2636,
+        2069,
+        2217
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_135",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "issue",
+      "gold": [
+        2304
+      ],
+      "retrieved": [
+        2301,
+        2304,
+        2299,
+        2302,
+        2303,
+        2300,
+        2351,
+        2408,
+        2407,
+        2406
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_136",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "issue",
+      "gold": [
+        2283,
+        2284
+      ],
+      "retrieved": [
+        2278,
+        2282,
+        2284,
+        2283,
+        2208,
+        2279,
+        2207,
+        1179,
+        2209,
+        2065
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_137",
+      "mode": "rerank",
+      "question_type": "error-message",
+      "source_type": "doc",
+      "gold": [
+        1162,
+        2066
+      ],
+      "retrieved": [
+        2065,
+        2080,
+        2079,
+        2064,
+        2208,
+        2062,
+        2207,
+        2188,
+        2205,
+        2077
+      ],
+      "first_hit_rank": 12
+    },
+    {
+      "id": "eval_138",
+      "mode": "rerank",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2444
+      ],
+      "retrieved": [
+        2443,
+        2444,
+        1574,
+        1575,
+        1588,
+        1997,
+        2821,
+        238,
+        2433,
+        2846
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_139",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        1752
+      ],
+      "retrieved": [
+        1751,
+        1752,
+        738,
+        159,
+        745,
+        743,
+        2080,
+        399,
+        746,
+        3027
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_140",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        1732
+      ],
+      "retrieved": [
+        1731,
+        1732,
+        3162,
+        1386,
+        3165,
+        1387,
+        3161,
+        2783,
+        1089,
+        1728
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_141",
+      "mode": "rerank",
+      "question_type": "version",
+      "source_type": "issue",
+      "gold": [
+        1698
+      ],
+      "retrieved": [
+        1697,
+        1161,
+        1698,
+        1150,
+        1011,
+        992,
+        1084,
+        1071,
+        3550,
+        221
+      ],
+      "first_hit_rank": 3
+    },
+    {
+      "id": "eval_142",
+      "mode": "rerank",
+      "question_type": "error-message",
+      "source_type": "issue",
+      "gold": [
+        2387
+      ],
+      "retrieved": [
+        2385,
+        2387,
+        2388,
+        2386,
+        3303,
+        2832,
+        2837,
+        1735,
+        3308,
+        1136
+      ],
+      "first_hit_rank": 2
+    },
+    {
+      "id": "eval_143",
+      "mode": "rerank",
+      "question_type": "how-to",
+      "source_type": "issue",
+      "gold": [
+        1803,
+        3486
+      ],
+      "retrieved": [
+        1802,
+        1803,
+        2505,
+        518,
+        2504,
+        2898,
+        1809,
+        3226,
+        514,
+        1810
+      ],
+      "first_hit_rank": 2
+    }
+  ]
+}

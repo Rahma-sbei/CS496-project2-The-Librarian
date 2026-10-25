@@ -1,0 +1,11 @@
+# What the web service needs and nothing else: no PyTorch, no sentence-transformers.
+# The question is embedded with fastembed (ONNX) - set LIBRARIAN_EMBEDDER=fastembed - so the service fits in 512 MB.
+# requirements.txt is the full set for building the corpus and index and running the evaluation.
+python-dotenv
+numpy
+rank-bm25
+openai
+fastapi
+uvicorn
+fastembed
+huggingface_hub

@@ -1,0 +1,23 @@
+# Render blueprint for the web service (free plan, 512 MB). Render reads this file when you create a Blueprint
+# from the GitHub repository. The only value to enter by hand is OPENAI_API_KEY.
+services:
+  - type: web
+    name: the-librarian
+    runtime: python
+    plan: free
+    # download the embedding model during the build, so a wake-up from sleep doesn't wait for it
+    buildCommand: >-
+      pip install -r requirements-deploy.txt &&
+      python -c "import json; from fastembed import TextEmbedding;
+      TextEmbedding(json.load(open('index/config.json'))['model'])"
+    startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips "*"
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: LIBRARIAN_EMBEDDER
+        value: fastembed
+      - key: FASTEMBED_CACHE_PATH
+        value: /opt/render/project/src/.fastembed_cache
+      - key: OPENAI_API_KEY
+        sync: false
