@@ -1,5 +1,125 @@
 [
   {
+    "id": "eval_001",
+    "category": "Core Concepts & Data Flow",
+    "question": "How does Streamlit's execution model handle script re-runs?",
+    "answer": "Streamlit executes the entire Python script from top to bottom whenever a user interacts with a widget or when code changes in the script.",
+    "source_file": "corpus/docs/execution_model.md",
+    "source_passage": "Streamlit's architecture is based on a clean execution loop. Whenever a user interacts with a UI widget (e.g., clicking a button, dragging a slider, or entering text) or whenever the source code file is updated on disk, Streamlit reruns the entire Python script from top to bottom. This ensures the user interface strictly reflects the current state of the script."
+  },
+  {
+    "id": "eval_002",
+    "category": "Core Concepts & Data Flow",
+    "question": "How can you persist state across user interactions in Streamlit?",
+    "answer": "By using st.session_state, which allows key-value pairs to persist across script reruns for a given user session.",
+    "source_file": "corpus/docs/session_state.md",
+    "source_passage": "Session State provides a dictionary-like API (st.session_state) that lets you store and access values that persist across reruns for an individual user browser session. You can read, update, or assign new keys to st.session_state dynamically throughout your app script."
+  },
+  {
+    "id": "eval_003",
+    "category": "Core Concepts & Data Flow",
+    "question": "What is the purpose of st.cache_data?",
+    "answer": "st.cache_data is used to cache computations that return data (e.g., DataFrames, API responses, database queries, string outputs). It creates a new copy of data upon each call to ensure immutability.",
+    "source_file": "corpus/docs/caching.md",
+    "source_passage": "st.cache_data is the recommended decorator for caching functions that return data structures such as Pandas DataFrames, API responses, numerical arrays, or SQL query results. Each time a cached function decorated with @st.cache_data is called, Streamlit creates a fresh copy of the return value, preventing accidental state mutations."
+  },
+  {
+    "id": "eval_004",
+    "category": "Core Concepts & Data Flow",
+    "question": "When should you use st.cache_resource instead of st.cache_data?",
+    "answer": "Use st.cache_resource for global non-serializable objects or shared connections, such as database connections, ML models, or TensorFlow/PyTorch sessions.",
+    "source_file": "corpus/docs/caching.md",
+    "source_passage": "Use @st.cache_resource to cache global, non-serializable objects or stateful resources that should be shared across all user sessions and app reruns. Typical use cases include database connection pools, machine learning model objects, and network socket connections."
+  },
+  {
+    "id": "eval_005",
+    "category": "Core Concepts & Data Flow",
+    "question": "How do you manually trigger a rerun of a Streamlit script?",
+    "answer": "By calling st.rerun().",
+    "source_file": "corpus/docs/execution_model.md",
+    "source_passage": "To manually force Streamlit to interrupt current script execution and immediately start a fresh rerun from line 1, call st.rerun(). This is commonly used inside callback functions or conditionally after processing asynchronous events."
+  },
+  {
+    "id": "eval_006",
+    "category": "Core Concepts & Data Flow",
+    "question": "What is the function of st.fragment?",
+    "answer": "st.fragment allows a user to define a section of the app that reruns independently without triggering a full top-to-bottom rerun of the entire script.",
+    "source_file": "corpus/docs/fragments.md",
+    "source_passage": "The @st.fragment decorator allows you to isolate a specific function as a fragment. When widgets inside a fragment change, only the code within that fragment reruns, leaving the rest of the application unchanged. This greatly improves performance for complex layouts."
+  },
+  {
+    "id": "eval_007",
+    "category": "Widgets & User Inputs",
+    "question": "Which widget provides a numeric input field with increment/decrement buttons?",
+    "answer": "st.number_input().",
+    "source_file": "corpus/docs/widgets.md",
+    "source_passage": "st.number_input displays a numeric input widget with +/- step buttons. It supports float and integer types, as well as configurable min_value, max_value, step, and format strings."
+  },
+  {
+    "id": "eval_008",
+    "category": "Widgets & User Inputs",
+    "question": "How can users upload files in a Streamlit app?",
+    "answer": "Using st.file_uploader().",
+    "source_file": "corpus/docs/widgets.md",
+    "source_passage": "st.file_uploader displays a file upload widget. It returns an UploadedFile object (a BytesIO subclass) which can be passed directly to libraries like Pandas, PIL, or PyPDF for processing."
+  },
+  {
+    "id": "eval_009",
+    "category": "Layouts & Media Display",
+    "question": "How do you divide the main Streamlit interface into side-by-side columns?",
+    "answer": "Using st.columns() (e.g., col1, col2 = st.columns(2)).",
+    "source_file": "corpus/docs/layouts.md",
+    "source_passage": "st.columns layout container divides the main app area into side-by-side columns. Pass an integer to create equal-width columns or a list of relative numerical weights to create variable-width columns."
+  },
+  {
+    "id": "eval_010",
+    "category": "Layouts & Media Display",
+    "question": "How do you render collapsible content blocks in Streamlit?",
+    "answer": "Using st.expander(\"Title\").",
+    "source_file": "corpus/docs/layouts.md",
+    "source_passage": "st.expander creates a collapsible container widget. Users can click the header to expand or collapse the container to hide detailed logs, control panels, or secondary information."
+  },
+  {
+    "id": "eval_011",
+    "category": "Data Visualization & Formatting",
+    "question": "Which component allows users to edit tabular data directly inside the UI?",
+    "answer": "st.data_editor().",
+    "source_file": "corpus/docs/data_display.md",
+    "source_passage": "st.data_editor displays an editable data table widget. Users can add, edit, or delete rows and cells directly within the interface, and the modified data is returned as a Pandas DataFrame or dictionary."
+  },
+  {
+    "id": "eval_012",
+    "category": "Data Visualization & Formatting",
+    "question": "How do you render a key metric indicator with a delta value?",
+    "answer": "st.metric(label=\"Revenue\", value=\"$12,000\", delta=\"+5%\").",
+    "source_file": "corpus/docs/data_display.md",
+    "source_passage": "st.metric renders a card-style key metric display with a large bold value, an optional label, and a colored delta indicator showing changes over time."
+  },
+  {
+    "id": "eval_013",
+    "category": "Configuration, Security & Deployment",
+    "question": "Where should API keys and database credentials be stored in a Streamlit project?",
+    "answer": "In .streamlit/secrets.toml.",
+    "source_file": "corpus/docs/configuration.md",
+    "source_passage": "Sensitive environment variables, database credentials, and secret keys should be stored locally inside .streamlit/secrets.toml. Streamlit automatically parses this TOML file into the st.secrets dictionary object."
+  },
+  {
+    "id": "eval_014",
+    "category": "Configuration, Security & Deployment",
+    "question": "What command must be called first before any other Streamlit calls in a script?",
+    "answer": "st.set_page_config().",
+    "source_file": "corpus/docs/configuration.md",
+    "source_passage": "st.set_page_config configures page layout, title, icon, and sidebar default state. It MUST be the very first Streamlit command executed in your Python script; calling it after other Streamlit elements will raise a StreamlitAPIException."
+  },
+  {
+    "id": "eval_015",
+    "category": "Configuration, Security & Deployment",
+    "question": "What CLI command runs a Streamlit application locally?",
+    "answer": "streamlit run app.py.",
+    "source_file": "corpus/docs/deployment.md",
+    "source_passage": "To launch your Streamlit web application server locally, open your terminal and execute `streamlit run <your_script.py>`. This starts a local HTTP server defaults to port 8501."
+  },
+  {
     "id": "eval_016",
     "category": "Core Concepts & Data Flow",
     "question": "How do you run a function when a widget's value changes or a button is clicked?",
