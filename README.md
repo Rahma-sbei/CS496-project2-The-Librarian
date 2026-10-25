@@ -7,6 +7,9 @@ and release notes. Every claim cites the passage it comes from; when the passage
 CS496 AI Engineering, Project 2 (retrieval-augmented generation), Mediterranean Institute of Technology, Fall 2026.
 Team: Nadia Ben Njima, Ahmed Brini, Rahma Sbei, Mariem Lahmer. Report: [report.pdf](report.pdf).
 
+**Try it live: <https://the-librarian-6wzd.onrender.com>** (free hosting: after 15 minutes without visitors the first
+page load takes about a minute while the service wakes up).
+
 ## Setup (one command)
 
 Python 3.12. From a clean clone:
@@ -30,7 +33,8 @@ Command-line version: `venv/Scripts/python generate.py "how do I keep state betw
 
 ## Deployment
 
-The service runs on Render's free plan from this repository, configured by [render.yaml](render.yaml): it installs
+The service is live at <https://the-librarian-6wzd.onrender.com>. It runs on Render's free plan from this
+repository, configured by [render.yaml](render.yaml): it installs
 only [requirements-deploy.txt](requirements-deploy.txt) and embeds questions with `fastembed` (ONNX) instead of
 PyTorch (`LIBRARIAN_EMBEDDER=fastembed`), so it needs about 290 MB instead of 640 MB. The vectors match PyTorch's
 (cosine ≥ 0.99999) and the retrieval evaluation gives identical recall either way. The free plan sleeps after 15
