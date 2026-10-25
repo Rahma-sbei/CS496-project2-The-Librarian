@@ -1,0 +1,78 @@
+{
+  "id": "issue-9278",
+  "type": "issue",
+  "number": 9278,
+  "url": "https://github.com/streamlit/streamlit/issues/9278",
+  "title": "Memory leak when sending PIL.Image to st.image()",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:st.image"
+  ],
+  "created_at": "2024-08-15T06:52:49Z",
+  "closed_at": "2026-07-19T12:30:34Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nI'm trying to make a Streamlit web app that shows video-like detection results by constantly sending image detections to the frame_display. I have no problem with object detection and annotation and the web app runs smoothly, but memory usage kept rising. No memory leak problems when I commented on the frame_display.image part.\n\n### Reproducible Code Example\n\n```Python\nimport cv2\r\nimport supervision as sv\r\nfrom collections import defaultdict, deque\r\nfrom inference import InferencePipeline\r\nfrom inference.core.interfaces.camera.entities import VideoFrame\r\nimport streamlit as st\r\nfrom PIL import Image\r\n\r\nframe_display = st.empty()\r\nSOURCE_VIDEO_PATH = #your video path here\r\n\r\n#my_custom_sink loops in every video frame\r\ndef my_custom_sink(predictions: dict, video_frame: VideoFrame):\r\n    #The detection part has no problem\r\n\r\n    #Saving annotated video frame then displaying it to Streamlit web app\r\n    example_frame= #example: video_frame\r\n    example_frame_rgb = cv2.cvtColor(example_frame, cv2.COLOR_BGR2RGB)\r\n    image_pil = Image.fromarray(example_frame_rgb)\r\n    frame_display.image(image_pil, caption=\"Annotated Frame\", use_column_width=True)\r\n\r\npipeline1 = InferencePipeline.init(\r\n    model_id= \"yolov8n-640\",\r\n    video_reference= SOURCE_VIDEO_PATH,\r\n    on_prediction=my_custom_sink,\r\n)\r\n\r\npipeline1.start()\r\npipeline1.join()\n```\n\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\nNo memory leak, previous detection images are not stored anymore\n\n### Current Behavior\n\nstreamlit\\elements\\image.py stored all the detection images\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.36.0\r\n- Python version: 3.11.4\r\n- Operating System: Windows\r\n- Browser: Chrome\r\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-08-15T06:52:59Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9278)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-08-15T23:11:57Z",
+      "body": "Hey [USER] Thank you for the issue!\r\n\r\nI am trying to run your app but hitting issues. I provided a SOURCE_VIDEO_PATH and set `example_frame = video_frame`. Is there something else I should be doing?\r\n\r\nWith regards to the memory leak, can you describe how you are seeing the memory leak? Is it just after multiple runs, the memory is well-exhausted, or over the course of a run, the memory is getting exhausted?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-08-16T02:07:15Z",
+      "body": "Could you explain further what issue are you experiencing?\r\n\r\nRegarding the memory leak, it seems that just after multiple runs, my memory usage reached almost 100%. My program seemed to keep storing the image_pil at tmp variable in Streamlit's image.py"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-08-16T03:06:06Z",
+      "body": "I temporarily solved the problem by writing the image to local storage, then created a different Python file containing all Streamlit-related scripts, accessing the image through it."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-08-20T20:39:46Z",
+      "body": "Here's the code I have:\r\n\r\n```python\r\nimport cv2\r\nimport supervision as sv\r\nfrom collections import defaultdict, deque\r\nfrom inference import InferencePipeline\r\nfrom inference.core.interfaces.camera.entities import VideoFrame\r\nimport streamlit as st\r\nfrom PIL import Image\r\n\r\nframe_display = st.empty()\r\nSOURCE_VIDEO_PATH = \"3048952-uhd_3840_2160_24fps.mp4\" #your video path here\r\n\r\n#my_custom_sink loops in every video frame\r\ndef my_custom_sink(predictions: dict, video_frame: VideoFrame):\r\n    #The detection part has no problem\r\n\r\n    #Saving annotated video frame then displaying it to Streamlit web app\r\n    example_frame= video_frame\r\n    example_frame_rgb = cv2.cvtColor(example_frame, cv2.COLOR_BGR2RGB)\r\n    image_pil = Image.fromarray(example_frame_rgb)\r\n    frame_display.image(image_pil, caption=\"Annotated Frame\", use_column_width=True)\r\n\r\npipeline1 = InferencePipeline.init(\r\n    model_id= \"yolov8n-640\",\r\n    video_reference= SOURCE_VIDEO_PATH,\r\n    on_prediction=my_custom_sink,\r\n)\r\n\r\npipeline1.start()\r\npipeline1.join()\r\n```\r\n\r\nI get this error:\r\n\r\n```\r\nError in results dispatching - OpenCV(4.8.0) :-1: error: (-5:Bad argument) in     inference_pipeline.py:914\r\n                             function 'cvtColor'                                                                                        \r\n                             > Overload resolution failed:                                                                              \r\n                             >  - src is not a numpy array, neither a scalar                                                            \r\n                             >  - Expected Ptr<cv::UMat> for argument 'src'    \r\n```\r\n\r\nSo something is wrong with my implementation."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-13T02:24:07Z",
+      "body": "I have a simpler example that exhibits the same behavior. Here I am using PIL to rescale images before passing them to Streamlit:\r\n```\r\nimport os, random, secrets, streamlit as st, time\r\nfrom PIL import Image\r\n\r\nst.set_page_config(layout=\"wide\")\r\npage = st.container()\r\nexc = page.empty()\r\nslideshow = page.empty()\r\ncounter = page.empty()\r\n\r\nfiles = []\r\nwhile True:\r\n    if not files:\r\n        root_folder = 'Pictures'\r\n        folders = [f.path for f in os.scandir(root_folder) if f.is_dir()]\r\n        for folder in folders:\r\n            files += [os.path.join(folder, x) for x in os.listdir(path=folder) if (x.lower()[-4:] in ['.jpg','.png']) or (x.lower()[-5:] == '.jpeg')]\r\n        count = len(files)\r\n    file = secrets.choice(files)\r\n    try:\r\n        img = Image.open(file)\r\n        if img.width > (5/3) * img.height:\r\n            scale = 1440/img.width\r\n        else:\r\n            scale = 864/img.height\r\n        img = img.resize((int(scale * img.width), int(scale * img.height)), resample=Image.Resampling.LANCZOS)\r\n        counter.text(count)\r\n        slideshow.image(img)\r\n        img = None\r\n    except Exception as e:\r\n        exc.text(f'{count}: {e}')\r\n    finally:\r\n        files.remove(file)\r\n        count -= 1\r\n    time.sleep(random.uniform(0.05,0.1))\r\n```\r\nEdit: my earlier scaling parameters were causing an unwanted second resizing."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-01T02:40:33Z",
+      "body": "> Here's the code I have:\r\n> \r\n> ```python\r\n> import cv2\r\n> import supervision as sv\r\n> from collections import defaultdict, deque\r\n> from inference import InferencePipeline\r\n> from inference.core.interfaces.camera.entities import VideoFrame\r\n> import streamlit as st\r\n> from PIL import Image\r\n> \r\n> frame_display = st.empty()\r\n> SOURCE_VIDEO_PATH = \"3048952-uhd_3840_2160_24fps.mp4\" #your video path here\r\n> \r\n> #my_custom_sink loops in every video frame\r\n> def my_custom_sink(predictions: dict, video_frame: VideoFrame):\r\n>     #The detection part has no problem\r\n> \r\n>     #Saving annotated video frame then displaying it to Streamlit web app\r\n>     example_frame= video_frame\r\n>     example_frame_rgb = cv2.cvtColor(example_frame, cv2.COLOR_BGR2RGB)\r\n>     image_pil = Image.fromarray(example_frame_rgb)\r\n>     frame_display.image(image_pil, caption=\"Annotated Frame\", use_column_width=True)\r\n> \r\n> pipeline1 = InferencePipeline.init(\r\n>     model_id= \"yolov8n-640\",\r\n>     video_reference= SOURCE_VIDEO_PATH,\r\n>     on_prediction=my_custom_sink,\r\n> )\r\n> \r\n> pipeline1.start()\r\n> pipeline1.join()\r\n> ```\r\n> \r\n> I get this error:\r\n> \r\n> ```\r\n> Error in results dispatching - OpenCV(4.8.0) :-1: error: (-5:Bad argument) in     inference_pipeline.py:914\r\n>                              function 'cvtColor'                                                                                        \r\n>                              > Overload resolution failed:                                                                              \r\n>                              >  - src is not a numpy array, neither a scalar                                                            \r\n>                              >  - Expected Ptr<cv::UMat> for argument 'src'    \r\n> ```\r\n> \r\n> So something is wrong with my implementation.\r\n\r\nI've never received this error so I'm unable to help"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-01T02:42:28Z",
+      "body": "I suspect this leak is not caused by Streamlit. I just implemented PIL solely with Streamlit and have no memory leak problems. Probably from the Roboflow's 'inference' library "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-04T17:32:18Z",
+      "body": "Try running my code, which does not have Roboflow in it anywhere, and watch your memory usage rise indefinitely. You'll need a bunch of images for it to pull from.\r\n\r\nI am not confident enough in my understanding of the code to contribute a patch, but from what I read, I think this could be fixed by the media file manager having references to each session and coordinates in the image metadata. Then, when an image at the same coordinates in a session is replaced, you remove its reference, and when there are no more references, you remove the image from the cache. This is the reverse direction from the session and coordinate metadata that is already kept."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-23T00:08:31Z",
+      "body": "Hey [USER] I believe the script you wrote would increase the memory. This is due to the while true loop is probably generating images and loading them into streamlit and being slightly different enough that we can't dedupe or detect clear.\r\n\r\nHave you tried:\r\n\r\n1. Loading and manipulating all the images at once with caching and then just leverage those images. Those should resolve avoid processing multiple times.\r\n2. Try a fragment with the `run_every` (See our [docs](https://docs.streamlit.io/develop/api-reference/execution-flow/st.fragment) for more info)\r\n\r\nCurious if that improves the memory footprint."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-26T22:27:02Z",
+      "body": "A fragment with run_every is working well, but the image rotation is part of a larger program that uses libraries requiring asyncio, and I'm having trouble getting that to play nice - the fragment doesn't run again until the asyncio loop stops. I was also hoping to load new images at randomized intervals."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-01-06T02:21:22Z",
+      "body": "Has this issue been resolved?\r\nI also have the same issue\r\nI am facing a memory leak issue in my Streamlit app, which is designed for real-time inference using video streams received via RTSP. The app continuously processes video frames and displays detection results in real-time.\r\n\r\nTo verify the issue, I created a minimal reproducible example with similar logic. The code below simulates random frames being displayed in a loop while monitoring memory usage:\r\n```python\r\nimport streamlit as st\r\nimport numpy as np\r\nimport psutil\r\nimport time\r\n\r\ndef get_memory_usage():\r\n   process = psutil.Process()\r\n   memory_info = process.memory_info()\r\n   return memory_info.rss / 1024 / 1024  \r\n\r\nst.button('restart')\r\nshow = st.checkbox('show video', value=True)\r\nvid = st.empty()\r\n\r\nmemory_text = st.empty()\r\nframe_count = 0\r\n\r\n[USER].fragment\r\ndef imgs(img):\r\n    vid.image(img)\r\n    \r\nwhile True:\r\n   frame_count += 1\r\n   im = np.random.random((500,500))\r\n   \r\n   if show:\r\n       vid.image(im)\r\n       # imgs(im)\r\n       \r\n       if frame_count % 100 == 0:\r\n           current_memory = get_memory_usage()\r\n           memory_text.text(f\"Frame: {frame_count}, Memory Usage: {current_memory:.2f} MB\")\r\n   \r\n   time.sleep(0.033)  # ~30fps\r\n\r\n```"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "id": "issue-8234",
+  "type": "issue",
+  "number": 8234,
+  "url": "https://github.com/streamlit/streamlit/issues/8234",
+  "title": "add a 12 hr format option to time_input",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:st.time_input"
+  ],
+  "created_at": "2024-03-04T20:43:16Z",
+  "closed_at": "2026-07-28T17:26:17Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\n The current functionality of time_input appears to be hard coded to a 24 hour format (ie 14:30). It would be helpful to have an option to use a 12 hour format instead (ie 2:30pm)\r\n\n\n### Why?\n\nMany people are used to thinking about time in a 12 hour format. Having that functionality supported when building UIs in Streamlit will greatly improve the user experience. \n\n### How?\n\nPerhaps a parameter for time_input such as \"use_24hr\" where its True by default but you can set it to False resulting in 12 hour functionality. \n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-03-04T20:43:26Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8234)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-03-05T17:55:07Z",
+      "body": "[USER] Thanks for the suggestion. Would you want to have this configurable, or would it also work for you if it gets auto adjusted based on the users locale? "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-03-05T18:25:47Z",
+      "body": "[USER] Personally, auto adjustment based on locale would be fine (US based, working with only US teams used to 12 hr format). But I can imagine some scenarios where configurability would be helpful (ie anything medical uses 24 hr format). Thanks! "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-03-05T18:30:56Z",
+      "body": "Related: #5215"
+    }
+  ]
+}

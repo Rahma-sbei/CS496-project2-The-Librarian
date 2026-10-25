@@ -1,0 +1,29 @@
+{
+  "id": "issue-13163",
+  "type": "issue",
+  "number": 13163,
+  "url": "https://github.com/streamlit/streamlit/issues/13163",
+  "title": "Support container keys in AppTest",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:app-testing"
+  ],
+  "created_at": "2025-11-30T15:52:00Z",
+  "closed_at": "2026-08-29T11:43:12Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAs far as I can tell, containers show up as \"Block\" of type \"flex_container\" in AppTest? It would be very useful if those blocks had the key specified in the app instead of \"None\" as it is today. \n\n```\n#10 15.95     _tree={\n#10 15.95         0: SpecialBlock(\n#10 15.95             type='main',\n#10 15.95             children={\n#10 15.95                 0: UnknownElement(),\n#10 15.95                 1: Block(\n#10 15.95                     type='flex_container',\n#10 15.95                     children={\n#10 15.95                         0: UnknownElement()\n#10 15.95                     }\n#10 15.95                 ),\n```\n\n### Why?\n\nThis would allow for much easier targeted testing of sections of the app. Today, finding areas of the app requires hardcoding navigation steps inside the element tree\n\nThanks and keep up the great work!\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-11-30T15:52:08Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-13163)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-02-16T14:35:11Z",
+      "body": "It is me again, reinforcing how useful this would be for app testing. Like very very useful. Testing today is pretty hard without an easy way to specifically target areas of the app. Especially if the layout is dynamic."
+    }
+  ]
+}

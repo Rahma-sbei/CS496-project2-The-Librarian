@@ -1,0 +1,33 @@
+{
+  "id": "issue-11740",
+  "type": "issue",
+  "number": 11740,
+  "url": "https://github.com/streamlit/streamlit/issues/11740",
+  "title": "Contribution documentation suggestions",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:contribution"
+  ],
+  "created_at": "2025-06-24T07:51:38Z",
+  "closed_at": "2026-07-22T10:02:34Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nI cannot edit the Contribution documentation directly to propose changes, because it is a \"wiki\" page https://github.com/streamlit/streamlit/wiki/Contributing I don't have edit access to instead of living directly in https://github.com/streamlit/streamlit/blob/develop/CONTRIBUTING.md\n\nHere are my suggestions based on my struggles building Streamlit on Ubuntu WSL:\n\nhttps://github.com/streamlit/streamlit/wiki/Contributing#ubuntu should have the additions:\n\n* If you are on Ubuntu 22.04.5 LTS or earlier, then you will only have access to libprotoc 3.12.4, which is lower than the minimum required version 3.20. Therefore, you will have to `do-release-upgrade`. *(This one could be edited to have the weasel word \"might\" instead of \"will\" if you don't believe very strongly in the validity of the detective work I did months ago.)*\n\n* Make sure you have sudo installed. This comes with Ubuntu by default; but if you somehow lack it, you can become root using `su -` and then install sudo with `apt-get install -y sudo`. *(This one is of questionable usefulness, but for some reason I did need to do this at some point.)*\n\n* If you get an error like `error: failed to remove file [blah blah blah]/streamlit/.venv/lib/python3.12/site-packages/streamlit-1.43.2.dist-info/INSTALLER: Permission denied (os error 13)`, try running `sudo chmod -R 777 .venv` first, and/or prefix your `make` command with `sudo`, eg `sudo make all`. *(This one could be moved to the section that talks about WSL, I suppose, since I don't know if this issue ever arises on native linux (I've only run everything through WSL so I don't know what happens on not-WSL).)*\n\nhttps://github.com/streamlit/streamlit/wiki/Contributing#windows should have the addition:\n\n* WSL2 is more likely than WSL1 to work, as there is (or, at least, has been) a [binary compatibility problem](https://github.com/microsoft/WSL/issues/8151) between nodejs and WSL1.\n\nhttps://github.com/streamlit/streamlit/wiki/Contributing#2-grab-the-code should have the addition:\n\n* For implementation reasons, the absolute filepath of the Streamlit directory must not contain any characters that are specially interpreted by the shell. (The shell in question is almost certainly [Bash](https://www.gnu.org/software/bash/manual/bash.html).) *(~~If #11741 and #11742 get fixed then this advice will become obsolete.~~ Edit: unfortunately, this one will not be obsolete until https://github.com/protobufjs/protobuf.js/issues/2081 (a thing with a similar problem, that we depend upon internally) is also fixed, and there is little momentum there. Edit 2026-04-29: that was fixed two days ago, so whenever you get on the current version of that dep special characters are back on the menu...!)*\n* **(new)** Independent of the previous warning, there should be a warning: Due to [internal implementation reasons](https://nodejs.org/api/esm.html#resolution-algorithm-specification), the absolute filepath of the Streamlit directory must not contain any backslashes.\n\n### Why?\n\nWSL is not officially supported, but neither is it officially anathema, so I'm happy to share these hard-won tips I discovered. Some of the other info relates to platforms that are officially supported.\n\n### How?\n\nYou may copy these all verbatim or change them in any way you like. I release all of that text I wrote into the public domain and also the license of this project. Feel free to close this issue when you've determined you've taken all that you want.\n\n### Additional Context\n\n**Trivia**\n\nThese tips mostly come from stuff I discovered while working on https://github.com/streamlit/streamlit/pull/10829, which was in turn something I started while trying to start working on a pull request for some other feature that I actually wanted.\n\n**Contribution License Agreement**\n\nBy submitting this issue I agree that all contributions to this project are made under the Apache 2.0 license.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-06-24T07:51:51Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-11740)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-06-24T12:17:04Z",
+      "body": "Thanks [USER] , I know we already have plans to update this documentation but we are discussing moving it into the codebase to make it more accessible to coding agents. These details are helpful as our team is using Mac. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T10:02:34Z",
+      "body": "Closing this since we applied a couple of updates in the recent months + paused external contributions recently."
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "issue-12873",
+  "type": "issue",
+  "number": 12873,
+  "url": "https://github.com/streamlit/streamlit/issues/12873",
+  "title": "508 Compliance - Add Alt=\"\" tag to decorative elements",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:accessibility"
+  ],
+  "created_at": "2025-10-27T16:37:52Z",
+  "closed_at": "2026-10-02T23:27:51Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\n508 reader applications use 'alt=\"\"' tags to skip over decorative elements such as the down arrow at the end of a selectbox.  This is not implemented in the Streamlit widgets.\n\n### Why?\n\nDecorative images without alt tags create clutter in the object hierarchy readers such as JAWS create and can be confusing to sight-impaired users\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-10-27T16:38:08Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12873)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-28T07:15:56Z",
+      "body": "Hi! I\u2019d like to work on this issue as part of Hacktoberfest 2025.  \nIt seems unassigned so far \u2014 could you please assign it to me?  \nI\u2019ll add `alt=\"\"` to decorative elements in Streamlit widgets to improve accessibility compliance. \n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-31T17:43:52Z",
+      "body": "Hi again ,just checking in to see if I could take this issue.\n\nHappy to start working on adding `alt=\"\"` to decorative elements \u2014 just waiting for confirmation so I can proceed.\n"
+    }
+  ]
+}

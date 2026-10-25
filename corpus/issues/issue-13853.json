@@ -1,0 +1,35 @@
+{
+  "id": "issue-13853",
+  "type": "issue",
+  "number": 13853,
+  "url": "https://github.com/streamlit/streamlit/issues/13853",
+  "title": "Back button doesn't work with elements synced with query params",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "area:frontend",
+    "feature:query-params"
+  ],
+  "created_at": "2026-02-07T07:11:35Z",
+  "closed_at": "2026-09-22T17:18:24Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen pressing the browser back button, the streamlit script does not reexecute, so elements synced with `st.query_params` do not refresh\n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-13853)\n\n```Python\nimport streamlit as st\n\nnum_elements = 10\n\nst.set_page_config(page_title=\"Mock element Slider\", layout=\"centered\")\n\nelement_ids = [f\"mock-element-{i:02d}\" for i in range(num_elements)]\nelement_to_idx = {element_id: idx for idx, element_id in enumerate(element_ids)}\n\nurl_element_id = st.query_params.get(\"element_id\")\nif (\n    \"mock_element_id\" not in st.session_state\n    or st.session_state[\"mock_element_id\"] not in element_to_idx\n):\n    st.session_state[\"mock_element_id\"] = (\n        url_element_id if url_element_id in element_to_idx else element_ids[0]\n    )\n\nwith st.container(key=\"mock-element-slider\"):\n    st.select_slider(\n        \"element\",\n        options=element_ids,\n        key=\"mock_element_id\",\n        label_visibility=\"collapsed\",\n    )\n\nst.query_params[\"element_id\"] = st.session_state[\"mock_element_id\"]\n\ncurrent_element_id = st.session_state[\"mock_element_id\"]\ncurrent_idx = element_to_idx[current_element_id]\nwith st.popover(f\"element `{current_element_id}`\"):\n    st.markdown(f\"({current_idx}/{num_elements})\")\n```\n\n### Steps To Reproduce\n\n1. Create a streamlit app with the above code, and go to http://localhost:8501/?element_id=mock-element-3\n2. Drag the element to mock-element-5\n3. Press the browser back button. \n\n### Expected Behavior\n\nYou would expect the slider to go back to mock-element-3\n\n### Current Behavior\n\nThe slider stays at mock-element-5\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\nI've previously seen https://github.com/streamlit/streamlit/issues/9279, which looks related but is different and doesn't resolve this issue",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-02-07T07:11:47Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-13853)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-02-12T23:47:27Z",
+      "body": "Marking as enhancement since this is currently expected. We'll figure out whether we want to change this behavior with the upcoming `bind` parameter, and maybe also for `st.query_params`. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-16T04:02:54Z",
+      "body": "This is a request for browser back/forward to restore widgets that are manually synced with `st.query_params`. Assigning query params uses `pushState` (`handlePageInfoChanged` in `App.tsx`), so the URL and history stack do change, but `onHistoryChange` is built around page navigation. On the same page it either does not produce a useful rerun, or it reruns with `getQueryString()` reading stale React `queryParams` instead of `document.location.search`. Even a correct rerun would not restore the slider here, because the keyed widget value in `st.session_state` is only initialized from the URL once. Maintainers already marked this as expected and want to revisit it with `bind=\"query-params\"` (which currently uses `replaceState`, so it does not create history entries either).\n\n### Related Issues\n\n- [#13963](https://github.com/streamlit/streamlit/issues/13963): Same-page back/forward with `st.navigation` does rerun, but `st.query_params` stays stale. That report explicitly calls out this single-page case and traces the stale values to `getQueryString()` preferring React state over the restored URL.\n- [#9279](https://github.com/streamlit/streamlit/issues/9279) (closed): Cross-page back navigation dropped query params on the first rerun. Cited by the reporter; fixed in PR #13129 via `preserveQueryParams`, which did not cover same-page query-param history.\n- [#9325](https://github.com/streamlit/streamlit/issues/9325): Original request to bind widget/`session_state` values to query params. Relevant because restoring widgets from history is part of that binding/bookmarkability design, not just a one-off `popstate` fix.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

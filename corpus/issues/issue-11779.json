@@ -1,0 +1,33 @@
+{
+  "id": "issue-11779",
+  "type": "issue",
+  "number": 11779,
+  "url": "https://github.com/streamlit/streamlit/issues/11779",
+  "title": "Add `key` to all components.",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "area:elements"
+  ],
+  "created_at": "2025-06-26T11:16:32Z",
+  "closed_at": "2026-07-22T08:04:27Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\n\u7ed9\u6bcf\u4e00\u4e2a\u7ec4\u4ef6[st.xxx]\u6dfb\u52a0key\uff0c\u589e\u52a0UI\u7684\u53ef\u5b9a\u5236\u6027\nAdd key to each component [ st.xxx ] to increase the customizability of the UI.\n\ne.g. st.columns,\n\n### Why?\n\nincrease the customizability of the UI.\n\n### How?\n\nadd key to components\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-06-26T11:16:44Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-11779)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-06-30T11:22:41Z",
+      "body": "been using stylable_container from extras to achieve that. Would be nice to have a native way to identify elements using CSS as opposed to the hacky way that the extra component identifies said stylable container.\n\nImagine if this:\n\n.stVerticalBlock:has(> div.element-container > div.stMarkdown > div[data-testid=\"stMarkdownContainer\"] > p > span.stylable_container)\n\nbecomes this:\n\n.stylable_container"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-30T08:24:01Z",
+      "body": "This feature would also be very handy for automated testing; Testers at my company asked to add keys so they can identify elements in a stable matter, which I now must do by putting everything inside containers (those do have a key parameter)."
+    }
+  ]
+}

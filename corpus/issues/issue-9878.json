@@ -1,0 +1,40 @@
+{
+  "id": "issue-9878",
+  "type": "issue",
+  "number": 9878,
+  "url": "https://github.com/streamlit/streamlit/issues/9878",
+  "title": "(CommunityCloud) Moving slider seems to generate 2 new (empty) window.history states",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:query-params"
+  ],
+  "created_at": "2024-11-17T07:03:47Z",
+  "closed_at": "2026-09-04T23:37:10Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nWhile investigating https://issues.streamlit.app/?issue=gh-9184 I noticed my browser history (i.e. back navigation) got _filled_ with `window.history` state entries that don't actually seem to do anything when you navigate backwards or forwards through them. It seems like this only affects community cloud? I was unable to reproduce on a local instance of streamlit.\r\n\r\n### Reproducible Code Example\r\n\r\n```python\r\nst.slider(\"Slider (1.0 float step)\", min_value=1.50, max_value=100.50, value=(2.5, 41.5), step=1.0)\r\nst.slider(\"Slider (1.1 float step)\", min_value=1.50, max_value=100.50, value=(2.5, 41.5), step=1.1)\r\nst.slider(\"Slider (int step)\", min_value=1, max_value=100, value=(2, 40), step=3)\r\n```\r\n\r\n### Steps To Reproduce\r\n\r\n1. Go to https://issues.streamlit.app/?issue=gh-9184 in MS Edge or Opera One(version: 114.0.5282.185) -- it probably works in Chrome too but I didn't have that installed to test.\r\n2. Right click on the browser \"Back\" button to see the tab history. It should look something like this\r\n![image](https://github.com/user-attachments/assets/6154ef06-c882-4c98-ad93-b340fb92a935)\r\n3. Adjust the sliders on the page a couple of times.\r\n4. Go back and right-click on the browser \"Back\" button. \r\n![image](https://github.com/user-attachments/assets/9de642ae-90eb-4783-b46f-0708295f6032)\r\n\r\n5. Clicking the \"Back\" button doesn't actually change any kind of state on the page (e.g. it doesn't move the sliders back to their old positions -- not that I was really expecting it to do that)\r\n\r\n\r\n\r\n### Expected Behavior\r\n\r\nWe shouldn't be putting do-nothing states into user's `window.history` on widget interaction.\r\n\r\n### Current Behavior\r\n\r\n![image](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fi.imgflip.com%2F1rpt5c.jpg&f=1&nofb=1&ipt=53ccae2a973a336828bfcaf6c76821c6c0278814b51b2fd6bdaca1150f84b1ce&ipo=images)\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: whatever you guys were running on Community Cloud in Nov 2024\r\n- Python version: _probably_ 3.10, based on what I know about community cloud\r\n- Operating System: Windows\r\n- Browser: Tested on MS Edge Version 131.0.2903.51 and Opera One (version: 114.0.5282.185)\r\n\r\n\r\n### Additional Information\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-17T07:03:59Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9878)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-11-19T17:03:35Z",
+      "body": "Hi [USER] , thanks for filing this issue! I was able to confirm that this is an issue in Streamlit OSS, not just Streamlit Community Cloud. I was able to repro it locally with an app that sets query string params. \r\n\r\nA simple repro app:\r\n\r\n```py\r\nimport streamlit as st\r\n\r\nst.checkbox(\"Toggle this\")\r\n\r\nst.query_params[\"number\"] = 1\r\n```\r\n\r\nToggle the checkbox, and you'll note that each re-run of this app will (erroneously) push a new state to the browser history. This happens in this piece of code: https://github.com/streamlit/streamlit/blob/develop/frontend/app/src/App.tsx#L787-L797\r\n\r\nTo fix this, I'm pretty sure this logic should be updated to check that the URL is actually different before updating state, so the bug fix might look something like this:\r\n\r\n```ts\r\n  handlePageInfoChanged = (pageInfo: PageInfo): void => {\r\n    const { queryString } = pageInfo\r\n\r\n    const url = new URL(document.location.href)\r\n    url.search = queryString || \"\"\r\n    const targetUrl = url.toString()\r\n\r\n    // Only send URL updates if the URL has changed\r\n    if (targetUrl !== document.location.href) {\r\n      return\r\n    }\r\n\r\n    window.history.pushState({}, \"\", targetUrl)\r\n\r\n    this.hostCommunicationMgr.sendMessageToHost({\r\n      type: \"SET_QUERY_PARAM\",\r\n      queryParams: queryString ? `?${queryString}` : \"\",\r\n    })\r\n  }\r\n```\r\n\r\nI will work with the team to get a proper fix for this, but wanted to confirm that this is an issue and thank you again for filing it!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-19T17:22:44Z",
+      "body": "[USER] ah hmmm, I'm actually working on a PR that probably fixes this (GH-8112), then. So perhaps hold off on a separate fix?\r\n \r\nBut what was weird to me about the example case was that the sliders weren't actually changing the url at all. Otherwise the additional history entries would have made sense to me."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-11-19T17:27:52Z",
+      "body": "[USER] I will hold off on taking further action on this bug and look forward to your related PR!"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "id": "issue-7868",
+  "type": "issue",
+  "number": 7868,
+  "url": "https://github.com/streamlit/streamlit/issues/7868",
+  "title": "`st.data_editor` doesn\u2019t return the input value unless you press Enter or click outside the editor",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.data_editor"
+  ],
+  "created_at": "2023-12-21T17:11:15Z",
+  "closed_at": "2026-07-23T21:34:30Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nUnlike `st.number_input`, `st.text_area`, and other widgets, `st.data_editor` only returns the input value after the user presses Enter or clicks outside the currently focused cell (excluding clicks on buttons).\n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-7868)\n\n```Python\nimport pandas as pd\nimport streamlit as st\n\n\ndef set_state(i: int, df: pd.DataFrame) -> None:\n    st.session_state.stage = i\n    st.session_state.df = df\n\n\nif \"stage\" not in st.session_state:\n    st.session_state.stage = 0\n\nif st.session_state.stage == 0:\n    st.write(\"Input your data\")\n    df = st.data_editor(pd.DataFrame({\"col1\": [\"a\", \"b\"], \"col2\": [\"c\", \"d\"]}))\n    st.button(\n        \"Begin\",\n        on_click=set_state,\n        args=[1, df],\n    )\n\nif st.session_state.stage == 1:\n    st.write(\"Your data\")\n    st.dataframe(st.session_state.df)\n```\n\n\n### Steps To Reproduce\n\n1. Click and edit a cell\n2. Press the `Begin` button without clicking another area or pressing the Enter key.\n3. Input value is not shown (input value is not returned from `st.data_editor`)\n\n![Screen Recording 2023-12-22 at 2 02 09](https://github.com/streamlit/streamlit/assets/45100960/0bd9f592-772c-440f-b06c-c73eee2e55c2)\n\n\n\n### Expected Behavior\n\nInput value is shown after clicking the button (input value is returned from `st.data_editor`).\n\n### Current Behavior\n\nInput value is not shown after clicking the button (input value is not returned from `st.data_editor`).\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n  - 1.29.0\n- Python version:\n  - 3.11.6\n- Operating System:\n  - Ubuntu 22.04.2 LTS\n- Browser:\n  - Google Chrome\n\n\n### Additional Information\n\nIf this is an expected behavior, feel free to close this issue.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-12-21T17:11:27Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-7868)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-12-22T15:10:52Z",
+      "body": "Hey [USER],\r\nInput value is shown after clicking the button and also Enter key is not pressed.\r\n\r\n[Screencast from 22-12-23 08:35:18 PM IST.webm](https://github.com/streamlit/streamlit/assets/105560839/8e981800-fe3b-4bfa-a11e-ed8b0b734e69)\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-12-22T16:41:12Z",
+      "body": "Hello [USER],\r\nAfter receiving your response, I tried inputting the value and clicking the button several times, but sometimes the input value is shown, and sometimes it is not.\r\nTherefore, this issue may be due to a race condition.\r\n\r\n![Screen Recording 2023-12-23 at 1 24 53](https://github.com/streamlit/streamlit/assets/45100960/4c8c2c00-7c28-48c7-bbbb-09b377ead7f0)\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-12-22T17:35:15Z",
+      "body": "Hello [USER],\r\nNow, I too tried inputting the value again and clicking the button, however sometimes the input value is shown, and it's not.\r\nMay be there is a need to create a new widget or parameters to solve this issue based on race condition."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-01-08T22:17:38Z",
+      "body": "I was able to reproduce the issue [here](https://issues.streamlit.app/?issue=gh-7868). This does indeed look like a race condition. There are two reruns fired in a short interval, the rerun of the button click and the one from the data editor input change. The issue is a bit similar to this one: https://github.com/streamlit/streamlit/issues/7862"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-02-19T04:02:19Z",
+      "body": "[USER] this might only be a real problem with button-like elements (or things like st.page_link), since I can't think of another element that a user could \"switch\" to which would \"instantly\" issue reruns. Is it possible for a button presses to \"collect\" all other rerun requests from elements on the page before they send their own rerun request?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-02-19T08:32:39Z",
+      "body": "[USER]  Yep, that is a good idea. Maybe even just adding a very short delay (e.g. 10ms) for sending out the button trigger event would solve that as well."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-02-19T14:23:43Z",
+      "body": "Funnily enough I ran into this very problem not 10 minutes after posting last night \ud83d\ude02.\r\n\r\nA short delay could work, though I think that makes some assumptions about the execution tike for all other elements on the page to update. For example, if I have a large dataframe in `data_editor`, is it possible the time the frontend needs to reassemble that into a rerun message potentially greater than 10ms? I don't know how you'd upper-bound that question...\r\n\r\nI'm not very familiar with the frontend execution model but i think a delay would only reliably work if it's a \"first-in-first-out\" situation. I.e. when an element starts processing to emit a rerun request back to the server it aquires some lock which prevents other elements (e.g. button) from starting to process their own. Then a short delay might work in all scenarios because you only need to bound the time required for an element to _enter_ the processing of its rerun request, not the whole thing."
+    }
+  ]
+}

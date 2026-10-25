@@ -1,0 +1,62 @@
+{
+  "id": "issue-1770",
+  "type": "issue",
+  "number": 1770,
+  "url": "https://github.com/streamlit/streamlit/issues/1770",
+  "title": "New API: st.set_page_config",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement"
+  ],
+  "created_at": "2020-07-28T10:34:22Z",
+  "closed_at": "2020-08-07T08:40:23Z",
+  "body": "## Proposal\r\n```\r\nst.set_page_config(\r\n\tlayout=\"centered\",  # Can be \"centered\" or \"wide\". In the future also \"dashboard\", etc.\r\n\tinitial_sidebar_state=\"auto\",  # Can be \"auto\", \"expanded\", \"collapsed\"\r\n\tpage_title=None,  # String or None. Strings get appended with \"\u2022 Streamlit\". \r\n\tpage_icon=None,  # String, anything supported by st.image, or None.\r\n)\r\n```\r\n\r\n## Background\r\nWe want to support the following in Streamlit:\r\n\r\n1. Ability to set page favicon\r\n2. Ability to set page title\r\n3. Ability to make a page start in wide mode (today you need to toggle it in \"preferences\")\r\n4. Ability to make a page start with the sidebar collapsed (today you need to collapse via the UI)\r\n\r\n## Must be first st command\r\nFor all of these settings, we'd prefer if the user sets them near the top of their script. Because it would be weird to have an app load, then show a bunch of stuff, *and then* change into wide mode, for example.\r\n\r\n## Immutable, for now\r\nFor title and favicon, it makes a lot of sense to support mutation. But it's not what 99% of the users will be doing, so it's OK if we don't support it at first.\r\nFor wide-mode and expand-sidebar, mutations make a lot less sense.\r\n\r\n(Copied from our internal spec [here](https://www.notion.so/streamlit/Product-1472107ee200491b82894fe5fb5e4559?p=44a10601796749f6bf8c130c4f2892cc))",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2020-07-29T13:51:54Z",
+      "body": "[USER] This sounds like a great solution, looking forward to it! One question I'm curious about is the difference between \"auto\" and \"expanded\" for the initial sidebar state. My impression is that in either case, if any `st.sidebar.*` functions have been called, the sidebar would show up expanded, and if no `st.sidebar.*` functions have been called, there will be no sidebar to expand or collapse. Is there something I'm missing?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-07-29T18:11:56Z",
+      "body": "[USER] Thanks! \"auto\" and \"expanded\" will have different results depending on the width of the browser window. \"auto\" sidebar (aka today's behavior) starts expanded if the window is wider than a certain point, and starts collapsed otherwise. The two new options allow you to force the initial sidebar state one way or the other, ignoring browser width.\r\n\r\nIncidentally, I'm wondering whether it makes sense to show an empty sidebar when `initial_sidebar_state=\"expanded\"`. I can imagine that somebody might want to dynamically append things to the sidebar and thus leave an open canvas there? But it's a pretty weird/niche use case, and it's already possible with st.sidebar.empty(). Will do some more product thinking here.\r\n\r\n(in favor of showing the expanded empty sidebar: I don't think Streamlit is currently capable of looking forward through the app to detect whether there's an st.sidebar somewhere later, so as soon as st.set_page_config is called we'd need to make a decision)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-07-30T00:43:32Z",
+      "body": "Oh, duh, forgot about the screen size thing! Sounds great \ud83d\ude42"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-08-08T19:46:07Z",
+      "body": "Hi [USER], thanks for putting this together! I'd love to test this out, but it looks like the latest available nightly release was from August 5th. Any idea when this feature will come out in a nightly release?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-08-13T10:17:36Z",
+      "body": "Hi [USER],\r\n\r\nI'm using latest nightly. Although st.beta_set_page_config() is the first streamlit call, **sometimes** (not always) when I hit a st.button() I'm getting the error below.\r\n\r\n```\r\nStreamlitAPIException: beta_set_page_config() can only be called once per app, and must be called as the first Streamlit command in your script.\r\n```\r\n\r\nFor now, I'll try to avoid this error with a try/except..."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-08-13T23:33:21Z",
+      "body": "Hi [USER], sorry we had some issues with the nightly over the past weekend but we just shipped out a release yesterday so you should be able to use this feature if you upgrade to the latest Streamlit version(0.65)!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-02-17T21:19:04Z",
+      "body": "For anybody who arrived here and is looking for the fix:\r\n\r\n**streamlit.set_page_config(page_title=None, page_icon=None, layout='centered', initial_sidebar_state='auto')**\r\n\r\nConfigures the default settings of the page.\r\nNote: This must be the first Streamlit command used in your app, and must only be set once.\r\nParameters\r\n\u2022 page_title (str or None) \u2013 The page title, shown in the browser tab. If None,\r\ndefaults to the filename of the script (\u201capp.py\u201d would show \u201capp \u2022 Streamlit\u201d).\r\n\u2022 page_icon (Anything supported by st.image or str or None) \u2013 The\r\npage favicon. Besides the types supported by st.image (like URLs or numpy arrays), you\r\ncan pass in an emoji as a string (\u201c\u201d) or a shortcode (\u201c:shark:\u201d). If you\u2019re feeling lucky,\r\ntry \u201crandom\u201d for a random emoji! Emoji icons are courtesy of Twemoji and loaded from\r\nMaxCDN.\r\n\u2022 layout (\"centered\" or \"wide\") \u2013 How the page content should be laid out. Defaults to \u201ccentered\u201d, which constrains the elements into a centered column of fixed width;\r\n\u201cwide\u201d uses the entire screen.\r\n\u2022 initial_sidebar_state (\"auto\" or \"expanded\" or \"collapsed\") \u2013\r\nHow the sidebar should start out. Defaults to \u201cauto\u201d, which hides the sidebar on mobilesized devices, and shows it otherwise. \u201cexpanded\u201d shows the sidebar initially; \u201ccollapsed\u201d\r\nhides it.\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-05T15:42:03Z",
+      "body": "Je cherche une application qui va me permettre d'analyser les matchs "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-05T15:42:41Z",
+      "body": "Br\u00e9sil Norv\u00e8ge analyse le match pour me donner le r\u00e9sultat final des stades processus \n"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "issue-7825",
+  "type": "issue",
+  "number": 7825,
+  "url": "https://github.com/streamlit/streamlit/issues/7825",
+  "title": "Enhance Streamlit's Compatibility with Playwright on Windows by Updating Event Loop Configuration",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:windows"
+  ],
+  "created_at": "2023-12-11T05:42:58Z",
+  "closed_at": "2026-06-14T20:24:41Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\r\n- [X] I added a descriptive title and summary to this issue.\r\n\r\n### Summary\r\n\r\nStreamlit's use of the older Selector event loop on Windows conflicts with Playwright's need for the newer Proactor event loop. This incompatibility causes exceptions when using Playwright for web scraping within Streamlit. The same issue will affect any other modules relying on the Proactor event loop in addition to Playwright.\r\n\r\n\r\n### Why?\r\n\r\nPlaywright requires the Proactor event loop on Windows to run its driver in a subprocess, as the Selector event loop does not support async subprocesses. The Proactor event loop has replaced the Selector event loop as the default event loop on Windows starting with Python 3.8. The issue is [documented](https://playwright.dev/python/docs/library#incompatible-with-selectoreventloop-of-asyncio-on-windows) in Playwright's official documentation.\r\n\r\n\r\n### How?\r\n\r\nProposing a modification or removal of the `_fix_tornado_crash` function in Streamlit ([source code](https://github.com/streamlit/streamlit/blob/e4ab8f4578eac6c8b5ca4d518bf65f09849ea2b2/lib/streamlit/web/bootstrap.py#L406)). This function currently enforces the Selector event loop, which is incompatible with Playwright. An alternative solution could be introducing a configurable option for users to select the appropriate event loop.\r\n\r\n\r\n### Additional Context\r\n\r\nTornado 6.1, released on October 30, 2020, supports the Proactor event loop on Windows (source: [Tornado 6.1 Release Notes](https://www.tornadoweb.org/en/stable/releases/v6.1.0.html)). Additionally, a related discussion in the Bokeh GitHub repository ([issue #12018](https://github.com/bokeh/bokeh/issues/12018)) and the [subsequent PR](https://github.com/bokeh/bokeh/pull/12019) supports the feasibility of this update.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-12-11T05:43:08Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-7825)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-09T15:02:01Z",
+      "body": "Is this issue still relevant?\nI'm learning how to use playwright with streamlit based on this post:\nhttps://www.stefsmeets.nl/posts/streamlit-pytest/\n\nSeems to work just fine on windows, and removing _fix_tornado_crash from the code in my local venv has no impact.\nUsing python 3.12, Tornado 6.4.2 and streamlit 1.44"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-14T20:24:41Z",
+      "body": "We recently migrated from Tornado to Starlette, which I believe also fixed this issue."
+    }
+  ]
+}

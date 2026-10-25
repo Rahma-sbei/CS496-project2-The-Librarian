@@ -1,0 +1,28 @@
+{
+  "id": "issue-16086",
+  "type": "issue",
+  "number": 16086,
+  "url": "https://github.com/streamlit/streamlit/issues/16086",
+  "title": "Add `allowed_dates` parameter to st.date_input to restrict selectable dates to a specific list",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:st.date_input"
+  ],
+  "created_at": "2026-07-20T17:52:47Z",
+  "closed_at": "2026-07-22T08:47:56Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nCurrently, st.date_input only supports continuous date ranges via min_value and max_value. \nThere is no way to restrict selectable dates to a specific list of valid dates, such as \ndates available in a dataframe. Adding an allowed_dates parameter would fill this gap.\n\n### Why?\n\nI'm always frustrated when I need to show a date picker that only allows the user to select \ndates that exist in a dataset. For example, when a dataframe contains sales data only for \nspecific dates, the current widget allows the user to select any date in the range, even \ndates with no data. This forces developers to use workarounds like st.selectbox, which \nlacks the calendar UI and date-picking experience that st.date_input provides.\n\n### How?\n\nIntroduce a new parameter called `allowed_dates` in `st.date_input` with the following behavior:\n\n- Accepts a list of datetime.date objects\n- Disables all dates not present in the list in the calendar UI\n- Example usage:\n\nimport streamlit as st\nimport pandas as pd\n\ndf = pd.DataFrame({\"date\": [\"2025-01-01\", \"2025-01-15\", \"2025-02-10\"]})\ndf[\"date\"] = pd.to_datetime(df[\"date\"]).dt.date\n\nselected = st.date_input(\n    \"Select a date\",\n    allowed_dates=df[\"date\"].tolist()\n)\n\n### Additional Context\n\nThis feature request was inspired by a common use case discussed while using st.date_input  with dataframes. The current workaround is to use st.selectbox with the list of available dates, but this sacrifices the calendar UI   experience.\n\nRelated issue: st.date_input currently supports min_value and max_value for continuous \nranges, but has no support for non-continuous date lists.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-20T17:52:58Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-16086)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-20T19:05:20Z",
+      "body": "This is a feature request (enhancement) for `st.date_input` to add an `allowed_dates` parameter that restricts the selectable dates to a specific, non-continuous list of `datetime.date` values (e.g. only dates present in a dataframe), disabling all other dates in the calendar UI. Today the widget only supports continuous ranges via `min_value`/`max_value`, forcing developers into workarounds like `st.selectbox` that lose the calendar experience. This is a well-established request that has been raised multiple times before, so it's very likely a duplicate of existing issues rather than a novel ask.\n\n### Related Issues\n\n- [#7062 \u2014 Allow passing an explicit list of selectable dates to st.date_input](https://github.com/streamlit/streamlit/issues/7062): Near-exact duplicate requesting a `selectable_dates` list parameter to restrict the picker to specific dates (blocking weekends, holidays, unavailable slots). Highest engagement (16 reactions).\n- [#8880 \u2014 Able to configure a set of available dates for date_input](https://github.com/streamlit/streamlit/issues/8880): Duplicate request to restrict `st.date_input` to a specific allowlist of dates rather than a min/max range, motivated by the same scheduling/data-availability use case.\n- [#7622 \u2014 date input disable dates on weekends](https://github.com/streamlit/streamlit/issues/7622): Closely related; asks to disable specific dates (e.g. weekends) in `st.date_input`, which is the inverse of an allowlist and would likely be solved by the same underlying capability.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

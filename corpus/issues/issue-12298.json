@@ -1,0 +1,23 @@
+{
+  "id": "issue-12298",
+  "type": "issue",
+  "number": 12298,
+  "url": "https://github.com/streamlit/streamlit/issues/12298",
+  "title": "Icon for `st.metric`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.metric"
+  ],
+  "created_at": "2025-08-23T01:16:03Z",
+  "closed_at": "2026-07-22T17:49:23Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAdd an `icon` parameter to `st.metric` to show icons like in these dashboards:\n\n<img width=\"1004\" height=\"108\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/a7164a5f-b39a-4d22-b59a-871792db4406\" />\n\n<img width=\"943\" height=\"81\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/65a4444e-df34-4f22-942c-b9ed2032bea1\" />\n\n<img width=\"1037\" height=\"175\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/04a9861b-065a-4cd7-b8ec-826e8270d72a\" />\n\n### Why?\n\nNice to quickly visualize what a metric is about. \n\n### How?\n\nNot sure about the exact design. Should we have a border around it? Or maybe even a light background color? Or a parameter to set the color and background color? Also need to see how this looks together with sparkline charts. \n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-08-23T01:16:12Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12298)\n"
+    }
+  ]
+}

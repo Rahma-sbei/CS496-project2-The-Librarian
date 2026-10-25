@@ -1,0 +1,27 @@
+{
+  "id": "issue-291",
+  "type": "issue",
+  "number": 291,
+  "url": "https://github.com/streamlit/streamlit/issues/291",
+  "title": "'from __future__' error running on python3.8rc1",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug"
+  ],
+  "created_at": "2019-10-06T16:52:26Z",
+  "closed_at": "2020-04-01T14:58:44Z",
+  "body": "# Summary\r\n\r\n I have installed streamlit using pip for python3.8rc1.\r\n\r\nUpon running `streamlit hello` and visiting the localhost URL, I see the following in a web popup:\r\n\r\n```\r\nFile \"/Library/Frameworks/Python.framework/Versions/3.8/lib/python3.8/site-packages/streamlit/hello.py\", line 18\r\n  from __future__ import division, unicode_literals\r\n  ^\r\nSyntaxError: from __future__ imports must occur at the beginning of the file\r\n```\r\n\r\nBriefly looking at the source for this file, I do not understand what is causing the error.\r\n\r\n\r\n# Steps to reproduce\r\n\r\nWhat are the steps we should take to reproduce the bug:\r\n1. Install python3.8rc1 on macOS catalina.\r\n2. `pip3 install streamlit`. Will require Developer Tools and fussing with pillow Zlib dependency.\r\n3. Run `streamlit hello`.\r\n4. Visit the page.\r\n\r\n\r\n# Debug info\r\n\r\n- Streamlit version: 0.47.4\r\n- Python version: Python 3.8.0rc1\r\n- Using Conda? PipEnv? PyEnv? Pex? No.\r\n- OS version: macOS 10.15 Beta (19A582a)\r\n- Browser version: Safari Version 13.0.2 (15608.2.30.1.1)\r\n",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2019-10-06T22:44:50Z",
+      "body": "Python 3.8 doesn't work very well for me, but you can get it running by just removing the line above, like so: https://github.com/XBattleFan/streamlit/commit/6422cb07e66434f51d86540c5f083ca555532695\r\n\r\nFractals and plotting will work, none of the others.\r\n\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-04-01T14:58:44Z",
+      "body": "We have full python 3.8 support now, and we've dropped python 2 support."
+    }
+  ]
+}

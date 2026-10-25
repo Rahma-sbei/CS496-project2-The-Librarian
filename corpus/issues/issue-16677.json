@@ -1,0 +1,32 @@
+{
+  "id": "issue-16677",
+  "type": "issue",
+  "number": 16677,
+  "url": "https://github.com/streamlit/streamlit/issues/16677",
+  "title": "StreamlitInvalidColorError message renders as one run-on line because bullets lack newlines",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.map",
+    "feature:builtin-charts",
+    "area:backend"
+  ],
+  "created_at": "2026-08-27T18:46:41Z",
+  "closed_at": "2026-08-28T20:40:42Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n`StreamlitInvalidColorError` builds its message from implicitly concatenated string literals, but the literals that introduce the bullet list have no separating newline:\n\n```python\n# lib/streamlit/errors.py:589-592\n\"This does not look like a valid color: {color}.\\n\\n\"\n\"Colors must be in one of the following formats:\"\n\"* Hex string with 3, 4, 6, or 8 digits. Example: `'#00ff00'`\"\n\"* List or tuple with 3 or 4 components. Example: `[1.0, 0.5, 0, 0.2]`\",\n```\n\nPython concatenates these into a single line, so the two bullets never start a new line. Because the message is rendered as Markdown, the `*` characters do not become a list \u2014 they appear as literal asterisks mid-sentence.\n\n### Reproducible Code Example\n\n```python\nimport streamlit as st\n\nst.map(\n    {\"lat\": [37.77], \"lon\": [-122.4]},\n    color=\"not-a-color\",\n)\n```\n\nOr directly:\n\n```python\nfrom streamlit.elements.lib.color_util import to_int_color_tuple\n\nto_int_color_tuple(\"red\")\n```\n\n### Steps To Reproduce\n\n1. Pass any invalid color to an API that validates colors (`st.map(color=...)`, `st.scatter_chart(color=...)`, etc.).\n2. Read the resulting error message.\n\n### Expected Behavior\n\n```\nThis does not look like a valid color: 'red'.\n\nColors must be in one of the following formats:\n* Hex string with 3, 4, 6, or 8 digits. Example: `'#00ff00'`\n* List or tuple with 3 or 4 components. Example: `[1.0, 0.5, 0, 0.2]`\n```\n\n### Current Behavior\n\n```\nThis does not look like a valid color: 'red'.\n\nColors must be in one of the following formats:* Hex string with 3, 4, 6, or 8 digits. Example: `'#00ff00'`* List or tuple with 3 or 4 components. Example: `[1.0, 0.5, 0, 0.2]`\n```\n\n### Suggested Fix\n\nAppend `\\n` to the `\"...following formats:\"` literal and to the first bullet.\n\n### Acceptance Criteria\n\n- [ ] The error message renders as a Markdown bullet list in the app.\n- [ ] The plain-text form contains one bullet per line.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\nUnknown.\n\n### Debug info\n\n- Streamlit version: 1.62.0 (`develop`, commit `2ac0d77d3`)\n- Python version: 3.13.6\n- Operating System: Windows 11 (platform-independent)\n- Browser: n/a\n\n### Additional Information\n\nI scanned the rest of `lib/streamlit/` for the same pattern (a string literal beginning `* ` or `- ` immediately following a literal that does not end in a newline) using a `tokenize`-based check; `errors.py:591-592` is the only occurrence, so this looks like an isolated slip rather than a systemic one.\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-27T20:24:35Z",
+      "body": "\u26a0\ufe0f **AI Triage Failed**\n\nThe AI triage job failed to complete. Please check the [workflow run](https://github.com/streamlit/streamlit/actions/runs/33111931612) for details.\n\nYou can retry by adding the `ai-review` label again or manually triggering the workflow."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-27T20:30:13Z",
+      "body": "This is a confirmed display bug in `StreamlitInvalidColorError` (`lib/streamlit/errors.py`). Adjacent string literals are implicitly concatenated, and the literals that introduce the Markdown bullets do not end with `\\n`, so the message becomes one run-on line. Streamlit API exceptions are rendered as Markdown, so those `*` characters never form a list. The suggested fix (add `\\n` after `\"...formats:\"` and after the first bullet, or use a triple-quoted string) is correct. A nearby chart-specific `StreamlitInvalidColorError` in `built_in_chart_utils.py` already formats this correctly; `st.map` and `color_util.to_int_color_tuple` / `to_css_color` hit the buggy shared class. Adjacent `StreamlitBadTimeStringError` has a similar implicit-concat slip (missing space, not missing bullets).\n\n### Related Issues\n\n- [#12868](https://github.com/streamlit/streamlit/issues/12868) \u2014 Confirmed bug for a confusing width validation error message. Same class of issue: user-facing exception text is incorrect, not the validation itself.\n- [#12681](https://github.com/streamlit/streamlit/issues/12681) \u2014 Enhancement to accept modern CSS color formats more consistently. Related to color parsing/validation, not the error-message layout.\n- [#12694](https://github.com/streamlit/streamlit/issues/12694) \u2014 Request to support built-in color names like `\"red\"` on chart `color`. Related because the issue\u2019s `to_int_color_tuple(\"red\")` repro is currently treated as invalid; this issue is still about message formatting, not named-color support.\n\nNo duplicates found.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

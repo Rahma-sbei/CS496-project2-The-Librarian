@@ -1,0 +1,25 @@
+{
+  "id": "issue-16270",
+  "type": "issue",
+  "number": 16270,
+  "url": "https://github.com/streamlit/streamlit/issues/16270",
+  "title": "`st.download_button` rejects documented `io.StringIO` data",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.download_button"
+  ],
+  "created_at": "2026-07-30T21:52:20Z",
+  "closed_at": "2026-07-31T14:50:07Z",
+  "body": "## Summary\n\n`st.download_button` documents `io.StringIO` as a supported file-like value, and the public typing tests accept it, but the runtime raises `StreamlitAPIException`. This affects both eager values and deferred callables because they share the same data conversion helper.\n\n## Reproducible Code Example\n\n```python\nimport io\n\nimport streamlit as st\n\nst.download_button(\"Download\", data=io.StringIO(\"hello\"))\n```\n\n## Steps To Reproduce\n\n1. Save the example as `app.py`.\n2. Run `streamlit run app.py`.\n3. Observe the exception while the download button is created.\n\n## Expected Behavior\n\nThe download button is rendered and downloads `hello` as `text/plain`, matching the documented `io.StringIO` support.\n\n## Current Behavior\n\nStreamlit raises:\n\n```text\nstreamlit.errors.StreamlitAPIException:\nInvalid binary data format: <class '_io.StringIO'>\n```\n\n`convert_data_to_bytes_and_infer_mime` handles `str` and the concrete `io.TextIOWrapper`, but not `io.StringIO`. The public `DownloadButtonDataType` and typing test already accept `io.StringIO`.\n\n## Debug info\n\n- Streamlit version: current `develop` (`1.60.0`)\n- Python version: 3.11.15\n- Operating System: macOS\n- Browser: not applicable; the exception occurs during script execution\n\n## Additional Information\n\nA focused fix and regression test are available in [ShiroKSH/streamlit@e4e7da440](https://github.com/ShiroKSH/streamlit/commit/e4e7da4400646822221cbdeb9423467d0ce4264b). It reads `io.StringIO` with `getvalue()`, matching the existing `io.BytesIO` behavior without changing the stream cursor.\n\nValidated with:\n\n- `make check`\n- `uv run pytest lib/tests/streamlit/runtime/download_data_util_test.py -q`\n- `uv run pytest lib/tests/streamlit/elements/download_button_test.py -q`\n- `uv run pytest lib/tests/streamlit/runtime/media_file_manager_test.py -k execute_deferred -q`\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-30T22:25:41Z",
+      "body": "This is a **bug**: `st.download_button` advertises `io.StringIO` as a supported `data` value (docstring, the public `DownloadButtonDataType` alias via `TextIO`, and the `button_types.py` typing test all accept it), but passing one raises `StreamlitAPIException: Invalid binary data format: <class '_io.StringIO'>` at runtime.\n\nThe root cause is in `convert_data_to_bytes_and_infer_mime` (`lib/streamlit/runtime/download_data_util.py`). It only handles text streams via `isinstance(data, io.TextIOWrapper)`, but `io.StringIO` is a *sibling* subclass of `io.TextIOBase` \u2014 it is **not** an `io.TextIOWrapper` \u2014 so it never matches the text branch (nor any `bytes`/`io.BytesIO`/`io.RawIOBase` branch) and falls through to `raise unsupported_error`. Because both the eager and deferred (callable) code paths in `button.py` route through this same helper, `io.StringIO` fails in both cases. The reporter's linked patch fixes this by reading `io.StringIO` via `getvalue()`, mirroring the existing `io.BytesIO` handling. A broader alternative would be to match `io.TextIOBase` so any text stream is covered.\n\n### Related Issues\n\n- [#14159 \u2014 st.download_button generate file_name and mime from io.FileIO](https://github.com/streamlit/streamlit/issues/14159): Also concerns how `st.download_button` handles file-like objects and MIME inference in the same `convert_data_to_bytes_and_infer_mime` code path; both point at gaps in the supported-`io.*`-types handling.\n- [#5053 \u2014 Deferred data for download button](https://github.com/streamlit/streamlit/issues/5053): Introduced the deferred-callable path that shares the same data-conversion helper affected by this bug.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

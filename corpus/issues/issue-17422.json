@@ -1,0 +1,24 @@
+{
+  "id": "issue-17422",
+  "type": "issue",
+  "number": 17422,
+  "url": "https://github.com/streamlit/streamlit/issues/17422",
+  "title": "Allow pyarrow 26 (needed for Python 3.15 wheels)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:arrow",
+    "area:dependencies"
+  ],
+  "created_at": "2026-10-12T04:37:39Z",
+  "closed_at": "2026-10-12T15:47:24Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nStreamlit 1.65.0 pins `pyarrow>=7.0,!=25.0.0,<26` (and `develop` still has `<26`). pyarrow 26.0.0 was released on 2026-10-09 and is the first release with CPython 3.15 wheels; pyarrow 25.x has no `cp315` wheels.\n\nSince Python 3.15.0 is also out, installing Streamlit on Python 3.15 currently forces the resolver onto pyarrow 25.0.1, which has to be built from source and fails unless the Arrow C++ libraries are installed.\n\nCould the upper bound be raised to `<27`?\n\n### Reproducible Code Example\n\n```bash\nuv init demo && cd demo\nuv python pin 3.15\nuv add streamlit\n```\n\n### Steps To Reproduce\n\n1. Use Python 3.15.0 (macOS arm64 here).\n2. Install `streamlit==1.65.0`.\n\n### Expected Behavior\n\nStreamlit installs using the pyarrow 26.0.0 `cp315` wheel.\n\n### Current Behavior\n\nThe resolver picks pyarrow 25.0.1, tries to build it from source and fails:\n\n```\nCMake Error at CMakeLists.txt:294 (find_package):\n  By not providing \"FindArrow.cmake\" in CMAKE_MODULE_PATH this project has\n  asked CMake to find a package configuration file provided by \"Arrow\", but\n  CMake did not find one.\n\n*** CMake configuration failed\n\nhint: `pyarrow` (v25.0.1) was included because ... depends on `streamlit` (v1.65.0) which depends on `pyarrow`\n```\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.65.0\n- Python version: 3.15.0\n- Operating System: macOS (arm64)\n- Package manager: uv 0.13.0\n\n### Additional Information\n\nThe previous bump to `<26` was #16529 (merged 2026-08-17).\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-12T07:34:37Z",
+      "body": "Streamlit 1.65.0 and current `develop` require `pyarrow>=10.0.1,!=25.0.0,<26` in `lib/pyproject.toml`. The `<26` cap is the usual next-major bound, last raised in #16529; the `!=25.0.0` exclusion should stay with any bump because PyArrow 25.0.0 can segfault on first import from a short-lived worker thread. PyArrow 26.0.0 (2026-10-09) is the first release with CPython 3.15 wheels, and the 25.x line has none, so a 3.15 install resolves to 25.0.1, which has no `cp315` wheel and fails in CMake while building from source without the Arrow C++ libraries. Supported versions are still 3.11\u20133.14 (`PYTHON_MAX_VERSION` is 3.14), while `requires-python` is `>=3.11` with no upper cap, so resolvers still attempt the install. Raising the bound to `<27` would allow the 26.0.0 wheel; adding 3.15 classifiers and CI would be a follow-up.\n\n### Related Issues\n\n- [#14847](https://github.com/streamlit/streamlit/issues/14847) (closed): PyArrow installation failed on Python 3.14 because the allowed range did not include a release with 3.14 wheels. Same install-time failure mode on the previous CPython release.\n- [#12774](https://github.com/streamlit/streamlit/issues/12774) (closed): Request to officially support Python 3.14, including dependency and CI updates. This issue is the narrower PyArrow 26 step toward the same kind of support for 3.15.\n\nNo open duplicate was found.\n\n---\n*This is an automated triage comment using `grok-4.7-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

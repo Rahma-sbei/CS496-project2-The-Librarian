@@ -1,0 +1,23 @@
+{
+  "id": "issue-2911",
+  "type": "issue",
+  "number": 2911,
+  "url": "https://github.com/streamlit/streamlit/issues/2911",
+  "title": "Add option to limit st.cache size by memory footprint rather than total number of entries",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:cache"
+  ],
+  "created_at": "2021-03-08T15:55:04Z",
+  "closed_at": "2026-10-20T12:07:27Z",
+  "body": "### Problem\r\n\r\nThe ability to limit the size of the cache was added by https://github.com/streamlit/streamlit/pull/1152 which is extremely useful when deploying a streamlit app to a remote server to prevent a memory leak, however it leaves the question as to what value `max_entries` should be set to.  For example, if my remote server has 1GB of memory and I'd like to allocate 500MB of it for the purposes of caching responses, what values of `max_entries` should I set for each of the functions I am caching to ensure I don't exceed that memory limit?  As of right now the only way to determine it is through trial and error.\r\n\r\n### Solution\r\n\r\n**MVP:** One solution would be to add another parameter to the `st.cache` function like `max_memory_footprint` to limit the size of the cache by memory rather than number of entries.\r\n\r\n**Possible additions:** An addition to this would be a global parameter like `maxCacheSize` in the `config.toml` file, this would be more convenient than limiting memory footprint by function as it may be difficult to determine what the optimal allocation per function would be in the case that you are caching multiple functions. \r\n\r\n**Preferred solution:** The preferred solution would probably be both options, a global memory limit that can be set to prevent the application from running out of memory, and a per-function memory limit for finer control when necessary. \r\n\r\nThank you!\r\n\r\n---\r\n\r\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\r\n\r\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-02T19:10:17Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-2911)\n"
+    }
+  ]
+}

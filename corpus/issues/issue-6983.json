@@ -1,0 +1,28 @@
+{
+  "id": "issue-6983",
+  "type": "issue",
+  "number": 6983,
+  "url": "https://github.com/streamlit/streamlit/issues/6983",
+  "title": "chat_message avatar is not being served at the right prefix",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.chat_message"
+  ],
+  "created_at": "2023-07-11T05:52:51Z",
+  "closed_at": "2026-06-09T20:58:17Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nWhen specifying avatar in the new `chat_message` function, it is not being served using full URL, like `st.image` does. As a result, when running behind proxy with a prefix (in my case in JupyterHub), the image could not be displayed.\r\n\r\nSee the rendering for the dashboard provided below:\r\n![image](https://github.com/streamlit/streamlit/assets/8834829/bff4f5df-ad90-4bb4-a502-487da3ca9200)\r\n\r\nWhen I inspect both images, this is HTML I get\r\n1. `st.image`: \r\n    ```\r\n    <img src=\"https://<Proxy URL>/media/3d5872f56e3e5060b1c5fa058c795575397f38cfb4e7dc6a4fe67b03.png\" alt=\"0\" style=\"max-width: 100%;\">\r\n    ```\r\n2. `st.chat_message`\r\n    ```\r\n    <img src=\"/media/3d5872f56e3e5060b1c5fa058c795575397f38cfb4e7dc6a4fe67b03.png\" alt=\"user avatar\" class=\"css-h1sjnp e1d0834u0\">\r\n    ```\r\n\r\nIf I manually modify the HTML in the developer console for the avatar element to include the full URL\r\n```\r\n<img src=\"https://<Proxy URL>/media/3d5872f56e3e5060b1c5fa058c795575397f38cfb4e7dc6a4fe67b03.png\" alt=\"user avatar\" class=\"css-h1sjnp e1d0834u0\">\r\n```\r\nthen it it works as expected:\r\n![image](https://github.com/streamlit/streamlit/assets/8834829/d48224cc-34b6-42fc-b8f1-05c8c3a07b45)\r\n\r\n\r\n\r\nSo, I think the avatar should just use the full URL, if there are no objections to that.\r\n\r\n### Reproducible Code Example\r\n\r\n```Python\r\nimport os\r\nimport streamlit as st\r\nimport numpy as np\r\nfrom PIL import Image\r\n\r\ndashboard_location = os.path.dirname(__file__)\r\n\r\nimage = Image.open(dashboard_location + '/logo.png')\r\n\r\nst.image(image, caption='Logo')\r\n\r\nwith st.chat_message(\"user\", avatar=np.array(image)):\r\n    st.write(\"Hello \ud83d\udc4b\")\r\n    st.line_chart(np.random.randn(30, 3))\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n_No response_\r\n\r\n### Expected Behavior\r\n\r\n_No response_\r\n\r\n### Current Behavior\r\n\r\n_No response_\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.24.0\r\n- Python version: 3.9\r\n- Operating System: Ubuntu\r\n- Browser: Edge on Mac\r\n\r\n### Additional Information\r\n\r\nI searched where URL is being calculated in code and found this place: https://github.com/streamlit/streamlit/blob/cf081f88bc4e25abb9130bf85c1e55e7b008e78d/lib/streamlit/elements/chat.py#L80\r\nThis would be my initial point of search to debug this error",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-07-17T13:41:30Z",
+      "body": "Hi [USER], thank you so much for sharing this issue! I do think this is expected behavior, but it makes sense that this would be problematic if you're using a proxy."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-09T20:58:16Z",
+      "body": "The `st.chat_message` avatar now uses the same prefix-aware media URL builder as `st.image` (`endpoints.buildMediaURL`, changed in #7130), so the avatar URL includes your `server.baseUrlPath` / proxy prefix correctly.\n\nClosing as resolved \u2014 if you still see the wrong prefix on a current Streamlit version behind your proxy, please reopen and we'll dig in."
+    }
+  ]
+}

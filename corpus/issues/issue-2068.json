@@ -1,0 +1,68 @@
+{
+  "id": "issue-2068",
+  "type": "issue",
+  "number": 2068,
+  "url": "https://github.com/streamlit/streamlit/issues/2068",
+  "title": "Look for Configuration Files in Platform-Recommended Directories",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut"
+  ],
+  "created_at": "2020-09-30T21:00:31Z",
+  "closed_at": "2022-09-23T14:16:46Z",
+  "body": "# Problem\r\n\r\nStreamlit uses the home directory for its configuration, but that adds _another_ config file to pollute a home directory. We should be good platform citizens and provide thoughtful locations for configuration files.\r\n\r\n# Solution\r\n\r\nWe as a team agreed on the following order:\r\n\r\n1. `$PROJECT_FOLDER/.streamlit`\r\n2. (great if possible, but not required) `$PROJECT_FOLDER/{../}+.streamlit` (i.e. any subfolder containing .streamlit)\r\n3. `~/.config/streamlit` if Unix/macOS (or in `$XDG_CONFIG_HOME`, if defined), `%CSIDL_COMMON_APPDATA%/streamlit` if Windows (that's [`ProgramData`](https://docs.microsoft.com/en-us/windows/deployment/usmt/usmt-recognized-environment-variables), meaning we follow Git and Conda)\r\n4. `~/.streamlit`\r\n\r\n### Additional context\r\n\r\nSee Closed Pull Request #1907 \r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-09-30T21:05:07Z",
+      "body": "We store our metrics tracking ID in `~/.streamlit`.\r\n\r\nWill need to maintain this data when switching locations so we don't throw off our metrics.\r\n\r\nAnd also read it from a single location on each platform, not a hierarchy of locations, I think."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2022-09-23T14:16:46Z",
+      "body": "Closing this issue since it's old and didn't see a lot of recent activity. Feel free to reopen or comment if you have the same problem!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-05-10T14:43:54Z",
+      "body": "Hey, I also think it would be nice to, at least, support XDG's Base Directory specification."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-09-05T17:59:38Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-02-13T07:23:49Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-07T00:25:37Z",
+      "body": "Also would love to see this!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-15T02:39:47Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-06-29T17:38:46Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-10T09:17:27Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-28T13:24:25Z",
+      "body": "Please support XDG Base Directory specs. \ud83e\udd7a"
+    }
+  ]
+}

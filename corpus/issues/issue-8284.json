@@ -1,0 +1,47 @@
+{
+  "id": "issue-8284",
+  "type": "issue",
+  "number": 8284,
+  "url": "https://github.com/streamlit/streamlit/issues/8284",
+  "title": "`st.popover` not closing when opening another PopOver",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.multiselect",
+    "upstream",
+    "feature:st.popover"
+  ],
+  "created_at": "2024-03-12T18:16:18Z",
+  "closed_at": "2026-07-16T11:53:20Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen using a SelectBox or MultiSelectBox inside a PopOver, and selection dropdown is visible, clicking on another PopOver will cause it to open without closing the previous one. \n\nhttps://github.com/streamlit/streamlit/assets/96068523/0736c094-376b-4283-9476-647e090547f0\n\nBased on some investigation, could only reproduce when  `ul [data-testid=\"stVirtualDropdown\"]` element is currently rendered and active. \n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-8284)\n\n```Python\nimport streamlit as st\n\npop_1 = st.popover(\"Open\")\npop_2 = st.popover(\"Open\")\n\npop_1.multiselect(\"Test\", options=[i for i in range(3)])\npop_2.multiselect(\"Test 2\", options=[i for i in range(3)])\n```\n\n\n### Steps To Reproduce\n\n1. Click on the second PopOver\n2. Click on the multiselect widget\n3. Without exiting the multiselect, click on the second popOver. \n\n### Expected Behavior\n\nFirst Clicked PopOver will close before opening next. \n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.32\n- Python version: 3.10\n- Operating System: MacOs 14.3.1\n- Browser: Chrome Version 122.0.6261.94 \n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-03-12T18:16:31Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-8284)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-03-14T00:17:20Z",
+      "body": "Hey! I would like to take this issue. Would You recommend it as a good first issue?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-22T21:31:51Z",
+      "body": "This is unfortunately an upstream bug with BaseWeb stemming from the way BaseWeb handles outside clicks. It seems like document clicks will only activate the _last_ event handler, of which that is the multiselect. I've tried adding some hacks, but I can't seem to get a way to ensure the popover actually closes. We'll have to explore this when we migrate off of BaseWeb"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-31T15:01:40Z",
+      "body": "This issue reports that when a `st.selectbox` or `st.multiselect` dropdown is open inside a `st.popover`, clicking on another popover button fails to close the first one, leaving both popovers open simultaneously. \n\n**Root Cause Analysis:** According to team member [USER]'s comment, this is an **upstream bug with BaseWeb** (the UI library Streamlit uses). The issue stems from how BaseWeb handles outside click events - document clicks only activate the _last_ event handler, which in this case is the multiselect's close handler rather than the popover's `onClickOutside` handler. This prevents the popover from detecting the click as an \"outside click\" when the dropdown is active. The team has indicated this will need to be addressed during the planned migration off of BaseWeb.\n\n### Related Issues\n\n- **#8265** - [Add open/close parameter to st.popover](https://github.com/streamlit/streamlit/issues/8265): Enhancement request to programmatically control popover open/closed state. If implemented, this could provide a workaround for this bug by allowing users to manually manage popover state.\n\n- **#10239** - [Dynamic popover height](https://github.com/streamlit/streamlit/issues/10239): Related issue about popovers not adjusting their height when expandable elements like selectbox dropdowns are opened inside them. Both issues involve the interaction between dropdowns and popovers.\n\n- **#9243** - [Popover and dialog first widget is always active](https://github.com/streamlit/streamlit/issues/9243): Related focus/activation issue with widgets inside popovers. Both issues stem from interactions between popover containers and their child widgets.\n\n---\n*This is an automated triage comment. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-16T11:53:20Z",
+      "body": "Closing this since I believe this has been fixed with the recent migration from baseweb to react-aria. "
+    }
+  ]
+}

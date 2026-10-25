@@ -1,0 +1,33 @@
+{
+  "id": "issue-7427",
+  "type": "issue",
+  "number": 7427,
+  "url": "https://github.com/streamlit/streamlit/issues/7427",
+  "title": "Limiting maximum and minimum of st.date_input's selectable dates to the maximum/minimum of datetime.datetime",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.date_input"
+  ],
+  "created_at": "2023-09-26T08:12:22Z",
+  "closed_at": "2026-08-20T12:50:41Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\r\n- [X] I added a descriptive title and summary to this issue.\r\n\r\n### Summary\r\n\r\nSetting the maximum available value of Python's datetime as default for st.date_input causes issues.\r\nThe function internally tries to set a value 10 years later for the selection widget and then crashes.\r\n\r\nTo reproduce the behaviour, run this code: \r\n```\r\nimport streamlit as st\r\nfrom datetime import datetime\r\nst.date_input('Enter Timespan:', value=[datetime.today() , datetime.max])\r\n```\r\nThe documentation for st.date_input includes a parameter to control the maximum value of the selection widget: \r\n> max_value : datetime.date or datetime.datetime\r\n>     The maximum selectable date. If value is a date, defaults to value + 10 years.\r\n>     If value is the interval [start, end], defaults to end + 10 years.\r\n\r\nSetting the parameter max_value of st.date_input to datetime.max solves the issue.\r\n`st.date_input('Enter Date:',  max_value=datetime.max, value=[datetime.today(), datetime.max])`\r\n\r\n### Why?\r\n\r\nThis result is expected behaviour and can be inferred from the documentation. \r\nHowever, it seems rather inelegant/unintuitive to explicitly have to set an additional max_value when using the maximum value of the data type used.\r\n\r\n### How?\r\n\r\nSince date_input works with datetime internally, I'd set it to check datetime.max (and datetime.min, similarily) itself and not try to set its maximum to an impossible value.  \r\nSo to get the max selectable value in pseudocode would be:\r\n```\r\nmax_value = max( value + 10 years, datetime.max)\r\n```\r\n\r\nIf this behaviour is not desired, a nicer warning would be in order. \r\n```\r\nError message: \r\nValueError: year 10009 is out of range\r\n```\r\nTook me a while to trace that back to streamlit internally adding 10 years. Maybe something like:\r\n```\r\nValueError: Cannot set value 9999. Default value range for date_input [9989-10009] would be out of range for datetime. Please set max_value.\r\n```",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-09-26T08:12:37Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-7427)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-12T17:43:00Z",
+      "body": "[USER] I'm working with two other interns on this issue."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-01T07:01:54Z",
+      "body": "+1 on this"
+    }
+  ]
+}

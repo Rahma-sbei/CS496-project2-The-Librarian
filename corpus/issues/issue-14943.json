@@ -1,0 +1,26 @@
+{
+  "id": "issue-14943",
+  "type": "issue",
+  "number": 14943,
+  "url": "https://github.com/streamlit/streamlit/issues/14943",
+  "title": "Programmatically closed popovers reopen when interacting with another stateful popover",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.expander",
+    "feature:st.popover"
+  ],
+  "created_at": "2026-04-27T16:12:50Z",
+  "closed_at": "2026-05-11T15:50:37Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-14943)\n\nThe widget state for stateful (with user set key, and on_change=\"rerun\") st.popover objects is being overridden or handled incorrectly when there are multiple stateful popovers on the page. This results in a bug where opening a second popover after a popover is closed programmatically results in the first popover re-opening alongside the second.\n\nThis only happens when the first popover is closed programmatically by setting the session state key value to False. Closing the popover by clicking outside the container or clicking the expander icon does not lead to this issue.\n\nThe minimal example below works fine in streamlit v1.55.0 but results in the described behaviour in 1.56.0. Presumably this bug was introduced somewhere in commit 5feecf4\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\ndef close_first_popover():\n    st.session_state.first_popover = False\n\ndef close_second_popover():\n    st.session_state.second_popover = False\n\nwith st.popover(\"A popover\", key=\"first_popover\", on_change=\"rerun\"):\n    st.button(\"Close First\", on_click=close_first_popover)\n\nwith st.popover(\"Another popover\", key=\"second_popover\", on_change=\"rerun\"):\n    st.button(\"Close Second\", on_click=close_second_popover)\n```\n\n### Steps To Reproduce\n\n1. Run the code example\n2. Open a popover\n3. Close the popover by clicking the button inside\n4. Open the other popover\n5. Both popovers open together\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n<img width=\"640\" height=\"360\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/202db3e3-69a7-4a21-bae6-3ed2a20298a2\" />\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.56.0\n- Python version: 3.13.7\n- Operating System: OpenSuse\n- Browser: Firefox/Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-27T16:13:02Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-14943)\n"
+    }
+  ]
+}

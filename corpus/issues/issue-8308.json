@@ -1,0 +1,79 @@
+{
+  "id": "issue-8308",
+  "type": "issue",
+  "number": 8308,
+  "url": "https://github.com/streamlit/streamlit/issues/8308",
+  "title": "`st.cache_resource` and `st.cache_data` should support async functions (coroutines)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:cache",
+    "area:threading/processing"
+  ],
+  "created_at": "2024-03-15T15:21:16Z",
+  "closed_at": "2026-09-07T15:15:17Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nThis was originally requested in #3651 for the deprecated `st.cache`, and the same problem still exists with  `st.cache_resource` and `st.cache_data`.\r\n\r\n### `st.cache_data`\r\n```python\r\nimport asyncio\r\n\r\nimport streamlit as st\r\n\r\n\r\n[USER].cache_data\r\nasync def get_data():\r\n    return 42\r\n\r\n\r\nasync def main():\r\n    data = await get_data()\r\n    st.write(data)\r\n\r\n\r\nasyncio.run(main())\r\n```\r\nThis results in the following error because the returned value of `get_data()`, a coroutine object, is not pickleable.\r\n```\r\nUnserializableReturnValueError: Cannot serialize the return value (of type get_data()) in get_data(). st.cache_data uses [pickle](https://docs.python.org/3/library/pickle.html) to serialize the function\u2019s return value and safely store it in the cache without mutating the original object. Please convert the return value to a pickle-serializable type. If you want to cache unserializable objects such as database connections or Tensorflow sessions, use st.cache_resource instead (see [our docs](https://docs.streamlit.io/library/advanced-features/caching) for differences).\r\n```\r\n\r\n### `st.cache_resource`\r\n\r\n```python\r\nimport asyncio\r\n\r\nimport streamlit as st\r\n\r\n\r\n[USER].cache_resource\r\nasync def get_resource():\r\n    return 42\r\n\r\n\r\nasync def main():\r\n    resource = await get_resource()\r\n    st.write(resource)\r\n\r\n\r\nasyncio.run(main())\r\n```\r\n\r\nIt runs successfully at the first run, but the following error occurs in the second run and later because the coroutine object returned from `get_resource()` is cached and the same coroutine object is awaited again.\r\n```\r\nRuntimeError: cannot reuse already awaited coroutine\r\n```\n\n### Why?\n\n_No response_\n\n### How?\n\nI think it's enough the sample code snippets above work as expected.\n\n### Additional Context\n\nI'm an author of [stlite](https://github.com/whitphx/stlite) (Wasm ver. of Streamlit) and [Transformers.js.py](https://github.com/whitphx/transformers.js.py) (a Python wrapper for FWs like stlite to use Transformers),\r\nand I encountered a situation where I wanted this feature: https://github.com/whitphx/transformers.js.py?tab=readme-ov-file#stlite-serverless-streamlit\r\nThe Transformers' object can only be obtained in an async way, and it's a compute-intensive task so I wanted to cache it. Now I do it using the session state as a workaround.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-03-15T15:21:26Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8308)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-10T04:32:32Z",
+      "body": "Seconded. Ever since I heard from a friend (more like an acquaintance, really) that _all cool kids use `async`_, I forced myself to learn it and now use it almost exclusively if there are some API calls or whatnot involved."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-22T18:38:59Z",
+      "body": "Hi,\r\n\r\nWhat do you think of this as a potential solution?\r\nhttps://github.com/streamlit/streamlit/compare/develop...DrMagPie:streamlit:async-cache?expand=1\r\n\r\nIn my (manual) testing it works well."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-09T08:57:34Z",
+      "body": "> Hi,\r\n> \r\n> What do you think of this as a potential solution? https://github.com/streamlit/streamlit/compare/develop...DrMagPie:streamlit:async-cache?expand=1\r\n> \r\n> In my (manual) testing it works well.\r\n\r\nThis works great in my test... I suggest to commit your code into production"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-08-08T10:26:40Z",
+      "body": "> Hi,\r\n> \r\n> What do you think of this as a potential solution? https://github.com/streamlit/streamlit/compare/develop...DrMagPie:streamlit:async-cache?expand=1\r\n> \r\n> In my (manual) testing it works well.\r\n\r\nThank you so much, it works perfectly in my case."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-23T19:31:16Z",
+      "body": "Hey all,\r\nAny update on this? That would very helpful.\r\nThanks"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-18T15:36:33Z",
+      "body": "Any update ? "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-28T21:45:07Z",
+      "body": "This sure would be handy, being able to support st.cache_data with an async function...."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-14T13:19:22Z",
+      "body": "Hi, and thank you for opening / upvoting this issue\nSorry [USER], I forgot to answer to this issue (mostly because I didn't have an elegant answer). \n\nStremalit cache primitives work with sync functions, you couldn't decorate an async function, but:\nyou can call an async operation inside a cached function in separate thread (to have isolated event loop):\n\nThis should work correctly, and the result should be very close to what you want:\n\n\n```python\nimport asyncio\nimport streamlit as st\nfrom concurrent.futures import ThreadPoolExecutor\n\n\n[USER].cache_data\ndef get_data(x:int) -> int:\n    # Use a separate thread to run the async operation\n    # This lets us create an isolated event loop that won't conflict\n    def run_in_thread(x:int) -> int:\n        async def _async_operation(x:int) -> int:\n            await asyncio.sleep(1)\n            return x ** 2\n\n        return asyncio.run(_async_operation(x))\n\n    # Execute in a separate thread and wait for the result\n    with ThreadPoolExecutor() as executor:\n        return executor.submit(run_in_thread, x).result()\n\n\nasync def main():\n    x = st.slider(\"Pick a number\" , 0, 10)\n    await asyncio.sleep(1)\n    data = get_data(x)  # Synchronous call\n    st.write(data)\n\n\nasyncio.run(main())\n\n```"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-14T15:24:23Z",
+      "body": "[USER] Also if your main streamlit app is not run by `asyncio.run(main())`, and it is just a python sync script, you can do a async call in your cached function in more laconic way:\n\n\n\n```python\nimport asyncio\n\nimport streamlit as st\n\n\nasync def get_data(number):\n    await asyncio.sleep(2)\n    return number ** 2\n\n[USER].cache_data\ndef get_cached_data(number: int):\n    return asyncio.run(get_data(number))\n\nx = st.slider(\"x\", 0, 100)\n\nst.write(get_cached_data(x))\n```"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-04-28T16:09:15Z",
+      "body": "I wrote a twisted function transformer in my library https://github.com/jokester/streamlit-concurrency to use `st.cache_data()` with async function. [demo in st cloud](https://concurrency.streamlit.app/cached_async)\n\nInternally it uses `st.cache_data` to cache a sync function waiting for `asyncio.run(the_real_async_fun())` result in an executor thread. Similar to the pattern mentioned in other comments."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-07T15:14:37Z",
+      "body": "[USER] this will be included in the 1.64 release -- I just merged a PR so if you want to try this in the nightly then that is possible as well. \n\nNote, there were a lot of product decisions on what exactly to support here. The PR has a document exploring them linked, and I also made some issues for areas that are still unsupported (see mentions above). Please let me know if you have any feedback on these decisions, and whether further support is needed for your use cases!"
+    }
+  ]
+}

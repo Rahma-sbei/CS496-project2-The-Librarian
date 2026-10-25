@@ -1,0 +1,29 @@
+{
+  "id": "issue-15299",
+  "type": "issue",
+  "number": 15299,
+  "url": "https://github.com/streamlit/streamlit/issues/15299",
+  "title": "Multi Select \"Select all\" performance bottleneck on large datasets",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:performance",
+    "feature:st.multiselect"
+  ],
+  "created_at": "2026-05-22T09:59:27Z",
+  "closed_at": "2026-06-14T19:46:49Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nWhen using st.multiselect it now includes \"Select all\" (was introduced in Streamlit version 1.55.0 (via Pull Request #13015) it casues the browser to freeze when clicking select all when having + 100 k items loaded into it, was not a problem before this was added. \nI want the options to disable the \"select all\" button as argument to make the mulitselect component behave like previous versions\n\n### Why?\n\nit makes the browser freeze\n\n### How?\n\nst.multiselect(label=\"large multi select\", options=largeListOf165k, disableSelectAll=True)\n\n### Additional Context\n\n```python\n import time\n    import streamlit as st\n    st.title(\"Performance Defect: Cascading st.multiselect with Large Datasets\")\n\n    st.markdown(\"\"\"\n    ### Feature Request Context\n    This example demonstrates a performance bottleneck involving two dependent `st.multiselect` widgets. \n\n    Selecting a category in the first widget filters the available choices in the second widget. When the underlying dataset contains 165,000 items, clicking the native **Select all** button on either widget triggers severe serialization overhead, memory spikes, and completely freezes the browser interface on a thinkpad p16 gen 1.\n\n    **Requested Feature:** A configuration parameter to natively disable the \"Select all\" option (e.g., `show_select_all=False`).\n    \"\"\")\n\n    # Mock data: 3 groups, each containing 55,000 items (165k total rows)\n    GROUPS = [\"Group_A\", \"Group_B\", \"Group_C\"]\n    ITEMS_PER_GROUP = 55000\n\n    # First widget: Select groups\n    selected_groups = st.multiselect(\n        label=\"1. Select Item Groups\", options=GROUPS, default=[\"Group_A\"]\n    )\n\n    # Generate dependent options based on the selection in the first widget\n    available_options = []\n    for group in selected_groups:\n        available_options.extend([f\"{group}_Item_{i}\" for i in range(ITEMS_PER_GROUP)])\n\n    # Second widget: Filtered choices based on the first widget\n    # Clicking 'Select all' here on a large subset causes immediate UI failure\n    selected_items = st.multiselect(\n        label=f\"2. Filtered Items (Current available choices: {len(available_options)})\",\n        options=available_options,\n    )\n\n    st.write(f\"Total items selected in widget 2: {len(selected_items)}\")\n\n```",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-22T09:59:38Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-15299)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-22T12:37:47Z",
+      "body": "This is a feature request (with a performance angle) for `st.multiselect`. The user reports that the \"Select all\" option added in Streamlit 1.55.0 (via PR #13015) causes the browser to freeze when the widget contains very large option lists (e.g., ~165k items). They are asking for a parameter (e.g., `show_select_all=False` / `disableSelectAll=True`) to opt out of the built-in \"Select all\" UI so the widget behaves like it did before 1.55.0.\n\nLooking at the implementation in `frontend/lib/src/components/widgets/Multiselect/Multiselect.tsx`, clicking \"Select all\" replaces the entire `value` array with all currently unselected options (`[...value, ...unselectedValues]`), which then has to be: (1) re-rendered as tags by baseweb, (2) serialized into a protobuf `StringArray`, (3) sent to the backend over the WebSocket, and (4) returned to the script as a list. With 165k items this is a very large state payload, so the bottleneck is inherent to the \"select everything at once\" interaction rather than to a specific bug \u2014 making the requested opt-out a reasonable enhancement. Note that `st.multiselect` is generally not designed for this scale of options; a server-side filter (or an autocomplete-style API) is usually the more scalable pattern.\n\n### Related Issues\n\n- [#14918 \u2014 Option to enable/disable the select all option on `st.multiselect`](https://github.com/streamlit/streamlit/issues/14918): Essentially the same feature request (parameter to disable the built-in \"Select all\"), but motivated by UX (a chart with 1000+ traces) rather than performance. This issue should likely be consolidated with #14918.\n- [#4714 \u2014 Add select all shortcut or button for multiselect](https://github.com/streamlit/streamlit/issues/4714) (closed): The original request that led to the \"Select all\" feature in 1.55.0 (PR #13015). Useful context for the history of the feature.\n- [#12644 \u2014 Make `st.multiselect` not wrap the selected options / keep its height](https://github.com/streamlit/streamlit/issues/12644): Related secondary UX problem when many options are selected \u2014 after a \"Select all\" the widget can grow enormously in height because every selection is rendered as a tag chip.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

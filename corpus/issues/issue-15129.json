@@ -1,0 +1,28 @@
+{
+  "id": "issue-15129",
+  "type": "issue",
+  "number": 15129,
+  "url": "https://github.com/streamlit/streamlit/issues/15129",
+  "title": "Set and delete cookies",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:authentication"
+  ],
+  "created_at": "2026-05-11T19:04:17Z",
+  "closed_at": "2026-05-11T19:35:59Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAbility to set and delete cookies natively in streamlit like st.context can read them as third-party libraries are running into issues \n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-11T19:04:29Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-15129)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-05-11T19:35:59Z",
+      "body": "Thanks for filing this [USER] . This looks to be overlapping with https://github.com/streamlit/streamlit/issues/14730, so I am going to mark this one as a duplicate. Please feel free to upvote https://github.com/streamlit/streamlit/issues/14730, thanks!"
+    }
+  ]
+}

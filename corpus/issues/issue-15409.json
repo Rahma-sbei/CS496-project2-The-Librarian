@@ -1,0 +1,20 @@
+{
+  "id": "issue-15409",
+  "type": "issue",
+  "number": 15409,
+  "url": "https://github.com/streamlit/streamlit/issues/15409",
+  "title": "HVTracker: Streamlit is now #1 on the leaderboard",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [],
+  "created_at": "2026-06-02T22:29:56Z",
+  "closed_at": "2026-06-04T16:21:33Z",
+  "body": "Hi Streamlit team,\n\nWe just added Streamlit to HVTracker, and in our latest public snapshot dated June 2, 2026, Streamlit is ranked #1 overall on the HVTracker leaderboard and #1 in UI & App Builders.\n\nProfile: https://hvtracker.net/agents/streamlit/\nLeaderboard: https://hvtracker.net/\n\nCurrent public signals on the profile include:\n- HVTrust score: 94.1\n- Evidence grade: A\n\nIf you\u2019d like, please add your HVTracker badge to the repo README so users can see the live trust profile directly from the project page.\n\nBadge markdown:\n[![HVTrust](https://hvtracker.net/badge/streamlit.svg)](https://hvtracker.net/agents/streamlit/)\n[![Evidence Grade](https://hvtracker.net/badge/streamlit-grade.svg)](https://hvtracker.net/agents/streamlit/)\n\nBadge guide: https://hvtracker.net/badges/\n\nThanks for building and maintaining Streamlit.",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-04T16:21:33Z",
+      "body": "Thanks for listing \ud83d\udc4d  Will check with the team if we want to add the badges"
+    }
+  ]
+}

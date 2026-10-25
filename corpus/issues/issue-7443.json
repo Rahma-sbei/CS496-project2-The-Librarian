@@ -1,0 +1,29 @@
+{
+  "id": "issue-7443",
+  "type": "issue",
+  "number": 7443,
+  "url": "https://github.com/streamlit/streamlit/issues/7443",
+  "title": "Display df with double sorting capablities",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe",
+    "feature:st.data_editor"
+  ],
+  "created_at": "2023-09-28T05:08:19Z",
+  "closed_at": "2026-07-22T07:57:32Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\r\n- [X] I added a descriptive title and summary to this issue.\r\n\r\n### Summary\r\n\r\nWhen display df using st function, you can only sort on one col at a time. Need a feature to sort on more columns with priority on what pushed. For example:\r\nDf:\r\n        Team   score  week   goals\r\nP1   a            2           1          1\r\nP2   a            1           2           2\r\nP3    b            1             1          1\r\n\r\nIf clicked on team - order will be as is. If second click on goals- P2 will switch P1.\r\n\r\n\r\n### Why?\r\n\r\n_No response_\r\n\r\n### How?\r\n\r\n_No response_\r\n\r\n### Additional Context\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-09-28T05:08:33Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-7443)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-12-29T21:57:24Z",
+      "body": "Thanks for the feature suggestion. This will require some changes to the search functionality of the underlying table library. I suggested this feature [here](https://github.com/glideapps/glide-data-grid/issues/841)."
+    }
+  ]
+}

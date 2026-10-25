@@ -1,0 +1,61 @@
+{
+  "id": "issue-1196",
+  "type": "issue",
+  "number": 1196,
+  "url": "https://github.com/streamlit/streamlit/issues/1196",
+  "title": "Altair chart does not render correctly when created from a dictionary",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:bug",
+    "feature:charts",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.altair_chart"
+  ],
+  "created_at": "2020-03-07T13:30:39Z",
+  "closed_at": "2026-07-19T12:12:58Z",
+  "body": "# Summary\n\nWhen I create an Altair chart from a dictionary, it does not get rendered correctly in Streamlit.\n\n# Steps to reproduce\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-1196)\n\n1. Create a chart from a dictionary\n2. Try to render it\n\n## Expected behavior:\n\nThe chart should render correctly.\n\n## Actual behavior:\n\nThe data of the chart does not get rendered. \n\n## Is this a regression?\n\nI don't know. It's the first time I have tried it.\n\n# Debug info\n\n- Streamlit version: 0.56.0\n- Python version: 3.7.4\n- Using Conda? PipEnv? PyEnv? Pex? Nope\n- OS version: MacOS 10.15.3\n- Browser version: Safari 13.0.5\n\n# Additional information\n**Code**\n```\nimport pandas as pd\nimport altair as alt\n\ndf = pd.DataFrame({'a': [1, 2, 3, 4, 5], 'b': [1, 3, 5, 7, 9]})\n\nchart = alt.Chart(df).mark_line().encode(\n    x='a',\n    y='b'\n)\n\nchart\n\nchart_dict = chart.to_dict()\nchart2 = alt.Chart.from_dict(chart_dict)\n\nchart2\n```\n\n**Output**\n<img width=\"1792\" alt=\"Screenshot 2020-03-07 at 20 28 49\" src=\"https://user-images.githubusercontent.com/17554280/76144385-4f5a8900-60b2-11ea-99e8-598ba7fd9f50.png\">\n\nThe same code renders correctly in Jupyter Notebook / Lab.\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-03-09T20:37:54Z",
+      "body": "Thanks [USER] for reporting it, I will move this to our backlog"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-03-09T21:16:26Z",
+      "body": "Thank you [USER]. \r\nCan you notify me once you have put this story in one of your upcoming sprints? \r\n\r\nI'm working on an Altair extension, which relies heavily on creating charts from dictionaries at the moment. I would like to offer Streamlit support from day one, hence I will postpone my work on it until a fix for this bug is in sight."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-04-03T21:49:23Z",
+      "body": "Seems that we don't have support for `NamedData`.\r\n\r\n```\r\n>>> chart.data\r\n   a  b\r\n0  1  1\r\n1  2  3\r\n2  3  5\r\n3  4  7\r\n4  5  9\r\n\r\n>>> chart2.data\r\nNamedData({\r\n  name: 'data-b939eed6eb919eb682f400791acca452'\r\n})\r\n```"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2022-09-23T13:55:49Z",
+      "body": "Closing this issue since it's old and didn't see a lot of recent activity. Feel free to reopen or comment if you have the same problem!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-11-09T17:15:52Z",
+      "body": "Can we re open this. ? \r\nI'm writing a streamlit app that programmatically makes altair charts from a dataframe. The only way I can think of doing this is by building a dictionary of encodings from user input, then using the chart.from_dict() method. As described above, the axis show but no data.  If there isn't a solution, can anyone suggest a different way to build a chart from user selections. ?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-07T13:43:21Z",
+      "body": "> Can we re open this. ? \n> I'm writing a streamlit app that programmatically makes altair charts from a dataframe. The only way I can think of doing this is by building a dictionary of encodings from user input, then using the chart.from_dict() method. As described above, the axis show but no data.  If there isn't a solution, can anyone suggest a different way to build a chart from user selections. ?\n\n[USER] did you get an answer for this issue ?\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-04-07T17:29:48Z",
+      "body": "This still seems to happen, see playground example [here](https://streamlit.io/playground?example=blank&code=H4sIAAAAAAAAA02N0QrCMAxF3_sVeVsLoeB0iEKfFH9Cxohrh8V1HbUPivjvtttEQyA395IT60YfIow0aLpD6lEzO3vUR7Ihe0kxpjtQKZVHinQK5Ax_FVTs4bxCKBHWCBuEqkYoLoubrAphi7Cr34Kx9kqJqjJNHrLmuhPSUbg1vR0MF9IMrdeGM0j1UImOk3yqhGRfwjIabdtMmxYZ_bRzMYfl_xvZBe_m-Hf5pZUf743X7AEBAAA)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-20T08:48:46Z",
+      "body": "Can confirm. Hitting this exact same issue. "
+    }
+  ]
+}

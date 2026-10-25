@@ -1,0 +1,36 @@
+{
+  "id": "issue-11996",
+  "type": "issue",
+  "number": 11996,
+  "url": "https://github.com/streamlit/streamlit/issues/11996",
+  "title": "`st.code` with large text is causing a RangeError",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.code",
+    "upstream"
+  ],
+  "created_at": "2025-07-21T16:37:21Z",
+  "closed_at": "2026-08-19T22:53:34Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nUsing `st.code` with a large text (> 30MB) is causing a `RangeError: Maximum call stack size exceeded`. \n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-11996)\n\n```Python\nimport streamlit as st\n\nLOREM_IPSUM = (\n    \"\"\"\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.\n\"\"\"\n    * 70000\n)\n\nst.code(LOREM_IPSUM, language=None)\n```\n\n### Steps To Reproduce\n\nRun app.\n\n### Expected Behavior\n\nShows the text correctly.\n\n### Current Behavior\n\nRuns into a frontend error:\n\n```\nErrorBoundary.tsx:54 RangeError: Maximum call stack size exceeded\nRangeError: Maximum call stack size exceeded\n    at processLines (react-syntax-highlighter.js?v=010628c8:541:56)\n    at SyntaxHighlighter (react-syntax-highlighter.js?v=010628c8:640:20)\n    at renderWithHooks (chunk-5QKKVA7G.js?v=d5264bfd:11596:26)\n    at mountIndeterminateComponent (chunk-5QKKVA7G.js?v=d5264bfd:14974:21)\n    at beginWork (chunk-5QKKVA7G.js?v=d5264bfd:15962:22)\n    at beginWork$1 (chunk-5QKKVA7G.js?v=d5264bfd:19806:22)\n    at performUnitOfWork (chunk-5QKKVA7G.js?v=d5264bfd:19251:20)\n    at workLoopSync (chunk-5QKKVA7G.js?v=d5264bfd:19190:13)\n    at renderRootSync (chunk-5QKKVA7G.js?v=d5264bfd:19169:15)\n    at recoverFromConcurrentError (chunk-5QKKVA7G.js?v=d5264bfd:18786:28)\n```\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.47.0\n- Python version: 3.12\n- Operating System: MacOS\n- Browser: Chrome\n\n\n### Additional Information\n\n- This line is causing the RangeError: Maximum call stack size exceeded if the tree is too big: https://github.com/react-syntax-highlighter/react-syntax-highlighter/blob/842b45ba9328cc232cf6d085e2e6db97291b797d/src/highlight.js#L277\n- Using `wrap_lines=True` doesn't cause the issue.\n- Maybe related to https://github.com/react-syntax-highlighter/react-syntax-highlighter/issues/357? ",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-21T16:37:31Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11996)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-28T22:59:05Z",
+      "body": "I would to contribute to this issue. Could u assign me this issue?\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-19T13:26:55Z",
+      "body": "Hello, I would like to work on this issue."
+    }
+  ]
+}

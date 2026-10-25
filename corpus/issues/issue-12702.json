@@ -1,0 +1,28 @@
+{
+  "id": "issue-12702",
+  "type": "issue",
+  "number": 12702,
+  "url": "https://github.com/streamlit/streamlit/issues/12702",
+  "title": "Support for Multiple Named Custom Themes",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:theming"
+  ],
+  "created_at": "2025-08-28T14:34:55Z",
+  "closed_at": "2026-07-30T08:03:59Z",
+  "body": "### Problem\n\nCurrently, Streamlit allows us to define only **one** custom theme in the .streamlit/config.toml file. While this is a great feature, it feels limiting. Much like developers/users who enjoy switching between light and dark modes in their IDEs/browsers, I often want to change the look and feel of my app based on different contexts, events, or even personal mood. \n\n### Solution\n\n```toml\n# .streamlit/config.toml\n\n[theme]\nbase = \"corporate-light\" # Default active theme key\n\n# Define the \"Corporate Light\" theme\n[theme.corporate-light]\nname = \"Corporate Light\" # A friendly name, cannot use default theme 'dark' or 'light'\nprimaryColor = \"#1e3a8a\"\nbackgroundColor = \"#ffffff\"\nsecondaryBackgroundColor = \"#f0f0f0\"\ntextColor = \"#31333F\"\nfont = \"sans serif\"\n\n# Define a \"Midnight Dark\" theme\n[theme.midnight-dark]\nname = \"Midnight Dark\"\nprimaryColor = \"#bfdbfe\"\nbackgroundColor = \"#1e293b\"\nsecondaryBackgroundColor = \"#334155\"\ntextColor = \"#f1f5f9\"\nfont = \"sans serif\"\n```\nAdd any other context or screenshots about the feature request here. For example, did this FR come from <https://discuss.streamlit.io> or another site? Link the original source here!\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-10-06T18:17:37Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12702)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-30T08:03:59Z",
+      "body": "Closing as a duplicate of #6813. Please upvote and comment on that issue."
+    }
+  ]
+}

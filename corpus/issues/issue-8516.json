@@ -1,0 +1,29 @@
+{
+  "id": "issue-8516",
+  "type": "issue",
+  "number": 8516,
+  "url": "https://github.com/streamlit/streamlit/issues/8516",
+  "title": "Support chart selections (with `on_select`) for Altair v4",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.altair_chart",
+    "area:events"
+  ],
+  "created_at": "2024-04-16T20:14:07Z",
+  "closed_at": "2026-07-22T08:20:31Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\r\n- [X] I added a descriptive title and summary to this issue.\r\n\r\n### Summary\r\n\r\nWe're soon going to add chart selections for Altair in Streamlit, via `st.altair_chart(..., on_select=\"rerun\")`. However, this only works for Altair v5 today, while `st.altair_chart` without selections enabled supports both Altair v4 and v5. Supporting selections for v4 wouldn't be easy due to differences in the underlying JSON representation and the need to set up new testing infrastructure to test both versions in parallel. That's why we decided to cut it from the initial release. \r\n\r\nIf you'd like us to implement support for chart selections with Altair v4, please upvote this issue with a \ud83d\udc4d and let us know in the comments below why you need v4 and can't upgrade to v5!",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-16T20:14:18Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8516)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T08:20:31Z",
+      "body": "Closing this since we are not supporting Altair v4 anymore."
+    }
+  ]
+}

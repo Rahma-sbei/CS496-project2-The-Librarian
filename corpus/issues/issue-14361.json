@@ -1,0 +1,41 @@
+{
+  "id": "issue-14361",
+  "type": "issue",
+  "number": 14361,
+  "url": "https://github.com/streamlit/streamlit/issues/14361",
+  "title": "Undefined date on altair chart hovering",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "priority:P3",
+    "feature:st.altair_chart",
+    "upstream"
+  ],
+  "created_at": "2026-03-13T06:42:57Z",
+  "closed_at": "2026-07-19T12:11:09Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nThere is this weird bug on latest versions of streamlit where yearmonth(date) in an altair chart displays undefined as a value when you hover it.\n\n### Reproducible Code Example\n\n```Python\nimport datetime\nfrom dateutil.relativedelta import relativedelta\n\nimport streamlit as st\nimport pandas as pd\nimport altair as alt\n\n\ndate_now = datetime.datetime.now()\ndate_last_month = datetime.datetime.now() - relativedelta(months=1)\n\ndata = [\n    {\"user\": 1, \"date\": date_now},\n    {\"user\": 2, \"date\": date_now},\n    {\"user\": 3, \"date\": date_now},\n    {\"user\": 4, \"date\": date_last_month},\n    {\"user\": 5, \"date\": date_last_month},\n    {\"user\": 6, \"date\": date_last_month},\n]\n\ndf = pd.DataFrame(data)\n\nchart = (\n    alt.Chart(\n        df,\n        title=alt.TitleParams(\n            \"undefined bug\",\n            anchor=\"middle\",\n        ),\n    )\n    .mark_bar()\n    .encode(\n        x=alt.X(\"yearmonth(date):N\", title=\"Mois\"),\n        y=alt.Y(\"count():Q\", title=\"Effectif\"),\n    )\n)\n\nst.altair_chart(chart)\n```\n\n### Steps To Reproduce\n\n1. Update streamlit to 1.55.0.\n2. Run the code.\n3. You see undefined instead of the month.\n\n### Expected Behavior\n\nYou should see the expected month from the dataframe.\n\n<img width=\"1174\" height=\"632\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/fe9bee88-37ec-42f6-b400-19b1346dc1ad\" />\n\n### Current Behavior\n\n<img width=\"607\" height=\"290\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/29f12615-c438-4de1-a5c8-50f2a03a796a\" />\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.55.0\n- Python version: 3.12.3\n- Operating System: Ubuntu 24.04 noble\n- Browser: Chrome (v146.0.7680.71)\n\n\n### Additional Information\n\nIt used to work fine on streamlit 1.52.2.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-03-13T06:43:06Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-14361)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-03-13T07:58:10Z",
+      "body": "This is a bug report for a regression in `st.altair_chart` where using `yearmonth(date):N` (time unit with nominal encoding) displays \"undefined\" instead of formatted date labels (e.g., \"February 2025\"). The user confirms this worked in Streamlit 1.52.2 but broke in 1.55.0. The most likely root cause is the **vega-lite upgrade from 6.3.1 to 6.4.2** (introduced via [PR #13023](https://github.com/streamlit/streamlit/pull/13023)). Vega-lite 6.4.0 introduced a tooltip newline feature ([vega-lite#9678](https://github.com/vega/vega-lite/pull/9678)) that caused a regression where tooltip data shows `\"undefined\"` instead of actual values. While vega-lite 6.4.2 includes a fix ([vega-lite#9707](https://github.com/vega/vega-lite/pull/9707)), the fix may not cover all cases \u2014 particularly time unit transforms with nominal encoding combined with Streamlit's mark config (`tooltip: { content: \"encoding\" }`) and/or the AST expression interpreter (`vega-interpreter`) used for CSP compliance.\n\n### Related Issues\n\n- **[#12390](https://github.com/streamlit/streamlit/issues/12390)** \u2014 Regression in v1.49.0 where tooltips in layered Altair charts stop showing when a facet encoding is used inside `st.dialog`. Both issues involve Altair chart tooltip/rendering regressions potentially tied to upstream vega-lite changes.\n- **[#5733](https://github.com/streamlit/streamlit/issues/5733)** (closed) \u2014 Previous issue where `st.altair_chart` showed blank axis/chart when provided a datetime domain, fixed by updating `vega-interpreter`. Demonstrates a pattern of datetime rendering issues caused by vega dependency incompatibilities.\n- **[#4342](https://github.com/streamlit/streamlit/issues/4342)** (closed) \u2014 Previous issue where tooltip and axis labels displayed incorrect dates for `st.altair_chart`. Same category of date formatting issues in Altair charts within Streamlit.\n\n---\n*This is an automated triage comment using `opus-4.6-thinking`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-03-15T21:10:55Z",
+      "body": "This bug is a result of a recent change made in `vega-lite` - I've made a PR on that repo that should resolve [here](https://github.com/vega/vega-lite/pull/9782) "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-19T12:11:09Z",
+      "body": "Closing this since it was fixed in the vega-lite dependency. "
+    }
+  ]
+}

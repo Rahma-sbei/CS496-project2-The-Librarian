@@ -1,0 +1,25 @@
+{
+  "id": "issue-9340",
+  "type": "issue",
+  "number": 9340,
+  "url": "https://github.com/streamlit/streamlit/issues/9340",
+  "title": "Popover is truncated when app is oembedded",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.popover"
+  ],
+  "created_at": "2024-08-27T13:43:56Z",
+  "closed_at": "2026-08-06T19:34:53Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen oembedding a Streamlit app (deployed on Cloud) in a Medium post, I figured the `st.popover` container gets truncated in its width.\r\n\r\n![image](https://github.com/user-attachments/assets/84c853f1-5db1-44c3-9de0-64390c6c7e92)\r\n\n\n### Reproducible Code Example\n\n_No response_\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\r\n- Python version:\r\n- Operating System:\r\n- Browser:\r\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-08-27T13:44:07Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9340)\n"
+    }
+  ]
+}

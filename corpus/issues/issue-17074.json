@@ -1,0 +1,52 @@
+{
+  "id": "issue-17074",
+  "type": "issue",
+  "number": 17074,
+  "url": "https://github.com/streamlit/streamlit/issues/17074",
+  "title": "Pills/ToggleButtonGroup: all options render with \"selected\" style on fresh page load in Safari",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:frontend",
+    "area:styling",
+    "status:cannot-reproduce",
+    "feature:st.segmented_control",
+    "feature:st.pills"
+  ],
+  "created_at": "2026-09-22T07:20:52Z",
+  "closed_at": "2026-10-21T17:19:30Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nOn fresh page load (before any user interaction), st.pills (multi-select mode) renders ALL options with the \"selected\" purple-outline style in Safari, even though no option is selected \u2014 the underlying server-side state (default=None) is correctly empty. The visual bug appears specifically in real Safari and does not reproduce in Chromium or Playwright's WebKit engine.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nselected = st.pills(\n    \"Filter\",\n    options=[\"Option A\", \"Option B\", \"Option C\"],\n    selection_mode=\"multi\",\n    default=None,\n)\nst.write(selected)\n```\n\n### Steps To Reproduce\n\n1. Open the app fresh in Safari (macOS or iOS) \u2014 a new tab/window, not a warm reload.\n2. Before clicking anything, observe the st.pills widget with selection_mode=\"multi\" and default=None.\n3. All options render with the \"selected\" purple-outline styling, even though nothing has been selected yet.\n4. The underlying state is correct (st.write(selected) shows an empty list) \u2014 this is a visual-only bug.\n5. Does NOT reproduce in Chromium or in Playwright's WebKit engine \u2014 only in real Safari.\n\n### Expected Behavior\n\nOn fresh load with default=None, all pill options should render in the plain/unselected style, matching the actual empty selection state.\n\n### Current Behavior\n\nAll pill options render in the \"selected\" style (purple outline/fill) on fresh page load in Safari, despite no option being selected and the server-side value correctly being an empty list.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.64.0\n- Python version: (from your requirements.txt / Railway build \u2014 Claude Code can confirm the exact version)\n- Browser: Safari (macOS) \u2014 reproduces on real Safari; does not reproduce in Chromium or Playwright's WebKit\n- OS: macOS\n\n### Additional Information\n\nExtracted the relevant CSS from the live page's compiled stylesheet:\n[data-selected]:not([data-disabled]) { background-color: rgba(79,70,229,0.1); border-color: rgb(79,70,229); color: rgb(79,70,229); }\n\nThis appears to be an attribute-presence selector issue: in Chromium/WebKit-via-Playwright, react-aria (the underlying ToggleButtonGroup implementation) correctly omits the data-selected attribute entirely on unselected buttons, so the selector doesn't match. It's possible real Safari's DOM/CSS engine handles react-aria's attribute timing differently on initial paint, causing data-selected to be briefly (or persistently) present on all buttons before Safari's own attribute-removal logic runs \u2014 worth investigating from the react-aria/Safari interaction side.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-22T07:21:02Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-17074)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-22T10:50:53Z",
+      "body": "[USER] I made a repro app for this here, but have not been able to reproduce https://issues.streamlit.app/?issue=gh-17074\nIs there something else in your app that might be interacting with this? "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-22T17:01:39Z",
+      "body": "Visual-only Safari bug: on a cold load, multi-select `st.pills` with `default=None` paints every option with the primary selected style even though widget state is correctly empty. This is plausible in code: after the BaseWeb \u2192 React Aria migration, `StyledPillsToggleButton` (and the shared `st.segmented_control` styles) key off the presence selector `[data-selected]:not([data-disabled])`. CSS `[data-selected]` matches any present attribute, including `data-selected=\"false\"` or `\"\"`, so a Safari/react-aria first-paint quirk that leaves that attribute on unselected `ToggleButton`s would produce exactly this screenshot while Chromium and Playwright WebKit (not real Safari) stay clean. The hosted repro not reproducing is consistent with that. Worth checking `st.segmented_control` in real Safari the same way, and inspecting whether unselected buttons have `data-selected` / `data-selected=\"false\"` in the DOM.\n\n### Related Issues\n\n- https://github.com/streamlit/streamlit/issues/12802 \u2014 Same `ToggleButtonGroup` CSS surface (`[data-selected]` / hover adjacency) for `st.segmented_control`; not a duplicate, but the closest existing styling bug on this component.\n- https://github.com/streamlit/streamlit/issues/12912 \u2014 Selected *appearance* of `st.pills` / `st.segmented_control` diverging from the actual value (disabled case). Same class of visual/state mismatch, different trigger.\n- https://github.com/streamlit/streamlit/issues/12388 \u2014 Earlier report that pills hide the selected style when `disabled=True`; inverse of this issue (selected look missing vs. selected look on everything), same widget.\n\nNo duplicate of the Safari cold-load \u201call pills look selected\u201d report was found.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-09-23T08:17:46Z",
+      "body": "This would be a genuinely useful fix/addition for the project."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-01T16:45:45Z",
+      "body": "Thanks for the detailed report \u2014 the CSS you extracted was genuinely useful in narrowing this down. I spent some time trying to reproduce it in real Safari and wasn't able to, so I want to share exactly what I tried in case it helps us find the difference between our setups.\n\n**What I tested:** Streamlit 1.64.0 (your reported version) in a clean venv, your snippet verbatim, with `primaryColor = \"#4F46E5\"` set so the selected style matches the indigo in your CSS. Real Safari 26.6.2 on macOS 26.7 \u2014 not Playwright's WebKit, since your report rules that out. Three loads: a first-ever visit to the URL, a warm reload, and one on a separate origin so every asset was refetched cold. On all three, the three `default=None` pills rendered plain: no `data-selected` attribute, `aria-pressed=\"false\"`, and a neutral `rgba(49,51,63,0.2)` border rather than the indigo one.\n\n**Why I trust that negative result:** a \"nothing found\" outcome is only as good as the detector, so the same page also had a second pills widget with `default=[\"Ctrl A\"]` as a control. That button reported `data-selected` present with `background-color: rgba(79,70,229,0.1); border-color: rgb(79,70,229); color: rgb(79,70,229)` \u2014 exactly the CSS you quoted. So the check does see the attribute and the indigo styling when they're really there; the `default=None` pills simply didn't have either. I also sampled every animation frame from before React first rendered through several seconds after, specifically to catch a transient flash on first paint, and there were zero frames where an unselected pill carried the attribute.\n\n**On the attribute-timing theory:** I don't think this one can be it, unfortunately. In the shipped bundle react-aria emits the attribute as `data-selected={isSelected || undefined}`, and React removes rather than sets an attribute whose value is `undefined`. So `data-selected=\"\"` or `data-selected=\"false\"` never exists on an unselected button in any engine \u2014 there's no attribute present for `[data-selected]` to match, and no window for Safari to remove it late. Related: the compiled rule on the page is class-scoped (`.st-emotion-cache-XXXX[data-selected]:not([data-disabled])`) rather than the bare `[data-selected]` selector, though that's secondary to the attribute never being there.\n\nSince you're clearly seeing it, I suspect something in your app that the minimal snippet doesn't have. Two things would help a lot:\n\n- Your exact Safari version, and whether it was macOS or iOS. I could only test 26.6.2 on macOS, and I don't have an iOS device to check.\n- Whether the app has any custom CSS, a theme beyond `primaryColor`, or custom components. This follows on from the question above \u2014 anything injecting styles that match `.stButtonGroup button` could paint the pills without any `data-selected` involved.\n\nIf you can still reproduce it, running this in Safari's console on the affected page would tell us which half of the problem it is:\n\n```js\ndocument.querySelectorAll('[data-testid=stButtonGroup] button').forEach(b =>\n  console.log(b.textContent.trim(), '| data-selected:', b.hasAttribute('data-selected'), '| border:', getComputedStyle(b).borderColor))\n```\n\nIf `data-selected` comes back `true` on options you haven't clicked, it's a state bug and I'd want your Safari version to chase it. If it's `false` but the border is still indigo, then something other than that rule is doing the painting, and whatever custom CSS is in the app is the place to look.\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-10-21T17:19:30Z",
+      "body": "Closing as team unable to repro"
+    }
+  ]
+}

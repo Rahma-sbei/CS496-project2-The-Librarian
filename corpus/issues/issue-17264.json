@@ -1,0 +1,33 @@
+{
+  "id": "issue-17264",
+  "type": "issue",
+  "number": 17264,
+  "url": "https://github.com/streamlit/streamlit/issues/17264",
+  "title": "Button in horizontal container shows native browser title tooltip even when the label is not truncated",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:frontend",
+    "area:widgets",
+    "feature:st.container",
+    "feature:st.columns",
+    "feature:tooltip",
+    "feature:st.button"
+  ],
+  "created_at": "2026-10-05T10:34:18Z",
+  "closed_at": "2026-10-06T17:41:12Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nStarting with Streamlit 1.62.0, a button inside **st.container(horizontal=True)** (or placed directly in a column) gets an HTML **title** attribute on its label when **help** is not set. Hovering the label then shows the browser's native tooltip.\n\nAccording to the **wrap** docstring, this is meant to \"reveal the full label\" when it's truncated with an ellipsis. However, the **title** is added even when the label fits and nothing is truncated. The result is an unexpected, unstyled tooltip on every short button in a horizontal layout. It also looks inconsistent next to Streamlit's own **help** tooltip, which has a different style and position.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nLONG_LABEL = \"This is a very long button label \" * 6\n\n# 1. Unexpected: native tooltip although the label is not truncated\nwith st.container(horizontal=True):\n    st.button(\"Short label\")\n\n# 2. Truncated label: here the native tooltip is useful\nwith st.container(horizontal=True):\n    st.button(LONG_LABEL)\n\n# 3. wrap=True: label wraps, no native tooltip\nwith st.container(horizontal=True):\n    st.button(LONG_LABEL, wrap=True, key=\"wrapped\")\n\n# 4. Vertical container: no native tooltip\nwith st.container(horizontal=False):\n    st.button(\"Short label\", key=\"vertical\")\n\n# 5. help set: Streamlit tooltip only\nst.button(\"With help\", help=\"This is a button with a tooltip\")\n```\n\n### Steps To Reproduce\n\n1. Run the app above with **streamlit run app.py**.\n2. Hover the mouse over the text of the first button (\"Short label\") and wait about one second.\n\n### Expected Behavior\n\nNo tooltip should appear, because the label is fully visible and **help** is not set. The native **title** tooltip should appear only when the label is actually truncated, as in case 2.\n\n### Current Behavior\n\nThe browser's native tooltip (rectangular, below and to the right of the cursor) shows the label text even though nothing is truncated. The button in the vertical container (case 4) does not show it.\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.65.0 (also reproduced on 1.62.0)\n- Python version: 3.12.8\n- Operating System: Windows 11\n- Browser: Chrome 154.0.8037.95 (64-bit)\n\n### Additional Information\n\n**Button** passes **addTitleTooltip = !wrap && !help** to the label component. In the 1.65.0 bundle, the hook that handles this flag (minified, in **StreamlitMarkdown.*.js**) always sets **title** to the label's text content. It does not check whether the text overflows (for example **el.scrollWidth > el.clientWidth**).\n\nA possible fix is to set **title** only when the label is truncated, and re-check it with a **ResizeObserver** alongside the existing **MutationObserver**. The same hook appears to be used by **st.checkbox**, **st.popover** and markdown with **wrap=False**, so these may be affected too.\n\nWorkaround: pass **wrap=True** to the button.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-05T10:34:30Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-17264)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-05T10:55:08Z",
+      "body": "This matches a documented limitation of the `wrap` behavior added in 1.62 ([#16325](https://github.com/streamlit/streamlit/pull/16325)), rather than an accidental title being attached. Inside `st.container(horizontal=True)`, and for a button placed directly in a column, `useResolvedWrap` treats the default `wrap=None` as no-wrap. `Button` then sets `addTitleTooltip` whenever that resolved wrap is false and `help` is unset. `useLabelTitleTooltip` always copies the rendered plain-text label onto a native HTML `title` and never checks overflow (`scrollWidth` vs `clientWidth`) or listens for resize. The horizontal-wrap product spec records this as an accepted trade-off (\"Tooltip for the full label\") and defers a follow-up, \"Styled, only-when-clipped label tooltip\", that would measure truncation and use the styled tooltip. The same hook is shared by the other button-like controls, `st.checkbox` / `st.toggle`, and `wrap=False` text, so those surfaces show the same native tooltip. `wrap=True` or a `help` string avoids the native title on buttons.\n\n### Related Issues\n\nNo duplicate of this report was found. The two closest open issues are adjacent tooltip and truncation requests:\n\n- [#16348](https://github.com/streamlit/streamlit/issues/16348) \u2014 Long `st.selectbox` labels are clipped with no way to read the full text. Same \"reveal the label only when it does not fit\" need, but a different widget and the opposite gap (no tooltip today).\n- [#12649](https://github.com/streamlit/streamlit/issues/12649) \u2014 `st.button` `help` tooltips are hover-only and do not appear on mobile. Related button-tooltip UX, not the native `title` path used for unwrapped labels.\n\n---\n*This is an automated triage comment using `grok-4.7-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

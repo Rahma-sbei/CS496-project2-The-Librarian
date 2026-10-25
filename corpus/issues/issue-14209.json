@@ -1,0 +1,40 @@
+{
+  "id": "issue-14209",
+  "type": "issue",
+  "number": 14209,
+  "url": "https://github.com/streamlit/streamlit/issues/14209",
+  "title": "WebSocket fails behind Istio VirtualService despite websocketUpgrade: true, causing localhost requests to stall even with normal CPU/memory usage",
+  "state": "closed",
+  "state_reason": "not_planned",
+  "labels": [
+    "type:bug",
+    "area:network",
+    "status:awaiting-user-response",
+    "area:deployment"
+  ],
+  "created_at": "2026-03-04T09:11:57Z",
+  "closed_at": "2026-06-08T16:54:43Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen deploying a minimal Streamlit app behind Istio (using Gateway + VirtualService with websocketUpgrade: true), the browser fails to establish a WebSocket connection (wss://.../stream), falling back to HTTP polling. Surprisingly, this causes localhost requests from within the same pod to become extremely slow, even though CPU and memory usage remain low. The same Istio setup works fine for other WebSocket-based apps like JupyterLab.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\nst.write(\"Hello World\")\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\nWith websocketUpgrade: true, Streamlit should successfully establish a WebSocket connection through Istio.\nEven if WebSocket fails, localhost access should remain responsive, as the app is idle and system resources are not saturated.\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\nStreamlit version: 1.47.1\nPython version: 3.10.12\nOperating System: Ubuntu 22.04.3 LTS\nBrowser: Edge/chrome\n\n### Additional Information\n\nthis is my virtual service template\napiVersion: networking.istio.io/v1beta1\nkind: VirtualService\nspec:\n  gateways:\n    - my-ns/my-gateway\n  hosts:\n    - \"example.com\"\n  http:\n    - match:\n        - uri:\n            prefix: /prefix/path\n      route:\n        - destination:\n            host: streamlit-svc.my-ns.svc.cluster.local\n            port:\n              number: 8501\n      websocketUpgrade: true\n      timeout: 60s\n\n<img width=\"2240\" height=\"308\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/2dda18e0-3b79-4f21-abaa-032b456a8e5e\" />\n\n<img width=\"1808\" height=\"542\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/aa9cb1b0-83a5-4a95-820c-a5ffc4273317\" />",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-03-04T09:12:09Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-14209)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-03-04T10:02:38Z",
+      "body": "This issue reports that Streamlit's WebSocket connection (`/_stcore/stream`) fails when deployed behind an Istio VirtualService with `websocketUpgrade: true`, causing the browser to fall back to HTTP polling. Additionally, the user reports that even localhost requests from within the same pod become extremely slow despite normal CPU/memory usage.\n\n**Root cause analysis:** Streamlit relies on a WebSocket connection at the `_stcore/stream` endpoint for all client-server communication. When deployed behind a reverse proxy with a path prefix (e.g., `/prefix/path`), the frontend constructs the WebSocket URI based on `window.location` via `getPossibleBaseUris()` (in `frontend/connection/src/utils.ts`). If the proxy's path rewriting doesn't perfectly align with what Streamlit expects, the WebSocket upgrade request may be routed incorrectly or stripped of necessary headers by Istio's Envoy sidecar. This is a known category of issues with Streamlit behind reverse proxies \u2014 the `server.baseUrlPath` config, CORS settings (`server.enableCORS`), and XSRF protection (`server.enableXsrfProtection`) all play a role. The localhost stalling behavior is unusual and may stem from Tornado's event loop being blocked by repeated failed WebSocket upgrade attempts or the ping interval settings (default 30s with Tornado >= 6.5), which can interact poorly with proxy timeouts. The user should ensure `server.baseUrlPath` is configured to match their Istio prefix path, and may need to disable CORS/XSRF protection for their deployment.\n\n### Related Issues\n\n- **#8188** \u2014 [Unnecessary failover on /_stcore/stream](https://github.com/streamlit/streamlit/issues/8188): Very closely related \u2014 reports Streamlit failing to establish WebSocket connections (`/_stcore/stream`) when deployed behind a reverse proxy (AWS ALB), with the app hanging at skeleton elements. Same root cause category of path/WebSocket handling behind proxies.\n- **#12108** \u2014 [Frequent websocket connection drops on higher (default 30s) ping_interval](https://github.com/streamlit/streamlit/issues/12108): Reports WebSocket connection instability after Tornado 6.5.1 upgrade for users behind proxies/Nginx. The `websocket_ping_interval` change from 1s to 30s (for Tornado >= 6.5) may contribute to connection issues in proxy environments like Istio.\n- **#8901** \u2014 [Reconnect to existing sessions instead of creating new upon unclean websocket close](https://github.com/streamlit/streamlit/issues/8901): Related to WebSocket connection reliability \u2014 when connections drop (as in this issue), Streamlit creates new sessions instead of reconnecting, exacerbating the user experience degradation.\n\n---\n*This is an automated triage comment using `opus-4.6-thinking`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-08T14:03:28Z",
+      "body": "Thanks for reporting this. WebSocket failures behind reverse proxies with path prefixes are a known challenge.\n\nTo help us investigate, could you share:\n1. Is `server.baseUrlPath` configured to match your Istio prefix path (e.g., `server.baseUrlPath = \"/prefix/path\"`)?\n2. What are your `server.enableCORS` and `server.enableXsrfProtection` settings?\n3. What errors appear in the browser console/network tab when the WebSocket connection fails?\n4. Does setting `server.baseUrlPath = \"/prefix/path\"` resolve the connection issue?\n\nIn the meantime, the [reverse proxy configuration docs](https://docs.streamlit.io/deploy/tutorials/docker) may help with your setup."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-08T16:54:43Z",
+      "body": "Going to close this issue as stale"
+    }
+  ]
+}

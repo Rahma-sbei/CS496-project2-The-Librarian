@@ -1,0 +1,77 @@
+{
+  "id": "issue-345",
+  "type": "issue",
+  "number": 345,
+  "url": "https://github.com/streamlit/streamlit/issues/345",
+  "title": "streamlit hello raises exception",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug"
+  ],
+  "created_at": "2019-10-09T18:47:20Z",
+  "closed_at": "2020-03-04T01:42:53Z",
+  "body": "# Summary\r\nType here a clear and concise description of the bug. Aim for 2-3 sentences.\r\n\r\n# Steps to reproduce\r\n```\r\ndocker run -it -p 8501:8501 ubuntu:19.04 bash\r\n```\r\nThen in the container, run:\r\n```\r\napt-get update\r\napt-get install python python-pip build-essential\r\npip install streamlit\r\nstreamlit hello\r\n```\r\nthen pick the 2nd demo\r\n\r\n## Expected behavior:\r\nNo exception raised\r\n\r\n## Actual behavior:\r\nException raised\r\n## Is this a regression?\r\nnot sure\r\n# Debug info\r\n- Streamlit version: (get it with `$ streamlit version`)\r\n- Python version: python2.7\r\n- Using Conda? no\r\n- OS version: Ubuntu Linux\r\n- Browser version:\r\n\r\n# Additional information\r\nIf needed, add any other context about the problem here.\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2019-10-09T18:47:41Z",
+      "body": "```\r\nImportError: cannot import name ConverterMapping\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/ScriptRunner.py\", line 306, in _run_script exec(code, module.__dict__)\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/hello.py\", line 334, in <module> run()\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/hello.py\", line 308, in run demo()\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/hello.py\", line 202, in plotting_demo chart = st.line_chart(last_rows)\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/__init__.py\", line 126, in wrapped_method return method(dg, *args, **kwargs)\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/DeltaGenerator.py\", line 122, in wrapped_method marshall_element, delta_type, last_index)\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/DeltaGenerator.py\", line 317, in _enqueue_new_element_delta rv = marshall_element(msg.delta.new_element)\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/DeltaGenerator.py\", line 119, in marshall_element return method(dg, element, *args, **kwargs)\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/DeltaGenerator.py\", line 822, in line_chart import streamlit.elements.altair as altair\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/elements/altair.py\", line 24, in <module> import altair as alt\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/__init__.py\", line 4, in <module> from .vegalite import *\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/vegalite/__init__.py\", line 2, in <module> from .v3 import *\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/vegalite/v3/__init__.py\", line 2, in <module> from .schema import *\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/vegalite/v3/schema/__init__.py\", line 2, in <module> from .core import *\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/vegalite/v3/schema/core.py\", line 6, in <module> from altair.utils.schemapi import SchemaBase, Undefined\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/utils/__init__.py\", line 14, in <module> from .plugin_registry import PluginRegistry\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/utils/plugin_registry.py\", line 3, in <module> import entrypoints\r\nFile \"/usr/lib/python2.7/dist-packages/entrypoints.py\", line 16, in <module> import configparser\r\nFile \"/usr/local/lib/python2.7/dist-packages/configparser.py\", line 11, in <module> from backports.configparser import (\r\n```"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2019-10-15T21:43:03Z",
+      "body": "Complete stack trace:\r\n```\r\nImportError: cannot import name ConverterMapping\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/ScriptRunner.py\", line 310, in _run_script exec(code, module.__dict__)\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/hello/hello.py\", line 110, in <module> run()\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/hello/hello.py\", line 101, in run demo()\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/hello/demos.py\", line 183, in plotting_demo chart = st.line_chart(last_rows)\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/__init__.py\", line 126, in wrapped_method return method(dg, *args, **kwargs)\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/DeltaGenerator.py\", line 121, in wrapped_method return dg._enqueue_new_element_delta(marshall_element, delta_type, last_index)\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/DeltaGenerator.py\", line 316, in _enqueue_new_element_delta rv = marshall_element(msg.delta.new_element)\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/DeltaGenerator.py\", line 119, in marshall_element return method(dg, element, *args, **kwargs)\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/DeltaGenerator.py\", line 821, in line_chart import streamlit.elements.altair as altair\r\nFile \"/usr/local/lib/python2.7/dist-packages/streamlit/elements/altair.py\", line 24, in <module> import altair as alt\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/__init__.py\", line 4, in <module> from .vegalite import *\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/vegalite/__init__.py\", line 2, in <module> from .v3 import *\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/vegalite/v3/__init__.py\", line 2, in <module> from .schema import *\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/vegalite/v3/schema/__init__.py\", line 2, in <module> from .core import *\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/vegalite/v3/schema/core.py\", line 6, in <module> from altair.utils.schemapi import SchemaBase, Undefined\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/utils/__init__.py\", line 14, in <module> from .plugin_registry import PluginRegistry\r\nFile \"/usr/local/lib/python2.7/dist-packages/altair/utils/plugin_registry.py\", line 3, in <module> import entrypoints\r\nFile \"/usr/lib/python2.7/dist-packages/entrypoints.py\", line 16, in <module> import configparser\r\nFile \"/usr/local/lib/python2.7/dist-packages/configparser.py\", line 11, in <module> from backports.configparser import (\r\n```"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2019-10-15T21:46:41Z",
+      "body": "This seems to be an `altair` problem. This snippet raises the same exception:\r\n```\r\nimport altair as alt\r\nimport pandas as pd\r\n\r\nsource = pd.DataFrame({\r\n    'a': ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'],\r\n    'b': [28, 55, 43, 91, 81, 53, 19, 87, 52]\r\n})\r\n\r\nalt.Chart(source).mark_bar().encode(\r\n    x='a',\r\n    y='b'\r\n)\r\n```\r\nDo: `python test.py` in the container"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2019-10-16T00:55:01Z",
+      "body": "Should we file an `altair` bug?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2019-10-16T17:31:02Z",
+      "body": "This only happens in Python 2, right?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2019-10-16T17:31:54Z",
+      "body": "Altair is tested against Python 2: https://github.com/altair-viz/altair/blob/master/.travis.yml. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2019-10-16T17:39:38Z",
+      "body": "Yeah, it shows up with the specific ubuntu-19.04 and above steps. It won't show up for example, with python:2.7-slim. Not sure which version of Linux `altair` tests use."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2019-10-17T04:47:52Z",
+      "body": "Filed: https://github.com/altair-viz/altair/issues/1733"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2019-10-17T14:59:15Z",
+      "body": "This appears to be an issue with the entrypoints package \u2013 I've closed the Altair issue. Reproduce by doing ``pip install entrypoints`` and then ``import entrypoints``"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2019-10-17T21:26:41Z",
+      "body": "It seems there is an issue with `configparser` that is installed by `apt-get`. This only happen for Python 2.7.\r\nA possible workaround is to remove `configparser` via `apt-get` before `pip install streamlit`:\r\n```\r\napt-get update\r\napt-get install python python-pip \r\napt-get remove python-configparser\r\npip install streamlit\r\nstreamlit hello\r\n```\r\nThis will take care of the bug.\r\n\r\nAnother solution is to use a different python image. For example for Python-2.7: `python:2.7-slim` does not have this problem, likely because python is preinstalled and the `apt-get` does not conflict with `pip`.\r\n\r\n[USER] this will probably work for `altair` as well.\r\n\r\n---\r\nAt this point, we're at a loss how to automatically fix this for users. But it seems very localized to the specific Docker image, and specifically on Python 2.x \u2014 and we have the work-around above. So we'll stop work on this at the moment.\r\n\r\nIf anyone has a solution, please let us know. We'll be happy to merge it in!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2019-10-18T20:49:26Z",
+      "body": "Reopening to make this easier for users to find."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-03-03T22:57:01Z",
+      "body": "This is a Python2 only bug. I think we should close it."
+    }
+  ]
+}

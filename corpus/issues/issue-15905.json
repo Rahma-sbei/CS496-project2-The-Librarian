@@ -1,0 +1,45 @@
+{
+  "id": "issue-15905",
+  "type": "issue",
+  "number": 15905,
+  "url": "https://github.com/streamlit/streamlit/issues/15905",
+  "title": "`st.camera_input` disabled on mobile + docs.streamlit.io is DOWN",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:awaiting-user-response",
+    "area:mobile",
+    "feature:st.camera_input"
+  ],
+  "created_at": "2026-07-08T16:35:35Z",
+  "closed_at": "2026-07-09T08:50:12Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen using `st.camera_input` on a deployed HTTPS Streamlit app from a mobile phone, it shows this message just like in localhost:\n\n<img width=\"1264\" height=\"1002\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/007a8229-9964-4da0-99e6-4bf8ce3c4066\" />\n\nThe widget should just ask for permission from the browser then the phone, but it doesn't.\nAND the whole docs.streamlit.app is DOWN, so I can't even click the \"Learn how to allow access\" link.\n\nCan you please solve this problem ASAP because my app depends on it.\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\nAsk for camera access and open it on mobile phones. \n\n### Current Behavior\n\nDOESN'T Ask for camera access and open it on mobile phones. \n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.58\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-08T16:35:45Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15905)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-08T19:08:44Z",
+      "body": "This reports that `st.camera_input` on a deployed HTTPS app viewed from a mobile phone stays on the *\"This app would like to use your camera. Learn how to allow access.\"* prompt and never triggers the browser's camera-permission request.\n\nLooking at the frontend, that message is the `AskForCameraPermission` view in `WebcamComponent.tsx`. It is shown whenever `webcamPermission !== WebcamPermission.SUCCESS`, and the state only flips to `SUCCESS` when `react-webcam`'s `onUserMedia` callback fires (i.e. `navigator.mediaDevices.getUserMedia()` resolves). If `getUserMedia()` never prompts/resolves on the device, the widget appears \"disabled\" and stuck on this message. Note that the `ERROR` path (`onUserMediaError`) renders the *exact same* message as the pending state, so a blocked/denied/failed camera is visually indistinguishable from \"still waiting\" \u2014 a UX gap worth addressing.\n\nThe most common environmental triggers for this (even over HTTPS) are: (1) the app being embedded in an `iframe` without `allow=\"camera; microphone\"` (Permissions Policy blocks `getUserMedia` silently); (2) the page not actually being a *secure context* on the phone (invalid/self-signed TLS cert, or LAN-IP over HTTP), which mobile browsers block without a visible prompt; or (3) camera access previously denied for that site/browser at the OS/browser level. The reporter should confirm whether the app is embedded and whether other camera sites work in the same mobile browser. The separate \"docs.streamlit.io is DOWN\" note refers to the `CAMERA_PERMISSION_URL` target (`docs.streamlit.io/knowledge-base/using-streamlit/enable-camera`); that would be a transient docs-hosting outage rather than a library bug.\n\n### Related Issues\n\n- [#5075 \u2013 Switching camera stuck on permissions](https://github.com/streamlit/streamlit/issues/5075) \u2014 Confirmed bug where `st.camera_input` gets stuck in a permissions loop on some mobile devices; closest match to this permission/mobile behavior.\n- [#9447 \u2013 st.camera_input - Image size with low resolution at small pages](https://github.com/streamlit/streamlit/issues/9447) \u2014 Another confirmed, mobile-specific `st.camera_input` issue; useful shared context for camera behavior on phones.\n- [#12477 \u2013 Allow uploading images from camera in st.chat_input](https://github.com/streamlit/streamlit/issues/12477) \u2014 Related mobile camera-capture request (enhancement, not a duplicate).\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-08T19:44:15Z",
+      "body": "Hi [USER], I made this repro app for the issue here: https://issues.streamlit.app/?issue=gh-15905 and tested it on my iPhone, but I was not able to reproduce the issue, the browser asks for permission for the camera as expected. \n\nThere are some ideas for investigation on your end in the AI triage above, could you see if any of this applies to you?\n\n> The most common environmental triggers for this (even over HTTPS) are: (1) the app being embedded in an iframe without allow=\"camera; microphone\" (Permissions Policy blocks getUserMedia silently); (2) the page not actually being a secure context on the phone (invalid/self-signed TLS cert, or LAN-IP over HTTP), which mobile browsers block without a visible prompt; or (3) camera access previously denied for that site/browser at the OS/browser level. The reporter should confirm whether the app is embedded and whether other camera sites work in the same mobile browser.\n\nI also tried out the referenced docs page and I am able to access it without issues: https://docs.streamlit.io/knowledge-base/using-streamlit/enable-camera\n\nIt has links to help page from various browsers, for example this one for chrome: https://support.google.com/chrome/answer/2693767"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-08T20:14:17Z",
+      "body": "I found out we need to explicitly allow camera access from the Android settings and Chrome's site settings, now it will ask for permission to open the camera.\nBut about the Streamlit docs, I really can't access them. Maybe it's a problem in my region (Egypt)"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-09T08:50:12Z",
+      "body": "[USER] I'm glad this is fixed for you. Perhaps the issue with the docs is due to being in Egypt, when I researched this a bit it seems there are sometimes broad blocks based on the cloud server. Our docs content is also hosted publicly in Github, so perhaps you could browse them there: https://github.com/streamlit/docs . You can use the preview feature to make the markdown files more readable. "
+    }
+  ]
+}

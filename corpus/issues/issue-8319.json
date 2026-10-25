@@ -1,0 +1,48 @@
+{
+  "id": "issue-8319",
+  "type": "issue",
+  "number": 8319,
+  "url": "https://github.com/streamlit/streamlit/issues/8319",
+  "title": "Select/Deselect All for st.data_editor - st.column_config.CheckboxColumn",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:st.column_config"
+  ],
+  "created_at": "2024-03-16T15:59:57Z",
+  "closed_at": "2026-07-30T08:07:45Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nWould like to be able to select/deselect all when using \"st.column_config.CheckboxColumn\" in st.data_editor.\r\n\r\nSimilar to how it works when using \"num_rows=dynamic\". (But I dont want to have dynamic rows)\r\n\r\n\n\n### Why?\n\nThis is mostly to make it easier when interacting with large df's where multiple cells/checkboxes have to be selected (and not for the purpose of removing rows etc like with \"num_rows=dynamic\").\n\n### How?\n\nThere should be a checkbox in the label field of the chekbox column. When checked, it would check all the checkboxes in the column, and then deselect all checked boxes if clicked again.\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-03-16T16:00:05Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8319)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-03-16T18:08:07Z",
+      "body": "[USER] Thanks for the feature request. We plan to add official support for row selection soon using the same checkbox row as used when \"num_rows=dynamic\". I assume this will likely fulfill your feature request, or? \r\n\r\nThe related issue is: https://github.com/streamlit/streamlit/issues/688"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-03-16T19:38:09Z",
+      "body": "Yes, as long as you will be able to select all (all checkboxes in column) with one click."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-05-13T11:45:07Z",
+      "body": "We will release row & column selections for `st.dataframe` in the `1.35` release. The row selections will provide a way to select/deselect all rows via checkbox in the header. It can be used like this:\r\n\r\n```python\r\nselection = st.dataframe(df, on_select=\"rerun\", selection_mode=\"multi-row\")\r\n```\r\n\r\n\r\nhttps://github.com/streamlit/streamlit/assets/2852129/ff29cf47-2d63-467b-96b8-06fa71cce970\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-08T06:20:10Z",
+      "body": "Cool! it is almost the feature I were looking for, and its fresh, thus now I got why it is not so well documented )\r\n\r\nBut one more -- how to **set** this column values **programmatically**? \r\n\r\nI can do like ```some_dataframe.selection['rows'].append(5)``` to add a value, \r\nbut it does not display this changes (new selected row) in the dataframe view!\r\n\r\n1. Is it possible? Ho how to manage this properly?\r\n\r\n2. also I couldn't find how to \r\n- add text to the header of this checkbox column (to get text + checkbox there), \r\n- change its order between other columns, \r\n- hide this column, \r\n\r\nbut it is not crucial comparing to programmatically setting values, \r\n\r\nand I realize almost all of this can be done using \r\n```st.column_config.CheckboxColumn``` with external ```st.selectbox``` (out of the table) to prefill the column values, \r\nbut it available only for ```st.data_editor```, not ```st.dataframe```."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-30T08:07:45Z",
+      "body": "Closing this as a duplicate of #7633. Please comment and upvote on this issue. "
+    }
+  ]
+}

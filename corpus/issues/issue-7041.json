@@ -1,0 +1,59 @@
+{
+  "id": "issue-7041",
+  "type": "issue",
+  "number": 7041,
+  "url": "https://github.com/streamlit/streamlit/issues/7041",
+  "title": "UI jitters, chart flashes for minutes when a complex Altair chart is used in multipage app (Chrome)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "priority:P3",
+    "feature:st.altair_chart"
+  ],
+  "created_at": "2023-07-19T16:03:59Z",
+  "closed_at": "2026-07-19T11:56:15Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nThe Streamlit UI \"jitters\"  when a complex Altair chart is used in a multi-page app  in `st.altair_chart`. \n\nWhat I mean by \"jitter\" is best seen in the attached video.\n\n* The jitter can last for tens of seconds and even minutes and renders the app unusable. Eventually it stops most of the times, but not always.\n* The chart sometimes flashes during the jitter.\n* It occurs with charts bigger **and** smaller than the screen width.\n* ~~Setting  `use_container_width=True` reduces the jitter to a half second or so, such that the app becomes usable, but it is noticeable.~~ This is not consistent. I've also seen it with  `use_container_width=True` now.\n* The \"fullscreen\" button is clickable and when clicked the chart shows as expected. In the background, the jitter continues.\n* Also happens with `st.write` instead of `st.altair_chart`.\n* It is triggered by hard reloading as well as regular app updates. Both are demonstrated in the video. Collapsing the sidebar also triggers the behavior.\n* Seems to be Chrome-specific. Firefox 115.0.2 (64-bit) seems unaffected.\n\nI'm not sure whether this is the only condition that triggers this. But I've used Altair charts a lot and haven't seen this under other conditions (single-page apps) yet.\n\nIt looks like some Javascript race condition trying to figure out the width of stuff, but I'm not a JS expert.\n\nApologies if it's a duplicate. I searched for \"jitter\" and \"wiggle\" and didn't find issues, but the behaviour is a bit tricky to put in words.\n\n### Reproducible Code Example\n\nI haven't managed to put together a minimal example yet, as my app is rather complex and requires a lot of data for the chart. I'll try to provide an example if necessary and as soon as I find the time.\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\nDon't jitter.\n\n### Current Behavior\n\nJitters.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.24.1\n- Python version: Python 3.11.3\n- Operating System: MacOS 13.3.1 (a) \n- Browser: Chrome Version 114.0.5735.198\n\n\n### Additional Information\n\n\nhttps://github.com/streamlit/streamlit/assets/8624827/65c3c4fc-b1d9-438e-a2c3-adb4013ab32d",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2023-07-23T14:44:10Z",
+      "body": "**Update:** \r\n\r\nAfter a Chrome update to 115.0.5790.102 (July 20), the bug seems to appear slightly less frequently, but it still exists."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-11-07T21:16:44Z",
+      "body": "[USER] We suspect we may have fixed this issue with the way the window is \"auto sized\" My guess is the chart is triggering resize events regularly and causing that jitter behavior. We replaced the behavior, and hopefully...it's fixed.\n\nCan you verify with the latest version?\n\nIf it still does not work, it will be beneficial to have a reproducible example to help us diagnose the problem."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-12-08T11:40:36Z",
+      "body": "[USER] , thanks for the update. I've tested today with Streamlit 1.29 \u2013\u00a0sadly, the problem is still there. I noticed today that it's not only the chart that is wiggling, but also the three controls on top of it.\r\nI will try to put together an example to reproduce when I find the time."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-17T21:44:06Z",
+      "body": "Hey [USER] ! We have made some updates in the past few months. Could you check to see if 1.35.0 addresses the latest issues. If not, do you have that repro example? Anything can help here."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-18T09:44:08Z",
+      "body": "Hi [USER] , thanks for coming back to this. I installed 1.35.0 and verified via `pipenv graph | grep streamlit` that it was properly updated. Unfortunately, the problem still exists.\r\n\r\nI'll try to put together an example with code and data so you can reproduce the issue."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-18T10:36:58Z",
+      "body": "Ok, here we go.\r\n\r\nI shrank the app and the data to a small example which demonstrates the problem and is small enough to upload. Note that the example is a bit stupid data-wise as I cut down the time range and limited it to cities starting with \"B\". But it flickers like hell on my Mac with the following config:\r\n\r\n* streamlit 1.35.0\r\n* Chrome Version 126.0.6478.62 (Offizieller Build) (arm64)\r\n* MacOs 14.5 (23F79)\r\n\r\nTo run, unzip and then:\r\n\r\n    pipenv install\r\n    pipenv run streamlit run app_flicker.py\r\n\r\nFor me, the flicker appears right on first loading, but also on reload (both command+R and command+shift+R) and when I play with the parameters. Note that the example is no longer a multi-page app (as was the one where I first reported the issue) but it still flickers.\r\n\r\nWould be so cool to have this fixed \u2013\u00a0it's admittedly a complex altair chart I'm using, but the combination of altair and streamlit is pure gold.\r\n\r\nLet me know if there is more I can do to help.\r\n\r\n[example.zip](https://github.com/user-attachments/files/15884636/example.zip)\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-27T12:55:35Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-7041)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-19T11:56:15Z",
+      "body": "Closing this since we haven't heard of the flicker issue for a while. Please respond here or create a new issue if you still get jitter via altair charts."
+    }
+  ]
+}

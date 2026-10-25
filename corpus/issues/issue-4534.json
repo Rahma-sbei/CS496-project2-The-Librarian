@@ -1,0 +1,52 @@
+{
+  "id": "issue-4534",
+  "type": "issue",
+  "number": 4534,
+  "url": "https://github.com/streamlit/streamlit/issues/4534",
+  "title": "HTML tags inside <code> get corrupted since v1.5.0",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:markdown",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.code",
+    "upstream"
+  ],
+  "created_at": "2022-03-22T12:21:24Z",
+  "closed_at": "2026-07-19T12:04:55Z",
+  "body": "### Summary\r\n\r\nNesting an HTML tag inside a `<code>` tag results in `,[object Object],` being displayed.\r\n\r\n### Steps to reproduce\r\n\r\nCode snippet:\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-4534)\r\n\r\n```python\r\nst.write(\r\n    \"\"\"\r\n<code>\r\n<span style='color: red'>test</span> hello\r\n</code>\r\n\"\"\",\r\n    unsafe_allow_html=True,\r\n)\r\n```\r\n\r\noutput:\r\n\r\n```\r\n,[object Object], hello\r\n```\r\n\r\nwhereas the correct behavior should output `test hello` with \"test\" in red.\r\n\r\n### Is this a regression?\r\nYep. The bug was introduced in version 1.5.0 (version 1.4.0 works correctly)\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.5.0\r\n- Python version: 3.8\r\n- Using conda environment\r\n- OS version: Ubuntu 20.04\r\n- Browser version: Google Chrome 99.0.4844.51\r\n\r\n### Additional information\r\n\r\nThis is what streamlit actually returns to the browser for display. I guess that it has something to do with the react-markdown update that was done between 1.4.0 and 1.5.0.\r\n\r\n- [React markdown commit](https://github.com/streamlit/streamlit/commit/be797682394955ef2b94a5f7641b6f9d8fd1dbfc)\r\n- [Comparison between 1.4.0 and 1.5.0](https://github.com/streamlit/streamlit/compare/1.4.0...1.5.0)\r\n- [Upgrade react-markdown issue](https://github.com/streamlit/streamlit/pull/4221)",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-04-05T16:58:07Z",
+      "body": "Thank you [USER] for reporting this issue!\r\n\r\nyes, the problem is related to the markdown/HTML renderer.\r\n\r\nIn some edge cases (for example, when using HTML tags and styles inside the code tag, this can lead to incorrect output)\r\n\r\nFor a workaround, you can use the `html` component to draw pure HTML.\r\n\r\n```python\r\nimport streamlit.components.v1 as components\r\n\r\ncomponents.html(\"\"\"<code>\r\n<span style='color: red'>test</span> hello\r\n</code>\"\"\")\r\n```\r\n\r\nWe constantly work on improving the display of markdown and HTML, and reducing incorrect cases.\r\nThanks again!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-04-22T10:41:42Z",
+      "body": "Hi, unfortunately the iframe produced by `components.html` does not wrap around the full content, and defaults to an height of 150. Setting this manually is not possible as the content might have a dynamic length. Is there a workaround for this? If not, is there an expected ETA for a fix to the original issue?\r\n\r\nThank you :)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-05-20T09:02:33Z",
+      "body": "Hey [USER] , sorry for the ping, thought you might have missed my reply \ud83d\ude05 "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-06-03T18:03:49Z",
+      "body": "This affects a HuggingFace demo: https://huggingface.co/spaces/lvwerra/codeparrot-highlighting\r\n\r\nwhich was highlighted in a recent blog: https://huggingface.co/blog/codeparrot\r\n\r\nThe `components.html` workaround seems to work:\r\n\r\n```\r\nwith col2:\r\n    st.subheader(\"Highlighted code\")\r\n    st.markdown('##')\r\n    html_string = highlight_token_scores(token_list, scores, sep=\"\")\r\n    #st.markdown(html_string, unsafe_allow_html=True)\r\n    components.html(html_string) # https://github.com/streamlit/streamlit/issues/4534\r\n    st.markdown('##')\r\n```\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T12:57:30Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-4534)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-19T12:04:55Z",
+      "body": "This is working correctly in the leatest version"
+    }
+  ]
+}

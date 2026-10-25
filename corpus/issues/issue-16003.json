@@ -1,0 +1,46 @@
+{
+  "id": "issue-16003",
+  "type": "issue",
+  "number": 16003,
+  "url": "https://github.com/streamlit/streamlit/issues/16003",
+  "title": "st.selectbox fuzzy search only matches contiguous substrings since 1.59.0 (BaseWeb \u2192 react-aria migration)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "status:confirmed",
+    "priority:P2",
+    "feature:st.selectbox"
+  ],
+  "created_at": "2026-07-14T18:07:00Z",
+  "closed_at": "2026-07-22T21:48:59Z",
+  "body": "### Checklist\n- [x] I have searched the existing issues for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nSince 1.59.0 (the `BaseWeb` \u2192 react-aria `ComboBox` migration, #15438), typing in\n`st.selectbox` only matches options where the query is a **contiguous substring**\nof the label. In 1.58.0 the search was truly fuzzy (non-contiguous subsequence),\nso e.g. typing `ape` matched both `Grape` and `Apple`. Now it only matches\n`Grape`, and queries like `aple` / `rp` that used to match return \"No results\".\n\n### Reproducible Code Example\n\n```python\nimport streamlit as st\n\nFRUITS = [\"Apple\", \"Apricot\", \"Banana\", \"Cherry\", \"Grape\", \"Mango\", \"Peach\", \"Pear\"]\nv = st.selectbox(\"Fruit\", FRUITS, index=2)  # Banana pre-selected\nst.write(\"value:\", v)\n```\n\n### Steps To Reproduce\n\n1. Run the app above.\n2. Click the selectbox and type `ape`.\n3. Observe the dropdown.\n4. Repeat with `aple` and `rp`.\n\n### Expected Behavior\n\nFuzzy (non-contiguous, case-insensitive, label-only, score-ordered) matching, as\nin 1.58.0:\n\n| Type | Dropdown |\n|------|----------|\n| `ape`  | `Grape`, `Apple` |\n| `aple` | `Apple` |\n| `rp`   | `Grape` |\n\n### Current Behavior\n\nOnly contiguous-substring matches survive (1.59.0 through current):\n\n| Type | Dropdown |\n|------|----------|\n| `ape`  | `Grape` only |\n| `aple` | *No results* |\n| `rp`   | *No results* |\n\nRoot cause appears to be that the react-aria `ComboBox` applies its own built-in\n`contains` text filter on top of Streamlit's already-fuzzy-filtered options, so\nthe visible list is the intersection (substring-only). Streamlit's own\n`fuzzyFilterSelectOptions` util is still correct in isolation\n(`ape \u2192 [Grape, Apple]`), so the fuzzy result is being re-filtered away by the\ncomponent. Consider disabling the component's built-in filter (e.g. a pass-through\n`defaultFilter`) so Streamlit's fuzzy filter is authoritative.\n\n(Screenshots attached: `EVIDENCE_v1_58_0_gap1_type_ape.png` shows `Grape, Apple`\non 1.58.0; `EVIDENCE_branch_gap1_type_ape.png` shows `Grape` only on 1.59.0+.)\n\n### Is this a regression?\n- [x] Yes, this used to work in a previous version.\n\nConfirmed via bisect against official PyPI wheels: `ape` \u2192 `[Grape, Apple]` on\n**1.58.0** (BaseWeb `Select`), `[Grape]` on **1.59.0** (react-aria `ComboBox`).\nIdentical in Chromium and WebKit. Introduced by #15438.\n\n### Debug info\n- Streamlit version: 1.59.0 (introduced); still present in current 1.59.x / dev builds\n- Python version: 3.12\n- Operating System: Linux (browser-independent)\n- Browser: Chromium and WebKit (both affected)\n\n### Additional Information\n\n- Related migration PR: #15438 (Remove `BaseWeb` for `selectbox`).\n- Discovered during QA of #15996 (which fixes the separate type-to-search\n  append bug #15985). This filtering regression is independent of that fix.\n- `filter_mode=\"fuzzy\"` is the default and the mode affected; `prefix` / `contains`\n  behave as documented.\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-14T18:07:30Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16003)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-14T18:41:23Z",
+      "body": "I can take this if it's still open\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-14T19:20:48Z",
+      "body": "##PR \n\nhttps://github.com/streamlit/streamlit/pull/16009\n\n## changes\n\nFixes the 1.59.0 regression where `st.selectbox` fuzzy search only matched contiguous substrings.\n\nSince the BaseWeb \u2192 react-aria `ComboBox` migration (#15438), RAC applied its own default `contains` text filter on top of Streamlit's `fuzzyFilterSelectOptions` result, so the visible list was the intersection (substring-only). Streamlit's fuzzy matcher was still correct in isolation.\n\nThe fix passes a no-op `defaultFilter` to `<ComboBox>` so Streamlit's own filter (fuzzy / contains / prefix / none) is authoritative and the already-filtered `displayOptions` reach the ListBox unchanged. Per the [React Aria docs](https://react-spectrum.adobe.com/react-aria/ComboBox.html#custom-filtering), `defaultFilter` is the documented way to override the built-in filter.\n\nRestores 1.58.0 behavior:\n\n| Type | Dropdown |\n| --- | --- |\n| `ape` | `Grape`, `Apple` |\n| `aple` | `Apple` |\n| `rp` | `Grape` |\n\n## Screenshot or video (only for visual changes)\n\nScreenshots below are hosted from a separate `cursor/pr-16003-assets-152a` branch on this fork (so they don't clutter the PR diff).\n\n### Before (bug \u2014 1.59.0 through current)\n\n| Query | Result |\n| --- | --- |\n| `ape` \u2014 only `Grape`, missing `Apple` | ![Before: typing ape shows only Grape](https://raw.githubusercontent.com/LuC-9/streamlit/cursor/pr-16003-assets-152a/bug_query_ape.png) |\n| `aple` \u2014 \"No results\" | ![Before: typing aple shows No results](https://raw.githubusercontent.com/LuC-9/streamlit/cursor/pr-16003-assets-152a/bug_query_aple.png) |\n| `rp` \u2014 \"No results\" | ![Before: typing rp shows No results](https://raw.githubusercontent.com/LuC-9/streamlit/cursor/pr-16003-assets-152a/bug_query_rp.png) |\n\n### After (fix)\n\n| Query | Result |\n| --- | --- |\n| `ape` \u2014 `Grape`, `Apple` | ![After: typing ape shows Grape and Apple](https://raw.githubusercontent.com/LuC-9/streamlit/cursor/pr-16003-assets-152a/fix_query_ape.png) |\n| `aple` \u2014 `Apple` | ![After: typing aple shows Apple](https://raw.githubusercontent.com/LuC-9/streamlit/cursor/pr-16003-assets-152a/fix_query_aple.png) |\n| `rp` \u2014 `Grape` | ![After: typing rp shows Grape](https://raw.githubusercontent.com/LuC-9/streamlit/cursor/pr-16003-assets-152a/fix_query_rp.png) |\n\n## GitHub Issue Link (if applicable)\n\nFixes #16003. Regression introduced by #15438.\n\n## Testing Plan\n\n- Unit Tests (JS and/or Python)\n  - Added two Vitest regression tests in `Selectbox.test.tsx` covering (a) `ape` \u2192 `Grape, Apple` and (b) `aple` \u2192 `Apple` only. Verified both tests fail without the fix and pass with it. All 51 tests in the suite pass.\n- E2E Tests\n  - No new e2e added. Existing `filter_mode` coverage in `st_selectbox` continues to pass; the widget-level filter modes (`prefix`/`contains`) were never affected because they happened to align with RAC's own `contains` filter, and their behavior is unchanged.\n- Any manual testing needed?\n  - Verified end-to-end with `make debug work-tmp/debug/repro_16003.py` using the reproducer from the issue; see screenshots above.\n\n---\n\n\n\n\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-15T07:46:37Z",
+      "body": "Reproduction app here: https://issues.streamlit.app/?issue=gh-16003"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-15T10:04:24Z",
+      "body": "[USER] Please take a look at https://github.com/streamlit/streamlit/pull/16009\nthis issue is resolved there"
+    }
+  ]
+}

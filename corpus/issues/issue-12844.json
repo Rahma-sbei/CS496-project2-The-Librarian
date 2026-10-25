@@ -1,0 +1,29 @@
+{
+  "id": "issue-12844",
+  "type": "issue",
+  "number": 12844,
+  "url": "https://github.com/streamlit/streamlit/issues/12844",
+  "title": "Prevent updates of disabled inputs in `AppTest`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:app-testing"
+  ],
+  "created_at": "2025-10-21T21:02:43Z",
+  "closed_at": "2026-08-29T11:43:11Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nIt would be great, if `AppTest` would check whether an element is disabled before updating its value. Trying to do so should lead to an error or at least a warning.\n\n### Why?\n\nWhen running AppTests I sometimes stumble upon cases, where the tests work even when they shouldn't ... just for me to find out, that again I changed values of disabled elements within the tests and `AppTest` happily does that.\n\nHaving at least a warning would make it easier to find those quirks in the tests.\n\n### How?\n\nNothing needs to change in the interface.\n\nFor convenience and backward compatibility it would be possible to include a flag in `AppTest` to configure the behavior, e.g. `at = AppTest('test_main.py', default_timeout=30, on_update_disabled_element='warning')`\nwith the possible values:\n- `accept`: take the new value without complaint (default, current behavior)\n- `warning`: take the new value and issue a warning\n- `error`: raise an error when trying to update a disabled element\n\n### Additional Context\n\nBelow you can find a short example to illustrate the problem: currently the test succeeds even though changing the value would not be possible in the app itself.\n\nTo run the example\n- save the code as `test_main.py`\n- run `pytest`\n\n```python\nimport streamlit as st\nfrom streamlit.testing.v1 import AppTest\n\nst.text_input('Text', value='initial value', disabled=True, key='k_text')\n\n\ndef test_disabled_input():\n    at = AppTest('test_main.py', default_timeout=30)\n    at.run()\n\n    at.text_input(key='k_text').set_value('new value')\n    at.run()\n\n    assert at.text_input(key='k_text').value == 'new value'\n```",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-10-21T21:03:00Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12844)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-21T19:45:33Z",
+      "body": "[USER] I tested this again with recent versions. It seems to be fixed starting with 1.61.0, probably due to #16209. At least the widget does no longer accept the new value if it is disabled.\n\nFor debugging purposes I think it would be beneficial to issue a warning or error, when an AppTest tries to update a disabled element. Right now the behavior is:\n- `ignore`: simply drop / ignore the new value"
+    }
+  ]
+}

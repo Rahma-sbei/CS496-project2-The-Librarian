@@ -1,0 +1,31 @@
+{
+  "id": "issue-17119",
+  "type": "issue",
+  "number": 17119,
+  "url": "https://github.com/streamlit/streamlit/issues/17119",
+  "title": "Keyed persist_state=None remount can reset the UI while st.session_state[key] still holds the previous value",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:widgets",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.session_state"
+  ],
+  "created_at": "2026-09-24T20:49:03Z",
+  "closed_at": "2026-09-25T13:44:09Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nA keyed `persist_state=None` widget that has already registered, is then hidden, then shown again can render the widget default while `st.session_state[key]` still holds the previous value on that remount run. A follow-up rerun overwrites session state with the default. Unmount should reset **both** the UI and `st.session_state[key]` in the same run (#3512).\n\nThis is a follow-up to #17106 / #17093. That PR syncs delayed first mount to a leftover pre-registration user key. This issue is the already-registered remount path: unmount cleanup has dropped widget-id state, but a leftover user-key entry can leave the two sides out of sync for one run.\n\n### Reproducible Code Example\n\n```python\nimport streamlit as st\n\nst.session_state.setdefault(\"input2\", \"input 2\")\nst.session_state.setdefault(\"input3\", \"input 3\")\n\nselect = st.selectbox(\"select delayed input\", [\"A\", \"B\"])\nif select == \"A\":\n    value = st.text_input(\"input 2\", key=\"input2\")\nelse:\n    value = st.text_input(\"input 3\", key=\"input3\")\n\nst.write(\"widget return:\", repr(value))\nst.write(\"session_state input2:\", repr(st.session_state.get(\"input2\")))\n```\n\n### Steps To Reproduce\n\n1. Load the app. Input 2 is shown on first load with `\"input 2\"`.\n2. Switch the selectbox to B.\n3. Optionally edit input 3 and press Enter.\n4. Switch back to A.\n5. Compare the input 2 field with the printed `st.session_state.get(\"input2\")` value, then press `r`.\n\n### Expected Behavior\n\nAfter the registered widget remounts, both the rendered input and `st.session_state[\"input2\"]` are the widget default (empty) on that same run. A follow-up rerun is not required to sync them.\n\nA user key written while the widget had **never** registered remains ordinary session state: delayed first mount (and leftover-key remount after edit/hide) should still adopt that stored value on both sides. `persist_state=\"session\"` / `\"page\"` (same page) should still remount the last edit.\n\n### Current Behavior\n\nAfter switching back to A (especially after editing the sibling input 3), the input 2 **field is empty** while `st.session_state.get(\"input2\")` still prints `\"input 2\"` for that run. A follow-up rerun clears the printed backend as well.\n\nWithout the sibling edit, A\u2192B\u2192A can keep UI and backend aligned at `\"input 2\"`. Either interpretation of leftover keys should keep UI and printed state in sync; the #3512 unmount rule for an already-registered `persist_state=None` widget is that both sides reset in the same run.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: current develop / #17106\n- Python version: 3.13\n- Operating System: macOS\n- Browser: Chromium (Playwright)\n\n### Additional Information\n\nFound during QA of https://github.com/streamlit/streamlit/pull/17106#issuecomment-5813147965.\n\nRelated:\n\n- #3512 \u2014 unmount should reset both the widget UI and the Python value in the same run\n- #17093 / #17106 \u2014 delayed first mount after a leftover pre-registration user key (out of scope here)\n- #12880 \u2014 identity-by-key (out of scope)",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-24T20:49:13Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-17119)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-25T13:44:09Z",
+      "body": "Closing this, still evaluating the issue. "
+    }
+  ]
+}

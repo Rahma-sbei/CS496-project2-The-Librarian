@@ -1,0 +1,24 @@
+{
+  "id": "issue-13516",
+  "type": "issue",
+  "number": 13516,
+  "url": "https://github.com/streamlit/streamlit/issues/13516",
+  "title": "Option to not wrap st.segmented_control while displaying on a page",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:st.segmented_control"
+  ],
+  "created_at": "2026-01-06T17:35:24Z",
+  "closed_at": "2026-08-19T13:43:23Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nWhen we have more number of tabs created with st.segemented_control on the mobile devices they wrap and on UI it takes lot of space on page. It should be displayed in the same row as tabs and the user can then scroll it horizontally to use them with this additional flag / option to not wrap it.\n\n<img width=\"490\" height=\"134\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/3ba8ef77-378a-4e8e-a95b-a743d799d762\" />\n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-01-06T17:35:39Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-13516)\n"
+    }
+  ]
+}

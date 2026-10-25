@@ -1,0 +1,99 @@
+{
+  "id": "issue-6336",
+  "type": "issue",
+  "number": 6336,
+  "url": "https://github.com/streamlit/streamlit/issues/6336",
+  "title": "Too much blank space wasted at the top of each page -- allow `st.set_page_config( margin_top = 20 )`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:layout",
+    "area:styling"
+  ],
+  "created_at": "2023-03-18T15:50:42Z",
+  "closed_at": "2026-10-12T19:48:38Z",
+  "body": "I have a lot of data to present to the user. It doesn't fit vertically on the screen.\n\nIt is frustrating to me that every single Streamlit page pushes my content down by 120pixels of blank space:\n\n<img width=\"1019\" alt=\"2023-03-18_16-44-15\" src=\"https://user-images.githubusercontent.com/1156771/226116012-d109b835-a455-4e77-96ac-e1ed1b5a498f.png\">\n\nPlease allow something like:\n\n```python\nst.set_page_config(  initial_sidebar_state=\"expanded\", margin_top = 20 )\n```\n\nAnd while we are at it, some nice to haves:\n\n```python\nst.set_page_config(  initial_sidebar_state=\"expanded\", margin_top = 20, margin_left = 20, margin_right = 10, margin_bottom=50, footer_text = \"Creative Commons ... \" )\n```\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-6336)\n",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2023-03-18T15:58:21Z",
+      "body": "PS: same issue with sidebar"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-03-20T22:57:10Z",
+      "body": "Thanks for sharing this request, [USER]! "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-03-21T16:13:54Z",
+      "body": "[USER] I've used the following markdown to somewhat get around this. It does seem without sufficient padding at the top, some text can get cutoff.\r\n\r\n```\r\n    st.markdown(\r\n        \"\"\"\r\n            <style>\r\n                .appview-container .main .block-container {{\r\n                    padding-top: {padding_top}rem;\r\n                    padding-bottom: {padding_bottom}rem;\r\n                    }}\r\n\r\n            </style>\"\"\".format(\r\n            padding_top=1, padding_bottom=1\r\n        ),\r\n        unsafe_allow_html=True,\r\n    )\r\n```\r\n\r\n**Example No Markdown**\r\n\r\n![image](https://user-images.githubusercontent.com/13786338/226670352-12145de0-d782-4c73-ac67-bf9de44780a3.png)\r\n\r\n**Example with Markdown**\r\n\r\n![image](https://user-images.githubusercontent.com/13786338/226670958-e4c8db78-4f06-4420-ad5b-c52fda0fb6b6.png)\r\n\r\n**Example padding_top=1, st.text as first element**\r\n\r\nThis shows the text being cutoff due to insufficient padding.\r\n\r\n![image](https://user-images.githubusercontent.com/13786338/226670115-c64290a2-c770-4696-aa07-ada92257302d.png)\r\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-03-29T00:04:56Z",
+      "body": "> I have a lot of data to present to the user. It doesn't fit vertically on the screen.\r\n\r\n[USER] any chance you can share some screenshots or mocks of how your app looks like? That would help us figure out a good solution and prioritize this request. We currently don't have any plans to allow this level of customization. But we heard multiple requests for a \"tight\" layout mode in the past, so happy to think it through if it makes sense!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-03-29T00:41:39Z",
+      "body": "[USER] Right now I have private data that I cannot share but suffice it to say that I have a \"drill down\" cascade of related tables and graphs that take more vertical space than the screen allows and that require to scroll down (and I'd like to show more before requiring to scroll). The lower elements depend on selections in the upper elements (selections done with streamlit-aggrid so far). Making the tables smaller makes it too hard to find data. Splitting on multiple screens is too difficult (especially with url param bugs which I detailed in another issue).\r\n\r\nHowever, what I wrote above was just a suggestion. If you make a \"tight\" layout with all \"aesthetic margins\" reduced to something like 10 or 20 pixels, I'll be happy with it :)\r\n\r\nThank you."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-03-29T00:44:15Z",
+      "body": "[USER] Thank you. Yes I know we can hack the CSS but it could break at any time with a new release. So I'd like a clean / officially supported solution ;)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-04T16:56:24Z",
+      "body": "We would very much like a solution to this too."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-13T04:37:34Z",
+      "body": "Yes"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-07T11:11:49Z",
+      "body": "yes , do not need so much space, \nI spend a lot of time for looking to how to hide the space of weeks.\nand because the doc is pool in my local language, I can not found the answer quickly, \nit is a terrible and bad experience,\nand then I must to use a long and long page, \nIt's so annoying and time-consuming to scroll the mouse every time. \n.st-emotion-cache-t1wise {\n        padding-left: 5rem;\n        padding-right: 5rem;\n    } also has some id looks is temp 't1wise', and do not know how to change it. \n\nst.markdown(\"\"\"\n    <style>\n        .stApp {padding-top: 0; margin-top: 0px; }\n        .stAppViewBlockContainer {\n            padding-top: 0rem;\n        }\n        div.block-container {padding-top: 0; }\n    </style>\n    \"\"\", unsafe_allow_html=True)  can remove a little top space.\n\nbut  I need to show a lot of info in one page, and I want to clean all space in every unit. like plotly_chart tab etc...\nand when hide the top info ,the deploy button is show and then hide. it should also hide and not show anytime."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-07T13:23:05Z",
+      "body": "add a .streamlit dir in project \nadd a config.toml file in .streamlit dir \n\n[client]\ntoolbarMode = \"minimal\"\n[ui]\nhideTopBar = true\n\nthen it can hide the toolbar by the toml file.\n\n.stVerticalBlock {\n     gap: 0px !important;\n}\n.stMainBlockContainer {\n    padding: 0px !important;\n}\n\nuse markdown in style css,\ncan hide the padding.\nand if need change other padding,\nfind the css class,\nthen add \n\nst.markdown(\"\"\"\n    <style>\n      .....\n    </style>\n    \"\"\", unsafe_allow_html=True)\n\nthis is not elegant but works.\n\nfor more,\nmaybe can gen a doc,\nshow all css and which css mean is what."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-18T11:32:05Z",
+      "body": "This is one of the most top voted features and is pending from a long time. Any plans to add this to roadmap?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-31T18:11:54Z",
+      "body": "I agree with [USER], this needs to be addressed asap"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-02T21:02:14Z",
+      "body": "+1 need this too !"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-10-12T23:08:02Z",
+      "body": "This is coming in Streamlit **1.66+** via theme variables, as implemented in #17350.\n\nYou can set the gap between the header and page content in `.streamlit/config.toml`:\n\n```toml\n[theme]\npaddingTop = \"1rem\"\npaddingBottom = \"1rem\"\n\n# Optional \u2014 omit to inherit the [theme] values above\n[theme.sidebar]\npaddingTop = \"1rem\"\npaddingBottom = \"1rem\"\n```\n\nValues are quoted `rem`, `px`, or a unitless number (`\"0\"` for zero padding)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-10-13T07:25:13Z",
+      "body": "is there any chance to also \"move\" the st.title into the above bar (when present) permanently or at least when scrolling down? \n\n| As it is now | Where the title can go |\n|--------------|-------------------------|\n|<img width=\"440\" height=\"876\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/7346e1d6-072a-4d53-acff-68d43965b395\" />|<img width=\"446\" height=\"870\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/88a70cf3-2ae3-4bf5-a050-a310e1cbd11d\" />|\n\nIn this way there would be the illusion of not waste that white space there either.\nWhat do you think? "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-10-13T15:49:37Z",
+      "body": "Hi [USER] - if you wouldn't mind, filing the above as a separate issue/enhancement it would help us to better track/triage!"
+    }
+  ]
+}

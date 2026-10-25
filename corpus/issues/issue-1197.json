@@ -1,0 +1,28 @@
+{
+  "id": "issue-1197",
+  "type": "issue",
+  "number": 1197,
+  "url": "https://github.com/streamlit/streamlit/issues/1197",
+  "title": "Select multiple options using autocomplete",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.multiselect"
+  ],
+  "created_at": "2020-03-09T07:03:23Z",
+  "closed_at": "2026-06-13T13:35:42Z",
+  "body": "Ability to select all options starting with `foo` in `st.multiselect`.\nSee: https://discuss.streamlit.io/t/multiselect-select-multiple-from-the-suggestions/2109\n\n\n\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n\n![Views](https://api.views-badge.org/badge/st-issue-1197)\n",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2024-07-11T12:36:50Z",
+      "body": "Hi. This seems like a good ux improvement. Commenting in case this can be easily bumped. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-13T13:35:42Z",
+      "body": "Closing since this has been implemented recently."
+    }
+  ]
+}

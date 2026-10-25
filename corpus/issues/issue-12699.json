@@ -1,0 +1,29 @@
+{
+  "id": "issue-12699",
+  "type": "issue",
+  "number": 12699,
+  "url": "https://github.com/streamlit/streamlit/issues/12699",
+  "title": "st.date_input: calendar UI not localized (month/day names remain English) and no locale parameter",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.date_input",
+    "area:localization"
+  ],
+  "created_at": "2025-10-05T22:57:33Z",
+  "closed_at": "2026-08-12T19:26:43Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\n The calendar popup of st.date_input is not localized: month/day names and control labels (e.g., \u201cToday\u201d) remain in English. There is\n  no parameter to set the widget\u2019s locale (e.g., pt-BR). Only the displayed date format can be customized via format.\n\n  Steps to Reproduce\n\n  1. Set your browser\u2019s primary language to Portuguese (Brazil).\n  2. Run:\n\n  import streamlit as st\n  from datetime import date\n\n  st.date_input(\"Data\", value=date.today(), format=\"DD/MM/YYYY\")\n\n  3. Open the date picker popup and observe that month/day names and labels are in English.\n\n  Expected Behavior\n\n  - Calendar UI strings (month/day names and labels like \u201cToday\u201d) should be localized based on the client/browser locale, or\n  - A public parameter should allow explicitly setting the widget locale (e.g., st.date_input(..., locale=\"pt-BR\")).\n\n  Actual Behavior\n\n  - Only the date format changes. Calendar UI strings remain in English.\n  - No locale parameter exists for st.date_input.\n\n  Environment\n\n  - Streamlit: latest\n  - Python: 3.12\n  - Browser/OS: Chrome on Windows (also reproducible elsewhere)\n\n  Request\n  Please add localization support for the calendar UI in st.date_input, either by automatically respecting the client locale or by\n  exposing an explicit locale parameter (e.g., locale=\"pt-BR\").\n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-10-05T22:57:45Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12699)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-10T14:31:12Z",
+      "body": "I feel you, fellow brazilian."
+    }
+  ]
+}

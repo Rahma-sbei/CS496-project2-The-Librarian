@@ -1,0 +1,45 @@
+{
+  "id": "issue-9387",
+  "type": "issue",
+  "number": 9387,
+  "url": "https://github.com/streamlit/streamlit/issues/9387",
+  "title": "Popover in sidebar is outside of the viewable page",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.popover"
+  ],
+  "created_at": "2024-09-02T16:19:56Z",
+  "closed_at": "2026-07-21T13:47:15Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nPopover in sidebar is cropped and overflows to outside of the viewable page\n\n![image](https://github.com/user-attachments/assets/e0c1d97d-b249-4834-9216-ce72289b2a15)\n\n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-9387)\n\n```Python\nimport streamlit as st\n\nwith st.sidebar:\n    st.selectbox(\"Selectbox\", [\"A\", \"B\", \"C\"], key=\"selectbox1\")\n    st.selectbox(\"Selectbox\", [\"A\", \"B\", \"C\"], key=\"selectbox2\")\n    st.selectbox(\"Selectbox\", [\"A\", \"B\", \"C\"], key=\"selectbox3\")\n    st.selectbox(\"Selectbox\", [\"A\", \"B\", \"C\"], key=\"selectbox4\")\n\nwith st.sidebar.popover(\"Check 123\"):\n    st.slider(\"Slider\", key=\"slider1\")\n    st.slider(\"Slider\", key=\"slider2\")\n    st.slider(\"Slider\", key=\"slider3\")\n    st.slider(\"Slider\", key=\"slider4\")\n    st.slider(\"Slider\", key=\"slider5\")\n```\n\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-02T16:20:06Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9387)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-02T19:55:21Z",
+      "body": "Could you try perhaps calling the contents inside the popover within a container like so:\r\n\r\n```\r\nwith st.sidebar.popover(\"Check 123\").container(height=300):\r\n    st.slider(\"Slider\", key=\"slider1\")\r\n    st.slider(\"Slider\", key=\"slider2\")\r\n    st.slider(\"Slider\", key=\"slider3\")\r\n    st.slider(\"Slider\", key=\"slider4\")\r\n    st.slider(\"Slider\", key=\"slider5\")\r\n```\r\n\r\nProduced this for me:\r\n\r\n![image](https://github.com/user-attachments/assets/fe18d4ca-f06f-4dcf-9c29-d928ed09c2a3)\r\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-03T13:43:06Z",
+      "body": "Thanks for opening the issue! I am able to reproduce it and it seems like this line is the culprit: https://github.com/streamlit/streamlit/blob/develop/frontend/lib/src/components/elements/Popover/Popover.tsx#L71\r\nIf I set to `false`, the popover is shown correctly and does not flow over. However, it also does not look as nice in general in the sidebar which is probably the reason why the flag was set like this.\r\n[USER]'s reply seems to be a great way of \"styling\" it I guess. I wonder what the preferred alternative would be, scrolling?\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-12T16:57:43Z",
+      "body": "Yup, even I faced the same problem.\r\n\r\nAdditionally, as the popover moves higher, more of the top gets truncated.\r\n\r\n Here is a sidebar popover opening up from below an expander:\r\n![image](https://github.com/user-attachments/assets/3c5ad36c-2d9c-4c11-8f98-ec2b6d38c54c)\r\n\r\nA small portion of the popover top is truncated. \r\n\r\nHere is the same popover when the sidebar expander is closed. More of the popover gets truncated, as the position from where the popover opens moves vertically up.\r\n\r\n![image](https://github.com/user-attachments/assets/e49a8b4d-64d0-42b7-9f83-3cc1788b039d)\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-01-24T19:48:42Z",
+      "body": "> Could you try perhaps calling the contents inside the popover within a container like so:\n> \n> ```\n> with st.sidebar.popover(\"Check 123\").container(height=300):\n>     st.slider(\"Slider\", key=\"slider1\")\n>     st.slider(\"Slider\", key=\"slider2\")\n>     st.slider(\"Slider\", key=\"slider3\")\n>     st.slider(\"Slider\", key=\"slider4\")\n>     st.slider(\"Slider\", key=\"slider5\")\n> ```\n> \n> Produced this for me:\n> \n> ![image](https://github.com/user-attachments/assets/fe18d4ca-f06f-4dcf-9c29-d928ed09c2a3)\n\nI have just accepted for the past 6 months my popovers will just always look funny. Thank you soooo much for this (in hindsight) obvious solution to this problem!"
+    }
+  ]
+}

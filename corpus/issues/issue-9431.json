@@ -1,0 +1,34 @@
+{
+  "id": "issue-9431",
+  "type": "issue",
+  "number": 9431,
+  "url": "https://github.com/streamlit/streamlit/issues/9431",
+  "title": "The StreamlitCallbackHandler output of langchain React Agent is missing the \u201cThought \u201d part.",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.status",
+    "upstream"
+  ],
+  "created_at": "2024-09-10T12:03:40Z",
+  "closed_at": "2026-07-22T09:51:13Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n![\u4f01\u4e1a\u5fae\u4fe1\u622a\u56fe_48ebaae7-a48e-4c67-b137-112bb8929e8b](https://github.com/user-attachments/assets/57d5f421-145d-4ff9-bfee-a97412c52751)\r\n![\u4f01\u4e1a\u5fae\u4fe1\u622a\u56fe_e67b4949-bf30-4268-915f-9c4a01afef60](https://github.com/user-attachments/assets/dda458f0-232a-4e2b-b23a-8dab3bd03964)\r\n\r\nI am using the React agent framework of langchain and displaying the execution process on the web interface using the StreamlitCallbackHandler. However, I cannot see the relevant information of Agent Thought on the web interface, as shown in the red box in the figure. But I can see it when printing locally. Could you please advise on how to display all the reasoning information of the Agent on the web interface? I have referred to the approach in https://blog.langchain.dev/langchain-streamlit/, but the problem still persists.\n\n### Reproducible Code Example\n\n```Python\nimport requests\r\nfrom typing import Any, List, Mapping, Optional, Dict\r\n\r\nfrom langchain.callbacks.manager import CallbackManagerForLLMRun\r\nfrom langchain.llms.base import LLM\r\n\r\nfrom langchain.tools import BaseTool\r\nfrom langchain.agents import initialize_agent\r\nfrom langchain_community.llms.utils import enforce_stop_tokens\r\nimport json\r\nimport streamlit as st\r\nfrom langchain_community.callbacks.streamlit import (\r\n    StreamlitCallbackHandler,\r\n)\r\n\r\n\r\n# self-define tools\r\nclass WeatherTool(BaseTool):\r\n    name = \"Weather\"\r\n    description = \"Use to search weather condition.\"\r\n\r\n    def _run(self, query: str) -> str:\r\n        return \"raining\"\r\n\r\nclass CustomCalculatorTool(BaseTool):\r\n    name = \"Calculator\"\r\n    description = \"Use for calculation.\"\r\n\r\n    def _run(self, query: str) -> str:\r\n        return \"3\"\r\n\r\nweather = WeatherTool()\r\ncalculator = CustomCalculatorTool()\r\ntools = [weather, calculator]\r\n\r\n# Initial agent\r\nquery = \"How about today's weather?\"\r\nllm = QwenLLM()\r\nagent = initialize_agent(tools, llm, agent=\"zero-shot-react-description\", verbose=True)\r\n# print(agent)\r\n# print(agent.run(query))\r\n\r\nif prompt := st.chat_input(\"Input\"):\r\n    with st.chat_message(\"user\", avatar='\ud83e\uddd1\u200d\ud83d\udcbb'):\r\n        st.markdown(prompt)\r\n    # print(f\"[user] {prompt}\", flush=True)\r\n    with st.spinner(\"Processing...\"):\r\n        with st.chat_message(\"assistant\", avatar='\ud83e\udd16'):\r\n            try:\r\n                st_callback = StreamlitCallbackHandler(st.container())\r\n                res = agent.run(prompt, callbacks=[st_callback])\r\n                st.write(res)\r\n            except Exception as e:\r\n                st.write(\"exception\uff1a{}\".format(str(e)))\r\n    st.button(\"Clear\")\n```\n\n\n### Steps To Reproduce\n\nexecute the code.\n\n### Expected Behavior\n\nno info.\n\n### Current Behavior\n\nno info\n\n### Is this a regression?\n\n- [X] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:1.38.0\r\n- Python version:3.12\r\n- Operating System:\r\n- Browser:\r\n- langchain==0.1.20\r\n- langchain-community==0.0.38\r\n- langchain-core ==0.1.52\r\n- langchain-experimental==0.0.49\r\n- langchain-text-splitters==0.0.2\r\n- langchainhub ==0.1.21\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-10T12:03:53Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9431)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-10T22:48:37Z",
+      "body": "Hello, I think this bug seems to be with https://github.com/langchain-ai/streamlit-agent\r\n\r\nI tried testing out one of their demos https://langchain-mrkl.streamlit.app/ and also didn't notice the output including the \"Thought\" so maybe this is by design. I'd recommend opening up an issue [here](https://github.com/langchain-ai/streamlit-agent/issues/new) for discussion.\r\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T09:51:13Z",
+      "body": "Closing this since the langchain handler was deprecated and removed recently. "
+    }
+  ]
+}

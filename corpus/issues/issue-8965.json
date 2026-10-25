@@ -1,0 +1,43 @@
+{
+  "id": "issue-8965",
+  "type": "issue",
+  "number": 8965,
+  "url": "https://github.com/streamlit/streamlit/issues/8965",
+  "title": "\"ImportError: cannot import name 'runtime_version' from 'google.protobuf'\" when developing on MacOS",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:docs",
+    "area:contribution"
+  ],
+  "created_at": "2024-06-24T09:19:26Z",
+  "closed_at": "2026-09-09T14:28:08Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen developing Streamlit on Mac following the [Contributing section in the Wiki](https://github.com/streamlit/streamlit/wiki/Contributing) and I ran `streamlit hello`, I encountered this error:\r\n```\r\n\u276f streamlit hello\r\nTraceback (most recent call last):\r\n  File \"/workspace/streamlit/lib/venv/bin/streamlit\", line 33, in <module>\r\n    sys.exit(load_entry_point('streamlit', 'console_scripts', 'streamlit')())\r\n  File \"/workspace/streamlit/lib/venv/bin/streamlit\", line 25, in importlib_load_entry_point\r\n    return next(matches).load()\r\n  File \"/path/to/pyenv/versions/3.10.6/lib/python3.10/importlib/metadata/__init__.py\", line 171, in load\r\n    module = import_module(match.group('module'))\r\n  File \"/path/to/pyenv/versions/3.10.6/lib/python3.10/importlib/__init__.py\", line 126, in import_module\r\n    return _bootstrap._gcd_import(name[level:], package, level)\r\n  File \"<frozen importlib._bootstrap>\", line 1050, in _gcd_import\r\n  File \"<frozen importlib._bootstrap>\", line 1027, in _find_and_load\r\n  File \"<frozen importlib._bootstrap>\", line 992, in _find_and_load_unlocked\r\n  File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed\r\n  File \"<frozen importlib._bootstrap>\", line 1050, in _gcd_import\r\n  File \"<frozen importlib._bootstrap>\", line 1027, in _find_and_load\r\n  File \"<frozen importlib._bootstrap>\", line 992, in _find_and_load_unlocked\r\n  File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed\r\n  File \"<frozen importlib._bootstrap>\", line 1050, in _gcd_import\r\n  File \"<frozen importlib._bootstrap>\", line 1027, in _find_and_load\r\n  File \"<frozen importlib._bootstrap>\", line 1006, in _find_and_load_unlocked\r\n  File \"<frozen importlib._bootstrap>\", line 688, in _load_unlocked\r\n  File \"<frozen importlib._bootstrap_external>\", line 883, in exec_module\r\n  File \"<frozen importlib._bootstrap>\", line 241, in _call_with_frames_removed\r\n  File \"/workspace/streamlit/lib/streamlit/__init__.py\", line 68, in <module>\r\n    from streamlit.delta_generator import (\r\n  File \"/workspace/streamlit/lib/streamlit/delta_generator.py\", line 37, in <module>\r\n    from streamlit import (\r\n  File \"/workspace/streamlit/lib/streamlit/cursor.py\", line 20, in <module>\r\n    from streamlit.runtime.scriptrunner import get_script_run_ctx\r\n  File \"/workspace/streamlit/lib/streamlit/runtime/__init__.py\", line 17, in <module>\r\n    from streamlit.runtime.runtime import Runtime, RuntimeConfig, RuntimeState\r\n  File \"/workspace/streamlit/lib/streamlit/runtime/runtime.py\", line 27, in <module>\r\n    from streamlit.proto.ForwardMsg_pb2 import ForwardMsg\r\n  File \"/workspace/streamlit/lib/streamlit/proto/ForwardMsg_pb2.py\", line 9, in <module>\r\n    from google.protobuf import runtime_version as _runtime_version\r\nImportError: cannot import name 'runtime_version' from 'google.protobuf' (/workspace/streamlit/lib/venv/lib/python3.10/site-packages/google/protobuf/__init__.py)\r\n```\r\n\r\nIt seems because `protobuf` released its new version [27.1](https://github.com/protocolbuffers/protobuf/releases/tag/v27.1) recently and the `protobuf` formula for Homebrew has been updated to it.\r\nAfter I ran `brew reinstall protobuf@3`, this problem was solved.\r\n\r\nSo the document https://github.com/streamlit/streamlit/wiki/Contributing#macos should be updated.\n\n### Reproducible Code Example\n\n_No response_\n\n### Steps To Reproduce\n\nFollow https://github.com/streamlit/streamlit/wiki/Contributing on MacOS, and run `streamlit hello.\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 0dfe07d\r\n- Python version: 3.10.6\r\n- Operating System: MacOS\r\n- Browser: -\r\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-24T09:19:38Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-8965)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-24T21:39:43Z",
+      "body": "Thank you [USER] for the issue. Yea, it seems like the protobuf versioning is a little messy. Interestingly, we have a new hire going through the setup, so we will ask them to try it out. We'll get the contributing doc updated :-) "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-24T21:40:20Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Visits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fstreamlit%2Fstreamlit%2Fissues%2F8965&title=visits&edge_flat=false)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-28T20:00:12Z",
+      "body": "Hi [USER] and  [USER],\n\nI'd like to help move this issue forward. I noticed the repository currently restricts pull requests to collaborators, so I wasn't able to open one directly.\n\nIn the meantime, I tested a fix locally on Apple Silicon (M4) and confirmed that pinning `protobuf@21` resolves the `runtime_version` ImportError described in this issue. I've pushed the change to my fork here:\n[link](https://github.com/atharvasardarx/streamlit/commit/0a0d81c1711818ffa3646227c7ef0a0722d9cdb5)\n\nPlease feel free to apply this fix directly, or if it's easier, I'm happy to open a PR myself if temporary contributor access could be granted. Let me know whichever works best on your end."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-09T14:28:07Z",
+      "body": "The original Mac `ImportError: cannot import name 'runtime_version'` happened when Homebrew `protoc` generated code newer than the Python `protobuf` in the venv.\n\nThat is no longer an issue for normal Streamlit development. We require `protobuf>=5.26.1` (which includes `runtime_version`), and `uv.lock` currently pins `protobuf==6.33.6`, which matches Homebrew protobuf 33.x and also accepts older gencode such as CI's protoc 26.1.\n\nPython only rejects gencode *newer* than the installed runtime. A much newer Homebrew protobuf than the lockfile can still fail that check, but that is an upgrade edge case, not the 2024 setup failure, and it does not require pinning `protoc` in the Mac install instructions. CONTRIBUTING troubleshooting now notes this.\n\nClosing."
+    }
+  ]
+}

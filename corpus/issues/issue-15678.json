@@ -1,0 +1,20 @@
+{
+  "id": "issue-15678",
+  "type": "issue",
+  "number": 15678,
+  "url": "https://github.com/streamlit/streamlit/issues/15678",
+  "title": "Potential resource leak when exception occurs during file operation",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [],
+  "created_at": "2026-06-24T06:39:17Z",
+  "closed_at": "2026-06-24T09:07:59Z",
+  "body": "## Bug Report\n\n### Description\nWhen an exception is raised during a file operation, the file handle may not be properly closed, leading to a resource leak.\n\n### Steps to Reproduce\n1. Open a file without using a context manager\n2. Raise an exception before closing the file\n3. The file handle remains open\n\n### Expected Behavior\nFile handles should always be closed, even when exceptions occur.\n\n### Suggested Fix\nUse a `with` statement (context manager) to ensure the file is always closed:\n\n```python\n# Instead of:\nf = open('file.txt', 'r')\ndata = f.read()\nf.close()\n\n# Use:\nwith open('file.txt', 'r') as f:\n    data = f.read()\n```\n\n### Environment\n- Python 3.x\n- Any OS\n\nThis is a common Python pitfall that can cause issues in long-running applications.\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-24T09:07:59Z",
+      "body": "[USER] if this relates to Streamlit in some way, please add more detail indicating how and re-open. "
+    }
+  ]
+}

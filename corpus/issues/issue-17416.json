@@ -1,0 +1,23 @@
+{
+  "id": "issue-17416",
+  "type": "issue",
+  "number": 17416,
+  "url": "https://github.com/streamlit/streamlit/issues/17416",
+  "title": "Improve app-shell landmarks and add a skip link (WCAG 2.4.1)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:accessibility"
+  ],
+  "created_at": "2026-10-11T01:26:33Z",
+  "closed_at": "2026-10-13T03:18:40Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nStreamlit\u2019s app shell should expose clear page landmarks and a way to skip repeated chrome, so keyboard and screen-reader users can move straight to the main content (WCAG 2.4.1 Bypass Blocks).\n\nToday the shell has a semantic `<header>` and a labeled sidebar region, but the primary content area (`stMain`) is a `<section>` rather than `<main>`, sidebar/page navigation is not exposed as a `navigation` landmark, and there is no skip link.\n\n### Why?\n\nWithout a main landmark and a skip mechanism, assistive-tech users often have to tab through header, toolbar, and sidebar controls on every page load or navigation. This was called out as part of the \u201cpage structure\u201d ask in #8399 (now closed/triaged). Our theme a11y inventory also leaves WCAG **2.4.1** unscored.\n\n### How?\n\nSuggested shell improvements (exact shape TBD):\n\n1. **Main landmark** \u2014 Render the primary app content as `<main>` (or give `stMain` an equivalent landmark role), without breaking existing layout/scroll behavior or `data-testid=\"stMain\"` consumers.\n2. **Navigation landmark** \u2014 Expose sidebar page nav and/or top nav as `<nav>` (or `role=\"navigation\"`) with an accessible name when present.\n3. **Skip link** \u2014 Add a keyboard-focusable \u201cSkip to main content\u201d link (visually hidden until focused) that moves focus into the main landmark.\n\nOut of scope for this issue: author-controlled heading hierarchy inside app content; document language (`lang`) which is tracked in #15726; focus-indicator bugs on `stMain` which are tracked separately in #17338.\n\n### Additional Context\n\n- Spun out from the #8399 triage (page structure / landmarks / skip links).\n- Related open focus/keyboard shell issues (not duplicates): #17338, #17339.\n- Wiki: `wiki/accessibility-theme.md` notes 2.4.1 as not evaluated; `wiki/accessibility-wcag.md` likewise leaves shell 2.4.1 unscored.\n- Current rough DOM shape:\n  - Header: semantic `<header>`\n  - Sidebar: labeled region (`aria-label=\"Sidebar\"`)\n  - Main scroll region: `<section class=\"stMain\" data-testid=\"stMain\" tabindex=\"0\">` (not `<main>`)\n  - No skip link in the app shell",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-11T01:26:41Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-17416)\n"
+    }
+  ]
+}

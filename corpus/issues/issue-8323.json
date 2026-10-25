@@ -1,0 +1,104 @@
+{
+  "id": "issue-8323",
+  "type": "issue",
+  "number": 8323,
+  "url": "https://github.com/streamlit/streamlit/issues/8323",
+  "title": "Impossible to disable st.chat_input while writing the model's response",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.chat_input",
+    "feature:st.write_stream"
+  ],
+  "created_at": "2024-03-18T15:39:52Z",
+  "closed_at": "2026-07-01T23:17:22Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nWhen a user enters a prompt in st.chat_input, it is not possible to disable the input while an LLM is generating the response to that input. \r\n\r\nThis leads to the possibility of the user 'interrupting' the model output and messing up the conversation structure.\r\n\r\nI've tried binding the `disable` argument to a variable inside the `st.session_state`, but it does not work.\r\n\r\nThis happens in the official ['chat-GPT like' implementation on streamlit forums](https://docs.streamlit.io/knowledge-base/tutorials/build-conversational-apps#write-the-app).\r\n\r\n\r\n### Reproducible Code Example\r\n\r\n```Python\r\nimport streamlit as st\r\nimport time\r\n\r\nst.title(\"ChatGPT-like clone\")\r\n\r\ndef stream_example_response():\r\n    response = \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.\"\r\n\r\n    # yield 5 characters every 0.1 seconds\r\n    for i in range(0, len(response), 5):\r\n        time.sleep(0.1)\r\n        yield response[i:i+5]\r\n\r\nif \"messages\" not in st.session_state:\r\n    st.session_state.messages = []\r\n\r\nif \"disable_chat_input\" not in st.session_state:\r\n    st.session_state.disable_chat_input = False\r\n\r\nfor message in st.session_state.messages:\r\n    with st.chat_message(message[\"role\"]):\r\n        st.markdown(message[\"content\"])\r\n\r\nif prompt := st.chat_input(\"What is up?\", disabled=st.session_state.disable_chat_input):\r\n    \r\n    st.session_state['disable_chat_input'] = True\r\n\r\n    st.session_state.messages.append({\"role\": \"user\", \"content\": prompt})\r\n    with st.chat_message(\"user\"):\r\n        st.markdown(prompt)\r\n\r\n    with st.chat_message(\"assistant\"):\r\n        response = st.write_stream(stream_example_response())\r\n    st.session_state.messages.append({\"role\": \"assistant\", \"content\": response})\r\n\r\n    st.session_state['disable_chat_input'] = False\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n1. Run the minimal example provided (`streamlit run minimal.py`)\r\n2. Send a prompt\r\n3. While the response is streaming, send another prompt\r\n4. The response gets interrupted, doesn't get registered on the history and the messages become messed up.\r\n\r\n### Expected Behavior\r\n\r\nWith the `disabled=st.session_state.disable_chat_input` I was expecting that the user input would be disabled until the response stops streaming. \r\nPerhaps would be useful to have an argument in `st.chat_input` or something so that it automatically disables until all the code inside the `if prompt:= ...` statement ends, whatever works best.\r\n\r\n### Current Behavior\r\n\r\n_No response_\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.31.1\r\n- Python version: 3.10.13\r\n- Operating System: Windows\r\n- Browser: Firefox\r\n\r\n\r\n### Additional Information\r\n\r\nVideo of the current (wrong) behavior:\r\n\r\n![st_issue](https://github.com/streamlit/streamlit/assets/55241721/ea291c9f-32ca-4040-9ab9-ea2c375ce3e4)",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-03-18T18:35:11Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8323)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-03-18T18:38:18Z",
+      "body": "[USER] Thanks for reporting this issue. This is currently expected, but we definitely could improve this behaviour. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-03-18T19:36:20Z",
+      "body": "So in the current state of streamlit and `st.chat_input`, there is no way to disable the input while the response is generating?\n\nHow could this be implemented? In the case of an hipothetical PR"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-03-18T20:46:09Z",
+      "body": "[USER] There might be a workaround by using `st.rerun`, but that could get a bit tricky. You would need to store the current text that's returned with `chat_input` in the session state, triggered a rerun, and check if this is in session state, set the chat_input to disabled and react to the text. \r\n\r\nWe could solve it in Streamlit by adding some functionality that auto-disables chat input after the users submits a text for the remaining session. But that would require some discussions with the product team. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-03-29T14:43:38Z",
+      "body": "This would be a desired functionality to be able to to disable chat input during model's processing! :)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-09T13:32:18Z",
+      "body": "This would also be a desirable functionality to disable chat while prompting for streamlit-feedback, making feedback mandatory after each request.\r\n\r\nRight now saving chat state and performing st.rerun() makes the feedback box disappear.  "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-15T10:11:41Z",
+      "body": "Following is my workaround; it works well for my simple chatbot:\r\n\r\n1. use session state to control the input state, and get the input value\r\n2. move everything into the **on_submit** callback, DO NOT use *st.chat_message(\"user\").write(...)* in it, or will write dup items.\r\n\r\n```python\r\n\r\nif \"disabled\" not in st.session_state:\r\n    st.session_state.disabled = False\r\n\r\nif \"messages\" not in st.session_state or 0 == len(st.session_state.messages):\r\n    st.session_state.messages = [{\"role\": \"assistant\", \"content\": \"Hi, what can I do for you?\"}]\r\n    \r\n\r\nfor msg in st.session_state.messages:\r\n    st.chat_message(msg[\"role\"]).write(msg[\"content\"])\r\n\r\ndef on_submit():\r\n    st.session_state.disabled = True\r\n\r\n    st.session_state.messages.append({\"role\": \"user\", \"content\": st.session_state.prompt})\r\n    # st.chat_message(\"user\").write(st.session_state.prompt)\r\n\r\n    response = llm.chat(st.session_state.prompt)\r\n\r\n    st.session_state.messages.append({\"role\": \"assistant\", \"content\": response})\r\n    # st.chat_message(\"assistant\").write(response)\r\n\r\n    st.session_state.disabled = False\r\n\r\n\r\nif prompt := st.chat_input(\"You question here\", on_submit=on_submit, disabled=st.session_state.disabled, key=\"prompt\"):\r\n    pass\r\n\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-24T11:45:38Z",
+      "body": "> [USER] There might be a workaround by using `st.rerun`, but that could get a bit tricky. You would need to store the current text that's returned with `chat_input` in the session state, triggered a rerun, and check if this is in session state, set the chat_input to disabled and react to the text.\r\n> \r\n> We could solve it in Streamlit by adding some functionality that auto-disables chat input after the users submits a text for the remaining session. But that would require some discussions with the product team.\r\n\r\nHi [USER] , any update on this ?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-02T13:15:09Z",
+      "body": "EDIT: added css selector for streamlit 1.39.0\r\n\r\nThis was was a 'must be fixed'. Callback was not working for me. I ended up using following css hack:\r\n```python\r\nimport time\r\nimport streamlit as st\r\n\r\n# .stApp[data-teststate=running] is present when bot answer is streaming\r\nst.markdown(\"\"\"\r\n<style>\r\n    .stApp[data-teststate=running] .stChatInput textarea,\r\n    .stApp[data-test-script-state=running] .stChatInput textarea {\r\n        display: none;\r\n    }\r\n</style>\r\n\"\"\", unsafe_allow_html=True)\r\n\r\ndef stream_text(text):\r\n    for char in text:\r\n        time.sleep(0.1)\r\n        yield char\r\n\r\nif prompt := st.chat_input(\"Say something. (This is disabled while assistant is streaming)\"):\r\n    with st.chat_message(\"user\"):\r\n        st.write(prompt)\r\n    with st.chat_message(\"assistant\"):\r\n        st.write_stream(stream_text(f\"user typed: {prompt}\"))\r\n```\r\nUnfortunately, focus is lost from chat input field because of this hack. Works at least with Streamlit 1.37.1 and 1.39.0, but may break after any update..."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-11T06:19:39Z",
+      "body": "Any updates on this? I think this would be a much-needed feature for almost all chatbots"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-11T06:22:32Z",
+      "body": "[USER] Thanks this look like an elegant way. Did you use this more? Any issues that might arise down the line? Also could you get this working with text streaming? An important part is to not do any rendering in the callback but then you can't stream the response"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-17T07:59:23Z",
+      "body": "> [USER] Thanks this look like an elegant way. Did you use this more? Any issues that might arise down the line? Also could you get this working with text streaming? An important part is to not do any rendering in the callback but then you can't stream the response\r\n\r\nNo, I changed to another framework (chainlit) for my frontend, it is much easy to use for me. :)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-30T06:05:02Z",
+      "body": "For future readers, following this worked for me - https://discuss.streamlit.io/t/disable-st-input-chat-during-conversation/50258/2?u=aflah1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-04T19:59:51Z",
+      "body": "For future readers, here is my approach (it works for me on streamlit version 1.39.0):\r\n\r\n```python\r\nimport time\r\nimport streamlit as st\r\n\r\n# beginning of your code here\r\n\r\ndef _handle_user_interaction():\r\n    st.session_state[\"waiting_for_answer\"] = True\r\n\r\nif \"waiting_for_answer\" not in st.session_state:\r\n    st.session_state[\"waiting_for_answer\"] = False\r\n\r\n# some more code here\r\n\r\nif user_prompt := st.chat_input(\r\n    \"Ask a question\",\r\n    on_submit=_handle_user_interaction,\r\n    disabled=st.session_state[\"waiting_for_answer\"]\r\n):\r\n    with st.chat_message(\"user\"):\r\n        st.write(user_prompt)\r\n\r\n    with st.chat_message(\"assistant\"):\r\n        with st.spinner():\r\n            time.sleep(5)\r\n        # stream the answer here\r\n\r\nif st.session_state[\"waiting_for_answer\"]:\r\n    st.session_state[\"waiting_for_answer\"] = False\r\n    st.rerun()\r\n```\r\n\r\nThe callback is needed for disabling the `st.chat_input` component and any other component you'd like to disable when the user submits a prompt, through setting the `waiting_for_answer` flag. Then, after printing the response, the flag is set to False again. Unfortunately, streamlit needs another user interaction to re-render the app with the flag disabled, so a `st.rerun` is needed "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-05T10:16:43Z",
+      "body": "The problem with this last solution is that apparently , the chat text box loses focus every time..."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-01T23:22:13Z",
+      "body": "## Update\n\nStreamlit 1.59+ will have a `submit_mode` parameter for `st.chat_input` that controls widget behavior after submission while the script is running:\n\n- \"submit\" (default): The widget remains fully enabled after submission. Users can submit new messages while the script is running (existing behavior).\n- \"disable\": The widget is automatically disabled after submission and re-enabled when the run completes. This prevents users from interrupting ongoing operations like LLM streaming.\n- \"stop\": The submit button transforms into a stop button while the script runs, allowing users to halt execution (like the app's \"Stop\" button). The text area is disabled during the run. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-14T17:19:59Z",
+      "body": "Thank you for this!"
+    }
+  ]
+}

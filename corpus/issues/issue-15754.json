@@ -1,0 +1,38 @@
+{
+  "id": "issue-15754",
+  "type": "issue",
+  "number": 15754,
+  "url": "https://github.com/streamlit/streamlit/issues/15754",
+  "title": "Add index= parameter to st.tabs to allow restoring active tab after rerun",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.tabs"
+  ],
+  "created_at": "2026-06-29T13:49:38Z",
+  "closed_at": "2026-07-07T15:04:13Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nst.tabs has no index= parameter, so the active tab cannot be restored after a rerun triggered by another widget (e.g. language selector). All other stateful widgets like st.radio and st.selectbox support index=. Please add it to st.tabs.\n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-29T13:49:50Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-15754)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-29T14:50:46Z",
+      "body": "This is a feature request (`type:enhancement`) for `st.tabs` to allow programmatically setting and restoring the active tab so it survives reruns triggered by other widgets. Notably, much of this is already implemented on the `develop` branch via the \"Dynamic Containers\" work: `st.tabs` now accepts `default` (the initially selected tab, by label), `key`, and `on_change` (`\"rerun\"` or a callable). With `on_change=\"rerun\"` and a `key`, the active tab is tracked and can be read/updated through `st.session_state[key]`, which is exactly the rerun-persistence the issue asks for. The main gap versus the request is that selection is keyed by tab **label** (`default=`) rather than by integer position (`index=`). This is a reasonable triage candidate to either close as resolved by the new stateful tabs API or to scope down to \"support selecting a tab by integer index.\"\n\n### Related Issues\n\n- [#12342 \u2014 Add support for dynamic tab badges or persistent tab keys](https://github.com/streamlit/streamlit/issues/12342): Closely related; both stem from `st.tabs` losing the active tab across reruns/updates and ask for a way to persist the selected tab.\n- [#11277 \u2014 Persist widget identity when key is set, even if the parameters change](https://github.com/streamlit/streamlit/issues/11277): Related state-persistence request relevant to the new keyed/stateful `st.tabs`, since restoring the active tab depends on stable widget identity.\n- [#11012 \u2014 Preserve session state (e.g. in file, database, or localstorage)](https://github.com/streamlit/streamlit/issues/11012): Broader request for persisting UI/session state across reruns and sessions, the same underlying need that motivates restoring the active tab.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-30T12:24:34Z",
+      "body": "[USER] have you tried setting a key and then it is possible to set the active tab via the session state? There is some description in the message above. Is there a use case you have that is not covered by those changes?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-07T15:04:13Z",
+      "body": "[USER] closing this for now, I think you should be able to accomplish with this feature described above, but if that is not the case please let me know the gap you are experiencing. \n\n>  Notably, much of this is already implemented on the develop branch via the \"Dynamic Containers\" work: st.tabs now accepts default (the initially selected tab, by label), key, and on_change (\"rerun\" or a callable). With on_change=\"rerun\" and a key, the active tab is tracked and can be read/updated through st.session_state[key], which is exactly the rerun-persistence the issue asks for."
+    }
+  ]
+}

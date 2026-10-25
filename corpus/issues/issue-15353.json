@@ -1,0 +1,35 @@
+{
+  "id": "issue-15353",
+  "type": "issue",
+  "number": 15353,
+  "url": "https://github.com/streamlit/streamlit/issues/15353",
+  "title": "st.connection(conn_name, type='snowflake') doesn't use named connection.",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:connections"
+  ],
+  "created_at": "2026-05-28T03:42:10Z",
+  "closed_at": "2026-06-05T08:20:15Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nTrying to make a Snowflake connection, as per [example 3](https://docs.streamlit.io/develop/api-reference/connections/st.connections.snowflakeconnection), fails, where a single named connection is available in the `conncetions.toml`.\n\nIt appears to ignore the named connection, and use the 'default' connection name.\n\nSetting the `SNOWFLAKE_DEFAULT_CONNECTION_NAME` environment variable will allow a succesful connection, with the same named connection and same `conncetions.toml` file.\n\n### Reproducible Code Example\n\n```Python\nimport os\n\nimport streamlit as st\n\nconn_name = os.getenv('SNOWFLAKE_DEFAULT_CONNECTION_NAME')\nst.write(conn_name)  # None\nconn_name = 'EQSQTDL-RG49312'\nst.write(conn_name)  # EQSQTDL-RG49312\n\ntry:\n    conn = st.connection(conn_name, type='snowflake')\n    st.success('Connected using conn_name.')\nexcept:\n    st.warning('conn_name failed!')\n    os.environ['SNOWFLAKE_DEFAULT_CONNECTION_NAME'] = 'EQSQTDL-RG49312'\n    conn_name = os.getenv('SNOWFLAKE_DEFAULT_CONNECTION_NAME')\n    conn = st.connection('snowflake')\n    st.success('Connected using named default connection.')\n```\n\n### Steps To Reproduce\n\n1. Configure a connections.toml file with valid connection parameters.\n2. Run the above app.\n\n### Expected Behavior\n\nApp should write success message \"Connected using conn_name\"\n\n### Current Behavior\n\n<img width=\"739\" height=\"234\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/f4c8bba2-57a7-4738-a206-61d507620983\" />\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.57.0\n- Python version: 3.12.10\n- Operating System: Windows\n- Browser: Edge\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-28T03:42:22Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15353)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-28T05:07:02Z",
+      "body": "Hey, I was just studying the st.connection routing and tracked down this bug. The fallback _connect logic drops the connection_name argument when secrets.toml is empty. I have a fix ready and am opening a PR momentarily to inject the name back into the kwargs.."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-28T16:06:37Z",
+      "body": "### Issue Analysis\n\nThis bug reports that `st.connection(\"my_connection\", type=\"snowflake\")` ignores the connection name passed by the user and instead tries to use the `default` entry from `~/.snowflake/connections.toml` (which fails when no `default` entry exists). Setting the `SNOWFLAKE_DEFAULT_CONNECTION_NAME` environment variable works around the problem, confirming that the named connection is never forwarded to `snowflake.connector.connect()`.\n\n### Likely Root Cause\n\nIn [`lib/streamlit/connections/snowflake_connection.py`](https://github.com/streamlit/streamlit/blob/develop/lib/streamlit/connections/snowflake_connection.py), the `SnowflakeConnection._connect` method handles three cases:\n\n1. If Streamlit secrets exist \u2192 use them.\n2. If `self._connection_name == \"snowflake\"` \u2192 call `snowflake.connector.connect()` with no args (relies on Snowflake's default-connection logic).\n3. Otherwise \u2192 call `snowflake.connector.connect(**kwargs)`.\n\n```619:663:lib/streamlit/connections/snowflake_connection.py\n    def _connect(self, **kwargs: Any) -> InternalSnowflakeConnection:\n        ...\n        st_secrets = self._secrets.to_dict()\n        try:\n            if len(st_secrets):\n                ...\n                conn_kwargs = {**st_secrets, **kwargs}\n                return snowflake.connector.connect(**conn_kwargs)\n\n            if self._connection_name == \"snowflake\":\n                ...\n                return snowflake.connector.connect()\n\n            return snowflake.connector.connect(**kwargs)\n```\n\nIn case 3 (the user's scenario, e.g. `st.connection(\"EQSQTDL-RG49312\", type=\"snowflake\")` with no matching `[connections.<name>]` block in `secrets.toml`), `self._connection_name` is never forwarded to the Snowflake connector. The connector therefore falls back to its own default (`\"default\"`), which is exactly the behavior the user describes. The fix is to pass `connection_name=self._connection_name` (when no secrets are configured and the name is not `\"snowflake\"`) so that Snowflake resolves the matching entry in `~/.snowflake/connections.toml`. This also matches the documented Example 3 in the `SnowflakeConnection` docstring.\n\n### Related Issues\n\n- [#9016 \u2014 Cannot Use kwargs Only in Snowflake Connection](https://github.com/streamlit/streamlit/issues/9016): Another bug in the same `_connect` branching logic \u2014 when secrets are absent, the call path doesn't behave as documented. Likely fixable alongside this one.\n- [#7637 \u2014 SnowflakeConnection.query() retries on errors that will never succeed](https://github.com/streamlit/streamlit/issues/7637): Same `SnowflakeConnection` class; useful context for connection-establishment behavior, though not a duplicate.\n- [#8381 \u2014 Connection for duckdb](https://github.com/streamlit/streamlit/issues/8381): General `feature:connections` request, only loosely related (different connector, but same module).\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

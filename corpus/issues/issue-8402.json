@@ -1,0 +1,74 @@
+{
+  "id": "issue-8402",
+  "type": "issue",
+  "number": 8402,
+  "url": "https://github.com/streamlit/streamlit/issues/8402",
+  "title": "Possibility to disable the \"Download as CSV\" button on st.dataframe/st.data_editor",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe",
+    "feature:st.data_editor"
+  ],
+  "created_at": "2024-04-01T15:01:15Z",
+  "closed_at": "2026-07-14T18:58:12Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\r\n- [X] I added a descriptive title and summary to this issue.\r\n\r\n### Summary\r\n\r\nThis feature would be capable of preventing the user from downloading data from certain dataframes.\r\n\r\n### Why?\r\n\r\nCurrently, the user can download data as CSV from any dataframe, and sometimes there is sensitive data which is not intended to be downloaded.\r\n\r\n### How?\r\n\r\nThere could be a new boolean parameter in st.dataframe and st.data_editor called \"allow_data_download\". Default = False\r\n\r\n### Additional Context\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-01T15:01:25Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8402)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-04-01T23:39:51Z",
+      "body": "Hey! The data that is being downloaded is exactly the same data you'd get by selecting all cells and copy-pasting them into a file. So disabling that button wouldn't really improve security in any way, that's why we decided not to add an option for disabling it.  "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-02T12:59:49Z",
+      "body": "Hey! I understand. \r\nWhat if this new st.dataframe/st.data_editor parameter disabled the \"Download as CSV\" button AND copy-pasting the values from the cells?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-04-03T14:17:30Z",
+      "body": "Yeah sure, we could do that. But then again... your user can also just write the value of every single cell somewhere else or take a screenshot and use OCR to get the full table. Sure, preventing the download button and copy-pasting makes things a bit slower for users to copy, but they can still do it. So what's really the purpose of this? If you have sensitive data that you don't want your users to get, you should probably not fully show it to them in the first place. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-03T17:03:30Z",
+      "body": "Well, there will always be a way to pass through security layers. You can, as you mentioned, copy-paste every single cell value or even take a screenshot. I guess the point here is to make it harder.\r\nAnyways, just an idea...\r\nThanks!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-28T05:23:30Z",
+      "body": "Hello, I also hope there is a feature that allows for disabling certain functions due to the main business operations and legal considerations of the company.\r\n1. There will be a confidentiality agreement with the user, which includes prohibitions on sharing, downloading, etc.\r\n2. If the system provides a download function, it means that the data was obtained through legal means.\r\n3. Obtaining data through screenshots, OCR, or taking pictures is considered an illegal method."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-08-27T13:30:20Z",
+      "body": "I agree with the author of this post, This feature can indeed be helpful. I am in particularly looking for this feature. Don't forget that if there is a button/icon for something, It means that it's there for a reason and is allowed while if someone tries to use OCR and so, It's illega activity and the consequences goes more towars the user than the builder. If an app builder displays this icon and user uses it, It goes on the shoulders of an app builder. \r\n\r\nAgain i am biased as i really needed this feature and i would start looking for other ways now but this feature should help alot of others and if it's not too much hastle to build, I would love to have it in my app. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-29T19:01:33Z",
+      "body": "I would also like to support this.  I understand there are workarounds, but in our line of business where the majority of our end users aren't super tech-savvy, disabling the copy/paste functionality and the download button would create a pretty big barrier.  We have  a need to show them the data for decision making, but want to prevent them from fully downloading it.  We've had instances where individuals have downloaded the data and taken it with them to another company (in this case, as sales reps).  The data is important for them to see for decision making, but if we can put a barrier in the way that makes it harder to run off with the data on their way out the door, that would be great."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-08T02:21:49Z",
+      "body": "I've also needed this feature to disable the download button in dataframes.\nYes, tech-savvy users can still bypass this barrier easily if they want to, but for our usecase of Streamlit (Proof-of-Concepts and small internal apps), removing the button is enough to discourage casual data export.\n\nFor anyone looking for a temporary workaround, you can hide the \u201cDownload CSV\u201d button via CSS. \n\n```css\nhide_button_css = \"\"\"\n    div[data-testid=\"stElementToolbar\"] {display: none;}\n\"\"\"\nst.markdown(f\"<style>{hide_button_css}</style>\", unsafe_allow_html=True)\n```\n\nThis is far from ideal, but better than nothing."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-06T03:16:50Z",
+      "body": "+1"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-14T19:00:45Z",
+      "body": "## Update\n\nStreamlit 1.60+ will support a config option `client.disableDataExport` to disable data download and copying in all dataframe instances.   "
+    }
+  ]
+}

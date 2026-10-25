@@ -1,0 +1,29 @@
+{
+  "id": "issue-11384",
+  "type": "issue",
+  "number": 11384,
+  "url": "https://github.com/streamlit/streamlit/issues/11384",
+  "title": "Allow `st.user` from headers",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.user",
+    "feature:authentication"
+  ],
+  "created_at": "2025-05-16T07:06:14Z",
+  "closed_at": "2026-07-22T11:02:51Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAllow use `x-auth-xxxxx` headers to build `st.user` instead of decrypt from OIDC token.\n\n### Why?\n\nCurrent `st.user` is based on OIDC token, but in our environment we use `oauth2-proxy` to handle oidc login and work as auth module in ingress.\n\nOur `oauth2-proxy` will set `x-auth-xxxxx` headers to request.\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-16T07:06:26Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-11384)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T11:02:11Z",
+      "body": "## Update\n\nThis is now supported via `server.trustedUserHeaders` (added in #12142 and available since Streamlit 1.49.0). For example, with oauth2-proxy:\n\n```toml\n[server.trustedUserHeaders]\n\"x-auth-request-email\" = \"email\"\n\"x-auth-request-user\" = \"name\"\n```\n\nThe mapped values are then available through `st.user`. This option is currently experimental. The proxy must strip/overwrite client-supplied versions of these headers, and the Streamlit server should not be directly reachable, because configured headers are trusted.\n"
+    }
+  ]
+}

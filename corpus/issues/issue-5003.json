@@ -1,0 +1,138 @@
+{
+  "id": "issue-5003",
+  "type": "issue",
+  "number": 5003,
+  "url": "https://github.com/streamlit/streamlit/issues/5003",
+  "title": "Deactivate responsiveness of st.columns",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.columns"
+  ],
+  "created_at": "2022-07-20T15:23:39Z",
+  "closed_at": "2026-08-18T09:15:43Z",
+  "body": "Hi, I'm using `st.columns` on `st.form`.\n\nIn mine desktop the widgets align. But in the mobile version not. \n\nI did some tests here and discovered that in the mobile version the app don't create the columns. \nHere are the [app link](https://guihungaro-streamlit-bug-streamlit-bug-columns-sk3jnd.streamlitapp.com/) and the [app repo](https://github.com/GuiHungaro/streamlit_bug)\n\n**Desktop version:**\n\n![image](https://user-images.githubusercontent.com/97532025/180021115-d0a0201e-eefb-4ab9-9328-ef2bf8700579.png)\n\n\n**Mobile version:**\n![image](https://user-images.githubusercontent.com/97532025/180021280-7d906165-844a-406b-a47c-54a51ee790e1.png)\n\n\n\n**The code:**\n\n```\nimport streamlit as st\nwith st.form(\"Test\"):\n    col1, col2, col3 = st.columns(3)\n    with col1:\n        st.write(\"col1\")\n        st.form_submit_button(\"Button 1\")\n    with col2:\n        st.write(\"col2\")\n        st.form_submit_button(\"Button 2\")\n    with col3:\n        st.write(\"col3\")\n        st.form_submit_button(\"Button 3\")\n```\n \n\nAccept sugestions to solve this bug, maybe using css or markdown.\n\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-5003)",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2022-07-20T19:07:05Z",
+      "body": "[USER] Thanks for reporting this! `st.columns` are built to be responsive, meaning that it will switch to rendering the columns underneath each other at a certain display size. So, this is more of an enhancement request to add some capabilities to deactivate the responsiveness of columns. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-08-14T14:24:12Z",
+      "body": "facing same issue here. Is there a workaround to align elements horizontally on mobile?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-09-05T03:25:40Z",
+      "body": "Same problem here.\r\nWish there was a workaround for this."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-09-25T18:43:02Z",
+      "body": "Anyone figured out a clever workaround for this yet? "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-09-30T03:09:09Z",
+      "body": "Please is there a workaround this issue?\r\nEven if it demands using custom CSS!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-10-12T15:08:33Z",
+      "body": "Guys this behavior is really annoying. Absolutely thin columns with minimum information that obviously should fit mobile screen go vertical instead. Please fix "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-10-12T19:03:21Z",
+      "body": "As workaround, you can use CSS style:\r\n```python\r\nst.write('''<style>\r\n\r\n[data-testid=\"column\"] {\r\n    width: calc(33.3333% - 1rem) !important;\r\n    flex: 1 1 calc(33.3333% - 1rem) !important;\r\n    min-width: calc(33% - 1rem) !important;\r\n}\r\n</style>''', unsafe_allow_html=True)\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-05-30T20:44:18Z",
+      "body": "Is there a plan to fix this still? I've run into a lot of issues with column resizing."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-05-31T07:29:12Z",
+      "body": "> As workaround, you can use CSS style:\r\n> \r\n> ```python\r\n> st.write('''<style>\r\n> \r\n> [data-testid=\"column\"] {\r\n>     width: calc(33.3333% - 1rem) !important;\r\n>     flex: 1 1 calc(33.3333% - 1rem) !important;\r\n>     min-width: calc(33% - 1rem) !important;\r\n> }\r\n> </style>''', unsafe_allow_html=True)\r\n> ```\r\n\r\nThanks! This code works. But it still remains a problem for me. What if I need to arrange two columns with different widths in a row, for example: \r\n```python\r\ncol1, col2 = st.columns([2, 1])\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-05-31T09:58:24Z",
+      "body": "> > As workaround, you can use CSS style:\r\n> > ```python\r\n> > st.write('''<style>\r\n> > \r\n> > [data-testid=\"column\"] {\r\n> >     width: calc(33.3333% - 1rem) !important;\r\n> >     flex: 1 1 calc(33.3333% - 1rem) !important;\r\n> >     min-width: calc(33% - 1rem) !important;\r\n> > }\r\n> > </style>''', unsafe_allow_html=True)\r\n> > ```\r\n> \r\n> Thanks! This code works. But it still remains a problem for me. What if I need to arrange two columns with different widths in a row, for example:\r\n> \r\n> ```python\r\n> col1, col2 = st.columns([2, 1])\r\n> ```\r\n\r\nAlright, I finally found a strange way to solve this problem ~ XD"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-06-13T09:06:40Z",
+      "body": "[USER] can you share with us the way please ? :) "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-06-14T07:21:17Z",
+      "body": "> [USER] can you share with us the way please ? :)\r\n\r\nfor example, when I need to arrange two columns with \r\n\r\n```python\r\ncol1, col2 = st.columns([5, 1])\r\n```\r\n\r\nI write css style like follows:\r\n\r\n```\r\n[data-testid=\"column\"] {\r\n    width: calc(25% - 1rem) !important;\r\n    flex: 1 1 calc(25% - 1rem) !important;\r\n    min-width: calc(20% - 1rem) !important;\r\n}\r\n.css-1l269bu {max-width:20% !important;}\r\n```\r\n\r\nwhere 'css-1l269bu' is the auto-generated class for the \"col2\" in Python code.\r\n\r\nit's not elegant but just works haha~"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-12T22:03:28Z",
+      "body": "Still an issue for me.\r\n\r\nThe work around are unusable if you have more than 1 set of columns.\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-12-14T10:38:41Z",
+      "body": "That worked for me \ud83d\udc4c\r\n```\r\nst.write('''\r\n    <style>\r\n    [data-testid=\"column\"] {\r\n        flex: 0 0 auto !important; /* Prevent columns from resizing */\r\n        width: calc(100% * var(--col-width)) !important; /* Fixed width based on proportions */\r\n    }\r\n    [data-testid=\"stHorizontalBlock\"] {\r\n        display: flex !important;\r\n        flex-wrap: nowrap !important; /* Prevent wrapping of columns */\r\n        gap: 1rem; /* Spacing between columns */\r\n    }\r\n    body {\r\n        overflow-x: auto !important; /* Allow horizontal scrolling if needed */\r\n    }\r\n    </style>\r\n    ''', unsafe_allow_html=True)\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-01-01T09:39:51Z",
+      "body": "very sad this is not implemented. I created an app with a goal to use it on mobile phone, and now it is unsuable. The whole design is gone and only 1 column rendered per row. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-01-02T01:57:12Z",
+      "body": "I think we can roll this into the slightly more general idea of configuring the threshold (#6592) to aggregate interest. The underlying problem is that the threshold is set by the overall width of the app and not the resultant width of the columns. e.g. It will flex the same with two columns or ten columns. So a responsiveness parameter that lets you either set an app-width threshold or column-width threshold would be nice (and could effectively allow disabling responsiveness by setting it sufficiently small)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-01-03T19:54:02Z",
+      "body": "This doesn't seem to work anymore - anyone else having issues?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-13T14:41:17Z",
+      "body": "> I think we can roll this into the slightly more general idea of configuring the threshold ([#6592](https://github.com/streamlit/streamlit/issues/6592)) to aggregate interest. The underlying problem is that the threshold is set by the overall width of the app and not the resultant width of the columns. e.g. It will flex the same with two columns or ten columns. So a responsiveness parameter that lets you either set an app-width threshold or column-width threshold would be nice (and could effectively allow disabling responsiveness by setting it sufficiently small).\n\nI faced a similad need multiple times in my development experience with streamlit actually. Do you [USER] think that can we create a feature request for this? So this would be officially supported by Streamlit.\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-31T08:06:48Z",
+      "body": "+1"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-08-17T22:31:42Z",
+      "body": "# Update\n\nWe didn't implement a way to control the wrapping of `st.columns` yet but note that you can solve the original problem here more elegantly with the new layout parameters we added to `st.container` ([docs](https://docs.streamlit.io/develop/api-reference/layout/st.container)):\n\n```python\nwith st.container(horizontal=True):\n    st.button(\"Button 1\")\n    st.button(\"Button 2\")\n    st.button(\"Button 3\")\n```\n\nThis will lay out the buttons side by side (without the big gap added by `st.columns`) and ensure they wrap only if there's not enough space:\n\n<img width=\"328\" height=\"72\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/784afac0-8711-4665-aee5-ca069544af51\" />\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-02-03T01:33:06Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-16T08:10:00Z",
+      "body": "ok so any input widget can be wrapped in st.container(horizontal=True) for mobiles scrrens?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-07T15:39:36Z",
+      "body": "important for mobile viewing"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-18T09:17:18Z",
+      "body": "## Update\n\nStreamlit 1.63+ will provide `wrap` parameter for `st.columns` to disable responsiveness:\n\n```pyhon\ncol1, col2 = st.columns(2, wrap=False)\n```"
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "id": "issue-9397",
+  "type": "issue",
+  "number": 9397,
+  "url": "https://github.com/streamlit/streamlit/issues/9397",
+  "title": "Axios 403 error with file uploader when site is embedded in Iframe",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:st.file_uploader",
+    "status:cannot-reproduce",
+    "priority:P3"
+  ],
+  "created_at": "2024-09-04T08:52:32Z",
+  "closed_at": "2026-06-19T07:57:53Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nGetting error **AxiosError: Request failed with status code 403** while uploading file with streamlit file uploader component embedded in Iframe. I have disabled CORS as stated in previously raised tickets in forum but the error is still there. The component is working fine if the file is uploaded outside Iframe. The app is deployed in Azure web app.\r\n\r\n![image003](https://github.com/user-attachments/assets/6f584edf-6b47-4b85-adf0-d3c67f4b44d8)\r\n\r\nOne thing that I have noticed is the _streamlit_xsrf_ cookie is acting differently in standalone site and in an iframe.\r\nIn iframe I can see two entries in cookie with 2nd entry throwing error.\r\n\r\n![image004](https://github.com/user-attachments/assets/0563037b-c8d1-41db-ad79-accb632f7ff2)\r\n\r\n\r\n_This Set-Cookie header didn't specify a \"SameSite\" attribute and was defaulted to \"SameSite=Lax,\" and was blocked because it came from a cross-site response which was not the response to a top-level navigation. The Set-Cookie had to have been set with \"SameSite=None\" to enable cross-site usage._\r\n\r\nIn the standalone site where the component is working fine, I can see only the first entry of the cookie, there is no 2nd entry.\r\n\n\n### Reproducible Code Example\n\n_No response_\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.38.0\r\n- Python version: 3.10.0\r\n- Operating System: Linux\r\n- Browser: Microsoft Edge\r\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-04T08:52:42Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Visits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fstreamlit%2Fstreamlit%2Fissues%2F9397&title=visits&edge_flat=false)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-04T14:53:34Z",
+      "body": "Hey [USER] thanks for opening this issue!\r\n\r\nYep, it is an interesting point, we work on making this experience better. \r\nIt is not secure, but if your app operates in the trusted perimeter, you can set both \r\n```toml\r\n[server]\r\nenableCORS = true\r\nenableXsrfProtection = true\r\n```\r\n\r\nThat would not check for CSRF tokens for file uploading, and it then would work when the streamlit app is embedded. \r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-04T16:30:08Z",
+      "body": "> Hey [USER] thanks for opening this issue!\r\n> \r\n> Yep, it is an interesting point, we work on making this experience better. It is not secure, but if your app operates in the trusted perimeter, you can set both\r\n> \r\n> ```toml\r\n> [server]\r\n> enableCORS = true\r\n> enableXsrfProtection = true\r\n> ```\r\n> \r\n> That would not check for CSRF tokens for file uploading, and it then would work when the streamlit app is embedded.\r\n\r\nThanks for checking the issue.\r\nUnfortunately issues still persists even after setting CORS parameters to true. It would be helpful if you can reopen the issue please."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-04T21:04:22Z",
+      "body": "[USER] sorry, I had a typo in previous comment\r\n\r\nDid you try \r\n\r\n```toml\r\n[server]\r\nenableCORS = false\r\nenableXsrfProtection = false\r\n```\r\n\r\n?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-05T03:19:35Z",
+      "body": "> [USER] sorry, I had a typo in previous comment\r\n> \r\n> Did you try\r\n> \r\n> ```toml\r\n> [server]\r\n> enableCORS = false\r\n> enableXsrfProtection = false\r\n> ```\r\n> \r\n> ?\r\n\r\nYeah, that was the first thing I tried but sadly it didnt worked."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-05T17:24:52Z",
+      "body": "Hm [USER] , it is very interesting, at least with disabled Cors protection and XSRF protection it should not set or check for XSRF token at all\r\n\r\nMaybe we could schedule some time to have a call to try to debug this together on your setup?\r\n\r\nMy working hours are in CET, so let's try to meet and debug it, I was unable to reproduce it :( "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-16T18:15:21Z",
+      "body": "Closing due to inactivity. Please reopen if this issue persists."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-11T05:48:51Z",
+      "body": " [USER] I have reinstalled everything and managed to  fix the issue by setting enableXsrfProtection = false. But it is having security implications. How can we make it work without turning Xsrf off? [USER] can you please reopen the issue."
+    }
+  ]
+}

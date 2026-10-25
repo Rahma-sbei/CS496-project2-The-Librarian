@@ -1,0 +1,49 @@
+{
+  "id": "issue-6625",
+  "type": "issue",
+  "number": 6625,
+  "url": "https://github.com/streamlit/streamlit/issues/6625",
+  "title": "Schedule clear cache",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:cache",
+    "feature:community-cloud"
+  ],
+  "created_at": "2023-05-04T12:31:11Z",
+  "closed_at": "2026-07-22T09:24:02Z",
+  "body": "### Problem\r\n\r\nI learned that the cache from \"st.cache_data()\" will only be cleared when the option \"Clear cache\" from developer options is manually activated by the owner of the app or if the cache expires. \r\n\r\nThe problem with that is when you have multiple sets of data in your app that are scheduled to be updated in specific dates of the month, at specific times, you either go and manually clear cache yourself in each of this updates or you'll have outdated data in your app until the cache expires.\r\n![image](https://user-images.githubusercontent.com/73763541/236198590-0ef4604e-1c36-4379-89d4-2663704f5ddc.png)\r\n\r\nOf course you can leave a small time for the argument \"ttl\" in \"st.cache_data()\" to try to get around this issue but you will be querying your database multiple times, and also increasing user loading time, when you know the data hasn't changed (in my case, the data is only updated once a month). This also creates the issue that the user of the app won't have the most recent data as soon as it is released.\r\n\r\n### Solution\r\n\r\nIt would be great to be able to leave a really long time as an argument to \"st.cache_data()\" and be able to schedule a \"Clear cache\" on the app settings (https://share.streamlit.io/) for when you know the data is gonna be released along the following months. \r\n\r\nThe format for this scheduling would be great if it was something close to what the Windows Task Scheduler offers as triggers, with multiple dates that don't exactly follow a standard such as crontab from linux, Databricks and other tools. Why? Because the data I work with has some randomness on the date it is released. Sometimes the 5th, sometimes the 8th, some time 1st day of the month, and so on.\r\n\r\n---\r\n\r\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\r\n\r\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-05-04T18:57:16Z",
+      "body": "Hey [USER],\r\n\r\nThanks for sharing this enhancement request! I'm under the impression that we don't have an actual limit on what you can pass as a `ttl` parameter (I could be wrong though) \u2013 is there a reason that you wouldn't be able to pass a huge number as a  `ttl` today to achieve this functionality?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-05-04T22:56:16Z",
+      "body": "Hello [USER]. I actually **can** pass a big value to ttl. What I **cannot do** and I'm requesting is for **scheduling clear cache**. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-05-05T14:46:54Z",
+      "body": "Hi [USER], thanks for clarifying! \r\n\r\nJust to make sure we fully understand the request \u2013 you're looking for a way to set a `ttl` parameter via Streamlit Community Cloud's UI rather than programmatically, correct? (You can schedule the cache to clear programmatically already \u2013 i.e. passing `2,678,400` as the `ttl` parameter is functionally the same as scheduling the cache to clear once a month.)\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-05-08T06:08:28Z",
+      "body": "[USER] We have a CLI command that allows you to clear the cache - the `streamlit cache clear` command. You can add this command to crontab or other schedulers to clear the cache on specific dates of the month. What do you think?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-05-08T13:20:01Z",
+      "body": "[USER] it would be more in the lines of what [USER] suggested. \r\n\r\n[USER] how could I do that?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T09:24:02Z",
+      "body": "Closing since since the recommended way is to set `ttl` / `max_entries` and we provide a manual `cached_data.clear()` function as well. "
+    }
+  ]
+}

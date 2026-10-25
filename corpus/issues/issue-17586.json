@@ -1,0 +1,43 @@
+{
+  "id": "issue-17586",
+  "type": "issue",
+  "number": 17586,
+  "url": "https://github.com/streamlit/streamlit/issues/17586",
+  "title": "Allow Pillow 13 in the published dependency range",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:dependencies"
+  ],
+  "created_at": "2026-10-20T21:44:37Z",
+  "closed_at": "2026-10-21T10:17:56Z",
+  "body": "## Checklist\n\n- [x] I have searched the existing issues for similar requests.\n- [x] I added a descriptive title and summary to this issue.\n\n## Summary\n\nPlease update Streamlit's published Pillow requirement from `pillow>=9.2.0,<13` to `pillow>=9.2.0,<14` and regenerate the lockfile so Streamlit can resolve Pillow 13.0.0.\n\n## Why?\n\nPillow 13.0.0 was released on 2026-10-16 and contains security fixes. Streamlit 1.66.0 currently caps Pillow below 13, which prevents downstream applications from receiving the patched release. This currently blocks the Markets/scdpy services audit because Streamlit resolves Pillow 12.3.0, which has known vulnerabilities fixed in Pillow 13.0.0.\n\n## How?\n\nI prepared the minimal change locally:\n\n```diff\n- pillow>=9.2.0,<13\n+ pillow>=9.2.0,<14\n```\n\nThe lockfile resolves successfully to Pillow 13.0.0. Existing Streamlit Pillow usage is covered by the image, hashing, and write-path tests.\n\n## Additional Context\n\n- Current dependency metadata: https://pypi.org/pypi/streamlit/json\n- Pillow 13.0.0 release: https://pypi.org/project/Pillow/13.0.0/\n- Streamlit dependency policy requires runtime dependencies to be capped below the next major version until compatibility is reviewed.\n- A full upstream PR was not submitted because `CONTRIBUTING.md` states that outside pull requests are currently paused.\n- The prepared local commit is `50bc26e2b6` on the `fchareyr/streamlit` fork.\n\nFocused local validation: `uv lock --check` and Ruff passed; tests require the repository's `protoc` tool, which was unavailable in the local environment.",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2026-10-20T21:46:03Z",
+      "body": "[USER] \u2014 calling the EPFL emergency hotline \ud83d\udcde\ud83c\udf93: could you help shepherd this tiny Pillow 13 cap lift? The patch is smaller than a coffee break at the Rolex Learning Center, and it would unblock a real downstream security audit."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-20T22:43:52Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-17586)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-10-21T00:50:09Z",
+      "body": "If you're using [uv](https://docs.astral.sh/uv/), you can put a temporary override in your `pyproject.toml`:\n\n```toml\n[tool.uv]\n# ...\noverride-dependencies = [\n    # https://github.com/streamlit/streamlit/issues/17586\n    \"pillow >= 13.0\",\n]\n```\n\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-10-21T11:14:41Z",
+      "body": "Thank you!"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-10-21T20:38:12Z",
+      "body": "We rolled this out as a patch in version 1.66.1 today. "
+    }
+  ]
+}

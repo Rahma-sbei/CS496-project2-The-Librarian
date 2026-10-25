@@ -1,0 +1,35 @@
+{
+  "id": "issue-8322",
+  "type": "issue",
+  "number": 8322,
+  "url": "https://github.com/streamlit/streamlit/issues/8322",
+  "title": "Alignment issue with help tooltips inside st.popover",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.popover"
+  ],
+  "created_at": "2024-03-18T12:50:58Z",
+  "closed_at": "2026-07-19T11:52:23Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nThe logic that keeps the help tooltip inside the screen is not working when the widget is inside a popover.\r\n\r\n<img width=\"1128\" alt=\"image\" src=\"https://github.com/streamlit/streamlit/assets/112868935/24b5a3cd-3151-47ea-90ab-625c91443e86\">\r\n\r\n\r\nVS.\r\n\r\n<img width=\"1128\" alt=\"image\" src=\"https://github.com/streamlit/streamlit/assets/112868935/a3843253-eb63-45d8-9ca0-00897374b406\">\r\n\r\n<img width=\"1128\" alt=\"image\" src=\"https://github.com/streamlit/streamlit/assets/112868935/c6fc1587-a404-435f-9af2-66ac56a305d1\">\r\n\r\n\r\n\r\n\r\n### Reproducible Code Example\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-8322)\r\n\r\n```Python\r\nimport streamlit as st \r\n\r\nst.set_page_config(layout='wide')\r\nhelp_message = '''This is a long help message, it's content is not important to I will just add some Moby Dick\r\nCall me Ishmael. Some years ago- never mind how long precisely- having little or no money in my purse, and nothing particular to interest me on shore, I thought I would sail about a little and see the watery part of the world. It is a way I have of driving off the spleen and regulating the circulation. Whenever I find myself growing grim about the mouth; whenever it is a damp, drizzly November in my soul; whenever I find myself involuntarily pausing before coffin warehouses, and bringing up the rear of every funeral I meet; and especially whenever my hypos get such an upper hand of me, that it requires a strong moral principle to prevent me from deliberately stepping into the street, and methodically knocking people\u2019s hats off- then, I account it high time to get to sea as soon as I can. This is my substitute for pistol and ball. With a philosophical flourish Cato throws himself upon his sword; I quietly take to the ship. There is nothing surprising in this. If they but knew it, almost all men in their degree, some time or other, cherish very nearly the same feelings towards the ocean with me.\r\n'''\r\n\r\n*cols, last_col = st.columns(10)\r\nwith last_col:\r\n    st.toggle('Some toggle', help=help_message)\r\n    \r\nwith last_col:\r\n    with st.popover('Config'):\r\n        st.toggle('Some other toggle', help=help_message)\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n_No response_\r\n\r\n### Expected Behavior\r\n\r\nThe tooltip should remain visible in full.\r\n\r\n### Current Behavior\r\n\r\nThe tootlip overflows out of the screen.\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version:\r\n- Python version:\r\n- Operating System:\r\n- Browser:\r\n\r\n\r\n### Additional Information\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-03-18T12:51:10Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-8322)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-03-18T18:44:04Z",
+      "body": "[USER] Thanks for reporting this issue. I was able to reproduce this [here](https://issues.streamlit.app/?issue=gh-8322)."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-19T11:52:23Z",
+      "body": "Closing this since I believe this was fixed with the basweb to react-aria migration"
+    }
+  ]
+}

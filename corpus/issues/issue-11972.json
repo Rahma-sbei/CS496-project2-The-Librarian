@@ -1,0 +1,33 @@
+{
+  "id": "issue-11972",
+  "type": "issue",
+  "number": 11972,
+  "url": "https://github.com/streamlit/streamlit/issues/11972",
+  "title": "Vertical st.segmented_control",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:st.segmented_control"
+  ],
+  "created_at": "2025-07-17T19:48:35Z",
+  "closed_at": "2026-07-30T08:05:55Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nIt would be nice to have an option to display the `st.segmented_control` element vertically. Right know, I'm using a little bit of CSS to achieve that (see below). However, whenever the segmented control changes, my scroll position within the element is reset.\n\n```css\n.st-key-vertical-segmented-control [data-baseweb=\"button-group\"] {\n    flex-direction: column;\n    flex-wrap: initial;\n    max-height: 200px;\n    max-width: 100%;\n    overflow: auto;\n    border: 1px solid rgba(0,0,0,.1);\n    gap: 0;\n    border-radius: .3em;\n    padding: 1px;\n}\n\n.st-key-vertical-segmented-control [data-baseweb=\"button-group\"] button {\n    border-radius: 0;\n    border: none;\n    border-bottom: 1px solid rgba(0,0,0,.1);\n}\n\n.st-key-vertical-segmented-control [data-baseweb=\"button-group\"] button:hover {\n    background: rgba(0,0,0,.03);\n    outline: 1px solid rgb(29, 52, 93);\n}\n\n.st-key-vertical-segmented-control [data-baseweb=\"button-group\"] button[kind=\"segmented_controlActive\"] {\n    outline: 1px solid rgb(29, 52, 93);\n}\n\n.stSpinner > div {\n    justify-content: center;\n}\n```\n\n<img width=\"1467\" height=\"614\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/31df5e0b-6d7d-40aa-83ec-5db43b4ea66b\" />\n\n\n### Why?\n\nIt looks nicer when there are multiple options and helps to prevent layout shift when the element options change dynamically, like when implementing interactive filter options.\n\n### How?\n\nVia a new parameter passed to `st.segmented_control`. Something like `layout=\"vertical\"` or `height=200`.\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-17T19:48:44Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-11972)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-04T13:55:50Z",
+      "body": "I support this.\nsimilar to https://github.com/streamlit/streamlit/issues/10017"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-30T08:05:55Z",
+      "body": "Closing this as a duplicate of #10017. Please comment and upvote on this issue."
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "id": "issue-16537",
+  "type": "issue",
+  "number": 16537,
+  "url": "https://github.com/streamlit/streamlit/issues/16537",
+  "title": "Allow disabling `Select All` in `st.multiselect`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:widgets",
+    "feature:st.multiselect"
+  ],
+  "created_at": "2026-08-17T11:26:32Z",
+  "closed_at": "2026-08-28T14:38:01Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nHello! I'd like the possibility to remove the `Select All` / `Select N matches` buttons in `st.multiselect` & similar components.\n\n(note: examples taken from [`st.multiselect` doc page](https://docs.streamlit.io/develop/api-reference/widgets/st.multiselect))\n\n<img width=\"279\" height=\"256\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/2cd8ce2b-5238-4236-9b51-c445b1a02603\" />\n\n## Bad UX impact\n\n\ud83d\udc49 Basically I want to be able to search something and press Enter, and have the first match added to the selected options.\n\nCurrently searching then pressing Enter would `Select N matches` which is not wanted here \ud83d\ude2c\n<img width=\"233\" height=\"284\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/06752b69-a47a-402d-8405-5306db098715\" />\n\nFor searches that have only 1 match it is already working as expected.\n<img width=\"219\" height=\"151\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/43e59544-f1be-4b07-b3c8-6bab00be2963\" />\n\n### Why?\n\nIn our case we have a list of ~500 clients and allow the user to select maybe 2-3, having the `Select All` button doesn't make sense here..\n\n### How?\n\nThis could be a new parameter on `st.multiselect` like `allow_select_all=False`\n\nAlthough that naming isn't great if a `Deselect All` option would exist as well \ud83e\udd14\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-17T11:26:42Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-16537)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-17T20:06:25Z",
+      "body": "This is an enhancement request to make `st.multiselect`'s bulk actions (\"Select all\" / \"Select N matches\") optional. Today those actions are always injected as the first dropdown item when more than one option is visible and the list has fewer than 1000 options (`useMultiselectFiltering.ts`), so pressing Enter after a multi-match search activates the bulk action instead of selecting the first match. A product spec for a configurable `select_all` parameter already exists in open PR #15300 (intended to close the earlier duplicate #14918), but the API has not landed in code yet\u2014only the hard-coded 1000-option threshold.\n\n### Related Issues\n\n- [#14918](https://github.com/streamlit/streamlit/issues/14918) \u2014 **Near duplicate (closed):** Same request for a parameter to enable/disable \"Select all\" on `st.multiselect`. Closed after the `select_all` spec was drafted in [#15300](https://github.com/streamlit/streamlit/pull/15300); this issue should likely track against that PR/spec.\n- [#15299](https://github.com/streamlit/streamlit/issues/15299) \u2014 Closely related (closed): Also asked to disable \"Select all\" (performance freeze on large lists); covered by the same `select_all` spec / threshold behavior.\n- [#15697](https://github.com/streamlit/streamlit/issues/15697) \u2014 Related (open): Customizable keyboard navigation for select/multiselect widgets; overlaps with the Enter-to-select-first-match UX called out here.\n\n---\n*This is an automated triage comment using `cursor-grok-4.5-high`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-17T22:26:31Z",
+      "body": "I indeed didn't find #14918 when searching existing issues for some reason, I don't think that issue should have been closed until it was actually implemented and shipped in a release..\n\nMaybe re-open that issue?\nOr feel free to use this one for tracking this feature impl \ud83e\udd14"
+    }
+  ]
+}

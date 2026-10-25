@@ -1,0 +1,31 @@
+{
+  "id": "issue-17127",
+  "type": "issue",
+  "number": 17127,
+  "url": "https://github.com/streamlit/streamlit/issues/17127",
+  "title": "`st.dataframe` toolbar buttons are 22.4px, below the WCAG 2.2 24px minimum target size (axe `target-size`)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:frontend",
+    "feature:st.dataframe",
+    "feature:st.data_editor",
+    "area:accessibility"
+  ],
+  "created_at": "2026-09-25T06:55:45Z",
+  "closed_at": "2026-10-01T04:56:23Z",
+  "body": "### Checklist\n- [x] I have searched the existing issues for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\nThe hover toolbar that `st.dataframe` draws (Show/hide columns, Download as CSV, Search, Fullscreen)\nrenders each button at 22.4 x 22.4 CSS px, and the buttons sit next to each other, so axe-core's\n`target-size` rule (impact: serious, WCAG 2.2 AA, SC 2.5.8 Target Size (Minimum)) fails. Cause:\n`StyledElementToolbarButton` in `frontend/lib/src/components/shared/BaseButton/styled-components.ts`\n(1.64.0, line ~524) sets `padding: theme.spacing.twoXS` and `minHeight: \"unset\"` around a small icon.\n\n### Reproducible Code Example\nSame app as above (the `st.dataframe` line is enough).\n\n### Steps To Reproduce\n1. `streamlit run app.py`\n2. Hover the dataframe so the toolbar appears.\n3. Run axe-core 4.13 with the `wcag22aa` tag.\n\n### Expected Behavior\nEach toolbar button is at least 24 x 24 CSS px (or spaced so a 24px circle around each does not overlap\nanother target).\n\n### Current Behavior\n```\ntarget-size (serious, wcag22aa, wcag258) \u2014 4 nodes\n<button kind=\"elementToolbar\" data-testid=\"stBaseButton-elementToolbar\" aria-label=\"Show/hide columns\" class=\"st-emotion-cache-18ac3gt eqzt73c20\">\n  Target has insufficient size (22.4px by 22.4px, should be at least 24px by 24px)\n<button ... aria-label=\"Download as CSV\" ...>   (same)\n<button ... aria-label=\"Search\" ...>            (same)\n<button ... aria-label=\"Fullscreen\" ...>        (same)\n```\n\n### Suggested fix\nGive `StyledElementToolbarButton` `minWidth: \"1.5rem\"` and `minHeight: \"1.5rem\"` (24px) instead of\n`minHeight: \"unset\"`, or raise the padding one step. The toolbar is already an overlay above the element,\nso the extra 1.6px per button does not move page layout. The same styled button is used by other element\ntoolbars (charts, `st.data_editor`), which would all pass with the one change.\n\nIn the same minimal app, axe also reports `target-size` on the `st.date_input` month/day spinbutton\nsegments (17.9 x 19.6px); that may deserve its own look but is secondary.\n\n### Is this a regression?\n- [ ] Yes, this used to work in a previous version.\n- [x] No.\n\n### Debug info\n- Streamlit version: 1.64.0 (latest)\n- Python version: 3.12\n- OS: Linux (CI) and Windows 11\n- Browser: Chromium (Playwright bundled)\n- axe-core: 4.13.0\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-25T08:08:19Z",
+      "body": "This is a WCAG 2.2 AA bug: `st.dataframe` hover-toolbar buttons (Show/hide columns, Download as CSV, Search, Fullscreen) measure **22.4\u00d722.4 CSS px**, below the 24px minimum in SC 2.5.8 (`axe` `target-size`). The reported cause is confirmed in `StyledElementToolbarButton` (`frontend/lib/src/components/shared/BaseButton/styled-components.ts`): it sets `minHeight: \"unset\"` and `padding: theme.spacing.twoXS` (0.25rem / 4px) around a `md` icon (`0.9rem` / 14.4px), which is exactly 22.4px, and adjacent buttons have no extra margin. The same `ToolbarAction` / `ELEMENT_TOOLBAR` button is reused by other element toolbars (data editor, charts, images, code copy, etc.), so raising `minWidth`/`minHeight` to `1.5rem` (or equivalent padding) would fix all of them. The secondary `st.date_input` spinbutton finding is a separate widget and should be tracked on its own issue.\n\n### Related Issues\n\n- [#16148](https://github.com/streamlit/streamlit/issues/16148) \u2014 Same element-toolbar Fullscreen buttons, different a11y defect (screen readers get a generic `Fullscreen` name and cannot tell which element the button controls).\n- [#12865](https://github.com/streamlit/streamlit/issues/12865) \u2014 Same hover toolbar: actions can be clipped inside fixed-height containers, making the buttons unusable even when they are visible enough to interact with.\n- [#13332](https://github.com/streamlit/streamlit/issues/13332) \u2014 Dataframe-specific accessibility work (keyboard access to the header three-dot menu). Different control than the hover toolbar, but overlapping a11y surface for `st.dataframe`.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-29T07:10:09Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-17127)\n"
+    }
+  ]
+}

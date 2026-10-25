@@ -1,0 +1,44 @@
+{
+  "id": "issue-15862",
+  "type": "issue",
+  "number": 15862,
+  "url": "https://github.com/streamlit/streamlit/issues/15862",
+  "title": "API to change font size of `st.tabs` headers",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "area:styling",
+    "feature:st.tabs"
+  ],
+  "created_at": "2026-07-07T08:18:52Z",
+  "closed_at": "2026-07-07T13:53:17Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nBefore version 1.59.0 I could change the fontsize of the tabs using this css code:\ncss = f\"\"\"\n                <style>\n                    .stTabs [data-baseweb=\"tab-list\"] button [data-testid=\"stMarkdownContainer\"] p {{\n                    font-size:2.0rem;\n                    }}\n                </style>\n                \"\"\"\n\n    st.markdown(css, unsafe_allow_html=True)\n\nNow this does not work anymore. \nInstead of this \"css hack\" I'd like to have an option it st.tabs to control this, but however this is how it is and the behaviour somehow changed\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\n\ndef render_tabs():\n    css = f\"\"\"\n                <style>\n                    .stTabs [data-baseweb=\"tab-list\"] button [data-testid=\"stMarkdownContainer\"] p {{\n                    font-size:2.0rem;\n                    }}\n                </style>\n                \"\"\"\n\n    st.markdown(css, unsafe_allow_html=True)\n    tabs = st.tabs([\"Tab1\", \"Tab2\", \"Tab3\"], default=\"Tab1\")\n    with tabs[0]:\n        st.write(\"This is tab 1\")\n\n    with tabs[1]:\n        st.write(\"This is tab 2\")\n\n    with tabs[2]:\n        st.write(\"This is tab 3\")\n\n\ndef main():\n    render_tabs()\n```\n\n### Steps To Reproduce\n\n1. run the example with streamlit 1.58.0 -> Tab headers have a bigger font\n2. run the example with streamlit 1.59.0 -> Tab headers unchanged\n\n### Expected Behavior\n\nNeed an example how to change the font size or better, have a parameter in st.tabs to control it without the need of a css hack.\n\n### Current Behavior\n\nFont size does not change\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.59.0\n- Python version: 1.14.6\n- Operating System: Mac OS 26.5.2\n- Browser: Edge\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-07T08:19:04Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15862)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-07T08:56:13Z",
+      "body": "The user's CSS hack for enlarging tab labels (targeting `.stTabs [data-baseweb=\"tab-list\"] button [data-testid=\"stMarkdownContainer\"] p`) stopped working in `1.59.0`. This is a side effect of the internal migration of `st.tabs` from BaseWeb to `react-aria-components` in PR #15328 (\"Remove `BaseWeb` for `Tabs`\"), which landed after `1.58.0` and is included in `1.59.0` (confirmed: the commit is an ancestor of `1.59.0` but not `1.58.0`). Tabs are no longer rendered with `[data-baseweb=\"tab-list\"]`, so the selector no longer matches. Because the hack relied on internal DOM structure (not a supported/stable API), this is expected to break; the productive path forward is the enhancement the reporter also requests: a native way to control tab label font size (rather than a CSS workaround). Note the markdown label paragraph is now styled at `theme.fontSizes.sm` in `StyledTab` (`frontend/lib/src/components/elements/Tabs/styled-components.ts`), so a working stopgap would need to target the new `react-aria-components` markup instead of `data-baseweb`.\n\n### Related Issues\n\n- **[#6709](https://github.com/streamlit/streamlit/issues/6709)** \u2013 \"Add option of changing tab name font size\" (`type:enhancement, area:styling, feature:st.tabs`). Effectively a duplicate of the feature request in this issue: a native option to change the `st.tabs` label font size instead of a CSS hack.\n- **[#6649](https://github.com/streamlit/streamlit/issues/6649)** \u2013 \"Allow for styles argument in widgets\". Related theme of wanting a supported styling API so apps don't depend on fragile global CSS hacks that break across versions (exactly what happened here).\n- **[#12311](https://github.com/streamlit/streamlit/issues/12311)** \u2013 \"Make all widgets use the same font size\" (`feature:theming`). Related to controlling/standardizing widget font sizes via theming, which is the likely native mechanism for tab label sizing.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-07T13:53:17Z",
+      "body": "[USER] thanks for filing this issue -- because we are migrating away from BaseWeb and your CSS styling targets an element that was part of the BaseWeb element, this will no longer work. I converted this to an enhancement request, but it looks like it duplicates https://github.com/streamlit/streamlit/issues/6709 -- can you comment/upvote that issue to reflect your interest? I am going to close your issue as a duplicate since the other one is older.\n\nIn the meantime, you might also update your CSS to something like this:\n\n```\ncss = \"\"\"\n<style>\n[data-testid=\"stTab\"] p {\n    font-size: 2.0rem;\n}\n</style>\n\"\"\"\nst.markdown(css, unsafe_allow_html=True)\n```\n\nOr, you could use the `key` param to target the CSS if needed. \n\n```\ncss = \"\"\"\n<style>\n.st-key-my-tabs [data-testid=\"stTab\"] p {\n    font-size: 2.0rem;\n}\n</style>\n\"\"\"\nst.markdown(css, unsafe_allow_html=True)\ntabs = st.tabs([\"Tab1\", \"Tab2\", \"Tab3\"], key=\"my-tabs\")\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-07T20:40:10Z",
+      "body": "Yes, its a duplicate but pretty old. Will there be a solution in the near future?\nHow would the CSS look now? This issue blocks me from upgrading to 1.59.0 and later."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-08T07:48:53Z",
+      "body": "[USER] did you see the alternative CSS I added above? I tested this as well and it seems to work for your use case with 1.59.0. Let me know if it doesn't. \n\nThe original issue doesn't have many upvotes, so it's important to add your voice to that issue because we look at the demand when prioritizing work. Right now, I don't see this being added soon based on this response from Johannes https://github.com/streamlit/streamlit/issues/6709#issuecomment-3368444527, but I really encourage you to add your thoughts in that issue so that we have an accurate reflection of the demand. "
+    }
+  ]
+}

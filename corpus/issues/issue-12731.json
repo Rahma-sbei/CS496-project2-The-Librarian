@@ -1,0 +1,65 @@
+{
+  "id": "issue-12731",
+  "type": "issue",
+  "number": 12731,
+  "url": "https://github.com/streamlit/streamlit/issues/12731",
+  "title": "`ValueError: Paths don't have the same drive`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "papercut",
+    "priority:P3",
+    "feature:file-watcher"
+  ],
+  "created_at": "2025-10-09T10:19:53Z",
+  "closed_at": "2026-07-14T18:39:28Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nSince the last update, I sometimes see the following error (and after this error, code changes are no longer detected), but I don't have any steps to reproduce it.\n\n```\nException in thread Thread-1:\nTraceback (most recent call last):\n  File \"uv\\python\\cpython-3.13.7-windows-x86_64-none\\Lib\\threading.py\", line 1043, in _bootstrap_inner\n    self.run()\n    ~~~~~~~~^^\n  File \".venv\\Lib\\site-packages\\watchdog\\observers\\api.py\", line 213, in run\n    self.dispatch_events(self.event_queue)\n    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \".venv\\Lib\\site-packages\\watchdog\\observers\\api.py\", line 391, in dispatch_events\n    handler.dispatch(event)\n    ~~~~~~~~~~~~~~~~^^^^^^^\n  File \".venv\\Lib\\site-packages\\watchdog\\events.py\", line 217, in dispatch\n    getattr(self, f\"on_{event.event_type}\")(event)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^\n  File \".venv\\Lib\\site-packages\\streamlit\\watcher\\event_based_path_watcher.py\", line 452, in on_created\n    self.handle_path_change_event(event)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^\n  File \".venv\\Lib\\site-packages\\streamlit\\watcher\\event_based_path_watcher.py\", line 402, in handle_path_change_event\n    and os.path.commonpath([path, abs_changed_path]) == path\n        ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<frozen ntpath>\", line 861, in commonpath\nValueError: Paths don't have the same drive\n```\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.50.0\n- Python version: 3.13.7\n- Operating System: Windows 11\n- Browser: Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-10-09T10:20:03Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-12731)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-10-10T10:34:38Z",
+      "body": "[USER] thanks for filing this, it's difficult to reproduce because it looks like it is a windows specific error (our dev team use Mac) but we are taking a look at patching this. It looks like a problem where your project may be spread across different drives -- `ValueError: Paths don't have the same drive` -- so a workaround could be to move everything onto the same drive. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-10T10:40:55Z",
+      "body": "Thanks [USER], I understand, I can't reproduce it intentionally either. For me (unless there's something I'm missing), all my files are on a single drive."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-03T16:32:49Z",
+      "body": "Hi [USER], I continue to get the error despite updating to \"1.51.0\". It is also common for Streamlit to indicate a file change when no files have been changed.\n\n```\nException in thread Thread-1:\nTraceback (most recent call last):\n  File \"uv\\python\\cpython-3.13.7-windows-x86_64-none\\Lib\\threading.py\", line 1043, in _bootstrap_inner\n    self.run()\n    ~~~~~~~~^^\n  File \".venv\\Lib\\site-packages\\watchdog\\observers\\api.py\", line 213, in run\n    self.dispatch_events(self.event_queue)\n    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \".venv\\Lib\\site-packages\\watchdog\\observers\\api.py\", line 391, in dispatch_events\n    handler.dispatch(event)\n    ~~~~~~~~~~~~~~~~^^^^^^^\n  File \".venv\\Lib\\site-packages\\watchdog\\events.py\", line 217, in dispatch\n    getattr(self, f\"on_{event.event_type}\")(event)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^\n  File \".venv\\Lib\\site-packages\\streamlit\\watcher\\event_based_path_watcher.py\", line 463, in on_created\n    self.handle_path_change_event(event)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^\n  File \".venv\\Lib\\site-packages\\streamlit\\watcher\\event_based_path_watcher.py\", line 453, in handle_path_change_event\n    changed_path_info.on_changed.send(abs_changed_path)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \".venv\\Lib\\site-packages\\blinker\\base.py\", line 249, in send\n    result = receiver(sender, **kwargs)\n  File \".venv\\Lib\\site-packages\\streamlit\\watcher\\local_sources_watcher.py\", line 132, in on_path_changed\n    and os.path.commonpath([watched_path, norm_filepath])\n        ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<frozen ntpath>\", line 861, in commonpath\nValueError: Paths don't have the same drive\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-11T13:59:08Z",
+      "body": "Also experiencing this issue\n\nLogging the two paths to the console shows an invalid path for 'abs_changed_path'. It's showing an invalid path being resolved:\n`\\\\?\\C:\\path\\to\\__pycache__\\<file>.pyc`\n\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-11T14:03:47Z",
+      "body": "[USER] can we please reopen this issue to track it?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-12T09:43:27Z",
+      "body": "Hi, I'm experiencing the same issue too.\n\n```bash\nException in thread Thread-1:\nTraceback (most recent call last):\n  File \"C:\\Program Files\\Python313\\Lib\\threading.py\", line 1041, in _bootstrap_inner\n    self.run()\n    ~~~~~~~~^^\n  File \"C:\\Users\\[HOME]\\.venv\\Lib\\site-packages\\watchdog\\observers\\api.py\", line 213, in run\n    self.dispatch_events(self.event_queue)\n    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\[HOME]\\.venv\\Lib\\site-packages\\watchdog\\observers\\api.py\", line 391, in dispatch_events\n    handler.dispatch(event)\n    ~~~~~~~~~~~~~~~~^^^^^^^\n  File \"C:\\Users\\[HOME]\\.venv\\Lib\\site-packages\\watchdog\\events.py\", line 217, in dispatch\n    getattr(self, f\"on_{event.event_type}\")(event)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^\n  File \"C:\\Users\\[HOME]\\.venv\\Lib\\site-packages\\streamlit\\watcher\\event_based_path_watcher.py\", line 463, in on_created\n    self.handle_path_change_event(event)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^\n  File \"C:\\Users\\[HOME]\\.venv\\Lib\\site-packages\\streamlit\\watcher\\event_based_path_watcher.py\", line 453, in handle_path_change_event\n    changed_path_info.on_changed.send(abs_changed_path)\n    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\[HOME]\\.venv\\Lib\\site-packages\\blinker\\base.py\", line 249, in send\n    result = receiver(sender, **kwargs)\n  File \"C:\\Users\\[HOME]\\.venv\\Lib\\site-packages\\streamlit\\watcher\\local_sources_watcher.py\", line 132, in on_path_changed\n    and os.path.commonpath([watched_path, norm_filepath])\n        ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<frozen ntpath>\", line 850, in commonpath\nValueError: Paths don't have the same drive\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-04T15:17:19Z",
+      "body": "Also experiencing the same issue. It looks like [USER] post gives a pretty good clue where the probelm originates.\n\nMay patch with following psuedocode!\n\nif abs_changed_path.startswith(\"\\\\?\\\"): abs_changed_path = abs_changed_path[4:]\n\nFor me it happens after a few minutes of running application, and you can spend a lot of time wondering why bugs persist, not realising the app didnt reload.\n\nMany thanks for your help with this."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-09T14:37:02Z",
+      "body": "Hi! Triaging older bugs this week \u2014 I think this one has shipped and can be closed.\n\nThe traceback you posted points at `event_based_path_watcher.py` lines 402 and 452, where `os.path.commonpath([path, abs_changed_path]) == path` raised `ValueError: Paths don't have the same drive` on Windows when an event referred to a file on a different drive than a watched directory.\n\nThat call site is now wrapped in `try/except ValueError` on `develop` and the different-drive case just continues the loop \u2014 see [`lib/streamlit/watcher/event_based_path_watcher.py:454-468`](https://github.com/streamlit/streamlit/blob/develop/lib/streamlit/watcher/event_based_path_watcher.py#L454-L468). The fix landed in [#12741](https://github.com/streamlit/streamlit/pull/12741) (commit `a8e49a83d`, \"Fix file watcher issue with common path check\") on 2025-10-15, after this issue was filed.\n\nIf you can update past the release containing #12741 (1.50.x line and later) and still see the same `ValueError` traceback, please share the new full traceback (with the post-fix line numbers) \u2014 the protection is specifically for the `commonpath` ValueError, so any remaining occurrence would point at a different code path and would be worth tracking separately.\n\nOtherwise this should be safe to close. Thanks!\n\n(Disclosure: I drafted this comment with help from Claude Code while triaging stale issues; the references above were verified manually against the current `develop` branch.)"
+    }
+  ]
+}

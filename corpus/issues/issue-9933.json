@@ -1,0 +1,44 @@
+{
+  "id": "issue-9933",
+  "type": "issue",
+  "number": 9933,
+  "url": "https://github.com/streamlit/streamlit/issues/9933",
+  "title": "st.pydeck_chart does not suport pydeck globeview",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:st.pydeck_chart"
+  ],
+  "created_at": "2024-11-26T20:03:11Z",
+  "closed_at": "2026-09-04T14:47:30Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nPydeck supports globeview, as seen in the [pydeck documentation](https://deckgl.readthedocs.io/en/latest/gallery/globe_view.html).\r\n\r\nRunning this example with `st.pydeck_chart(deck)` renders a flat earth projection instead.\r\n\r\n### Reproducible Code Example\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-9933)\r\n\r\n```Python\r\nimport pydeck as pdk\r\nimport pandas as pd\r\n\r\nCOUNTRIES = \"https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_scale_rank.geojson\"\r\nview_state = pdk.ViewState(latitude=51.47, longitude=0.45, zoom=2, min_zoom=0)\r\n\r\n# Set height and width variables\r\nview = pdk.View(type=\"_GlobeView\", controller=True, width=1000, height=700)\r\nlayers = [\r\n    pdk.Layer(\r\n        \"GeoJsonLayer\",\r\n        id=\"base-map\",\r\n        data=COUNTRIES,\r\n        stroked=False,\r\n        filled=True,\r\n        get_fill_color=[200, 200, 200],\r\n    )\r\n]\r\n\r\ndeck = pdk.Deck(\r\n    views=[view],\r\n    initial_view_state=view_state,\r\n    tooltip={\"text\": \"{name}, {primary_fuel} plant, {country}\"},\r\n    layers=layers,\r\n    map_provider=None,\r\n    # Note that this must be set for the globe to be opaque\r\n    parameters={\"cull\": True},\r\n)\r\n\r\ndeck.to_html(\"globe_view.html\", css_background_color=\"black\")\r\n\r\nimport streamlit as st\r\nst.pydeck_chart(deck)\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\nrun the streamlit app example given above to reproduce.  \r\n\r\n### Expected Behavior\r\n\r\nThe expected behavior is a 3-d earth we can rotate and spin, e.g. to a polar view like this:  \r\n![image](https://github.com/user-attachments/assets/b747a1cf-2388-4a27-8cfe-6b544ce12ddf)\r\n\r\n\r\n### Current Behavior\r\n\r\nWe don't get an error, we simply get a 2d web-mercator projection:\r\n\r\n![image](https://github.com/user-attachments/assets/72f3b00e-6eaf-49d1-baaa-f7c4e7d4471b)\r\n\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.40.1\r\n- Python version: 3.12\r\n- Operating System: Linux (Ubuntu 24.04)\r\n- Browser: Chrome\r\n\r\n\r\n### Additional Information\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-26T20:03:24Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9933)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-27T22:08:53Z",
+      "body": "Hey [USER] Thanks for the report! I was able to reproduce it and update with the repro example. It looks like we do not support views outright, and I wonder if it's intended due to how we can render them or licensing or whatnot. This will require more investigation."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-03-25T21:19:59Z",
+      "body": "I took a look at this and wanted to share my findings.\n\nThe behavior has described in the ticket is correct, thank you [USER] for a great issue report!\n\nIn the code, we've had a [long-standing statement](https://github.com/streamlit/streamlit/blob/500b739c0d3cd623849ba986e390630db793b853/frontend/src/components/elements/DeckGlJsonChart/DeckGlJsonChart.tsx#L76) that intentionally removes views from being passed to deck.gl on the frontend since we've traditionally just supported a single MapView.\n\nDeck.gl has 4 fully supported views (MapView, FirstPersonView, OrthographicView, OrbitView), and 1 experimental view (_GlobeView) [[docs](https://deck.gl/docs/developer-guide/views)]. In order to support all of these view types, we'd need to do a bit of refactoring that adds support for all the different types of views. We may even want to consider supporting multiple types of views at once, since Deck.gl supports this too.\n\nIf we were to fix this, this is a potentially breaking change for apps that may have previously passed in a pydeck View, but rely on it falling back to MapView at runtime. \n\n```python\nst.pydeck_chart(\n    pdk.Deck(\n        views=[pdk.View(type=\"FirstPersonView\")],\n        # Other args...\n    )\n)\n```\n\nTo be clear, that certainly isn't a reason _against_ fixing this as we'd be technically fixing that issue as well during this, I'm just using this to illustrate the compounding factors that are at hand with this.\n\nWith all of that said, I am going to turn this into a feature request given the breadth of what may need to be done in order to support this!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-25T21:20:33Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Visits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fstreamlit%2Fstreamlit%2Fissues%2F9933&title=visits&edge_flat=false)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-04T14:06:42Z",
+      "body": "## UPdate\n\nThis will be available in Streamlit **1.64+** ([#16819](https://github.com/streamlit/streamlit/pull/16819)). `st.pydeck_chart` now honors `_GlobeView` instead of forcing a Web Mercator map.\n\n```python\nimport streamlit as st\nimport pydeck as pdk\n\nCOUNTRIES = \"https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_50m_admin_0_scale_rank.geojson\"\n\nst.pydeck_chart(\n    pdk.Deck(\n        layers=[\n            pdk.Layer(\n                \"GeoJsonLayer\",\n                data=COUNTRIES,\n                filled=True,\n                stroked=False,\n                get_fill_color=[200, 200, 200],\n            )\n        ],\n        views=[pdk.View(type=\"_GlobeView\", controller=True)],\n        initial_view_state=pdk.ViewState(latitude=51.47, longitude=0.45, zoom=0),\n        map_provider=None,\n        parameters={\"cull\": True},\n    )\n)\n```"
+    }
+  ]
+}

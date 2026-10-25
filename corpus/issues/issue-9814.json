@@ -1,0 +1,49 @@
+{
+  "id": "issue-9814",
+  "type": "issue",
+  "number": 9814,
+  "url": "https://github.com/streamlit/streamlit/issues/9814",
+  "title": "BUG: `AppTest` sidebar does not clean widgets if not rendered in the last run of the script",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:app-testing"
+  ],
+  "created_at": "2024-11-08T16:49:39Z",
+  "closed_at": "2026-08-29T11:43:12Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nApp script\r\n\r\n```py\r\n\"\"\"login.py\"\"\"\r\nimport streamlit as st\r\n\r\nif \"logged_in\" not in st.session_state:\r\n    st.session_state.logged_in = False\r\nif \"username\" not in st.session_state:\r\n    st.session_state.username = None\r\n\r\nst.title(\"A Well-Tested App! :scientist:\")\r\n\r\nif not st.session_state.logged_in:\r\n    with st.form(\"login_form\"):\r\n        st.session_state.username = st.text_input(\"Username\")\r\n        password = st.text_input(\"Password\", type=\"password\")\r\n        if st.form_submit_button(\r\n            \"Login\",\r\n            use_container_width=True,\r\n            type=\"primary\",\r\n            icon=\":material/login:\",\r\n        ):\r\n            if st.session_state.username == \"johndoe\" and password == \"password123\":\r\n                st.session_state.logged_in = True\r\n                st.rerun()\r\n            else:\r\n                st.error(\r\n                    \"Login failed. Incorrect username/password.\",\r\n                    icon=\":material/lock:\",\r\n                )\r\n\r\nelse:\r\n    st.success(\r\n        f\"Logged in as {st.session_state.username}\",\r\n        icon=\":material/lock_open:\",\r\n    )\r\n    with st.sidebar:\r\n        if st.button(\r\n            \"Logout\",\r\n            icon=\":material/logout:\",\r\n            use_container_width=True,\r\n        ):\r\n            st.session_state.logged_in = False\r\n            st.session_state.username = None\r\n            st.rerun()\r\n```            \r\n\r\n\r\n### Reproducible Code Example\r\n\r\n```Python\r\nfrom streamlit.testing.v1 import AppTest\r\n\r\nat = AppTest.from_file(\"login.py\").run()\r\n\r\nprint(\"Sidebar before login:\\n\", at.sidebar)\r\n\r\nat.text_input[0].set_value(\"johndoe\").run()\r\nat.text_input[1].set_value(\"password123\").run()\r\nat.button[0].click().run()\r\n\r\n# at.session_state.logged_in = True\r\n# at.run()\r\n\r\nprint(\"Sidebar after login:\\n\", at.sidebar)\r\n\r\nat.sidebar.button[0].click().run()\r\n\r\nprint(\"Sidebar after logout:\\n\", at.sidebar)\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n1. Create an app using the `login.py` file provided\r\n2. Test it using the code in the reproducible code example\r\n3. There should be no button in the sidebar after logging out as it is only created if `session_state.logged_in == True`\r\n4. However, according to the tests, the button still exists in the sidebar, although it is not visible in the App UI\r\n\r\n### Expected Behavior\r\n\r\n```\r\nSidebar before login:\r\n SpecialBlock(\r\n    type='sidebar'\r\n)\r\nSidebar after login:\r\n SpecialBlock(\r\n    type='sidebar',\r\n    children={\r\n        0: Button(label='Logout')\r\n    }\r\n)\r\nSidebar after logout:\r\n SpecialBlock(\r\n    type='sidebar'\r\n)\r\n```\r\n\r\n### Current Behavior\r\n\r\n```\r\nSidebar before login:\r\n SpecialBlock(\r\n    type='sidebar'\r\n)\r\nSidebar after login:\r\n SpecialBlock(\r\n    type='sidebar',\r\n    children={\r\n        0: Button(label='Logout')\r\n    }\r\n)\r\nSidebar after logout:\r\n SpecialBlock(\r\n    type='sidebar',\r\n    children={\r\n        0: Button(label='Logout')\r\n    }\r\n)\r\n```\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.40.0\r\n- Python version: 3.10.11\r\n- Operating System: Windows11\r\n- Browser: NA\r\n\r\n\r\n### Additional Information\r\n\r\nhttps://siddhantsadangi.slack.com/archives/C03BGMVBD5L/p1730798201368119",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-08T16:49:50Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9814)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-10T06:59:13Z",
+      "body": "Thank you for highlighting this, I experienced the same behavior in a project of mine.\r\nThe sidebar is not rendered anymore when upgrading to 1.40, but it comes back when downgrading to 1.39."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-10T17:18:59Z",
+      "body": "Just discovered that this behaviour happens in the main block too"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-11T22:13:11Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Visits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fstreamlit%2Fstreamlit%2Fissues%2F9814&title=visits&edge_flat=false)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-11-11T22:14:40Z",
+      "body": "Thank you [USER] for filing this!\r\n\r\nWe understand there is a gap with our AppTest capabilities right now, but also want to be transparent and mention that it is unlikely we'll be resolving them at this moment. We'll keep this issue open so that others can \ud83d\udc4d - we use that information to help surface the most impactful work. Thank you again for filing this!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-15T17:44:07Z",
+      "body": "Does anyone know of a workaround until the bug is fixed?"
+    }
+  ]
+}

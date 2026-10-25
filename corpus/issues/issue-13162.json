@@ -1,0 +1,44 @@
+{
+  "id": "issue-13162",
+  "type": "issue",
+  "number": 13162,
+  "url": "https://github.com/streamlit/streamlit/issues/13162",
+  "title": "Inconsistent margin above the first checkbox/toggle inside a horizontal container inside a column",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:layout",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.container",
+    "feature:st.columns",
+    "feature:st.checkbox",
+    "feature:st.toggle"
+  ],
+  "created_at": "2025-11-28T22:30:32Z",
+  "closed_at": "2026-07-20T15:04:25Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen putting checkboxes/toggles inside a horizontal container inside a column, a `margin-top: 0.5rem` is applied to the first checkbox/toggle, and not to the others.\n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-13162)\n\n```Python\nimport streamlit as st\n\ncols = st.columns(2)\nwith cols[0]:\n    st.button(\"Button 1\", width=\"stretch\")\n    st.button(\"Button 2\", width=\"stretch\")\nwith cols[1]:\n    with st.container(horizontal=True):\n        st.checkbox(\"Checkbox 1\")\n        st.checkbox(\"Checkbox 2\")\n        st.checkbox(\"Checkbox 3\")\n    with st.container(horizontal=True):\n        st.checkbox(\"Checkbox 4\")\n        st.checkbox(\"Checkbox 5\")\n        st.checkbox(\"Checkbox 6\")\n```\n\n### Steps To Reproduce\n\nTry the above code example.\n\n### Expected Behavior\n\nEither the `margin-top: 0.5rem` should be applied to all checkboxes/toggles, or to none.\n\nI'm not sure if the `margin-top: 0.5rem` is still worth the trouble, since we now have `vertical_alignment=\"center\"` as well as `st.space()` to align stuff perfectly in most cases, and considering this is the second bug I've found with it (see #10265). Given that `margin-top: 0.5rem` was broken not long ago, and remains broken in this new situation, I suspect not many people would notice if we removed the `margin-top: 0.5rem` altogether.\n\n### Current Behavior\n\nA `margin-top: 0.5rem` is applied to the first checkbox/toggle, and not to the others.\n\n<img width=\"730\" height=\"123\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/93cd48b9-b4d9-4d9f-9362-32ca4f823233\" />\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.51.0\n- Python version: 3.11.9\n- Operating System: MacOS\n- Browser: Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-11-28T22:30:42Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-13162)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-01T17:00:43Z",
+      "body": "[USER] thanks for reporting this, just want to suggest as a workaround, you could replace the columns with a horizontal + vertical containers. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-11T17:00:08Z",
+      "body": "This is a CSS styling bug related to checkbox/toggle margin handling inside nested layout containers. The issue occurs when checkboxes or toggles are placed inside a horizontal `st.container` that is itself inside an `st.column`. \n\n**Root Cause Analysis:** The bug originates in `frontend/lib/src/components/core/Block/styled-components.ts` (lines 166-171). When a column uses default vertical alignment (TOP), a CSS rule applies `marginTop: theme.spacing.sm` (0.5rem) to the first checkbox using the selector `& ${StyledElementContainer}:first-of-type > ${StyledCheckbox}`. However, when checkboxes are inside a horizontal container, the `:first-of-type` CSS selector only matches the first `StyledElementContainer` containing a checkbox within that container, causing only the first checkbox to receive the margin while others do not. This results in inconsistent vertical spacing between checkboxes in the same horizontal row.\n\n### Related Issues\n\n- **#10265** - Same author reported a very similar bug where the `:last-of-type` selector caused unexpected margins on the last checkbox. This is essentially the same underlying issue but manifesting differently with horizontal containers.\n\n- **#12434** - Related alignment issue where padding on elements inside horizontal containers causes visual misalignment, showing a pattern of layout issues with horizontal containers.\n\n- **#11207** - Related enhancement request for toggle widget layout control, indicating user needs around toggle/checkbox styling in containers.\n\n---\n*This is an automated triage comment. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-25T15:14:15Z",
+      "body": "Hi, I've submitted PR #13462 to fix this. Sorry for not commenting here first. Happy to adjust if needed!"
+    }
+  ]
+}

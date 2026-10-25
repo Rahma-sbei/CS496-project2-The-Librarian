@@ -1,0 +1,24 @@
+{
+  "id": "issue-15371",
+  "type": "issue",
+  "number": 15371,
+  "url": "https://github.com/streamlit/streamlit/issues/15371",
+  "title": "FIPS friendliness",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "area:server"
+  ],
+  "created_at": "2026-05-29T17:15:55Z",
+  "closed_at": "2026-08-11T09:30:19Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nStreamlit should support [FIPS](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards)  friendliness.\n\nWhen a library or package is not FIPS friendly, it significantly limits your ability to use it commercially since you cant sell that software to the US gov or anyone that works with them.\n\n### Why?\n\nStreamlit is not officially [FIPS](https://en.wikipedia.org/wiki/Federal_Information_Processing_Standards) compliant. Any current FIPS friendliness seems to be [maintained by the community](https://github.com/search?q=repo%3Astreamlit%2Fstreamlit+fips&type=issues). This means that sometimes new Streamlit features are developed that break FIPS requirements. \n\nThe FIPS regressions seem to have been trivial, so it would be nice if they could be caught before release.\n\n### How?\n\n1. Streamlit should run it's pre-release CI suite on a FIPS compliant image and check for crashes. The suite should set up a FIPS environment (like the python-fips chainguard container) and executes a test script to see if unapproved paths are blocked. \n2. Streamlit should run a linter so that we pass `usedforsecurity=False` flag on non-cryptographic internal hashes; like cache key generation, file watchers, session IDs, or anything else we would use MD5 for. \n\n\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-29T17:16:10Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-15371)\n"
+    }
+  ]
+}

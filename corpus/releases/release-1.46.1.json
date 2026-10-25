@@ -1,0 +1,9 @@
+{
+  "id": "release-1.46.1",
+  "type": "release",
+  "url": "https://github.com/streamlit/streamlit/releases/tag/1.46.1",
+  "title": "1.46.1",
+  "version": "1.46.1",
+  "date": "2025-06-26T16:03:09Z",
+  "body": "<!-- Release notes generated using configuration in .github/release.yml at 1.46.1 -->\n\n\n\n**Full Changelog**: https://github.com/streamlit/streamlit/compare/1.46.0...1.46.1"
+}

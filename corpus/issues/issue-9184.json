@@ -1,0 +1,46 @@
+{
+  "id": "issue-9184",
+  "type": "issue",
+  "number": 9184,
+  "url": "https://github.com/streamlit/streamlit/issues/9184",
+  "title": "Slider with floats do not use the step parameter based on min_value when step can be casted to int (e.g. 1.0)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.slider",
+    "upstream"
+  ],
+  "created_at": "2024-07-31T11:44:32Z",
+  "closed_at": "2026-07-19T12:01:01Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nWhen using st.slider with float values, the step parameters is relative to to 0 and not relative to min_value as expected.\r\n\r\nApparently it is a problem from BaseWeb:\r\n\r\n```\r\nimport * as React from \"react\";\r\nimport { Slider } from \"baseui/slider\";\r\nexport default () => {\r\n  const [value, setValue] = React.useState([3]);\r\n  return (\r\n    <Slider\r\n      value={value}\r\n      onChange={({ value }) => value && setValue(value)}\r\n      onFinalChange={({ value }) => console.log(value)}\r\n      min={0.5}\r\n      max={3.5}\r\n      step={1.0}\r\n      marks\r\n    />\r\n  );\r\n}\r\n```\r\n\r\n### Reproducible Code Example\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-9184)\r\n\r\n```Python\r\nimport streamlit as st\r\n\r\nst.slider(\"Slider\", min_value=1.50, max_value=100.50, value=(2.5, 41.5), step=1.0)\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\nstreamlit run code.py\r\n\r\n### Expected Behavior\r\n\r\nThe selection should be at step one from 1.5\r\n\r\n### Current Behavior\r\n\r\nOnly 2.0, 3.0 and so on can be selected.\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.37.0\r\n- Python version: 3.10\r\n- Operating System: Windows 11\r\n- Browser: Edge\r\n\r\n\r\n### Additional Information\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-07-31T11:44:44Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9184)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-07-31T17:54:19Z",
+      "body": "[USER] Thanks for raising this issue. I was able to reproduce it [here](https://issues.streamlitapp.com/?issue=gh-9184). This will need a bit more internal discussion. Since this is our behavior for sliders forever, we might not want to change it. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-08-01T06:37:39Z",
+      "body": "[USER] thanks for the feedback. I think it is quite an important bug, as users expect the same behaviour for the step parameter regardless if it is castable to int or not."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-08-01T12:07:04Z",
+      "body": "Oh, got it. There is some inconsistency in how values are handled. E.g., when using step `1.0` vs `1.1`. I extended the example a bit [here](https://issues.streamlit.app/?issue=gh-9184). That is indeed something we should try to fix. It looks like it needs to be addressed inside baseweb."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-19T12:01:01Z",
+      "body": "Closing this since it was fixed with the recent migration from baseweb to react-aria"
+    }
+  ]
+}

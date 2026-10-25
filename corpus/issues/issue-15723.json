@@ -1,0 +1,29 @@
+{
+  "id": "issue-15723",
+  "type": "issue",
+  "number": 15723,
+  "url": "https://github.com/streamlit/streamlit/issues/15723",
+  "title": "Add logging support for better observability",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:debugging",
+    "area:backend"
+  ],
+  "created_at": "2026-06-26T06:44:52Z",
+  "closed_at": "2026-06-29T09:31:32Z",
+  "body": "## Feature Request\n\n### Summary\nThe project would benefit from structured logging to make it easier to debug issues in production.\n\n### Motivation\nCurrently it can be difficult to understand what the application is doing at runtime without adding print statements. Proper logging would:\n\n- Allow users to control verbosity with log levels (DEBUG, INFO, WARNING, ERROR)\n- Make it easier to integrate with log aggregation systems\n- Help diagnose issues in production without code changes\n\n### Proposed Implementation\n```python\nimport logging\n\nlog = logging.getLogger(__name__)\n\ndef my_function():\n    log.debug(\"Starting my_function\")\n    # ... \n    log.info(\"my_function completed successfully\")\n```\n\n### Impact\nLow risk change with high value for users running this in production environments.\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-26T09:08:35Z",
+      "body": "This is a generic feature request asking Streamlit to adopt structured logging with Python's `logging` module and configurable log levels. However, Streamlit **already provides this**: `lib/streamlit/logger.py` exposes a `get_logger(__name__)` helper that returns a standard `logging.Logger`, and `set_log_level` supports `CRITICAL`/`ERROR`/`WARNING`/`INFO`/`DEBUG`. The log level can also be configured via the `logger.level` config option (`config.toml`, env var, or CLI flag), and the project's own contributor guide instructs internal code to use this logger. The issue body is high-level and AI-generated (note the `ai-review` label and lack of a concrete gap), so it likely duplicates existing functionality. Several open issues already track real, concrete gaps in Streamlit's logging (suppressing specific messages, writing logs to a file, conforming to Python logging standards, etc.) and are better venues for the underlying concern.\n\n### Related Issues\n\n- [#4742 \u2014 Logging strategy should follow the standard](https://github.com/streamlit/streamlit/issues/4742): Long-standing request to make Streamlit's logging configuration play nicely with the standard Python `logging` ecosystem (custom loggers, propagation, etc.) \u2014 the most direct overlap with this request.\n- [#4539 \u2014 Save logs to a text file, as a parameter in the config.toml](https://github.com/streamlit/streamlit/issues/4539): Concrete observability/log-aggregation gap (file sink configurable via `config.toml`) that this generic request would also benefit from.\n- [#11645 \u2014 Add the ability to mute/disable messages logged by the Logger](https://github.com/streamlit/streamlit/issues/11645): Related request to give users finer-grained control over Streamlit's log output, which is part of \"controlling verbosity\".\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-29T09:31:32Z",
+      "body": "[USER] this issue is also too broad to be actionable. Note the above assessment, we do have support for logging. If you have a more specific use case that is not working, please provide that. "
+    }
+  ]
+}

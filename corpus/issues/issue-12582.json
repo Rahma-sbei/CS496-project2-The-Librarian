@@ -1,0 +1,28 @@
+{
+  "id": "issue-12582",
+  "type": "issue",
+  "number": 12582,
+  "url": "https://github.com/streamlit/streamlit/issues/12582",
+  "title": "Control wrap behavior for horizontal `st.container`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.container"
+  ],
+  "created_at": "2025-09-22T00:04:51Z",
+  "closed_at": "2026-08-17T19:15:41Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nToday, `st.container(..., horizontal=True)` always wraps elements if there are too many to show them in a row. In some situations, it would be good to control whether the elements should wrap or not, e.g. through a parameter `wrap=True|False`. \n\n### Why?\n\nIn some situations, you don't want elements to wrap. \n\n### How?\n\n- Easiest solution would be a parameter `wrap: bool = True` on `st.container`. \n- We should also think about whether we want to integrate this with scrolling in some way, e.g. by doing `overflow=\"wrap\"|\"scroll\"|\"fit\"`. Could then also think through whether we'd need this for horizontal and vertical directions separately. \n- Looking at #6592, maybe we should also allow something like `wrap=\"phone\"|\"tablet\"|\"desktop\"` to wrap on different screen sizes, and have the same `wrap` parameter on `st.columns`. \n- We probably also want a `wrap` parameter on a few other elements, such as `st.markdown` to control text wrapping. \n- We also need to look into minimum widths of elements then, to make sure elements don't look weird because they become too small. \n\n### Additional Context\n\nRelated:\n\n- #5003 \n- #6592",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-09-22T00:05:02Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12582)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-17T19:49:52Z",
+      "body": "## Update\n\nStreamlit 1.63+ will allow deactivating wrapping for horizontal containers via `wrap = False`\"\n\n```python\nwith st.container(horizontal=True, wrap=False):\n    ...\n```"
+    }
+  ]
+}

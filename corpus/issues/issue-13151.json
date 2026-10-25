@@ -1,0 +1,49 @@
+{
+  "id": "issue-13151",
+  "type": "issue",
+  "number": 13151,
+  "url": "https://github.com/streamlit/streamlit/issues/13151",
+  "title": "Improve area chart type in `st.metric`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:st.metric"
+  ],
+  "created_at": "2025-11-27T20:36:31Z",
+  "closed_at": "2026-07-20T15:18:30Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nThe area chart on `st.metric` could be improved by 1) removing the bottom padding 2) allowing the axis to better adjust to the given data, like its done with the line chart type. With the current state, its very hard to see changes in data if the numbers are relatively high. \n\n<img width=\"234\"  alt=\"Image\" src=\"https://github.com/user-attachments/assets/4a3f9e15-743e-4106-88f6-92137f188127\" /> \n\n\n### Why?\n\n_No response_\n\n### How?\n\nOn the bottom padding: Just make sure charts of all types are all the exact same height, but then inside Vega Lite add extra padding in the line/bar charts to make them look better.\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-11-27T20:36:40Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-13151)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-06T21:50:41Z",
+      "body": "Hi [USER], I would like to contribute to this issue"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-12-08T10:50:03Z",
+      "body": "+1 to this. It feels like `chart_type=\"line\"` doesn't have this issue.\n\nMaybe adding support for `chart_min`, `chart_max` would be an explicit solution, otherwise all area charts tend to look very flat:\n<img width=\"800\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/4c21b4f6-bca0-4a7e-aaba-4f3372ae70a0\" />\n\nSame as ^ with chart_type=\"line\" btw:\n<img width=\"800\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/511baf33-1efb-425d-b9bf-095e0f71c5c1\" />"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-08T17:48:33Z",
+      "body": "I currently have a solution that fixes the issue of flat charts, but am still working on extending the shading with no bottom margin. \n\nShould I make a PR with my current solution? (Sorry I'm kind of new to contributing so not 100p sure on the process) "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-11T03:42:12Z",
+      "body": "Hi, I made a PR with my changes and it's referenced above. Would love a review or feedback on this."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-20T15:18:30Z",
+      "body": "We fixed the area chart in this PR: https://github.com/streamlit/streamlit/pull/15907 "
+    }
+  ]
+}

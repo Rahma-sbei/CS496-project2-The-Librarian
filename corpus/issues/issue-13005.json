@@ -1,0 +1,75 @@
+{
+  "id": "issue-13005",
+  "type": "issue",
+  "number": 13005,
+  "url": "https://github.com/streamlit/streamlit/issues/13005",
+  "title": "Integer/pixel size for `gap` parameter in `st.container` and `st.columns`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:st.container",
+    "feature:st.columns"
+  ],
+  "created_at": "2025-11-12T21:31:31Z",
+  "closed_at": "2026-07-08T13:48:58Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\n`st.container` and `st.columns` both have a `gap` parameter but it's only possible to specify small/medium/large/None. We should additionally allow setting a pixel value. \n\n### Why?\n\nI had a few situations where I wanted a tiny gap of only a few pixels. `None` felt to small and `\"small\"` felt too big. \n\n### How?\n\nJust accept an integer in addition to the existing values, similar to `width` or `height` parameters we have elsewhere. \n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-11-12T21:31:41Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-13005)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-13T12:14:44Z",
+      "body": "Hello everyone, we are two master\u2019s students from Freie Universit\u00e4t Berlin. As part of a course, we are supposed to participate in an open-source project and solve an issue. We have chosen Streamlit as our project.\n\nWe'd be happy to solve this issue. Please let us know if that's okay."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-11-15T07:53:27Z",
+      "body": "Hey [USER], go for it, feel free to open a PR! Greetings from a former TU student ;)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-08T19:43:30Z",
+      "body": "Hi, my name is Luke and I'm a junior at CMU taking a SWE course. My team has been tasked with contributing to an open source project and I would like to take on this issue."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-12-10T14:12:29Z",
+      "body": "[USER] there's already an existing PR for this (see linked above your comment) but if that doesn't get merged, feel free to make one yourself!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-24T15:09:51Z",
+      "body": "Hi! I\u2019m interested in working on this issue and can start investigating right away."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-08T15:11:57Z",
+      "body": "Hi [USER] team!\nI'd like to work on this issue (#13005).\nI'm planning to:\n- Update the frontend component to accept `gap: number | \"small\" | \"medium\" | \"large\" | None`\n- Update the Python API and type hints\n- Add a small example in the docs\n- Write a test for the new behavior\n\nThis will be my first contribution to Streamlit. Let me know if this approach sounds good or if there's any specific implementation detail I should follow. Happy to discuss!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-16T20:45:02Z",
+      "body": "I'd like to work on this \u2014 planning to support `int` and CSS string values (e.g., `16`, `\"16px\"`, `\"1rem\"`) for the `gap` parameter in both `st.columns` and `st.container`. Will follow up with a PR."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-16T21:36:29Z",
+      "body": "Hi, I've submitted a PR implementing this feature \u2014 https://github.com/streamlit/streamlit/pull/14390.\n\nThe implementation adds support for `int` and pixel string values (e.g., `\"16px\"`) for the `gap` parameter in both `st.columns` and `st.container`. Backward compatibility with `\"small\"`, `\"medium\"`, `\"large\"`, and `None` is fully preserved.\n\nHappy to iterate based on feedback!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-04-08T18:34:14Z",
+      "body": "Hi [USER], I have opened a pull request few weeks ago and still it hasn't been reviewed. Would appreciate a review when you get a chance."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-01T12:07:44Z",
+      "body": "Implemented in https://github.com/streamlit/streamlit/pull/14995 \u2014 `gap` accepts a positive int (pixels) for `st.container` and `st.columns`, plus proto/frontend wiring. CI will need `make protobuf` for generated artifacts."
+    }
+  ]
+}

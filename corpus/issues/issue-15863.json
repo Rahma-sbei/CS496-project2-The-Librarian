@@ -1,0 +1,38 @@
+{
+  "id": "issue-15863",
+  "type": "issue",
+  "number": 15863,
+  "url": "https://github.com/streamlit/streamlit/issues/15863",
+  "title": "`st.selectbox` with many options (~16k) freezes on open in 1.59.0 \u2014 forced reflow in StreamlitMarkdown (regression from 1.58.0)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "area:frontend",
+    "area:performance",
+    "status:confirmed",
+    "priority:P1",
+    "feature:st.selectbox"
+  ],
+  "created_at": "2026-07-07T08:40:04Z",
+  "closed_at": "2026-07-07T13:58:10Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nAn `st.selectbox` populated with a large number of options (~16,000) becomes effectively unusable in **1.59.0**: clicking to open the dropdown freezes the main thread for ~25 seconds. During the freeze the widget is greyed out (stale/running state) and neither clicking nor scrolling works. The same code on **1.58.0** opens the dropdown in ~0.5 s and is fully responsive.\n\nA Chrome DevTools performance trace of the open interaction shows the time is dominated by a **forced reflow / layout thrashing**, with the top contributing call frame inside **`StreamlitMarkdown`** (plus `useFloatingOverlay` from the dropdown). On 1.58.0 the \"Forced reflow\" insight does not appear at all for the same interaction.\n\nThis looks like a rendering regression in how selectbox options are rendered in 1.59.0 (each option appears to go through the Markdown renderer). The 1.59 changelog includes a \"fix selectbox format_func object-identity\" change (#15618) which touches this code path.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\n# ~16k options, with a trivial format_func (mirrors a real destination-search selectbox)\noptions = [f\"{40000 + i} - LOCATION NAME {i}\" for i in range(16000)]\n\nchoice = st.selectbox(\n    \"Search destination\",\n    options=options,\n    index=None,\n    format_func=lambda o: o,\n)\nst.write(choice)\n```\n\n### Steps To Reproduce\n\n\n1. Run the app above with **streamlit==1.59.0**.\n2. Click the selectbox to open the dropdown.\n3. Observe the widget greys out and the tab freezes for ~25 s (no click / no scroll).\n4. Downgrade to **streamlit==1.58.0**, rerun, repeat: the dropdown opens in ~0.5 s and is responsive.\n\n### Expected Behavior\n\n\nOpening a selectbox with a large option list should stay responsive (as it does in 1.58.0 \u2014 ~0.5 s to open), without freezing the main thread.\n\n### Current Behavior\n\nOn 1.59.0 the open interaction blocks the main thread ~25 s. Measured with Chrome DevTools (Performance):\n\n- 1.58.0: interaction (INP) ~495 ms, no \"Forced reflow\" insight, widget stays interactive (white).\n- 1.59.0: ~26 s of blocked main thread, \"Forced reflow\" insight ~4.4 s, top frame inside `StreamlitMarkdown` (+ `useFloatingOverlay`); widget greyed out / not clickable.\n\nReproduced with the minimal snippet above **in isolation** (no other app code): on 1.59.0 the selectbox never becomes interactive on open (stays greyed ~25 s); on 1.58.0 it opens immediately.\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:- Streamlit version: 1.59.0 (vs 1.58.0 OK)\n- Python version: 3.13\n- Operating System: Windows 11\n- Browser: Chrome\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\nThe forced reflow is dominated by `StreamlitMarkdown` \u2014 each of the ~16k options appears to be rendered through the Markdown renderer, and combined with the dropdown's `useFloatingOverlay` (which reads layout geometry) this triggers heavy synchronous layout on open. Suspected related change: #15618 (\"fix selectbox format_func object-identity\"), which modified the selectbox option render path in 1.59.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-07T08:40:13Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15863)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-07T08:57:30Z",
+      "body": "This is a **frontend performance regression** in `st.selectbox` introduced in **1.59.0**: opening a dropdown backed by a very large option list (~16k) freezes the main thread for many seconds.\n\n**Likely root cause (not the PR the reporter suspected).** The regression is almost certainly [#15438 \u2014 *Remove `BaseWeb` for `selectbox`*](https://github.com/streamlit/streamlit/pull/15438), which shipped in 1.59.0 (confirmed: present in `1.59.0`, absent in `1.58.0`). The old BaseWeb dropdown rendered options through `VirtualDropdown` using `react-window`'s `FixedSizeList`, so only the handful of visible rows were mounted. The new `react-aria-components` `ComboBox` implementation (`frontend/lib/src/components/shared/Dropdown/Selectbox.tsx`) renders **every** option at once via `displayOptions.map(...)` into `StyledListBoxItem`s \u2014 i.e. ~16k DOM nodes are created synchronously on open. Combined with the new `useFloatingOverlay` hook (floating-ui `flip`/`shift`/`size` + `autoUpdate`, added in [#15638](https://github.com/streamlit/streamlit/pull/15638)) that reads layout geometry to position the popover, this produces the \"Forced reflow\" / layout-thrashing the DevTools trace shows.\n\nThe reporter's suspected PR [#15618](https://github.com/streamlit/streamlit/issues/15618) / [#15639](https://github.com/streamlit/streamlit/pull/15639) (\"format_func object-identity\") is likely a **red herring** \u2014 that change is Python-side selection resolution and doesn't touch option rendering. The `StreamlitMarkdown` frame in the trace is most likely the widget label (or imprecise profiler attribution); the dominant cost is the un-virtualized option list. A fix should restore list virtualization for the selectbox (and likely multiselect) dropdown.\n\n### Related Issues\n\n- [#7104 \u2014 Allow developer to limit the max number of results to show in the `st.selectbox` dropdown to improve widget performance](https://github.com/streamlit/streamlit/issues/7104): Directly describes the same underlying problem \u2014 rendering thousands of DOM elements for large option lists slows the browser. Most closely related.\n- [#12260 \u2014 Regression: Selectbox/Multiselect keyboard focus not activating on mobile](https://github.com/streamlit/streamlit/issues/12260): Another confirmed regression in the same `st.selectbox`/`st.multiselect` widgets, indicating the dropdown rewrite has introduced regressions in this area.\n- [#12090 \u2014 Slow Rendering Of Large Pages (Many Widgets)](https://github.com/streamlit/streamlit/issues/12090): Broader frontend rendering-performance issue caused by high DOM element counts; same class of bottleneck.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-08T11:48:37Z",
+      "body": "## Update\n\nThis will be fixed in the patch 1.59.1 that will be released today."
+    }
+  ]
+}

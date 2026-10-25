@@ -1,0 +1,38 @@
+{
+  "id": "issue-12980",
+  "type": "issue",
+  "number": 12980,
+  "url": "https://github.com/streamlit/streamlit/issues/12980",
+  "title": "Support real-time chart updates without rerunning the entire script",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:runtime"
+  ],
+  "created_at": "2025-11-08T09:05:23Z",
+  "closed_at": "2026-09-26T15:04:25Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nCurrently, Streamlit requires rerunning the entire script to refresh visual elements such as charts or plots.\nThis feature request suggests adding native support for incremental or real-time updates to chart components, allowing smoother dashboards for live data without script reruns.\n\n### Why?\n\nI often build dashboards with data that changes every few seconds (e.g. IoT sensors, live logs, financial data).\nThe current rerun mechanism makes the app flicker and consume excessive CPU, as every update forces Streamlit to re-execute all widgets and scripts.\nA lighter update mechanism would make Streamlit much more efficient for real-time applications.\n\n### How?\n\nIntroduce a new method, for example:\n\nchart = st.line_chart(initial_data)\nchart.update(new_data)\n\n\nor a context manager such as:\n\nwith st.chart(\"my_chart\") as chart:\n    chart.update(data)\n\n\nThis would allow partial UI updates for selected components instead of full script reruns, leading to faster refresh rates and better performance.\n\n### Additional Context\n\nThis feature would be highly valuable for real-time dashboards and data streaming use cases.\nSimilar functionality exists in libraries like Plotly Dash (dcc.Interval) or Bokeh Server.\nDiscussion inspiration: Streamlit Community Forum \u2013 Real-time dashboard performance",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-11-08T09:05:33Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12980)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-08T09:29:49Z",
+      "body": "https://docs.streamlit.io/develop/api-reference/execution-flow/st.fragment"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-08T10:37:37Z",
+      "body": "[USER] as an update on this, in 1.63 we released a feature allowing targeted runs of fragments from callbacks, so you could now create a refresh button that will update only your charts without re-running the entire script. \n\nFor example, \n\n```\nimport streamlit as st\nst.title(\"Live sensor dashboard\")\n# Expensive setup outside the fragment \u2014 not re-executed on refresh.\nconn = get_sensor_connection()\n[USER].fragment(key=\"charts\")\ndef charts():\n    st.line_chart(conn.read_recent())\ncharts()\n# The button lives outside the fragment; clicking it reruns only \"charts\".\nst.button(\"Refresh charts\", on_click=lambda: st.rerun(\"charts\"))\n```\n\nI am wondering also if you have tried `run_every` with fragments to refresh only the charts on an interval?\n\n```\n[USER].fragment(run_every=\"2s\")\ndef live_chart():\n    st.line_chart(conn.read_recent())\nlive_chart()\n```\n\nI'm leaving this issue open since this is talking more about automatic updates based on data changes instead of user events. This is something we are also working on supporting -- curious to see how close `run_every` alone would meet your use case and whether there are gaps still. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-26T15:04:25Z",
+      "body": "[USER] I am doing a gap analysis of your issue, and I believe this pattern is now covered by various shipped features and bug fixes (scroll to top). \n\nI made a demo app here: https://live-operator-demo.streamlit.app/\n\nIt also shows how to implement this pattern with code example for anyone interested in implementing an app like this. \n\nPolling updates that only re-run the charts:\n\n```\nimport streamlit as st\n\n# Expensive, one-time setup lives OUTSIDE the fragment, so it runs once and is\n# not repeated on every refresh.\n[USER].cache_resource\ndef get_connection():\n    return connect_to_feed()\n\nconn = get_connection()\n\n# Anything in the main script body (title, filters, a text input) runs once and\n# stays put while the tiles below refresh on their own.\nst.text_input(\"Operator notes\")\n\n# Each tile reruns on its OWN timer \u2014 only the tile re-executes, not the script.\n[USER].fragment(run_every=\"1s\")\ndef price_tile(symbol):\n    df = conn.read_recent(symbol)            # fetch latest for this tile\n    st.metric(symbol, f\"${df['price'].iloc[-1]:,.2f}\")\n    st.line_chart(df, x=\"time\", y=\"price\")\n\nfor col, sym in zip(st.columns(3), [\"BTC-USD\", \"ETH-USD\", \"SOL-USD\"]):\n    with col:\n        price_tile(sym)\n```\n\nI wanted to build this out to ensure there is no flickering or scrolls and I don't see any -- as mentioned above, I believe we have fixed some bugs that were likely affecting this for you. \n\nIf anyone has any remaining gaps around this pattern, please comment here and tag me or create a new issue. \nI have also opened two new issues about more specific related aspect: a [freshness signal](https://github.com/streamlit/streamlit/issues/17141) and [server-driven updates](https://github.com/streamlit/streamlit/issues/17142). "
+    }
+  ]
+}

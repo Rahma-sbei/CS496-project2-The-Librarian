@@ -1,0 +1,76 @@
+{
+  "id": "issue-6969",
+  "type": "issue",
+  "number": 6969,
+  "url": "https://github.com/streamlit/streamlit/issues/6969",
+  "title": "Bad message format error when using containers",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.session_state",
+    "feature:st.container"
+  ],
+  "created_at": "2023-07-10T01:43:36Z",
+  "closed_at": "2026-07-16T11:46:47Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nI ran into an error when using st.container to create a `text_area` object only if a `text_input` object had some input from the user.\r\nHowever, after I enter some input into the `text_area`, I see an error that says \"Bad message format\" and \"Bad 'setIn' index 4 (should be between [0, 2])\"\r\n\r\n![error](https://github.com/streamlit/streamlit/assets/10709215/0c89e70d-feb0-4da1-85bf-0321c793c3a8)\r\n\r\n\r\n### Reproducible Code Example\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-6969)\r\n\r\n```Python\r\nimport streamlit as st\r\n\r\nif \"new_note\" not in st.session_state:\r\n    st.session_state[\"new_note\"] = st.container()\r\n\r\nwith st.session_state.new_note:\r\n    title = st.session_state.new_note.text_input(\"Title for your note\")\r\n    if title is not None and len(title) > 0:\r\n        content = st.session_state.new_note.text_area(\"Content for your note\")\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n1. Visit the Streamlit app in the browser\r\n2. Fill some random content in the box that says \"Title for your note\" and hit Enter\r\n3. Fill some random content in the box that says \"Content for your note\" and hit Ctrl + Enter\r\n\r\n### Expected Behavior\r\n\r\nExpected the code to run without errors.\r\n\r\n### Current Behavior\r\n\r\nError message shown on screen is as follows\r\n```\r\nBad message format\r\nBad 'setIn' index 4 (should be between [0, 2])\r\n```\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version:\r\n- Python version:\r\n- Operating System:\r\n- Browser:\r\n- Virtual environment:\r\n\r\n\r\n### Additional Information\r\n\r\n_No response_\r\n\r\n### Are you willing to submit a PR?\r\n\r\n- [x] Yes, I am willing to submit a PR!",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-07-10T11:45:12Z",
+      "body": "[USER] Thanks for reporting this issue. I was able to reproduce this [here](https://issues.streamlit.app/?issue=gh-6969). The general issue here is that it's currently not supported to store streamlit elements (e.g. `st.container`) in session state. So you might need to restructure your app without using the session state to store the container. But in general, we probably should show a warning with an explanation if someone stores a container in the session state. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-07-12T09:04:45Z",
+      "body": "I am also getting a very similiar error when using the new StreamlitCallbackHandler from LangChain (https://blog.streamlit.io/langchain-streamlit/) together with a chain (as opposed to an agent).\r\n\r\nLLM:\r\n`\r\nllm = OpenAI(client=OpenAI, model='text-davinci-003', streaming=True, callbacks=[StreamlitCallbackHandler(message_placeholder)], temperature=0, max_tokens=1024, verbose=True)\r\n`\r\n\r\nchain:\r\n`\r\nchain = RetrievalQAWithSourcesChain.from_chain_type(llm=llm, chain_type='stuff', retriever=docsearch.as_retriever())\r\n`\r\n\r\nanswer:\r\n`\r\nmessage_placeholder = st.container()\r\nanswer = st.session_state['chain']({'question': user_input}, return_only_outputs=True)\r\nst.session_state.generated_text.append(answer)\r\n`\r\n\r\nFor the first question everything works fine (streaming works), when asking for a second question the following error pops up:\r\n\r\n> Bad message format\r\n> Bad 'setIn' index 1 (should be between [0, 0])"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-01-16T15:57:04Z",
+      "body": "[USER] Did you find a solution for this? I'm also getting this in `StreamlitCallbackHandler `."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-08-08T02:14:57Z",
+      "body": "Is there a solution to this problem?  I am getting it in apps without containers, with streaming output from openai models"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-08-08T12:35:19Z",
+      "body": "I downgraded my streamlit to 1.30.0 and the problem went away"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-18T12:11:38Z",
+      "body": "I am encoutering the same problem now with version 1.39 it used to work with 1.38 I think."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-23T11:27:09Z",
+      "body": "I have the same issue with streamlit 1.39, using the `StreamlitCallbackHandler`. I'll try downgrading but this needs fixing.\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T12:55:14Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-6969)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-09-03T14:28:10Z",
+      "body": "Encountering this issue with version 1.42"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-31T15:01:48Z",
+      "body": "This is a bug involving the interaction between `st.container` and `st.session_state`. The issue occurs when a container is stored in session state and reused to create widgets dynamically. The root cause appears to be a **delta path synchronization issue**: when a container is stored in `st.session_state`, its cursor and delta path are captured at that moment. When the container is reused in subsequent script runs, the delta path becomes stale because the frontend's element tree structure has changed. This causes the \"Bad 'setIn' index X (should be between [0, Y])\" error in `SetNodeByDeltaPathVisitor.ts` when attempting to set elements at invalid indices. The error is surfaced as \"Bad message format\" in the UI via the error handler in `App.tsx`.\n\n### Related Issues\n\n- **#5402** - [\"Bad 'setIn' index XX\" when using st.cache_data in thread](https://github.com/streamlit/streamlit/issues/5402) - **Highly related**. Same underlying frontend error (\"Bad 'setIn' index\") occurring in a different context (threaded caching with spinners). Both issues suggest problems with delta path synchronization when elements are created outside the normal script flow.\n\n- **#12762** - [Key is ignored when using fragments and containers](https://github.com/streamlit/streamlit/issues/12762) - Related. This involves containers with fragments where widget keys don't behave correctly, leading to duplicate elements. Similar pattern of container + dynamic content issues.\n\n- **#5044** - [empty() does not remove cleared elements](https://github.com/streamlit/streamlit/issues/5044) - Related. Another container state management bug where `st.empty()` doesn't properly clean up internal widget state, leading to synchronization issues between the frontend and backend element trees.\n\n---\n*This is an automated triage comment. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-16T11:46:47Z",
+      "body": "Closing this since storing containers in session state is not supported, and likely will never be supported. "
+    }
+  ]
+}

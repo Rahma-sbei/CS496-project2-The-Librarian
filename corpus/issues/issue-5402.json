@@ -1,0 +1,42 @@
+{
+  "id": "issue-5402",
+  "type": "issue",
+  "number": 5402,
+  "url": "https://github.com/streamlit/streamlit/issues/5402",
+  "title": "\"Bad 'setIn' index XX (should be between [0, X])\" when using st.cache_data in thread",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:cache",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.spinner",
+    "area:threading/processing"
+  ],
+  "created_at": "2022-09-22T13:42:35Z",
+  "closed_at": "2026-07-16T11:37:13Z",
+  "body": "### Summary\r\n\r\nIf fetching data from multiple sources, it can be tempting to run code concurrently as well as cache the results.  However, this causes problems when using st.experimental_memo.  It results in the error:\r\n\r\n\"Bad 'setIn' index XX (should be between [0, X])\"\r\n\r\n### Steps to reproduce\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-5402)\r\n\r\nThe following code should show it quite clearly:\r\n\r\n```python\r\nimport logging\r\nimport time\r\nimport threading\r\nimport streamlit as st\r\n\r\nfrom streamlit.runtime.scriptrunner import add_script_run_ctx\r\n\r\n[USER].experimental_memo(ttl=1)\r\ndef function1(interval):\r\n    interval = interval/4\r\n    logging.info(\"sleeping for %s seconds\", interval)\r\n    time.sleep(interval)\r\n    logging.info(\"done sleeping for %s seconds\", interval)\r\n    return interval\r\n\r\n\r\ndef main():\r\n    format = \"%(asctime)s: %(message)s\"\r\n    logging.basicConfig(format=format)\r\n\r\n    threads = []\r\n    for index in range(25):\r\n        x = threading.Thread(target=function1, args=(index,))\r\n        # Hack to remove the following logging messages:\r\n        #    `Thread 'Thread-123': missing ScriptRunContext`\r\n        # see https://github.com/streamlit/streamlit/issues/1326\r\n        add_script_run_ctx(x)\r\n        threads.append(x)\r\n        x.start()\r\n\r\n    logging.info(\"Waiting for threads to finish\")\r\n    for thread in threads:\r\n        thread.join()\r\n\r\n    logging.info(\"done\")\r\n    st.write(\"done\")\r\n\r\n\r\nif __name__ == \"__main__\":\r\n    main()\r\n```\r\n\r\n\r\n**Expected behavior:**\r\n\r\nThe threaded function should be run.  No error should be shown.\r\n\r\n\r\n**Actual behavior:**\r\n\r\nThe function runs fine.  The data is cached.   But, the frontend fails with an ugly error message:\r\n\r\n\"Bad 'setIn' index XX (should be between [0, X])\"\r\n\r\n\r\n### Is this a regression?\r\n\r\nI don't think so\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.12.2\r\n- Python version: 3.9.13\r\n- Using Conda? PipEnv? PyEnv? Pex?  Poetry\r\n- OS version: Mac OSx 12.2.1\r\n- Browser version:  Chrome 104.0.5112.101\r\n\r\n### Additional information\r\n\r\nThis appears to be caused by st.experimental_memo defaulting to showing a spinner while it's running.  If you change line 8 to: `[USER].experimental_memo(ttl=1, show_spinner=False)` the error does not happen. \r\n\r\n<img width=\"577\" alt=\"image\" src=\"https://user-images.githubusercontent.com/2852129/195096902-33822771-605e-430d-81b6-4d05a3f4cbd6.png\">\r\n\r\n<img width=\"522\" alt=\"image\" src=\"https://user-images.githubusercontent.com/2852129/195096997-27b5f9a9-da95-4ae1-b57c-3617f88bc700.png\">",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2022-10-11T13:02:21Z",
+      "body": "[USER] Thanks for reporting this issue! I was able to reproduce the issue [here](https://issues.streamlitapp.com/?issue=gh-5402). \r\n\r\nThe error message comes from the following line, but I'm not sure about the root cause of the issue:\r\n\r\nhttps://github.com/streamlit/streamlit/blob/7550b6e2edfdc2c3a11fd6b68d8e64541963237a/frontend/src/lib/AppNode.ts#L387\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-06-06T16:03:37Z",
+      "body": "This also occurs with cache_data now that experimental_memo is out of beta. I get the error popup a lot. Is it possible to hide the error?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T13:00:40Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-5402)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-16T11:37:13Z",
+      "body": "Closing this since I believe this has been fixed with the transient spinner update."
+    }
+  ]
+}

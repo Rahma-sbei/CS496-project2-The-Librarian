@@ -1,0 +1,30 @@
+{
+  "id": "issue-5616",
+  "type": "issue",
+  "number": 5616,
+  "url": "https://github.com/streamlit/streamlit/issues/5616",
+  "title": "Bring back colored borders for `st.info`, `st.success`, `st.warning` and `st.error` to improve visibility",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:layout",
+    "area:frontend",
+    "area:styling"
+  ],
+  "created_at": "2022-10-27T21:00:59Z",
+  "closed_at": "2026-07-22T09:24:41Z",
+  "body": "### Problem\r\n\r\n- Today I updated to a more recent version (1.14.0) of Streamlit and the alerts/notifications (`st.info`, `st.success`, `st.warning`, `st.error`) do not have borders anymore.\r\n- For those of us with some difficulty to distinguish colors, the borders really helped. `st.warning` is the trickiest one to see in my case, both in the main area as well as in the sidebar, followed by `st.success`.\r\n- I tried adding borders using the CSS markdown trick, but haven't found a way to add a different border color depending on alert type.\r\n\r\n### Example\r\n\r\n```\r\n# Using streamlit 1.14.0\r\nimport streamlit as st\r\n\r\n\r\n# CSS markdown trick to add border - cannot achieve different border colors depending on alert type\r\nst.markdown(\"\"\"\r\n<style>\r\n    .stAlert {border-style: solid; border-radius: 5px; border-width: 1px; border-color:darkblue;}\r\n</style>\r\n\"\"\",unsafe_allow_html=True)\r\n\r\n\r\n# Streamlit Alerts in sidebar\r\nwith st.sidebar:\r\n    st.info('Info')\r\n    st.success('Success')\r\n    st.warning('Warning')\r\n    st.error('Error')\r\n\r\n\r\n# Streamlit Alerts in main area\r\nst.info('Info')\r\nst.success('Success')\r\nst.warning('Warning')\r\nst.error('Error')\r\n\r\n```\r\n\r\n### Solution\r\n\r\n**MVP:** A CSS markdown trick example on how to add different border colors depending on alert type.\r\n\r\n**Preferred solution:** Bring back the colored borders for `st.info`, `st.success`, `st.warning` and `st.error`.\r\n\r\n### Voting for feature requests\r\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\r\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-10-28T11:53:48Z",
+      "body": "Just a note: The border around alert elements were removed in #4964 and were present last in `streamlit==1.11.1` "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-10-28T12:15:34Z",
+      "body": "Thanks for the clarification and the pointer to the specific pull request, appreciate it."
+    }
+  ]
+}

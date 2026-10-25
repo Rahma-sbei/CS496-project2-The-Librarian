@@ -1,0 +1,31 @@
+{
+  "id": "issue-11950",
+  "type": "issue",
+  "number": 11950,
+  "url": "https://github.com/streamlit/streamlit/issues/11950",
+  "title": "`theme.dataframeHeaderBackgroundColor` shows incorrect color and changing appearance when it includes an alpha value",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:st.dataframe",
+    "status:confirmed",
+    "priority:P3",
+    "upstream"
+  ],
+  "created_at": "2025-07-16T04:42:59Z",
+  "closed_at": "2026-07-29T03:26:48Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nAlthough including transparency in theme colors isn't recommended, the dataframe headers are incorrect to a greater extreme than some overlapping color: The header initially appears almost black and then changes to the designated colors (sans transparency) as you hover over it.\n\nhttps://github.com/user-attachments/assets/37dd4ce9-ac02-4a55-88eb-0b7355a2e317\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nst.dataframe({\"A\": [1, 2, 3], \"B\": [4, 5, 6]}, on_select=\"rerun\")\n```\n\n### Steps To Reproduce\n\n```\n#config.toml\n[theme]\ndataframeHeaderBackgroundColor = \"#FF00001a\"\n```\n1. Run the app.\n2. Move the cursor on and off the header to see the color change.\n\n### Expected Behavior\n\nThe header color should be consistent. Some slightly different colors from overlapping transparent layers might be expected, but not a drastic color shift from almost black.\n\n### Current Behavior\n\nThe color shifts from near black to the equivalent color without the alpha layer in the header of the dataframe (as you hover-unhover repeatedly).\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.46.2.dev20250714\n- Python version: 3.13\n- Operating System: Mac\n- Browser: Prisma\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-16T04:43:13Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11950)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-16T04:55:29Z",
+      "body": "Note: changes to the configuration option seems to be more dependent on restarting the session to reflect the change, which may be due the complexity of the dataframe. I wonder if there is a common underlying issue here. Although we may not want to invest in supporting transparency exactly, we should still want a good developer experience where theming configuration changes reflect without needing reboots or new sessions."
+    }
+  ]
+}

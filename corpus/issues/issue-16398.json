@@ -1,0 +1,32 @@
+{
+  "id": "issue-16398",
+  "type": "issue",
+  "number": 16398,
+  "url": "https://github.com/streamlit/streamlit/issues/16398",
+  "title": "Custom `secondaryBackgroundColor`/`backgroundColor` not applied to derived `codeBackgroundColor` and `dataframeHeaderBackgroundColor`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:st.dataframe",
+    "status:confirmed",
+    "priority:P3",
+    "feature:theming",
+    "feature:st.code"
+  ],
+  "created_at": "2026-08-06T23:35:09Z",
+  "closed_at": "2026-08-07T19:38:41Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen you set a custom `theme.secondaryBackgroundColor` and/or `theme.backgroundColor` (but don't set `theme.codeBackgroundColor` / `theme.dataframeHeaderBackgroundColor`), code blocks and dataframe headers still use the default derived colors from the base theme instead of recomputing them from the custom colors.\n\nBy default, both `codeBackgroundColor` and `dataframeHeaderBackgroundColor` should be `bgMix` = a 50/50 mix of `backgroundColor` and `secondaryBackgroundColor`. That derivation happens correctly in `createEmotionColors`, but then gets overwritten with the base theme value.\n\n### Reproducible Code Example\n\n`.streamlit/config.toml`:\n\n```toml\n[theme]\nbackgroundColor = \"#ffffff\"\nsecondaryBackgroundColor = \"#FAFAF9\"\n```\n\n```Python\nimport streamlit as st\n\nst.code(\"print('hello')\")\nst.dataframe({\"a\": [1, 2, 3]})\n```\n\n### Steps To Reproduce\n\n1. Set the theme config above\n2. Run the app\n3. Inspect the code block background color\n\n### Expected Behavior\n\nCode background should be the mix of `#ffffff` and `#FAFAF9`, i.e. roughly `#FDFDFC`.\n\n### Current Behavior\n\nCode background is `#F8F9FB`, which is the *default* `bgMix` (`mix(#ffffff, #f0f2f6, 0.5)`), ignoring the custom `secondaryBackgroundColor`.\n\nSame issue for dataframe header background (`dataframeHeaderBackgroundColor`).\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: develop\n- Python version:\n- Operating System:\n- Browser:\n\n### Additional Information\n\nRoot cause in `frontend/lib/src/theme/utils.ts` (`createEmotionTheme`):\n\n```ts\nconditionalOverrides.colors.codeBackgroundColor =\n  codeBackgroundColor ?? colors.codeBackgroundColor\n\nconditionalOverrides.colors.dataframeHeaderBackgroundColor =\n  dataframeHeaderBackgroundColor ?? colors.dataframeHeaderBackgroundColor\n```\n\n`colors` here is the *base* theme's colors, so when the config option isn't set, we throw away the correctly derived value from `createEmotionColors(newGenericColors)` and replace it with the base default.\n\nContrast with the correct pattern used for `link` / `codeTextColor` a few lines below:\n\n```ts\nconditionalOverrides.colors.link =\n  linkColor ?? conditionalOverrides.colors.blueTextColor\n\nconditionalOverrides.colors.codeTextColor =\n  codeTextColor ?? conditionalOverrides.colors.greenTextColor\n```\n\nThese two (`codeBackgroundColor` and `dataframeHeaderBackgroundColor`) seem to be the only instances of this bug \u2014 other derived colors from `bgMix` (e.g. `darkenedBgMix*`) are not overwritten and should pick up the custom colors correctly.\n\nFix should be something like:\n\n```ts\nconditionalOverrides.colors.codeBackgroundColor =\n  codeBackgroundColor ?? conditionalOverrides.colors.codeBackgroundColor\n\nconditionalOverrides.colors.dataframeHeaderBackgroundColor =\n  dataframeHeaderBackgroundColor ??\n  conditionalOverrides.colors.dataframeHeaderBackgroundColor\n```",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-06T23:36:06Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16398)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-07T11:37:35Z",
+      "body": "Confirmed bug in theme color derivation: when `theme.backgroundColor` / `theme.secondaryBackgroundColor` are customized but `codeBackgroundColor` / `dataframeHeaderBackgroundColor` are left unset, those surfaces keep the base-theme `bgMix` instead of the mix of the custom colors. Root cause is in `frontend/lib/src/theme/utils.ts` (`createEmotionTheme`): after `createEmotionColors(newGenericColors)` correctly derives `bgMix`-based values, the overrides fall back to the base theme\u2019s `colors.codeBackgroundColor` / `colors.dataframeHeaderBackgroundColor` instead of the newly derived `conditionalOverrides.colors.*` (unlike the correct pattern used for `link` / `codeTextColor`). Fix is a one-line fallback change for each property; existing unit tests only cover empty config or explicit overrides, so they miss this case.\n\n### Related Issues\n\n- [#11950](https://github.com/streamlit/streamlit/issues/11950) \u2014 Same `dataframeHeaderBackgroundColor` theme option; different failure mode (incorrect rendering when the value includes alpha).\n- [#11933](https://github.com/streamlit/streamlit/issues/11933) \u2014 Same header background theme option; styling does not extend through the scrollbar region.\n- [#11348](https://github.com/streamlit/streamlit/issues/11348) \u2014 Custom `backgroundColor` / `secondaryBackgroundColor` not applied consistently to derived UI surfaces (multiselect dropdown).\n\nNo exact duplicate found.\n\n---\n*This is an automated triage comment using `cursor-grok-4.5-high`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

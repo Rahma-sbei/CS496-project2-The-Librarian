@@ -1,0 +1,37 @@
+{
+  "id": "issue-17522",
+  "type": "issue",
+  "number": 17522,
+  "url": "https://github.com/streamlit/streamlit/issues/17522",
+  "title": "Bug: Update a toast message example fails, even on docs page",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "area:frontend",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.toast"
+  ],
+  "created_at": "2026-10-17T01:11:23Z",
+  "closed_at": "2026-10-20T18:00:47Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nExample 3: Update a toast message on the st.toast documentation page fails. The first toast shows but does not update. Regression came about in 1.59 as part of #15523. Also related to #16498.\n\n### Reproducible Code Example\n\n```Python\nimport time\nimport streamlit as st\n\ndef cook_breakfast():\n    msg = st.toast(\"Gathering ingredients...\")\n    time.sleep(1)\n    msg.toast(\"Cooking...\")\n    time.sleep(1)\n    msg.toast(\"Ready!\", icon=\"\ud83e\udd5e\")\n\nif st.button(\"Cook breakfast\"):\n    cook_breakfast()\n```\n\n### Steps To Reproduce\n\n1. Run the code\n2. Click the button\n3. Watch as the toast does not update\n\n### Expected Behavior\n\nWatch as the toast updates to reflect the new message.\n\n### Current Behavior\n\nNo error message in either the python or in the browser console. \n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.66\n- Python version: 3.15\n- Operating System: 15.8.1 (24H32)\n- Browser: Firefox and Chrome\n\n\n### Additional Information\n\nUsed to work in 1.58 but not 1.59",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-17T01:11:31Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-17522)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-17T10:03:22Z",
+      "body": "This is a regression in the documented `st.toast` update pattern (`msg = st.toast(...); msg.toast(...)`), including Example 3 on the docs page. The first toast appears, later calls produce no Python or browser error, and the visible text never changes. The backend still does the right thing: `st.toast` returns a `DeltaGenerator` locked to that element (`Cursor.lock_element`), so `msg.toast()` overwrites the same delta path within the run.\n\nThe break matches 1.59 / [#15523](https://github.com/streamlit/streamlit/pull/15523). That change replaced BaseWeb with React Aria\u2019s `toastQueue` and dropped the old `toaster.update()` effect that pushed body and icon changes into an already-visible toast. `Toast` now calls `toastQueue.add` only on mount (`useEffect` with `[]` in `frontend/lib/src/components/elements/Toast/Toast.tsx`). Within one run the node keeps the same `scriptRunId` key, so React updates props in place and the effect never runs again. On 1.66, [#16498](https://github.com/streamlit/streamlit/pull/16498) adds a second guard: if a toast with the same `toastId` (the delta path) is already in `toastQueue.visibleToasts`, the effect returns and keeps the original content. A fix needs to write the new body and icon into the existing queue entry, while still avoiding a duplicate when a rerun re-emits the same toast. No other open issue reports this update failure.\n\n### Related Issues\n\n- [#7740](https://github.com/streamlit/streamlit/issues/7740) (closed by [#16498](https://github.com/streamlit/streamlit/pull/16498)): toasts disappeared when `st.rerun()` followed `st.toast()`. The fix keeps the toast alive across remounts and skips a second enqueue when that delta path is already visible, which also drops a real in-place `msg.toast()` update.\n- [#15523](https://github.com/streamlit/streamlit/pull/15523): removed the BaseWeb toaster, including the effect that applied body and icon changes to a toast that was already showing. This is the 1.59 change; the docs example worked in 1.58.\n\n---\n*This is an automated triage comment using `grok-4.7-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-10-17T17:10:57Z",
+      "body": "I've gone ahead and tried to fix the bug. I've interacted with the 1.58, 1.59, 1.66 and proposed fixes. The proposed bug version appears to replicate the 1.58 behavior though I know there was an issue that changed how toast behave during a re-run and I haven't tested that explicitly. \n\n:robot: _AI text below_ :robot:\n\n## Root cause\n\n#15523 (released in 1.59.0) replaced the BaseWeb toaster with react-aria's `ToastQueue`. The BaseWeb version had a `toaster.update` effect, and `msg.toast(...)` relied on it to update the toast already on screen.\n\n`ToastQueue` has no update API (only `add`, `close`, `pauseAll`, `resumeAll` and `clear`), and the `Toast` component only calls `add` on mount. When `msg.toast(...)` re-sends the element at the same delta path in the same run, the new props reach the component but are never applied, so the first toast stays on screen until it expires.\n\n1.58.0 is the last release where the docs example works. There, each update replaced the toast's content in place and restarted its 4s timer.\n\n## Open design question: interaction with #16498\n\n#16498 (for #7740) de-duplicates a toast that a new run re-emits at the same position while it's still visible. The existing toast and its timer are kept, whatever the new content is.\n\nThat also affects the docs example. If you click \"Cook breakfast\" again while \"Ready!\" is still showing, the new run's \"Gathering ingredients...\" is treated as a duplicate and suppressed. In 1.58, a second click restarted the sequence.\n\nOne way to keep both behaviors: compare the new content with what is on screen.\n- **Identical body, icon and duration:** leave the toast and its timer alone, as #16498 does. An unconditional `st.toast(\"Saved\")` still expires 4s after it first appeared, across reruns.\n- **Different content:** replace the toast and restart its timer, as 1.58 did.\n\n## Reference implementation\n\nI tried that approach in [one commit on my fork](https://github.com/streamlit/streamlit/compare/develop...tabedzki:streamlit:tabedzki/fix/toast-update-in-place), in case it's useful.\n\n**How it works:**\n- A small store holds each visible toast's current content and is read by `StreamlitToastItem`. Each update replaces the content and restarts the timer, keeping the toast's stack position and expanded state.\n- Dismissed or expired toasts are not shown again, as the docstring says.\n\n**Testing:** it includes Vitest tests, plus two E2E tests that fail on `develop` and pass with the change.\n\n**Differences from 1.58:**\n- The restarted timer uses the update's `duration`.\n- Switching between a timed and an infinite duration replaces the toast, because react-aria fixes the timer when the toast is created.\n"
+    }
+  ]
+}

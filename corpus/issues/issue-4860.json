@@ -1,0 +1,29 @@
+{
+  "id": "issue-4860",
+  "type": "issue",
+  "number": 4860,
+  "url": "https://github.com/streamlit/streamlit/issues/4860",
+  "title": "Allow sharing of Streamlit apps through JupyterHub",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:deployment",
+    "status:unlikely"
+  ],
+  "created_at": "2022-06-13T08:36:43Z",
+  "closed_at": "2026-07-22T10:20:20Z",
+  "body": "**Problem.**\r\nWorking in a Jupyter Hub environment the best way to share applications/dashboards across an organization is to render them with voila and share the link to whoever needs it. Moreover, in such structure its always possible to run your streamlit solution in a port of your k8s instance, but that port if of course not accessible to other users.\r\n\r\n**Solution.**\r\nUsing https://cdsdashboards.readthedocs.io/en/stable/ ContainDS to do that is in theory possible. \r\nIt looks to me that containDS is a separate project to streamlit.\r\n\r\n**Additional context.**\r\nThis thread shows how some organizations already use such approach for panel, one of the big four:\r\nhttps://twitter.com/JamesABednar/status/1535371689323896842?s=20&t=sbk7MWdigcZbzl1ywmU78w\r\n\r\n**Request/Question.**\r\nIs there any specific documentation regarding rendering streamlit with voila in a Jupyter Hub environement?\r\n\r\n**Comment:**\r\nBeing streamlit one of the most powerful dashboards frameworks it is so far out of scope for us since the first requirement is \"sharability\" via urls, within the jupyterhub  since it has to be transparent to several thousands of people who do not even know what python is (I.e. forgot about asking them to open the terminal to do this or that to fire a streamlit app)\r\n\r\n### Voting for feature requests\r\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\r\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2022-10-14T11:38:42Z",
+      "body": "[USER] Thanks for reporting this issue. I don't think we currently have any official support for JupyterHub. But there might be ways to make it work - not sure. I have renamed the issue since this might require a dedicated project to better support JupyterHub-based deployments.\r\n\r\nFor other users reading this enhancement: please upvote the issue (\ud83d\udc4d) if you also want to have better JupyterHub support."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T10:20:20Z",
+      "body": "Closing this since we won't add support for sharing Streamlit apps in JupyterHub. "
+    }
+  ]
+}

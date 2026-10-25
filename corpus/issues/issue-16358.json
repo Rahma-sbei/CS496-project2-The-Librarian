@@ -1,0 +1,28 @@
+{
+  "id": "issue-16358",
+  "type": "issue",
+  "number": 16358,
+  "url": "https://github.com/streamlit/streamlit/issues/16358",
+  "title": "Streamlit 1.61 runs into error when launching streamlit hello: connection failed with status 500",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:needs-triage"
+  ],
+  "created_at": "2026-08-06T02:41:32Z",
+  "closed_at": "2026-08-06T06:38:45Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nPackage is installed from conda-forge\n\nException in ASGI application\nTraceback (most recent call last):\n  File \"/opt/miniconda3/envs/tf-env/lib/python3.14/site-packages/uvicorn/protocols/http/httptools_impl.py\", line 422, in run_asgi\n    result = await app(  # type: ignore[func-returns-value]\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        self.scope, self.receive, self.send\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/opt/miniconda3/envs/tf-env/lib/python3.14/site-packages/uvicorn/middleware/proxy_headers.py\", line 63, in __call__\n    return await self.app(scope, receive, send)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/miniconda3/envs/tf-env/lib/python3.14/site-packages/starlette/applications.py\", line 90, in __call__\n    await self.middleware_stack(scope, receive, send)\n  File \"/opt/miniconda3/envs/tf-env/lib/python3.14/site-packages/starlette/middleware/errors.py\", line 186, in __call__\n    raise exc\n  File \"/opt/miniconda3/envs/tf-env/lib/python3.14/site-packages/starlette/middleware/errors.py\", line 164, in __call__\n    await self.app(scope, receive, _send)\n  File \"/opt/miniconda3/envs/tf-env/lib/python3.14/site-packages/streamlit/web/server/starlette/starlette_path_security_middleware.py\", line 162, in __call__\n    await self.app(scope, receive, send)\n  File \"/opt/miniconda3/envs/tf-env/lib/python3.14/site-packages/starlette/middleware/sessions.py\", line 88, in __call__\n    await self.app(scope, receive, send_wrapper)\n  File \"/opt/miniconda3/envs/tf-env/lib/python3.14/site-packages/streamlit/web/server/starlette/starlette_gzip_middleware.py\", line 144, in __call__\n    await super().__call__(scope, receive, send)\n  File \"/opt/miniconda3/envs/tf-env/lib/python3.14/site-packages/streamlit/web/server/starlette/starlette_gzip_middleware.py\", line 125, in __call__\n    responder = _MediaAwareGZipResponder(\n        self.app, self.minimum_size, compresslevel=self.compresslevel\n    )\nTypeError: GZipResponder.__init__() missing 1 required keyword-only argument: 'thread_minimum_size'\n\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.61.0-pyhd8ed1ab_0(conda-forge)\n- Python version: 3.14.5\n- Operating System: MacOS 26.6\n- Browser: Chrome: 151.0.7922.76\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-06T02:41:46Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16358)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-06T06:38:45Z",
+      "body": "Thanks for reporting. This issue was fixed in Streamlit 1.61.1 patch yesterday. Updating to the latest version should fix this. "
+    }
+  ]
+}

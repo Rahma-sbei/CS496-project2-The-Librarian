@@ -1,0 +1,78 @@
+{
+  "id": "issue-16030",
+  "type": "issue",
+  "number": 16030,
+  "url": "https://github.com/streamlit/streamlit/issues/16030",
+  "title": "Streamlit websockets 16.1 issue",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "area:dependencies",
+    "status:confirmed",
+    "priority:P2",
+    "upstream",
+    "area:server"
+  ],
+  "created_at": "2026-07-16T09:53:12Z",
+  "closed_at": "2026-07-18T08:34:23Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nStreamlit's pyproject.toml pins \"websockets>=12.0.0\". Version 16.1 of websockets (released July 9, 2026) introduced a change that blocks non-ASCII values in HTTP headers (see [changelog](https://websockets.readthedocs.io/en/stable/project/changelog.html#id2), \"Blocked non-ASCII values in Headers\").\n\nThis breaks the WebSocket handshake for setups where a reverse proxy / auth layer injects headers containing UTF-8 characters before the request reaches Streamlit \u2014 for example [Authelia](https://www.authelia.com/) forward-auth, which can inject a Remote-Name header containing the user's display name (e.g. accented characters, non-Latin scripts).\n\nSince Streamlit's dependency constraint allows websockets to resolve to 16.1+, installing/upgrading Streamlit in a fresh environment can silently pull in a version that breaks WebSocket connections for any deployment relying on non-ASCII header values, with no warning at install time\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n1. Deploy Streamlit behind a reverse proxy (nginx/Traefik) with Authelia forward-auth, configured to forward Remote-Name, Remote-Email, etc. headers to the backend.\n2. Ensure a user's Authelia display name contains a non-ASCII character (e.g. \"Fran\u00e7ois\", \"M\u00fcller\", \"\u7530\u4e2d\").\n3. Install/upgrade Streamlit in an environment where pip resolves websockets to >=16.1.\n4. Log in as that user and attempt to load the app.\n\n### Expected Behavior\n\nThe WebSocket connection (/_stcore/stream) should be established successfully, as it was with websockets<16.1.\n\n### Current Behavior\n\nThe WebSocket handshake fails because websockets 16.1 rejects the non-ASCII header value. The app gets stuck on \"Please wait...\" / the frontend logs a WebSocket connection failure, similar in symptom to issues like #8799.\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.58\n- Python version: 3.12\n- Operating System: Debian\n- Browser: Chrome / Mozilla\n\n\n### Additional Information\n\nWorkaround: pinning websockets<16.1 restores normal behavior.\n\nPossible fixes on Streamlit's side:\n\n- Tighten the websockets dependency constraint (e.g. >=12.0.0,<16.1) until this is addressed, or\n\n- Percent-encode / sanitize header values Streamlit forwards or reads internally before they reach the websockets layer.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-16T09:53:22Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16030)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-16T10:37:47Z",
+      "body": "### Issue analysis\n\nThis is a **bug / upstream-dependency regression**. Streamlit's `lib/pyproject.toml` currently declares `websockets>=12.0.0,<17`, which still allows `websockets` to resolve to **16.1** (released 2026-07-09). That release \"Blocked non-ASCII values in Headers\", so any WebSocket handshake carrying a UTF-8 header value is now rejected.\n\nStreamlit doesn't import `websockets` directly \u2014 it's used as **uvicorn's WebSocket protocol implementation** (`ws=\"websockets-sansio\"` for uvicorn \u2265 0.44.0, else `\"auto\"`), configured in `lib/streamlit/web/server/starlette/starlette_server.py` (`_get_websocket_protocol`). The handshake header parsing therefore happens inside the `websockets` layer. When a reverse proxy / forward-auth layer (e.g. Authelia injecting a `Remote-Name` with accented or non-Latin characters) forwards a non-ASCII header, `websockets` 16.1 rejects it and the `/_stcore/stream` handshake fails, leaving the app stuck on \"Please wait...\".\n\n**Likely fixes** (as the reporter notes): tighten the constraint to exclude the broken range (e.g. `websockets>=12.0.0,<16.1` or skip 16.1) and/or sanitize/percent-encode forwarded header values before they reach the `websockets` layer. Note the concern is valid even with the existing `<17` cap, since 16.1 falls within it.\n\n### Related Issues\n\n- [#8799](https://github.com/streamlit/streamlit/issues/8799) \u2014 \"WebSocket header HTTP_SEC_WEBSOCKET_PROTOCOL value changed ... which gives connection error\" (closed). Directly referenced by this issue; same failure class of a WebSocket handshake failing due to a header value.\n- [#8188](https://github.com/streamlit/streamlit/issues/8188) \u2014 \"Unnecessary failover on /_stcore/stream\". Same symptom/deployment context: the `/_stcore/stream` WebSocket hangs/fails when running behind a reverse proxy.\n- [#12108](https://github.com/streamlit/streamlit/issues/12108) \u2014 \"Frequent websocket connection drops ...\". Same pattern of an upstream WebSocket-layer dependency change (Tornado 6.5.1) breaking WebSocket connectivity for users behind proxies/Nginx.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-16T11:07:23Z",
+      "body": "[USER] Thanks for reporting this issue. This looks like an intended change by `websockets` so there might be a valid reason to exclude non-ASCII header. It would be good if you report this to the https://github.com/python-websockets/websockets repo as well to get more clarity on why this was done. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-16T16:15:09Z",
+      "body": "We are seeing the same symptom, but the immediate exception is in **uvicorn**, not in websockets itself.\n\n**Environment where we reproduced it:**\n- Streamlit 1.58.0 / 1.59.2\n- uvicorn 0.51.0\n- websockets 16.1\n- Python 3.10 / 3.14\n- Reverse proxy: nginx + Authentik, forwarding user display-name headers (e.g. `X-authentik-name: C\u00e9line`)\n\n**Traceback:**\n```\n  File \".../uvicorn/protocols/websockets/websockets_sansio_impl.py\", line 196, in <listcomp>\n    (key.encode(\"ascii\"), value.encode(\"ascii\", errors=\"surrogateescape\"))\nUnicodeEncodeError: 'ascii' codec can't encode characters in position 4-5: ordinal not in range(128)\n```\n\n**What's happening:**\n- `websockets` 16.x decodes incoming HTTP header values as ISO-8859-1 (latin-1). A byte like `0xE9` therefore becomes the character `\u00e9` (U+00E9) by the time uvicorn sees it.\n- `uvicorn 0.51.0` then tries to build the ASGI `headers` list with `value.encode(\"ascii\", errors=\"surrogateescape\")`.\n- For a real non-ASCII character such as `\u00e9` (U+00E9) this is impossible, so the WebSocket handshake aborts.\n\n**Note on the workaround `websockets<16.1`:** pinning websockets may avoid websockets-side validation, but it did **not** fix the above `UnicodeEncodeError` for us, because the crash is in uvicorn's re-encoding of the header value.\n\n**Manual workaround:**\nIn `uvicorn/protocols/websockets/websockets_sansio_impl.py`, in `handle_connect`, change the header listcomp so values are encoded back with `latin-1` (which preserves the original bytes, because websockets decoded them with latin-1):\n\n```python\n(key.encode(\"ascii\"), value.encode(\"latin-1\"))\n```\n\n**Suggested fix:**\nUvicorn should encode WebSocket header values with `latin-1` (or at least preserve the ISO-8859-1 decoded bytes) when building the ASGI `scope` in `websockets_sansio_impl.py`."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-16T22:12:31Z",
+      "body": "I think this issue can be closed in favor of https://github.com/Kludex/uvicorn/issues/3035, unless you want to keep it open until resolved in uvicorn."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-16T22:19:18Z",
+      "body": "Can you take care of filing the bug against Authelia? They should really not send non-ASCII headers."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-17T06:57:22Z",
+      "body": "i created this issue: https://github.com/goauthentik/authentik/issues/24156"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-17T17:22:34Z",
+      "body": "### \u2705 Confirmed \u2014 reproduced end-to-end\n\nReproduced on a clean environment. A fresh `pip install streamlit==1.58.0` silently resolves to the broken combination:\n\n- `streamlit==1.58.0`, `uvicorn==0.51.0`, `websockets==16.1`\n\nStreamlit 1.58 selects uvicorn's `websockets-sansio` protocol (uvicorn \u2265 0.44.0), so this is the affected path.\n\n**Repro:** raw WebSocket handshake to `/_stcore/stream` simulating a forward-auth proxy injecting a display-name header:\n\n| Header value | Result |\n|---|---|\n| `X-Authentik-Name: Celine` (ASCII) | `101 Switching Protocols` \u2705 |\n| `X-Authentik-Name: C\u00e9line` (raw byte `0xE9`) | connection dropped, **no response** \u274c |\n\nServer traceback matches [USER]'s report exactly:\n\n```\nFile \".../uvicorn/protocols/websockets/websockets_sansio_impl.py\", line 196, in handle_connect\n    (key.encode(\"ascii\"), value.encode(\"ascii\", errors=\"surrogateescape\"))\nUnicodeEncodeError: 'ascii' codec can't encode character '\\xe9' in position 1: ordinal not in range(128)\n```\n\n### Root cause (the precise regression)\n\nThe changelog phrase *\"Blocked non-ASCII values in Headers\"* is a little misleading for this case \u2014 websockets 16.1's header-value regex `[\\x09\\x20-\\x7e\\x80-\\xff]*` still **allows** high bytes, so `0xE9` passes through. The actual break is a change in how the value is **decoded**:\n\n- **websockets 16.0** \u2014 `http11.py`: `value = raw_value.decode(\"ascii\", \"surrogateescape\")` \u2192 `\u00e9` becomes surrogate `U+DCE9`, which uvicorn's `value.encode(\"ascii\", errors=\"surrogateescape\")` round-trips cleanly back to `0xE9`. \u2705\n- **websockets 16.1** \u2014 `http11.py`: `value = raw_value.decode(\"iso-8859-1\")` \u2192 `\u00e9` becomes the real char `U+00E9`, which uvicorn's surrogateescape re-encode **cannot** encode \u2192 `UnicodeEncodeError` \u2192 handshake aborts. \u274c\n\n(16.1's `parse_headers` docstring still claims *\"Non-ASCII characters are represented with surrogate escapes,\"* which no longer matches its own code \u2014 worth flagging upstream.)\n\n### Two corrections/notes for triage\n\n1. **Dependency constraint.** The current constraint (both `develop` and 1.58.0) is `websockets>=12.0.0` with **no upper bound** \u2014 not `<17`. So 16.1 (and anything newer) is fully permitted, and fresh installs pull it.\n2. **Workaround discrepancy resolved.** The reporter says pinning `websockets<16.1` fixes it; [USER] says it didn't. In this exact stack (streamlit 1.58.0 / uvicorn 0.51.0), **`websockets==16.0` makes the non-ASCII handshake succeed** (101, no crash) \u2014 so the pin *does* work here. [USER]'s result was likely a different websockets/uvicorn combination (Authentik + Python 3.10/3.14).\n\n### Possible Streamlit-side mitigations\n\n- Add an upper bound / exclude the broken range in `lib/pyproject.toml` (e.g. `websockets>=12.0.0,!=16.1` or a tested cap), and/or\n- Track the upstream fix \u2014 this is fundamentally a websockets 16.1 \u2194 uvicorn incompatibility (uvicorn should re-encode with `latin-1` to preserve the ISO-8859-1 bytes websockets now produces).\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-17T17:50:13Z",
+      "body": "> The changelog phrase \"Blocked non-ASCII values in Headers\" \n\nIt referred to setting values in headers for outgoing HTTP messages, not parsing values in incoming messages. I plan to clarify the changelog."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-17T22:01:51Z",
+      "body": "As a stopgap measure, I just released websockets 16.1.1 which undoes the problematic change in 16.1.\n\nThe change will happen in websockets 17.0, where it's properly documented as a backwards incompatible change, and I'll work with the maintainer of uvicorn to fix the problem by then."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-18T08:34:23Z",
+      "body": "[USER], thanks for taking a look and doing a quick patch! With that patch, I'm going to close this issue here and will keep track of the [upstream uvicorn issue](https://github.com/Kludex/uvicorn/issues/3035)."
+    }
+  ]
+}

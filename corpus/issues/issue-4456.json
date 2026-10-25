@@ -1,0 +1,23 @@
+{
+  "id": "issue-4456",
+  "type": "issue",
+  "number": 4456,
+  "url": "https://github.com/streamlit/streamlit/issues/4456",
+  "title": "Make it possible to control the HTML \"type\" attr via st.text_input",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:st.text_input"
+  ],
+  "created_at": "2022-02-28T12:23:29Z",
+  "closed_at": "2026-06-14T10:54:02Z",
+  "body": "### Problem\r\n\r\nI want to set `type=email` on the HTML generated from `st.text_input`.\r\nI think other types such as `type=number` should also be available.\r\n\r\nSetting an appropriate `type` is important because it improves user experiences.\r\nFor example, browsers provide client-side validations according to the `type`, and smartphone browsers change the keyboard layout based on the `type`.\r\n\r\n### Solution\r\n\r\nOne suggestion is to update the existing `type` argument on `st.text_input` to accept the values same to the HTML `<input>`. In that case, `\"default\"` may be deprecated and `\"text\"` will be used for that purpose instead.\r\n\r\nAny other solutions such as adding another argument also work.\r\nI don't have any preference and respect the core team's design decision.\r\n\r\n---\r\n\r\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\r\n\r\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-14T10:54:10Z",
+      "body": "Closing this in favour of https://github.com/streamlit/streamlit/issues/6704"
+    }
+  ]
+}

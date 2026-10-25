@@ -1,0 +1,25 @@
+{
+  "id": "issue-16139",
+  "type": "issue",
+  "number": 16139,
+  "url": "https://github.com/streamlit/streamlit/issues/16139",
+  "title": "Timer.run() receives an extra positional argument with Sentry ThreadingIntegration and st.fragment(run_every)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P2",
+    "feature:st.fragment"
+  ],
+  "created_at": "2026-07-23T10:41:56Z",
+  "closed_at": "2026-07-24T07:14:19Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen Streamlit is used together with Sentry's default ThreadingIntegration, a periodically running fragment can fail with:\n\nTypeError: Timer.run() takes 1 positional argument but 2 were given\n\nThe error appears to be caused by an interaction between Streamlit's thread-state wrapper and Sentry's threading wrapper.\n\nStreamlit stores the already-bound thread.run method and later forwards *args and **kwargs to it. Sentry's threading integration may invoke the replacement wrapper with the thread instance as a positional argument. That argument is then forwarded to the already-bound Timer.run method, resulting in the TypeError.\n\n### Reproducible Code Example\n\n```Python\nimport sentry_sdk\nimport streamlit as st\n\nsentry_sdk.init(\n    dsn=\"YOUR_TEST_SENTRY_DSN\",\n)\n\n[USER].fragment(run_every=\"1s\")\ndef timer_fragment() -> None:\n    st.write(\"Fragment executed\")\n\ntimer_fragment()\n```\n\n### Steps To Reproduce\n\nInstall the dependencies:\n\npip install streamlit==1.60.0 sentry-sdk\n\nCreate app.py:\n\nimport sentry_sdk\nimport streamlit as st\n\nsentry_sdk.init(\n    dsn=\"YOUR_TEST_SENTRY_DSN\",\n)\n\n[USER].fragment(run_every=\"1s\")\ndef periodically_updated_fragment() -> None:\n    st.write(\"Fragment is running\")\n\nperiodically_updated_fragment()\n\nRun the application:\n\nstreamlit run app.py\n\nLeave the application open while the fragment timer runs.\n\n### Expected Behavior\n\nst.fragment(run_every=...) should run normally when Sentry's default integrations are enabled.\n\nThird-party wrappers around thread.run should not cause Streamlit to forward an extra thread instance to an already-bound run method.\n\n### Current Behavior\n\nThe background timer can fail with:\n\nTypeError: Timer.run() takes 1 positional argument but 2 were given\n  File \"streamlit/runtime/scriptrunner_utils/script_run_context.py\", line ..., in _run_with_thread_state\n    original_run(*args, **kwargs)\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.60.0\n- Python version: 3.12\n- Operating System: Linux in the deployed environment\n- Browser: Google Chrome\n\n\n### Additional Information\n\nThe issue does not occur after adding ThreadingIntegration() to disabled_integrations.\n\nA related earlier Streamlit change allowed the thread-state wrapper to accept *args and **kwargs, but forwarding those arguments to an already-bound Timer.run appears to introduce this follow-up incompatibility.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-23T10:42:08Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16139)\n"
+    }
+  ]
+}

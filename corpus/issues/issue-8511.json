@@ -1,0 +1,118 @@
+{
+  "id": "issue-8511",
+  "type": "issue",
+  "number": 8511,
+  "url": "https://github.com/streamlit/streamlit/issues/8511",
+  "title": "Rerun fragment only programatically with `st.fragment` instead of `run_every`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.fragment"
+  ],
+  "created_at": "2024-04-16T10:05:07Z",
+  "closed_at": "2026-09-07T11:28:33Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nI love experimental_fragment but I really wish there was a function like `st.fragment_rerun` or something that allowed you to check for certain conditions on which to rerun that fragment on. Right now you can only do it every n seconds, and if you put a while loop to stop reruns it doesn't stop the reruns from just piling up in the queue (or at least I think that's what's going on). \r\n\r\nAlternatively you can run `st.rerun` under a condition and just rerun the whole script but that's quite heavy handed when the point of fragments is to isolate reruns.\n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-16T10:05:19Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8511)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-17T23:05:00Z",
+      "body": "I think that this could be solved by having an invalidation callback. If the callback returns true, the fragment is invalidated and re-rendered. This would allow for you to check for changes in session state that impact the fragment.\r\n\r\nHere is a really simple example using a counter. In a more complex application, there might be many places that increment the count that exist outside the fragments which display it.\r\n\r\n```python\r\nimport streamlit as st\r\n\r\ndef invalidator():\r\n    if st.session_state['prev'] != st.session_state['current']\r\n        st.session_state['prev'] = st.session_state['current']\r\n        return true\r\n    return false\r\n\r\ndef increment_value():\r\n    st.session_state['current'] = st.session_state['current'] + 1\r\n\r\n[USER].experimental_fragment(invalidation_callback=invalidator)\r\ndef display_value():\r\n    st.print(st.session_state['current'])\r\n\r\nif st.session_state.get('current') == None:\r\n    st.session_state['current'] = 0\r\n\r\nst.button('Increment Value', on_click=increment_value)\r\ndisplay_value()\r\n```"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-22T20:32:31Z",
+      "body": "[USER] actually asked me to make a ticket for this the other week, haha. I'll just post my support for a `st.rerun(scope='fragment')` feature here. \r\n\r\nHaving this feature would allow me to use fragments in https://github.com/Asaurus1/streamlit-process-manager which I currently can't do very nicely (no way to stop running the fragment when process terminates)\r\n\r\nThe invalidator function is interesting but difficult to understand and technically challenging to implement. When does the invalidator get run and by what script runner or in what context? Is it every time session state changes? How do you ensure that the invalidator does not mutate session state thereby causing a recursion problem? "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-22T21:36:05Z",
+      "body": "Yep as [USER] mentioned we would most likely support this via an API like `st.rerun(scope='fragment')`.\r\n\r\nI would suggest to hold off on any contributions here until [USER] and I can take a closer look at the overall fragment usage in the next month or two, but I think we will most likely add something like this or support an external contribution.\r\n\r\nif anyone else has feedback / use case / input feel free to add please!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-22T21:38:39Z",
+      "body": "I don't think you need to ensure that the invalidator does not mutate session state. Recursion problems are possible to create in streamlit already, it's up to the developer to avoid them. It would run every time any fragment updates, so you'd have to be careful about performance when implementing it.\r\n\r\nA more straightforward approach to resolve my use case that is also in line with what you guys are thinking would be the ability to tag fragments like `st.experimental_fragment(tags=['tag1', 'tag2'])` and be able to rerun all of the fragments that include that tag like `st.rerun(tag='tag1')`."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-10T01:23:56Z",
+      "body": "We agreed to solve this by adding an optional `scope=` kwarg to `st.rerun()`, so you can do e.g. `scope=\"app\"` or `scope=\"fragment\"`.\r\n\r\nOne question I'd love some input on, is whether the default should remain `scope=\"app\"` (as today), or if we'd want some `scope=\"auto\"` which by default only re-runs the fragment when called in a fragment. A few developers reported that that's the default behavior they would expect.\r\n\r\nA main downside of `scope=\"auto\"` is that `st.rerun()` is the main way to break out of a dialog today, so either we'd have to force everyone to always do `st.rerun(scope=\"app\")` in a dialog to exit, or else have a different behavior for dialogs vs fragments. I don't really like either of those options.\r\n\r\nSomeone else may even have another, more clever idea in this vein - ideas and feedback welcome!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-10T01:25:36Z",
+      "body": "[USER] the tag thing is very interesting for triggering fragment calls from outside themselves or establishing dependency chains. We'll plan to add the `scope=` feature first ^ but I bookmarked this to come back later since it does sound very interesting and powerful. Not sure if we want to break that into a separate issue from this one (or move the scope thing to its own issue)"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-10T05:05:01Z",
+      "body": "  \r\n  \r\n  \r\nCan you elaborate more on the \"dialogue, breakout\"? I haven't used dialogues much yet, my impression was that they had some kind of \"ok/cancel\" button built into them.\r\n  \r\n\r\n  \r\n\r\n  \r\nWould there be use cases for fragments with dialogues?\r\n  \r\n\r\n  \r\n\r\n  \r\n\r\n  \r\n  \r\n  \r\n  \r\n  \r\n>   \r\n> On Jun 9, 2024 at 18:24, Joshua Carroll  ***@***.***>  wrote:\r\n>   \r\n>   \r\n>\r\n> We agreed to solve this by adding an optional  scope=  kwarg to  st.rerun(), so you can do e.g.  scope=\"app\"  or  scope=\"fragment\".\r\n>\r\n>   \r\n>\r\n> One question I'd love some input on, is whether the default should remain  scope=\"app\"  (as today), or if we'd want some  scope=\"auto\"  which by default only re-runs the fragment when called in a fragment. A few developers reported that that's the default behavior they would expect.\r\n>\r\n>   \r\n>\r\n> A main downside of  scope=\"auto\"  is that  st.rerun()  is the main way to break out of a dialog today, so either we'd have to force everyone to always do  st.rerun(scope=\"app\")  in a dialog to exit, or else have a different behavior for dialogs vs fragments. I don't really like either of those options.\r\n>\r\n>   \r\n>\r\n> Someone else may even have another, more clever idea in this vein - ideas and feedback welcome!\r\n>\r\n>   \r\n>\r\n> \u2014\r\n>  Reply to this email directly,   view it on GitHub, or   unsubscribe.\r\n>  You are receiving this because you were mentioned.Message ID:  ***@***.***>\r\n>\r\n>   \r\n     "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-10T23:10:34Z",
+      "body": "Oh, yep sorry for using shorthand.\r\n- Every dialog is a fragment already - so if I draw a widget inside a dialog and move the widget, the dialog code reruns but the rest of the app does not.\r\n- Dialogs support exiting via top right `x` and ESC, but to use a \"Submit\" button etc you need to use `st.rerun()`.\r\n\r\nFrom [the docs](https://docs.streamlit.io/develop/api-reference/execution-flow/st.dialog)\r\n> st.experimental_dialog inherits behavior from [st.experimental_fragment](https://docs.streamlit.io/develop/api-reference/execution-flow/st.fragment). When a user interacts with an input widget created inside a dialog function, Streamlit only reruns the dialog function instead of the full script.\r\n> \r\n> A user can dismiss a modal dialog by clicking outside of it, clicking the \"X\" in its upper-right corner, or pressing``ESC`` on their keyboard. Dismissing a modal dialog does not trigger an app rerun. To close the modal dialog programmatically, call st.rerun() explicitly inside of the dialog function.\r\n\r\ne.g. I might do something like:\r\n\r\n```python\r\n[USER].experimental_dialog(\"Login\")\r\ndef login():\r\n    user_name = st.text_input(\"Username:\")\r\n    if st.button(\"Submit\", disabled=not user_name):\r\n        st.session_state.user_name = user_name\r\n        st.rerun()\r\n```\r\n\r\nSo it would probably be un-intuitive if `st.rerun()` worked differently on a dialog vs a fragment (since they're otherwise basically identical). On the other hand, it might also be annoying to be forced to remember `st.rerun(scope=\"app\")` for every form-style dialog."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-11T00:58:34Z",
+      "body": "  \r\n  \r\n  \r\nWhat about just a named wrapper? st.experimental_close_dialog()?   \r\n  \r\n\r\n  \r\nI personally don't see a huge problem with `st.rerun(\"app\")` either... If you make the first argument not require the keyword it's still very    readable and easy to understand what it's going to do. And then if you want to just rerun the dialog (which you might want) you could write `st.rerun(\"dialog\") or st.rerun(\"fragment\")` (depending on if dialog rerun would require special logic)\r\n  \r\n\r\n  \r\n\r\n  \r\n\r\n  \r\n  \r\n  \r\n  \r\n  \r\n>   \r\n> On Jun 10, 2024 at 16:11, Joshua Carroll  ***@***.***>  wrote:\r\n>   \r\n>   \r\n>\r\n> Oh, yep sorry for using shorthand.\r\n>\r\n>   \r\n>   \r\n> Every dialog is a fragment already - so if I draw a widget inside a dialog and move the widget, the dialog code reruns but the rest of the app does not.\r\n>   \r\n> Dialogs support exiting via top right  x  and ESC, but to use a \"Submit\" button etc you need to use  st.rerun().\r\n>   \r\n>   \r\n>\r\n> From  the docs\r\n>\r\n>   \r\n> >   \r\n> >\r\n> > st.experimental_dialog inherits behavior from  st.experimental_fragment. When a user interacts with an input widget created inside a dialog function, Streamlit only reruns the dialog function instead of the full script.\r\n> >\r\n> >   \r\n> >\r\n> > A user can dismiss a modal dialog by clicking outside of it, clicking the \"X\" in its upper-right corner, or pressingESC  on their keyboard. Dismissing a modal dialog does not trigger an app rerun. To close the modal dialog programmatically, call st.rerun() explicitly inside of the dialog function.\r\n> >\r\n> >   \r\n>   \r\n>\r\n> e.g. I might do something like:\r\n>\r\n>   \r\n>   \r\n>   [USER].experimental_dialog(\"Login\")   def   login():  user_name   =   st.text_input(\"Username:\")  if   st.button(\"Submit\",  disabled=not   user_name):  st.session_state.user_name   =   user_name   st.rerun()  \r\n>\r\n>   \r\n>\r\n> So it would probably be un-intuitive if  st.rerun()  worked differently on a dialog vs a fragment (since they're otherwise basically identical). On the other hand, it might also be annoying to be forced to remember  st.rerun(scope=\"app\")  for every form-style dialog.\r\n>\r\n>   \r\n>\r\n> \u2014\r\n>  Reply to this email directly,   view it on GitHub, or   unsubscribe.\r\n>  You are receiving this because you were mentioned.Message ID:  ***@***.***>\r\n>\r\n>   \r\n     "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-21T17:01:10Z",
+      "body": "Any progress on this?  This would be very helpful for a project I am working on currently.  I personally like the st.rerun(\"fragment\") but any of the ideas would be fine if was implemented. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-21T17:04:17Z",
+      "body": "Yep, I think we'll have a PR up for this soon and most likely will be in the next release\r\n\r\n`st.rerun(scope=\"fragment\")`"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-26T21:27:33Z",
+      "body": "Hey all, wanted to get people's takes on a detail of the behavior of `st.rerun(scope=\"fragment\")`.\r\n\r\nI have a [lengthy comment](https://github.com/streamlit/streamlit/pull/8979/files#diff-dde6a5b9ce1cd911b5ef16b852c67389c77f513d9c7b5fb3ab673567731d1df9R74) describing the behavior in question in the PR (#8979) adding the new kwarg.\r\n\r\nIn short, the thing that I'm not entirely sure about is whether it's reasonable to disallow calling `st.rerun(scope=\"fragment\")` even from within a fragment if it's called during a full script run. The details of why I think this is reasonable are contained in the code comment, but I think having this limitation should be ok primarily because I think it should be rare to ever want to do anything like this anyway.\r\n\r\nDoes anyone have a potential use case that naturally lends itself to calling `st.rerun()` like this? If so, we might have to put some more effort into figuring out what the correct behavior should be here."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-27T06:35:01Z",
+      "body": "[USER] that is a _really_ good question and I have a two part answer/opinion.\r\n\r\n1. I think that the behavior you've gone with _is_ reasonable, and your logic is sound.\r\n2. This unfortunately means (I think) that the `fragment` mechanism won't do what I was originally hoping it _could_ do.\r\n\r\nTo explain #2, here is a simplified version of the code that I was _hoping_ would be enabled by allowing you to re-run fragments programatically.\r\n\r\n```python\r\n[USER].experimental_fragment\r\ndef a_simple_counter():\r\n    current_count = st.session_state.counter\r\n\r\n    st.write(\"The counter is at\", current_count)\r\n    if current_count < 10:\r\n       time.sleep(1)\r\n       st.session_state.counter += 1\r\n       st.rerun(scope=\"fragment\")\r\n    else:\r\n       st.button(\"Reset Counter\", on_click=reset_counter)\r\n       st.success(\"Finished\")\r\n\r\ndef reset_counter():\r\n    st.session_state.counter = 0\r\n\r\n\r\n# Page code\r\nreset_counter()\r\na_simple_counter()\r\nst.button(\"rerun-page\", help=\"just a button to click to force a full rerun\")\r\n```\r\n\r\nIf the behavior of `st.rerun(scope=\"fragment\")` is as you have described above, then every time the _full page_ re-runs,\r\nthe counter will sleep for 1 second, increment the counter by 1, and then do nothing since the rerun is skipped. Only by clicking the \"Reset Counter\" button _inside of the fragment_ will it trigger a fragment-rerun that causes the fragment to count to 10 before it completes and ceases to run.\r\n\r\nIn my ideal world, when the fragment is first encountered during a full page re-run, it would start running in it's own separate script thread and continue to re-run itself, updating it's little block of the page until the counter reaches 10. Almost like a thread spawn. Meanwhile, the rest of the script _continues_ to run until it reaches the end of the main page. This is not how I think you guys originally envisioned `fragments` to work. For fairly obvious reasons this would have all the race-conditiony fun and joy of dealing with threaded concurrency. I am not saying you should make fragments do this.\r\n\r\nNow, the behavior where `st.rerun(scope=\"fragment\")` queues up the fragment to be \"rerun\" _after_ the main script execution **would actually solve my problem here**. Once the page code finishes, the fragment would resume counting from wherever it left off until it reached 10, whereupon it too would exit. However I can, as you likely did, envision many other uses for `fragment` where this behavior would not be expected and potentially even cause major issues or confusion. It leaves major questions open like \"what if a `rerun` is encountered multiple times in the fragment\"? \r\n\r\nYou could make the \"scheduled execution\" opt-in via a second argument; `st.rerun(scope=\"fragment\", when=\"soon\")` perhaps. This could have the behavior of causing the rerun of the page/fragment to be scheduled \"soon\" (e.g. as soon as possible after the current thing that is running finishes, similar to how scheduling things \"soon\" in async code works). I don't know that that would be easy to implement, though, and would definitely have to get run by product team separately.\r\n\r\nThat went on longer than I though it would, but that seems to be how I do things \ud83e\udd72. Thanks for working on this!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-27T06:36:59Z",
+      "body": "> Any progress on this? This would be very helpful for a project I am working on currently. I personally like the st.rerun(\"fragment\") but any of the ideas would be fine if was implemented.\r\n\r\n[USER] would you share a sample of your usecase with us?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-27T13:53:02Z",
+      "body": "I am not sure this fits the usecase that I was hoping that it would.  My initial feeling is that I would like the ability to rerun a target fragment from an alternate section of code:  simplified ex:\r\n\r\n```\r\n[USER].experimental_fragment(id=\"targetfragment\")\r\ndef displayCheckbox():\r\n    #enables / disables the checkbox\r\n    allselected = all(\r\n        s in st.session_state and st.session_state[s] is not None for s in [\"opt1\", \"opt2\"])\r\n    st.checkbox(\"Everything has a selection? ( *Required )\", key=\"allCorrect\", disabled=not allselected)\r\n\r\n\r\n[USER].experimental_fragment(id=\"option1fragment\")\r\ndef displayOptions1():\r\n    st.selectbox(label=\"select option 1:\", options=getOptions1(),\r\n                                          key=\"opt1\",\r\n                                          index=None,\r\n                                          on_change=st.rerun(scope=\"targetfragment\"))\r\n    \r\n\r\n\r\n[USER].experimental_fragment(id=\"option2fragment\")\r\ndef displayOptions2():\r\n    st.selectbox(label=\"select option 2:\", options=getOptions2(),\r\n                                           key=\"opt2\",\r\n                                           index=None,\r\n                                           on_change=st.rerun(scope=\"targetfragment\"))\r\n    \r\n\r\n\r\n\r\ndisplayOptions1()\r\ndisplayOptions2()\r\ndisplayCheckbox()\r\n```\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-27T20:01:46Z",
+      "body": "Thanks for the input [USER] [USER]. I'm going to go ahead and merge the current PR into the feature branch as-is (while keeping this issue open) since we still have a few weeks until the code cutoff for next release so can potentially make further changes to the behavior before then.\r\n\r\nFor [USER]'s use case, the behavioral change to have fragment-scoped reruns also wait until the full script completes is something that we could do, but I believe both [USER] and I weren't fans of this approach primarily because having a call to `st.rerun()` not execute immediately feels pretty weird / has the potential for unexpected behavior previously described. It would be something not too difficult to do on the eng side though if we do want this behavior.\r\n\r\n[USER]'s suggestion might be a bit trickier to implement before the next release since I don't think we had something like this in mind, so it'll require some thought on the product side before we make a decision on changing the API in this way. It is, however, an additive change, so I think it could happen in the relatively near future if we do decide that we want it since there won't be any backwards compatibility considerations to worry about."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-27T20:55:37Z",
+      "body": "Thanks y'all! I also agree something like what [USER] described would be a cool and useful addition, although it will need some more thought. I agree it's an additive change. I started sketching out a few additional API ideas for this.\r\n\r\nBTW [USER] I have built some simple apps with the current released feature that worked almost like you described using the `run_every=` kwarg. Basically have some state that keeps track of when the `run_every=` should stop, and then trigger a full rerun at that point and either stop calling the fragment or remove / change the `run_every=` kwarg. Anyway, it'll be great if we can get to some major work on async in the not-too-distant future since I know it's always been a huge pain and becoming more and more so (IMO)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-04-16T09:44:46Z",
+      "body": "Do you have any updates on this? \n\n\nIt seems that having the possibility to check for certain conditions on which to rerun a fragment on is still a needed feature. (See here https://discuss.streamlit.io/t/fragment-as-an-inner-function-to-control-run-every-dynamically/100507/2)\nThe case describe in the end of this thread is also my exact need and I don't think that we are alone.\n\nWhen a fragment is use to display the status of let's say a long running process we want the fragment to stop refreshing when the process is finished.\n\nHaving the possibility to stop the \"run_every\" of the fragment or to choose when to rerun or not the fragment is still a needed feature. It seems that the only working workaround as of now is to put a contidition at the begining of the fragment to stop it's rendering but it is not a graceful approach.\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-07T11:27:38Z",
+      "body": "## Update\n\nThis is available in Streamlit 1.63+. You can rerun a specific fragment from a widget callback:\n\n```python\n[USER].fragment(key=\"results\")\ndef results():\n    st.write(st.session_state.filter)\n\nresults()\n\nst.selectbox(\n    \"Filter\",\n    OPTIONS,\n    key=\"filter\",\n    on_change=lambda: st.rerun(\"results\"),\n)\n```"
+    }
+  ]
+}

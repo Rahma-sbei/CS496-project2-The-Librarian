@@ -1,0 +1,39 @@
+{
+  "id": "issue-16618",
+  "type": "issue",
+  "number": 16618,
+  "url": "https://github.com/streamlit/streamlit/issues/16618",
+  "title": "Text overflow from expander container in sidebar",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:layout",
+    "type:regression",
+    "feature:markdown",
+    "status:confirmed",
+    "priority:P2",
+    "feature:st.expander",
+    "feature:st.sidebar"
+  ],
+  "created_at": "2026-08-23T20:48:47Z",
+  "closed_at": "2026-08-26T03:43:20Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n<img width=\"298\" height=\"296\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/28afdb4d-1876-40b3-a505-7bf7d0baabb0\" />\n\n### Reproducible Code Example\n\n```Python\nwith st.sidebar:\n    with st.expander(\n        \"Demo data\",\n        icon=\":material/dataset:\",\n    ):\n        st.markdown(\n            \"\"\"\n            **Storage**\n\n            - bucket1/awesome_zoom_background.jpg\n            - bucket2/folder1/folder2/lenna.png\n\n            **Database tables**\n\n            cities, countries, messages, teams, users, users_teams\n            \"\"\"\n        )\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.62.0\n- Python version: 3.11.12\n- Operating System: WSL\n- Browser: Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-23T20:48:56Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16618)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-24T01:01:30Z",
+      "body": "Long unbreakable markdown (file paths in list items) overflows the bordered `st.expander` when it is placed in `st.sidebar`. This looks like a CSS min-content issue rather than an expander animation bug: markdown uses `overflow-wrap: break-word` (and `word-break: break-word` only on `p`, not `li`), which does not shrink a flex item\u2019s min-content width, while the expander details panel is `overflow: visible` with no `min-width: 0`. Nested flex layout (sidebar \u2192 expander \u2192 block) then lets long tokens paint past the expander border. A likely fix is `overflow-wrap: anywhere` / `word-break` on list content plus containing overflow on the expander panel. `#12366` addressed the same wrapping class in bordered containers and shipped in 1.49, but this 1.52 sidebar+expander case still reproduces.\n\n**Related issues:**\n- https://github.com/streamlit/streamlit/issues/12366 \u2014 Same long-token markdown overflow in a bordered container; closed by adding `overflow-wrap: break-word`, which appears insufficient inside the sidebar expander flex layout.\n- https://github.com/streamlit/streamlit/issues/6394 \u2014 Long markdown (inline code) overflowing nested alert containers; same wrapping failure mode in a constrained parent.\n- https://github.com/streamlit/streamlit/issues/9387 \u2014 Nested content overflowing the sidebar viewport (`st.popover`); related sidebar overflow, different mechanism (positioning vs. text wrapping).\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-24T04:55:12Z",
+      "body": "**Note**: This is a markdown list sizing regression rather than an `st.expander` or sidebar bug. \nTop-level lists carry `width: fit-content`, which is floored at `min-content`, and the `overflow-wrap: break-word` above it does not reduce `min-content` width \u2014 so a list holding an item too long to fit is sized to that item and never wraps. Paragraphs have `width: auto` and are unaffected, which is why the prose wraps and only the bullets spill. Introduced by #13036 (`text_alignment`) and shipped in 1.52.0.\n**Impacted**: any container narrower than the longest list item. The sidebar clips the overflow, so the text is lost rather than just misaligned. \n**Not impacted**: full-width lists, lists whose items fit, nested lists, and widget labels."
+    }
+  ]
+}

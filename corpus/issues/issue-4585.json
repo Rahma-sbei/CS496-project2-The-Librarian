@@ -1,0 +1,74 @@
+{
+  "id": "issue-4585",
+  "type": "issue",
+  "number": 4585,
+  "url": "https://github.com/streamlit/streamlit/issues/4585",
+  "title": "Calling Julia from Streamlit App using PyJulia",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "status:unlikely",
+    "area:integrations"
+  ],
+  "created_at": "2022-04-03T15:07:32Z",
+  "closed_at": "2026-07-22T10:21:15Z",
+  "body": "### Summary\r\n\r\nI'm trying to use a julia function from a streamlit app. Created a toy example to test the interaction, simply returning a matrix from a julia functions based on a single parameter to specify the value of the diagonal elements. \r\n\r\nWill also note at the outset that both `julia_import_method = \"api_compiled_false\"` and `julia_import_method = \"main_include\"` works when importing the function in Spyder IDE (rather than at the command line to launch the  streamlit app via `streamlit run streamlit_julia_test.py`). \r\n\r\nMy project directory looks like:\r\n\r\n-my_project_directory\r\n--julia_test.jl\r\n--streamlit_julia_test.py\r\n\r\nThe julia function is in `julia_test.jl` and just simply returns a matrix with diagonals specified by the v parameter:\r\n\r\n    function get_matrix_from_julia(v::Int)\r\n       m=[v 0\r\n          0 v]\r\n     return m\r\n    end\r\n\r\nThe streamlit app is `streamlit_julia_test.py` and is defined as:\r\n\r\n    import os\r\n    from io import BytesIO\r\n    \r\n    import numpy as np\r\n    import seaborn as sns\r\n    import matplotlib.pyplot as plt\r\n    import streamlit as st\r\n    \r\n    # options:\r\n    # main_include\r\n    # api_compiled_false\r\n    # dont_import_julia\r\n    julia_import_method = \"api_compiled_false\"\r\n    \r\n    if julia_import_method == \"main_include\":\r\n    \r\n        import julia\r\n        from julia import Main\r\n        Main.include(\"julia_test.jl\")\r\n    \r\n    elif julia_import_method == \"api_compiled_false\":\r\n\r\n        # works in Spyder IDE\r\n        from julia.api import Julia\r\n        jl = Julia(compiled_modules=False)\r\n    \r\n        this_dir = os.getcwd()\r\n        julia_test_path = \"\"\"include(\\\"\"\"\"+ this_dir + \"\"\"/julia_test.jl\\\"\"\"\" +\")\"\"\"\r\n        print(julia_test_path)\r\n        jl.eval(julia_test_path)\r\n        get_matrix_from_julia = jl.eval(\"get_matrix_from_julia\")\r\n    \r\n    elif julia_import_method == \"dont_import_julia\":\r\n        print(\"Not importing \")\r\n    else:\r\n        ValueError(\"Not handling this case:\" + julia_import_method)\r\n    \r\n    \r\n    st.header('Using Julia in Streamlit App Example')\r\n    \r\n    st.text(\"Using Method:\" + julia_import_method)\r\n    \r\n    matrix_element = st.selectbox('Set Matrix Diagonal to:', [1,2,3])\r\n    \r\n    matrix_numpy = np.array([[matrix_element,0],[0,matrix_element]])\r\n    \r\n    col1, col2 = st.columns([4,4])\r\n    \r\n    with col1:\r\n    \r\n        fig, ax = plt.subplots(figsize=(5,5))\r\n        sns.heatmap(matrix_numpy, ax = ax, cmap=\"Blues\",annot=True)\r\n        ax.set_title('Matrix Using Python Numpy')\r\n        buf = BytesIO()\r\n        fig.savefig(buf, format=\"png\")\r\n        st.image(buf)\r\n    \r\n    with col2:\r\n    \r\n        if julia_import_method == \"dont_import_julia\":\r\n            matrix_julia = matrix_numpy\r\n        else:\r\n            matrix_julia = get_matrix_from_julia(matrix_element)\r\n    \r\n        fig, ax = plt.subplots(figsize=(5,5))\r\n        sns.heatmap(matrix_julia, ax = ax, cmap=\"Blues\",annot=True)\r\n        ax.set_title('Matrix from External Julia Script')\r\n        buf = BytesIO()\r\n        fig.savefig(buf, format=\"png\")\r\n        st.image(buf)\r\n\r\n\r\nIf the app were working correctly, it would look like this (which can be reproduced by setting the `julia_import_method = \"dont_import_julia\"` on line 13):\r\n\r\n[![enter image description here][1]][1]\r\n\r\n**Testing**\r\n\r\nWhen I try `julia_import_method = \"main_include\"`, I get the well known error:\r\n\r\n    julia.core.UnsupportedPythonError: It seems your Julia and PyJulia setup are not supported.\r\n    \r\n    Julia executable:\r\n        julia\r\n    Python interpreter and libpython used by PyCall.jl:\r\n        /[HOME]/opt/anaconda3/bin/python3\r\n        /[HOME]/opt/anaconda3/lib/libpython3.9.dylib\r\n    Python interpreter used to import PyJulia and its libpython.\r\n        /[HOME]/opt/anaconda3/bin/python\r\n        /[HOME]/opt/anaconda3/lib/libpython3.9.dylib\r\n    \r\n    Your Python interpreter \"/[HOME]/opt/anaconda3/bin/python\"\r\n    is statically linked to libpython.  Currently, PyJulia does not fully\r\n    support such Python interpreter.\r\n    \r\n    The easiest workaround is to pass `compiled_modules=False` to `Julia`\r\n    constructor.  To do so, first *reboot* your Python REPL (if this happened\r\n    inside an interactive session) and then evaluate:\r\n    \r\n        >>> from julia.api import Julia\r\n        >>> jl = Julia(compiled_modules=False)\r\n    \r\n    Another workaround is to run your Python script with `python-jl`\r\n    command bundled in PyJulia.  You can simply do:\r\n    \r\n        $ python-jl PATH/TO/YOUR/SCRIPT.py\r\n    \r\n    See `python-jl --help` for more information.\r\n    \r\n    For more information, see:\r\n    \r\n        https://pyjulia.readthedocs.io/en/latest/troubleshooting.html\r\n\r\n\r\nAs suggested, when I set `julia_import_method = \"api_compiled_false\"`, I get a seg fault:\r\n\r\n\r\n    include(\"my_project_directory/julia_test.jl\")\r\n    2022-04-03 10:23:13.406 Traceback (most recent call last):\r\n      File \"/[HOME]/opt/anaconda3/lib/python3.9/site-packages/streamlit/script_runner.py\", line 430, in _run_script\r\n        exec(code, module.__dict__)\r\n      File \"my_project_directory/streamlit_julia_test.py\", line 25, in <module>\r\n        jl = Julia(compiled_modules=False)\r\n      File \"/[HOME]/.local/lib/python3.9/site-packages/julia/core.py\", line 502, in __init__\r\n        if not self.api.was_initialized:  # = jl_is_initialized()\r\n      File \"/[HOME]/.local/lib/python3.9/site-packages/julia/libjulia.py\", line 114, in __getattr__\r\n        return getattr(self.libjulia, name)\r\n      File \"/[HOME]/opt/anaconda3/lib/python3.9/ctypes/__init__.py\", line 395, in __getattr__\r\n        func = self.__getitem__(name)\r\n      File \"/[HOME]/opt/anaconda3/lib/python3.9/ctypes/__init__.py\", line 400, in __getitem__\r\n        func = self._FuncPtr((name_or_ordinal, self))\r\n    AttributeError: dlsym(0x21b8e5840, was_initialized): symbol not found\r\n    \r\n    \r\n    signal (11): Segmentation fault: 11\r\n    in expression starting at none:0\r\n    Allocations: 35278345 (Pool: 35267101; Big: 11244); GC: 36\r\n    zsh: segmentation fault  streamlit run streamlit_julia_test.py\r\n\r\n\r\nI've also tried the alternative recommendation provided in the PyJulia response message regarding the use of:\r\n\r\n    python-jl my_project_directory/streamlit_julia_test.py\r\n\r\nBut I get this error when running the python-jl command:\r\n\r\n    INTEL MKL ERROR: dlopen(/[HOME]/opt/anaconda3/lib/libmkl_intel_thread.1.dylib, 0x0009): Library not loaded: [USER]/libiomp5.dylib\r\n      Referenced from: /[HOME]/opt/anaconda3/lib/libmkl_intel_thread.1.dylib\r\n      Reason: tried: '/Applications/Julia-1.7.app/Contents/Resources/julia/bin/../lib/libiomp5.dylib' (no such file), '/usr/local/lib/libiomp5.dylib' (no such file), '/usr/lib/libiomp5.dylib' (no such file).\r\n    Intel MKL FATAL ERROR: Cannot load libmkl_intel_thread.1.dylib.\r\n\r\nSo I'm stuck, thanks in advance for a modified reproducible example or instructions for the following system specs! \r\n\r\n\r\n    System specs:\r\n    Mac OS Monterey 12.2.1 (Chip - Mac M1 Pro)\r\n    Python 3.9.7\r\n    Julia 1.7.2\r\n    PyJulia 0.5.8.dev\r\n    Streamlit 1.7.0\r\n\r\n  [1]: https://i.stack.imgur.com/sVaBz.jpg",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2022-08-20T17:04:53Z",
+      "body": "Same issue here on Mac OS Monterey on intel"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2022-10-14T11:23:14Z",
+      "body": "[USER] Thanks for reporting this issue. Not sure if this is related specifically to Streamlit. Is PyJulia running fine if you are using it with pure python scripts? It could be that `PyJulia` is not supported well on the M1 processor yet?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-12-16T13:32:41Z",
+      "body": "Same problem here on Ubuntu 22 on Intel. :( Running PyJulia in normal python scripts does work, but if I try using it from a streamlit app, it throws a segfault. It happens even when simply importing PyJulia. So the minimum example in my case would be \r\n\r\n```python\r\n# main.py\r\nfrom julia import Main\r\nimport streamlit as st\r\n\r\nst.title(\"Hello, world! \ud83d\udc4b\")\r\n```\r\nRunning it with `streamlit run main.py` throws a segfault. If I instead try \r\n```python\r\n# test.py\r\nfrom julia import Main\r\nprint(Main.eval(\"2 + 2\"))\r\n```\r\nand run it with `python test.py`, everything works fine. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-12-16T13:59:22Z",
+      "body": "After some more research: the problem is probably caused by the fact that PyJulia is not thread-safe. [Here's](https://discourse.julialang.org/t/pyjulia-django-and-segfaults/25313) a similar discussion regarding integrating Julia and Django which also throws segfaults. Seems like it is indeed not a problem with streamlit. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-07-28T10:11:20Z",
+      "body": "did you try python with static lib? https://pyjulia.readthedocs.io/en/latest/troubleshooting.html#ultimate-fix-build-your-own-python \r\nbtw, I think julia was not fully supported in M1 until version 1.8\r\n\r\nOther alternatives to try:\r\n* juliacall instead of pyjulia\r\n* ensure julia with only 1 thread with env var JULIA_NUM_THREADS=1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-07-28T16:16:02Z",
+      "body": "Thanks [USER], [USER] et al! I didn't see the activity on this thread until [USER] responded so apologies for the delay here. I will try to find some time to revisit the error and see how it goes and if [USER] suggestions work. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-07-28T16:19:41Z",
+      "body": "Thanks [USER], [USER] et al! I didn't see the activity on this thread until [USER] responded so apologies for the delay here. I will try to find some time to revisit the error and see how it goes and if [USER] suggestions work. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-09-02T12:57:02Z",
+      "body": "I faced with the same issue with `pyjulia`. I tested the solution of [USER]. \r\n\r\n1. `juliacall` works\r\n2. `JULIA_NUM_THREADS=1` not work.\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-02-05T16:15:51Z",
+      "body": "I've developed a proof-of-concept library named [streamlit-julia-call](https://github.com/mrkn/streamlit-julia-call), which enables calling Julia from Streamlit applications. You can see how to use it in [a simple demo app](https://github.com/mrkn/streamlit-julia-call-demo). I hope it proves to be useful to you."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-10T00:27:37Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-4585)"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T10:21:15Z",
+      "body": "Closing this since we won't add native support for calling Julia in Streamlit. "
+    }
+  ]
+}

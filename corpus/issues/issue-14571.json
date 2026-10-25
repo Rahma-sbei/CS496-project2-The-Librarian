@@ -1,0 +1,35 @@
+{
+  "id": "issue-14571",
+  "type": "issue",
+  "number": 14571,
+  "url": "https://github.com/streamlit/streamlit/issues/14571",
+  "title": "Security improvement: Azure SSO secrets in env vars instead of a plaintext file?",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:security",
+    "feature:st.secrets",
+    "feature:authentication"
+  ],
+  "created_at": "2026-03-30T18:03:32Z",
+  "closed_at": "2026-07-22T09:15:58Z",
+  "body": "https://github.com/streamlit/streamlit/blob/65c4486d2e5fdac89759cc06d687838e23f14824/lib/streamlit/config.py#L2753\n\nhttps://docs.streamlit.io/develop/tutorials/authentication/microsoft\n\nHello, I would like to be able to pull StreamLit SSO credentials from env vars instead of a plaintext file. It would improve the security of this tool.",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2026-03-30T18:10:57Z",
+      "body": "Another useful feature would be the ability to avoid cred files and env vars entirely, and pull from a key vault. If we could specify this when we import `streamlit` package, perhaps as a constructor, that would improve security too."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-03-31T07:38:04Z",
+      "body": "This issue requests the ability to configure Azure SSO (and more broadly, `st.login` authentication) secrets via environment variables instead of requiring a plaintext `secrets.toml` file. The author references `lib/streamlit/config.py` and the [Microsoft authentication tutorial](https://docs.streamlit.io/develop/tutorials/authentication/microsoft). This is a valid enhancement request for improved secret management flexibility. Notably, Streamlit's `config.toml` already supports environment variable overrides (e.g. `STREAMLIT_SERVER_PORT`), but the `[auth]` section of `secrets.toml` does not have an equivalent mechanism. This appears to be a duplicate of #10543, which has significant community interest (78 upvotes).\n\n### Related Issues\n\n- **#10543** \u2014 [Set `[auth]` secrets config from environment variables or through `st.login`](https://github.com/streamlit/streamlit/issues/10543): This is essentially the same request \u2014 allow authentication secrets to be configured via environment variables or `st.login` arguments rather than exclusively through `secrets.toml`. **Likely duplicate.**\n- **#7731** \u2014 [Allow different paths for storing configuration files](https://github.com/streamlit/streamlit/issues/7731): Related request for more flexible configuration file paths, motivated by deployment environments (e.g. Google Cloud Run) where mounting `secrets.toml` as a volume is problematic.\n- **#7946** \u2014 [Increase secret management's level of protection](https://github.com/streamlit/streamlit/issues/7946): Broader request to improve the security posture of Streamlit's secret management, including encryption of secrets rather than storing them in plain text.\n\n---\n*This is an automated triage comment using `claude-4.6-opus-high-thinking`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T09:15:58Z",
+      "body": "## Update\n\nClosing this since its possible to set `secrets` programmatically via `st.App`: https://github.com/streamlit/streamlit/pull/14861 see: https://docs.streamlit.io/develop/api-reference/server/st.app\n\nThis allows setting secrets from env variables or key vaults. "
+    }
+  ]
+}

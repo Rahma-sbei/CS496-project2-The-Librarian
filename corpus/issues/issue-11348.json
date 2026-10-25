@@ -1,0 +1,35 @@
+{
+  "id": "issue-11348",
+  "type": "issue",
+  "number": 11348,
+  "url": "https://github.com/streamlit/streamlit/issues/11348",
+  "title": "Multiselect drop down background is inconsistent",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:theming"
+  ],
+  "created_at": "2025-05-13T18:31:40Z",
+  "closed_at": "2026-07-27T19:30:59Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nIf I use a theme with `backgroundColor` and `secondaryBackgroundColor` set for both the main body of the app and the sidebar, the color of the multiselect dropdown is inconsistent.\n\n* In the main body of the app, the dropdown background comes from `theme.backgroundColor` and the hover effect is a 15% alpha layer derived from `theme.secondaryBackgroundColor`.\n* In the sidebar, the dropdown background comes from `theme.sidebar.secondaryBackgroundColor` and the hover effect is a 15% alpha layer derived from `theme.secondaryBackgroundColor`.\n\n<img width=\"1279\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/93212cd2-6211-455a-b951-0e72a3fb93a8\" />\n\n<img width=\"1279\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/6040cb5d-6e45-43fa-9352-5cc5b423ba3a\" />\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nst.multiselect(\"Widgets\", [\"A\", \"B\", \"C\"])\nwith st.sidebar:\n    st.multiselect(\"Gizmos\", [\"A\", \"B\", \"C\"])\n```\n\n### Steps To Reproduce\n\n```\n[theme]\nbase=\"dark\"\nbackgroundColor=\"#0e1117\"\nsecondaryBackgroundColor=\"indigo\"\ncodeBackgroundColor=\"darkslategrey\"\n\n[theme.sidebar]\nbackgroundColor=\"#262730\"\nsecondaryBackgroundColor=\"darkgoldenrod\"\n```\n\n### Expected Behavior\n\nWith both the main body and sidebar having their own background color and secondary background color, I'd expect consistent application within those regions.\n\nNote: There is currently an inversion between primary and secondary background color in the sidebar if they are not set separately and only inherited from the main body. I'm not commenting on that; I only mean to say if I do set values in `[theme.sidebar]` that I expect to them to apply in the sidebar like they do to the main body if set in `[theme]`\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.45.1\n- Python version: 3.13\n- Operating System: Mac\n- Browser: Prisma\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-13T18:31:53Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11348)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-13T18:33:57Z",
+      "body": "I'm told there's work being tracked elsewhere to deal with a border around the multiselect dropdown so it doesn't appear merged into the background in the main body. I'm not sure where that is to link to, but I'll drop here, relatedly, that the 15% alpha wash derived from the secondary background color looks good as the drop down background, which would then stack with the hover effect.\n\n![Image](https://github.com/user-attachments/assets/901cc7e4-e912-423b-a030-9ec709bc3278)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-24T12:58:02Z",
+      "body": "Maybe checkout the contents in the file `frontend/lib/src/components/shared/Dropdown/styled-components.ts`. I'm guessing that the `background` property may be relevant to this issue."
+    }
+  ]
+}

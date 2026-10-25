@@ -1,0 +1,52 @@
+{
+  "id": "issue-14782",
+  "type": "issue",
+  "number": 14782,
+  "url": "https://github.com/streamlit/streamlit/issues/14782",
+  "title": "`LinkColumn(width=..., display_text=\":material/...` fails to render the icon when the width (in pixels) is less than 4 times the length of the icon's name (in characters)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:st.dataframe",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.column_config",
+    "upstream"
+  ],
+  "created_at": "2026-04-14T14:07:26Z",
+  "closed_at": "2026-09-24T08:33:45Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nA material icon in the `display_text` of a `LinkColumn` fails to render when the `width` is less than 4 times the length of the icon's name (e.g. `OPEN_IN_NEW` or `SIGNAL_CELLULAR_CONNECTED_NO_INTERNET_0_BAR`).\n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-14782)\n\n```Python\nimport pandas as pd\nimport streamlit as st\n\ndata_df = pd.DataFrame([[\"https://issues.streamlit.app\"] * 6])\n\nst.dataframe(\n    data_df.style,\n    width=\"content\",\n    column_config={\n        \"0\": st.column_config.LinkColumn(\"22px\", width=22, display_text=\"\ud83d\udd17\"),\n        \"1\": st.column_config.LinkColumn(\"44px\", width=44, display_text=\":material/open_in_new:\"),\n        \"2\": st.column_config.LinkColumn(\"43px\", width=43, display_text=\":material/open_in_new:\"),\n        \"3\": st.column_config.LinkColumn(\"172px\", width=172, display_text=\":material/signal_cellular_connected_no_internet_0_bar:\"),\n        \"4\": st.column_config.LinkColumn(\"171px\", width=171, display_text=\":material/signal_cellular_connected_no_internet_0_bar:\"),\n        \"5\": st.column_config.LinkColumn(\"small\", width=\"small\", display_text=\":material/signal_cellular_connected_no_internet_0_bar:\"),\n    },\n)\n```\n\n### Steps To Reproduce\n\n1. Try the code above\n2. Notice some columns show part of the name of the icon instead of the expected icon (`OPEN_IN_NEW` and `SIGNAL_CELLULAR_CONNECTED_NO_INTERNET_0_BAR`).\n\n### Expected Behavior\n\nI would expect the material icon to render even if it doesn't fit in the cell, as emojis do (see \ud83d\udd17 in the first column).\n\nAlternatively, I wouldn't mind if it raised an exception (with a clear message). I don't really need this to work. It's just that the current behavior wasn't obvious. I fell down the trap when I switched from `\"\ud83d\udd17\"` to `\":material/open_in_new:\"` while I had a `width=40`, and it wasn't obvious why that didn't work.\n\n### Current Behavior\n\n<img width=\"600\" height=\"102\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/0d638683-aa5c-4d3c-9168-a2140daeac2c\" />\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.56.0\n- Python version: 3.11.9\n- Operating System: macOS\n- Browser: Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-14T14:07:38Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-14782)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-14T14:32:24Z",
+      "body": "This is a bug in how material icons render in `LinkColumn` when the column width is too narrow. When `display_text=\":material/open_in_new:\"` is used, Streamlit extracts the icon name (`\"open_in_new\"`) and renders it using the \"Material Symbols Rounded\" font via ligatures on the glide-data-grid canvas ([`LinkColumn.ts`](https://github.com/streamlit/streamlit/blob/develop/frontend/lib/src/components/widgets/DataFrame/columns/LinkColumn.ts#L73-L117)). The ligature mechanism requires the **full** text (e.g., `\"open_in_new\"`) to match and render as a single icon glyph. When the column width drops below ~44px, glide-data-grid's canvas text rendering truncates the display text to fit the cell, breaking the ligature match and causing the raw (partial) text to appear instead of the icon. Emojis like \ud83d\udd17 are single Unicode characters, so they are not affected by text truncation in the same way. A potential fix could involve Streamlit overriding the column's minimum width when a material icon is used as `display_text`, or providing a custom cell renderer that prevents text truncation for icon-font cells.\n\n### Related Issues\n\n- https://github.com/streamlit/streamlit/issues/9444 \u2014 **Re-calculate dataframe column width when a column is sorted**: Also involves column width interacting poorly with icon rendering (sort arrow overlapping header text). Both highlight that width calculations don't account for icon/symbol content.\n- https://github.com/streamlit/streamlit/issues/11794 \u2014 **Sort LinkColumn by display_text**: Related to `LinkColumn` + `display_text` behavior; while about sorting rather than rendering, it shares the same feature surface area.\n- https://github.com/streamlit/streamlit/issues/10365 \u2014 **Inline code replaces / with _ sometimes**: Related to material icon shortcode parsing issues; both involve material icon syntax (`:material/...:`) not working as expected in certain contexts.\n\n---\n*This is an automated triage comment using `claude-4.6-opus-high-thinking`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-16T17:56:01Z",
+      "body": "I've been looking at this \u2014 material icons in `LinkColumn` break when the column is narrow. The root cause is glide's `truncateString` (`max = w / 4`) slicing the ligature string before `fillText`, which breaks font shaping. For example, `\"open_in_new\"` (11 chars) gets sliced at any width below 44px.\n\nWe can fix this on the Streamlit side by resolving icon names to their Unicode codepoints before passing them to glide (single char, never truncated). This involves creating a map which will increase our bundle size ~15-20kb. But I think this might be worth fixing in glide instead \u2014 either relaxing the heuristic for short strings, or adding an opt-in flag to use canvas clipping instead of string truncation. Both would be small patches and would help any glide consumer using icon fonts or ligatures.\n\nWhat's your read [USER] \u2014 worth exploring a glide-side fix, or better to handle it in Streamlit?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-16T19:21:06Z",
+      "body": "Oh wow! Good catch! I didn't expect that to depend on the length of the icon's name. \ud83d\ude32 \n\nI'll update the issue title and description so it's not specific to 44px.\n\nFor example, `display_text=\":material/signal_cellular_connected_no_internet_0_bar:\"` fails with `width=171` or `width=\"small\"`, which should be plenty enough to render the icon. \ud83d\ude2c "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-05-04T14:06:20Z",
+      "body": "Yeah, I think this is something we likely want to fix in glide-data-grid directly. Another alternative would be to implement a custom link column implementation, which I think would be fine if we also resolve some of the other outstanding issues/feature requests with link column as well: https://github.com/streamlit/streamlit/issues?q=is%3Aissue%20state%3Aopen%20LinkColumn%20sort%3Areactions-%2B1-desc But probably not worth the overhead to only fix this specific aspect"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-05-04T14:08:06Z",
+      "body": "[USER] \n\n> We can fix this on the Streamlit side by resolving icon names to their Unicode codepoints before passing them to glide (single char, never truncated). This involves creating a map which will increase our bundle size ~15-20kb. \n\nmaybe we can scope a quick fix that only handles `:material/open_in_new:` as a special case which is probably the big majority of icon usage in link column anyways? "
+    }
+  ]
+}

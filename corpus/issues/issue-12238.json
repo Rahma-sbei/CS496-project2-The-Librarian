@@ -1,0 +1,28 @@
+{
+  "id": "issue-12238",
+  "type": "issue",
+  "number": 12238,
+  "url": "https://github.com/streamlit/streamlit/issues/12238",
+  "title": "Multi-column selections in `st.dataframe` should be additive",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe"
+  ],
+  "created_at": "2025-08-15T21:41:42Z",
+  "closed_at": "2026-07-22T09:37:18Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nWhen activating multi-column selections in `st.dataframe`, clicking on a new column changes the selection to that column. You need to shift-click to add the column to the selection. Instead, we should add the clicked column to the selection upon a normal click. \n\nhttps://github.com/user-attachments/assets/447b75fa-4c54-43e4-8b65-dfa5abaa1488\n\n \n\n### Why?\n\n- More in line with how multi-row selections work. \n- Easier to use on mobile. Today, you effectively can't do multi-column selections on mobile since you can't shift-click. \n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-08-15T21:41:52Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12238)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T09:37:18Z",
+      "body": "Closing this since its fixed a couple of versions ago and should work as expected."
+    }
+  ]
+}

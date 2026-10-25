@@ -1,0 +1,41 @@
+{
+  "id": "issue-11971",
+  "type": "issue",
+  "number": 11971,
+  "url": "https://github.com/streamlit/streamlit/issues/11971",
+  "title": "SelectboxColumn in data editor not working when fragment with run_every is active",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.data_editor",
+    "feature:st.fragment"
+  ],
+  "created_at": "2025-07-17T19:45:23Z",
+  "closed_at": "2026-07-19T11:39:44Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen a data editor with a selectbox column is used in conjunction with a fragment with active run_every (not inside the fragment), the options further down in the select box cannot be selected. While scrolling, the scroll position automatically jumps to the top with every fragment rerun, making options further down unreachable.\n\n### Reproducible Code Example\n\n```Python\nimport string\nimport pandas as pd\nimport streamlit as st\n\nst.session_state.counter = 0\nst.title(\"Minimal Working Example\")\n\n\n[USER].fragment(run_every=0.5)\ndef fragment():\n    st.session_state.counter += 1\n    st.write(f\"Counter: {st.session_state.counter}\")\n\n\nif st.toggle(\"Run Fragment\", value=True):\n    fragment()\n\ndata = pd.DataFrame({'column_1': ['b']})\nst.data_editor(\n    data,\n    hide_index=True,\n    column_config={\n        'column_1': st.column_config.SelectboxColumn(\"Select\", options=list(string.ascii_lowercase))\n    }\n)\n```\n\n### Steps To Reproduce\n\n1. Double click on the cell containing *b* in *column_1*\n2. Try to scroll down in the opened select window\n3. Notice that the scroll position resets every 0.5 seconds (each fragment rerun)\n4. Disable the toggle *Run Fragment*\n5. Open the selection window once more and notice that scrolling works\n\n### Expected Behavior\n\nThe scroll position remains at the current position unless I scroll further up or down.\n\n### Current Behavior\n\nThe scroll position automatically scrolls back to the top with every fragment run.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.47.0\n- Python version: 3.13.4\n- Operating System: MacOS Sequoia 15.5\n- Browser: Safari, Firefox, Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-17T19:45:39Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11971)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-21T12:32:36Z",
+      "body": "[USER] thank you for filing this issue. I was able to reproduce this [here](https://issues.streamlit.app/?issue=gh-11971). I also added a few more tests. The issue occurs also without the usage of `session_state` and it is only applicable to selectboxes inside the data editor. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-22T08:36:33Z",
+      "body": "How can I contribute to fix this issue?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-19T11:39:44Z",
+      "body": "This seems to be fixed in the latest release."
+    }
+  ]
+}

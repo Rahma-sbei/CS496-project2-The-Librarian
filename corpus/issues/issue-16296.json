@@ -1,0 +1,33 @@
+{
+  "id": "issue-16296",
+  "type": "issue",
+  "number": 16296,
+  "url": "https://github.com/streamlit/streamlit/issues/16296",
+  "title": "Port auto-increment feature not working after moving to starlette",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "area:windows",
+    "area:network",
+    "status:confirmed",
+    "priority:P3",
+    "area:server"
+  ],
+  "created_at": "2026-08-03T09:01:57Z",
+  "closed_at": "2026-08-03T22:10:13Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nHello, I noticed that after updated the streamlit version to more than 1.56, the port auto-increment feature stops working when running streamlit app on more than 1 terminal. All processes will be launched at 8501 instead of finding next available port. I assume it is because of the change from tornado to starlette in version 1.57. I tried up to latest version 1.60 and it's still not working. Is it intended as deprecated feature or just a bug?\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\nPort auto increment to find next available port when run a 2nd applicaiton.\n\n### Current Behavior\n\nAll processes start streamlit at port 8501.\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: >=1.57\n- Python version: 3.12\n- Operating System: Window\n- Browser: Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-03T09:02:13Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16296)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-03T13:34:14Z",
+      "body": "### Summary\n\nThis is a **regression on Windows** introduced by the Tornado \u2192 Starlette/Uvicorn server migration (v1.57). When the default port `8501` is already in use, Streamlit no longer auto-increments to the next free port; instead every process happily binds to `8501`.\n\n**Likely root cause:** The new server pre-binds its own socket in `_bind_socket()` and unconditionally sets `SO_REUSEADDR`:\n\n```271:271:lib/streamlit/web/server/starlette/starlette_server.py\n        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)\n```\n\nOn POSIX systems `SO_REUSEADDR` only permits rebinding sockets left in `TIME_WAIT`, but **on Windows it allows two active sockets to bind the exact same address/port simultaneously**. As a result the second `streamlit run` process binds `8501` successfully, `bind()` never raises `EADDRINUSE`, and the port-retry loop in `UvicornServer.start()` (`for attempt in range(MAX_PORT_SEARCH_RETRIES + 1)`, ~lines 354\u2013392) never advances to the next port. The old Tornado server relied on `tornado.netutil.bind_sockets`, which on Windows uses `SO_EXCLUSIVEADDRUSE` (and avoids `SO_REUSEADDR`), so conflicts were detected and auto-increment worked. The Windows-appropriate fix is to use `SO_EXCLUSIVEADDRUSE` instead of `SO_REUSEADDR` on Windows.\n\nThis is a bug/regression, not intended deprecation.\n\n### Related Issues\n\n- [#15378 \u2014 Running Streamlit with Starlette in Corporate Network](https://github.com/streamlit/streamlit/issues/15378): Confirmed `type:regression` from the same Starlette/Uvicorn migration affecting the server on Windows (`area:windows`, `area:network`, `area:server`) \u2014 closest sibling in nature.\n- [#15022 \u2014 Intermittent `OSError: [WinError 121]` since upgrading to `v1.57.0`](https://github.com/streamlit/streamlit/issues/15022): Another confirmed Windows-specific server regression introduced by the 1.57 Starlette/Uvicorn migration, pointing to Windows socket-handling differences in the new server.\n- [#9271 \u2014 auto-select next available port](https://github.com/streamlit/streamlit/issues/9271): Directly concerns the port auto-increment / free-port-search feature this issue reports as broken (see also [#9328](https://github.com/streamlit/streamlit/issues/9328) for specifying the starting port).\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

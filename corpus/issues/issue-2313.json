@@ -1,0 +1,45 @@
+{
+  "id": "issue-2313",
+  "type": "issue",
+  "number": 2313,
+  "url": "https://github.com/streamlit/streamlit/issues/2313",
+  "title": "Enable horizonal scrolling for wide columns (e.g. with charts)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:layout",
+    "feature:st.columns",
+    "type:possible-component"
+  ],
+  "created_at": "2020-11-03T21:41:14Z",
+  "closed_at": "2026-08-18T09:15:44Z",
+  "body": "_(Note, you don't have to fill out every section here. They're just here for guidance. That said, nicely detailed feature requests are more likely to get eng attention sooner)_\n\n### Problem\n\nWhen I call `st.dataframe(df)` on a dataframe that has too many columns to fit into the width of the page, the `st.dataframe` container allows me to scroll sideways to see the other columns.\nHowever, when I attempt to display multiple graphs side-by-side using `st.columns`, the graphs in the columns get cut by the vertical edges of the column space. Is there a way to allow the columns to scroll horizontally to solve this problem?\n\n### Solution\n\n**MVP:** What's the smallest possible solution that would get 80% of the problem out of the way?\nEither of the following two options would work:\n\n1. Allow unsafe style injection in `st.columns` via (say) `**kwargs`. This way, I could inject `style=\"overflow-x:scroll\"` with minimal code change in streamlit infra.\n\n2. Allow unsafe javascript execution after the page has loaded (this will probably make a ton of other people happy, too)\n\n**Possible additions:** What are other things that could be added to the MVP over time to make it better?\n\n**Preferred solution:** If you don't like the MVP above, tell us why, and what you'd like done instead.\n\n### Additional context\n\nAdd any other context or screenshots about the feature request here. For example, did this FR come from https://discuss.streamlit.io or another site? Link the original source here!\n\nhttps://discuss.streamlit.io/t/is-there-a-way-to-horizontally-scroll-containers/6737\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-2313)",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2020-11-03T21:47:17Z",
+      "body": "I'd like to be able to do something like this:\r\n\r\n```\r\ncols = st.columns(len(all_my_data), style=\"overflow-x:scroll\")\r\nfor col, data in zip(cols, all_my_data):\r\n    with col:\r\n        st.altair_chart(my_graph_drawing_function(data))\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-08-14T00:53:27Z",
+      "body": "Hey [USER] ,This feature would really solve my functionality. Hope there would be a feature/workaround soon.\r\nMy particular use case is to render charts at header level of a dataframe.\r\n\r\nCheck my issue here for more context: https://discuss.streamlit.io/t/render-header-level-interactive-charts-for-dataframes/49048\r\n\r\n[USER] & I were able to figure out a part of the functionality, when combined with horizontal scroll it solves my use case.\r\n\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-19T00:33:26Z",
+      "body": "+1 this would be great to do! My use-case is that I have a lot of columns that overflow the width of the page, and I'd like to be able to scroll instead of having their names truncated. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-01-22T11:34:02Z",
+      "body": "I would say this is a must have feature. Adding horizontal scrolling will further scale streamlit's usability towards a wider other web applications and improving the overall user experience."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-18T09:18:41Z",
+      "body": "## Update\n\nStreamlit 1.63+ will provide `wrap` parameter for `st.columns` to disable responsiveness and enable horizontal scrolling instead:\n\n```pyhon\ncol1, col2 = st.columns(2, wrap=False)\n```\n\nHorizontal scrolling can also be enabled via the `wrap` and a horizontal containter:\n```\nwith st.container(horizontal=True, wrap=False):\n   ...\n```"
+    }
+  ]
+}

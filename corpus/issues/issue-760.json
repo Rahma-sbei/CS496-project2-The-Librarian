@@ -1,0 +1,22 @@
+{
+  "id": "issue-760",
+  "type": "issue",
+  "number": 760,
+  "url": "https://github.com/streamlit/streamlit/issues/760",
+  "title": "Resolve caching differences in Python 2 vs 3",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "feature:cache"
+  ],
+  "created_at": "2019-11-27T13:42:37Z",
+  "closed_at": "2020-04-01T15:04:00Z",
+  "body": "When hashing a function that returns an object that we can't pickle, python 3 raises a TypeError while python 2 falls back to hashing the name of the non-hashable object.\r\n\r\n`get_hash()` therefore raises a TypeError in python 3 but not in python 2.\r\n\r\nEvaluate if we can remove the `except` blocks in `_def _code_to_bytes` for python 2 and also handle `None` getting passed to `hasher.update` in `def _update` in hashing.py",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-04-01T15:04:17Z",
+      "body": "Dropped python 2 support"
+    }
+  ]
+}

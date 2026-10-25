@@ -1,0 +1,38 @@
+{
+  "id": "issue-11061",
+  "type": "issue",
+  "number": 11061,
+  "url": "https://github.com/streamlit/streamlit/issues/11061",
+  "title": "OpenAI responses API support for write_stream",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.write_stream"
+  ],
+  "created_at": "2025-04-09T15:52:07Z",
+  "closed_at": "2026-06-23T12:48:06Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nI was trying out the new OpenAI [responses API](https://platform.openai.com/docs/api-reference/responses) (which OpenAI recommends instead of chat completions for new projects, see [this note](https://platform.openai.com/docs/api-reference/chat) at the top of chat completions docs). I saw [st.write_stream](https://docs.streamlit.io/develop/api-reference/write-magic/st.write_stream) provides automatic support for rendering streaming outputs when using chat completions, which is awesome, but the same support doesn't yet exist for the responses API. Would it be possible to extend `write_stream` with similar support for responses? Thank you!\n\n### Why?\n\nThe responses API is now recommended by OpenAI, and it'd be great to have first-class support for rendering its streaming output\n\n### How?\n\nAdd support for passing a generator returned by `openai.responses.create` to `st.write_stream`. Ideally, returned messages, including tool calls, would be incrementally rendered\n\nAs an example, currently, running the example below:\n\n```python\nimport streamlit as st\nimport openai\n\n# Function to handle streaming responses from OpenAI\ndef stream_openai_response(prompt):\n    return openai.responses.create(\n        model=\"gpt-4o\",\n        input=prompt,\n        stream=True,\n        tools=[{\"type\": \"web_search\"}]\n    )\n\n# Streamlit UI\nst.title(\"OpenAI Responses API Streaming with Tool Calls\")\nst.write(\"Enter your prompt below to receive a streaming response from OpenAI.\")\n\n# User input\nuser_input = st.text_area(\"Your prompt:\", height=100)\n\nif st.button(\"Submit\"):\n    if user_input:\n        st.write(\"**Response:**\")\n        # Display the streaming response using st.write_stream\n        st.write_stream(stream_openai_response(user_input))\n    else:\n        st.warning(\"Please enter a prompt before submitting.\")\n```\n\nresults in raw JSON output:\n\n<img width=\"875\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/8c5b2f4d-ef35-40ad-a1fa-00f4e8c0f5e8\" />\n\nBut it'd be great for it to render output messages similar to what we do for chat completions:\n\n<img width=\"712\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/45c6c4c5-91f6-4088-b522-34d51d06a79d\" />\n\n\n\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-04-09T15:52:20Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-11061)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-04-09T15:54:39Z",
+      "body": "Hi [USER]. Thanks for filing this enhancement request. I agree it would be nice to have."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-12T00:15:53Z",
+      "body": "Hello [USER] \n\nTotally agree. That would be an awesome feature to have.\n\nIn the meantime, here\u2019s a solution I came up with based on your example, in case it\u2019s helpful:\n\n```python\ndef stream_openai_response(prompt):\n    stream = openai.responses.create(\n        model=\"gpt-4o\",\n        input=prompt,\n        stream=True,\n        tools=[{\"type\": \"web_search\"}]\n    )\n\n    for chunk in stream:\n        if chunk.type == 'response.output_text.delta':\n            yield chunk.delta\n```\n\nBest,\n\nJavier"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-23T12:48:33Z",
+      "body": "## Update\n\nStreamlit will support this natively with 1.59+"
+    }
+  ]
+}

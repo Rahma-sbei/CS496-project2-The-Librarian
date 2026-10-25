@@ -1,0 +1,38 @@
+{
+  "id": "issue-14670",
+  "type": "issue",
+  "number": 14670,
+  "url": "https://github.com/streamlit/streamlit/issues/14670",
+  "title": "Set state of a widget with `bind=\"query-params\"`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:widgets"
+  ],
+  "created_at": "2026-04-07T16:32:17Z",
+  "closed_at": "2026-05-12T13:49:13Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nI have a widget (e.g. `key=\"input\"`) and a button to set an arbitrary value to my widget (e.g. `st.session_state[\"input\"] = \"arbitrary value\"`). That works fine.\n\nNow, if I add `bind=\"query-params\"` to my widget, my button still updates the widget, but not the query param. If the user reloads the page, the new value is not persisted. \ud83d\ude22 And if my button sets the query param (`st.query_params[\"input\"] = \"arbitrary value\"`), that raises a\n> streamlit.errors.StreamlitAPIException: Cannot directly set query parameter 'input' - it is bound to a widget. Modify the widget value instead.\n\nAnd the suggestion to \"Modify the widget value instead\" doesn't work; it doesn't update the widget. Anyway, I wouldn't want to pass `\"arbitrary value\"` to the widget's `value`/`default` as I would expect this to clear the query param from the URL, and the value would go back to `\"default\"` if the user reloads the page (the point of the query param is to persist).\n\nHere is a simple example with `st.text_input()`, but this applies to all widgets with `bind=\"query-params\"`.\n\n```py\nimport streamlit as st\n\nst.markdown(\"Edit the text input below, then try the buttons below.\")\n\nwith st.container(horizontal=True):\n    if st.button('1. Set session state to \"arbitrary value\"'):\n        st.session_state[\"input\"] = \"arbitrary value\"\n\n    if st.button('2. Reset session state to \"default\"'):\n        st.session_state[\"input\"] = \"default\"\n\nwith st.container(horizontal=True):\n    if st.button('3. Set query param to \"arbitrary value\"'):\n        st.query_params[\"input\"] = \"arbitrary value\"\n\n    if st.button('4. Reset query param to \"default\"'):\n        st.query_params[\"input\"] = \"default\"\n\nst.text_input(\"Input\", \"default\", key=\"input\", bind=\"query-params\")\n```\n\n### Why?\n\nI have multiple widget+button pairs like that in my Streamlit app, and I have been syncing the session state and query params manually (which doesn't always work reliably). I was thrilled by the new `bind=\"query-params\"` (THANK YOU!!! \u2764\ufe0f ), but that is a blocker for me to adopt it.\n\n### How?\n\nI imagine two solutions:\n1. The widget could update the query param if the session state has changed since the last render. I think that would be ideal.\n2. We could allow setting `st.query_params[\"input\"] = \"arbitrary value\"`. I guess that should then automatically update the session state.\n\n### Additional Context\n\nReal-world examples:\n1. I have two buttons next to a `st.segmented_control()` to select and deselect all options.\n   <img width=\"1112\" height=\"118\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/45915a97-b049-44da-9564-ea07e72eb175\" />\n2. I have a dice button next to a selectbox to select a random option.\n   <img width=\"205\" height=\"92\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/1f96c179-6527-4c18-a695-196b4c1eab4a\" />",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-07T16:32:28Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-14670)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-10T12:25:45Z",
+      "body": "Interesting discovery! If we force an update of the query params AFTER the `st.text_input()`, the `2. Reset session state to \"default\"` button works! \ud83d\ude32\n\nHere's how:\n```py\n# ...\nst.query_params.update()\n```\nOr:\n```py\n# ...\nst.query_params[\"a different key\"] = []\n```\nBut this does NOT work:\n```py\n# ...\nst.query_params.pop(\"a different key\", None)\n```\n\nI wouldn't consider this a solution, or even a satisfying workaround, since:\n1. It only works to reset the default value, and not any other value, like the `1. Set session state to \"arbitrary value\"` button.\n2. It's really not obvious, especially because we need to run `st.query_params.update()` AFTER the `st.text_input()`, and not when in the button's `on_click`.\n\nBut it hints at some code already partially handling this."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-10T18:12:38Z",
+      "body": "Thanks for posting this [USER] , I looked into this a little bit today and I want to discuss a bit more with teammates that have more context on this feature. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-12T13:49:13Z",
+      "body": "- Resolved by #14744"
+    }
+  ]
+}

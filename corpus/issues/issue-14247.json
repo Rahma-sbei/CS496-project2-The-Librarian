@@ -1,0 +1,62 @@
+{
+  "id": "issue-14247",
+  "type": "issue",
+  "number": 14247,
+  "url": "https://github.com/streamlit/streamlit/issues/14247",
+  "title": "\"Missing Submit Button\" error displayed while a form is loading",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:frontend",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.form",
+    "feature:st.form_submit_button"
+  ],
+  "created_at": "2026-03-06T14:37:18Z",
+  "closed_at": "2026-07-08T11:46:40Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhile a form is loading, for a brief moment \"Missing Submit Button\" error flashes on the screen.\n\n### Reproducible Code Example\n\nFrom official examples: https://docs.streamlit.io/develop/api-reference/execution-flow/st.form\n\n```Python\nimport streamlit as st\n\nwith st.form(\"my_form\"):\n    st.write(\"Inside the form\")\n    slider_val = st.slider(\"Form slider\")\n    checkbox_val = st.checkbox(\"Form checkbox\")\n\n    # Every form must have a submit button.\n    submitted = st.form_submit_button(\"Submit\")\n    if submitted:\n        st.write(\"slider\", slider_val, \"checkbox\", checkbox_val)\nst.write(\"Outside the form\")\n```\n\n### Steps To Reproduce\n\n1. Navigate to the official form example: https://doc-form1.streamlit.app/\n2. Turn on browser developer tools (I am using Chrome in this example)\n3. Select \"Disable cache\"\n4. Select \"Slow 4G\" throttling\n    <img width=\"387\" height=\"97\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/7e77f36c-71fc-482e-9d99-34ffde158198\" />\n5. Refresh the page\n6. Observe a big red error message \"Missing Submit Button\"\n\n<img width=\"1158\" height=\"850\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/9f039a3d-e969-4540-8fe9-2bb0597d3a15\" />\n\nAfter the form finishes loading it works fine.\n\n### Expected Behavior\n\nWhile a form is loading, no error messages should be displayed.\n\n### Current Behavior\n\nWhile a form is loading, for a brief moment \"Missing Submit Button\" error flashes on the screen.\n\n<img width=\"1158\" height=\"850\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/9f039a3d-e969-4540-8fe9-2bb0597d3a15\" />\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.55.0\n- Python version: 3.12.12\n- Operating System: Ubuntu 24.04 LTS \n- Browser: Chrome, Firefox\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-03-06T14:37:31Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-14247)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-03-06T15:34:36Z",
+      "body": "This is a valid bug in the `st.form` frontend component. During initial page load on slow connections, the \"Missing Submit Button\" error briefly flashes because the form renders before all its child elements (including the submit button) have been received from the backend.\n\n**Root cause:** The `Form` component in `frontend/lib/src/components/widgets/Form/Form.tsx` checks whether to show the \"Missing Submit Button\" warning based on two conditions: (1) no submit button is registered in `formsData`, and (2) `scriptRunState === ScriptRunState.NOT_RUNNING`. The problem is that `NOT_RUNNING` is the **default initial state** (see `ScriptRunContext.tsx` line 70 and the commented-out `INITIAL` state in `ScriptRunState.ts` lines 18-21). On slow connections, there's a window where the form component renders with `NOT_RUNNING` before the script has actually started running \u2014 the frontend cannot distinguish \"script hasn't started yet\" from \"script has finished.\" This causes the form to incorrectly conclude the script completed without a submit button, flashing the error until the script actually runs and delivers the submit button delta.\n\n### Related Issues\n\n- https://github.com/streamlit/streamlit/issues/13002 \u2014 Request to disable sidebar rendering until page load is complete. Same class of problem: premature rendering of UI elements/errors before the backend script has finished executing.\n- https://github.com/streamlit/streamlit/issues/5798 \u2014 Request to optimize static file loading and reduce app startup time. Faster loading would reduce the window during which this flash occurs, though it wouldn't fix the root cause.\n- https://github.com/streamlit/streamlit/issues/11010 \u2014 Reports flickering and weird behavior during page load in multipage apps after upgrade. Related to the general theme of visual glitches during the loading phase.\n\n---\n*This is an automated triage comment using `opus-4.6-thinking`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-06T16:55:19Z",
+      "body": "Hi, i would like to contribute to this issue. I am checking the issue. Thanks\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-24T06:27:23Z",
+      "body": "Hi, I\u2019d like to work on this issue.\n\nFrom what I observed, the warning is triggered before child components (including the submit button) are fully mounted, which leads to a transient false positive during initial render.\n\nI\u2019ve implemented a fix by moving the validation logic into a useEffect and delaying it until after the initial mount.\n\nThis approach eliminates the flicker while preserving the existing behavior when a submit button is actually missing.\n\nHappy to open a PR if this aligns with the intended behavior."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-27T06:40:13Z",
+      "body": "Hello!\n\nI was able to reproduce the issue where the \"Missing Submit Button\" error briefly flashes while the form is loading under slow network conditions.\n\nIf no one is currently working on this, I would like to investigate the root cause and try to propose a fix.\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-04-15T16:18:52Z",
+      "body": "Hi, I\u2019ve submitted a PR to fix this issue: #14766. thanks"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-07T18:17:09Z",
+      "body": "Has #15561 been included in the new 1.59.0 release? I'm still getting that error message flash after upgrading to release 1.59.0\n\n<img width=\"1714\" height=\"973\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/3831f40c-b79d-4d63-8ade-3c7b5d0a5fac\" />\n\n\nEdit: I just noticed that the entire page has already finished rendering while the \"Missing Submit Button\" error is still being displayed. In versions <= 1.58.0, I've only observed this error message appearing before the script finished rendering the form."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-07T19:38:00Z",
+      "body": "[USER], thanks for reporting this issue. I will have another look at this."
+    }
+  ]
+}

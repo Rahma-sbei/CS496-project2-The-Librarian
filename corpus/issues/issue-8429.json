@@ -1,0 +1,49 @@
+{
+  "id": "issue-8429",
+  "type": "issue",
+  "number": 8429,
+  "url": "https://github.com/streamlit/streamlit/issues/8429",
+  "title": "Unable to test a multipage app which consists a custom sidebar using AppTest",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:app-testing"
+  ],
+  "created_at": "2024-04-04T15:05:42Z",
+  "closed_at": "2026-07-22T17:38:56Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nI am facing an issue somewhat similar to [this](https://github.com/streamlit/streamlit/issues/8070), but during testing with AppTest. App functions as expected. Testing main.py works fine. Testing the page fails. \r\n\n\n### Reproducible Code Example\n\n_No response_\n\n### Steps To Reproduce\n\n1. Create the following directory structure:\r\n\r\n```\r\n\u251c\u2500\u2500 server\r\n\u2502   \u251c\u2500\u2500 main.py\r\n\u2502   \u251c\u2500\u2500 pages\r\n\u2502   \u2502   \u2514\u2500\u2500 register.py\r\n\u2502   \u2514\u2500\u2500 utils.py\r\n\u2514\u2500\u2500 tests\r\n    \u2514\u2500\u2500 unit\r\n        \u251c\u2500\u2500 test_main.py\r\n        \u2514\u2500\u2500 test_register.py\r\n```\r\n2. Disable sidebar in config.tom with \r\n```\r\n[client]\r\nshowSidebarNavigation = false\r\n```\r\n3. Add your own custom sidebar in both main.py and register.py with the following two lines of code:\r\n```\r\nst.sidebar.page_link(\"main.py\", label=\"Home\")\r\nst.sidebar.page_link(\"pages/register.py\", label=\"Register\")\r\n```\r\n4. Everything should work as expected when you run the app.\r\n5. Write test for main in test_main.py\r\n```\r\nfrom streamlit.testing.v1 import AppTest\r\nsys.path.append(os.path.abspath(\"server\"))\r\ndef test_main_page():\r\n    at = AppTest.from_file(\"server/main.py\")\r\n    at.run()\r\n    assert not at.exception\r\n```\r\n6. Running the above test should pass.\r\n7. Write a test for test_register.py as follows:\r\n```\r\nfrom streamlit.testing.v1 import AppTest\r\nsys.path.append(os.path.abspath(\"server\"))\r\ndef test_main_page():\r\n    at = AppTest.from_file(\"server/pages/register.py\")\r\n    at.run()\r\n    assert not at.exception\r\n```\n\n### Expected Behavior\n\nThe above test in test_register.py should pass.\n\n### Current Behavior\n\nstreamlit.errors.StreamlitAPIException: Could not find page: `main.py`. Must be the file path relative to the main script, from the directory: `pages`. Only the main app file and files in the `pages/` directory are supported.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.32.2\r\n- Python version: 3.11\r\n- Operating System: Linux\r\n- Browser: Chrome\r\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-04T15:05:55Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-8429)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-08T21:17:57Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Visits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fstreamlit%2Fstreamlit%2Fissues%2F8429&title=visits&edge_flat=false)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-14T04:22:33Z",
+      "body": "If you are trying to test your main.ly page, why call AppTest on the registry.py page? The issue is that AppTest thinks registry.py _is_ the main app page here and is looking for pages relative to \"that\".\r\n\r\nI see the problem though, You want to be able to run AppTest in a mode where it things the root of your directory is something other than the file being loaded. That may require an additional keyword argument..."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-14T04:27:34Z",
+      "body": "I think you need to set up AppTest with main.py and then switch pages to registry.py with https://github.com/streamlit/streamlit/blob/9f9f03b8247897cdd334d972028a5bb1ea451046/lib/streamlit/testing/v1/app_test.py#L381 If you want to test a subpage. \r\n\r\n[USER] I will note that the current docstring for AppTest claims that the capability provided by switch_page() doesn't exist \ud83e\udee0. Perhaps that was an update that came later and we never removed the docstring note"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-07T15:47:48Z",
+      "body": "[USER] Thank you. I got confused by the documentation. I thought switching page wasn't supported by AppTest. I will try this out."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T11:54:14Z",
+      "body": "Re-verified against current `develop` at `0aba4dab0b`.\n\nCalling `AppTest.from_file(\"server/pages/register.py\")` treats `register.py` as the main script, so `page_link(\"main.py\")` is resolved relative to the `pages` directory. The supported multipage testing flow is to start from the actual main script and then switch pages:\n\n```python\nat = AppTest.from_file(\"server/main.py\").run()\nat.switch_page(\"pages/register.py\").run()\nassert not at.exception\n```\n\nThat flow passes, and page switching has been supported since #8280. Closing as completed because the requested capability is implemented. The AppTest documentation can be clarified separately if the main-script requirement remains confusing."
+    }
+  ]
+}

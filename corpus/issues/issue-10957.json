@@ -1,0 +1,31 @@
+{
+  "id": "issue-10957",
+  "type": "issue",
+  "number": 10957,
+  "url": "https://github.com/streamlit/streamlit/issues/10957",
+  "title": "TypeError: unhashable type: 'list' when a Pandas DataFrame contains a list using st.cache",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:cache",
+    "status:confirmed",
+    "priority:P3",
+    "upstream"
+  ],
+  "created_at": "2025-03-29T13:31:44Z",
+  "closed_at": "2026-07-16T22:18:49Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nLooking at https://github.com/streamlit/streamlit/issues/111 it looks like hashing a DataFrame where any value was a list used to cause problems. However, it was fixed and it's working now.\n\nHowever, if you have two cached functions and one is using the result of the other, the problem comes back.\n\nIn 1.42 this doesn't raise an exception, but since 1.43 it does.\n\n### Reproducible Code Example\n\n```Python\nimport pandas as pd\nimport streamlit as st\n\n\n[USER].cache_data\ndef get_df1():\n    df1 = pd.DataFrame({\"col\": [[1, 2]]}, index=[1])\n    print(df1)\n    return df1\n\n\n[USER].cache_data\ndef get_df2(df1):\n    df2 = pd.DataFrame({\"col2\": [42]}, index=[1])\n    print(df2)\n\n    return pd.merge_asof(df1, df2, left_index=True, right_index=True)\n\n\ndf1 = get_df1()\ndf2 = get_df2(df1)\nprint(df2)\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\nTraceback:\n```\n2025-03-29 14:23:20.849 Pandas DataFrame hash failed. Falling back to pickling the object.\nTraceback (most recent call last):\n  File \"/[HOME]/projects/test/.venv/lib64/python3.13/site-packages/streamlit/runtime/caching/hashing.py\", line 453, in _to_bytes\n    values_hash_bytes = self.to_bytes(pd.util.hash_pandas_object(obj))\n                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^\n  File \"/[HOME]/projects/test/.venv/lib64/python3.13/site-packages/pandas/core/util/hashing.py\", line 174, in hash_pandas_object\n    h = combine_hash_arrays(hashes, num_items)\n  File \"/[HOME]/projects/test/.venv/lib64/python3.13/site-packages/pandas/core/util/hashing.py\", line 63, in combine_hash_arrays\n    first = next(arrays)\n  File \"/[HOME]/projects/test/.venv/lib64/python3.13/site-packages/pandas/core/util/hashing.py\", line 173, in <genexpr>\n    hashes = (x for x in _hashes)\n                         ^^^^^^^\n  File \"/[HOME]/projects/test/.venv/lib64/python3.13/site-packages/pandas/core/util/hashing.py\", line 154, in <genexpr>\n    hash_array(series._values, encoding, hash_key, categorize)\n    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/[HOME]/projects/test/.venv/lib64/python3.13/site-packages/pandas/core/util/hashing.py\", line 279, in hash_array\n    return _hash_ndarray(vals, encoding, hash_key, categorize)\n  File \"/[HOME]/projects/test/.venv/lib64/python3.13/site-packages/pandas/core/util/hashing.py\", line 318, in _hash_ndarray\n    codes, categories = factorize(vals, sort=False)\n                        ~~~~~~~~~^^^^^^^^^^^^^^^^^^\n  File \"/[HOME]/projects/test/.venv/lib64/python3.13/site-packages/pandas/core/algorithms.py\", line 795, in factorize\n    codes, uniques = factorize_array(\n                     ~~~~~~~~~~~~~~~^\n        values,\n        ^^^^^^^\n        use_na_sentinel=use_na_sentinel,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        size_hint=size_hint,\n        ^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/[HOME]/projects/test/.venv/lib64/python3.13/site-packages/pandas/core/algorithms.py\", line 595, in factorize_array\n    uniques, codes = table.factorize(\n                     ~~~~~~~~~~~~~~~^\n        values,\n        ^^^^^^^\n    ...<3 lines>...\n        ignore_na=use_na_sentinel,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"pandas/_libs/hashtable_class_helper.pxi\", line 7281, in pandas._libs.hashtable.PyObjectHashTable.factorize\n  File \"pandas/_libs/hashtable_class_helper.pxi\", line 7195, in pandas._libs.hashtable.PyObjectHashTable._unique\nTypeError: unhashable type: 'list'\n```\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.44.0\n- Python version: 3.13\n- Operating System: Fedora 41\n- Browser: Firefox 136.0.3\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-29T13:31:55Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-10957)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-31T16:16:51Z",
+      "body": "Hey [USER], thank you for opening this issue!\n\nI was able to reproduce it locally when the error info you provided appears in the app console output, although looks like it does not affect how the app actually works, and it displays the df correctly (See: https://issues.streamlit.app/?issue=gh-10957) \n\nAnyway, I can confirm that this is a bug, and we need to investigate the root cause of it. Thank you again for opening!"
+    }
+  ]
+}

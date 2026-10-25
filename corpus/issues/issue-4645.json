@@ -1,0 +1,28 @@
+{
+  "id": "issue-4645",
+  "type": "issue",
+  "number": 4645,
+  "url": "https://github.com/streamlit/streamlit/issues/4645",
+  "title": "Disallow a user to ignore a certain widget",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:st.text_input"
+  ],
+  "created_at": "2022-04-25T19:45:18Z",
+  "closed_at": "2026-07-22T10:03:30Z",
+  "body": "Argparse has `required=True`, but there is no equivalent in Streamlit. In particular, in Streamlit it is impossible to prohibit making the `text_input` field empty.\r\n\r\n---\r\n\r\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\r\n\r\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2022-07-28T15:17:33Z",
+      "body": "[USER] Thanks for your suggestion! This seems like a reasonable and useful addition. I have forwarded this suggestion to our product team. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-08-20T02:19:30Z",
+      "body": "Related even though specifically for forms: #7165"
+    }
+  ]
+}

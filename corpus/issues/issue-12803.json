@@ -1,0 +1,25 @@
+{
+  "id": "issue-12803",
+  "type": "issue",
+  "number": 12803,
+  "url": "https://github.com/streamlit/streamlit/issues/12803",
+  "title": "Make sidebar border react to hover events",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:theming",
+    "feature:st.sidebar"
+  ],
+  "created_at": "2025-10-18T02:42:33Z",
+  "closed_at": "2026-09-22T03:45:12Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nIf `showSidebarBorder=False`, the sidebar border shows up on hover, to indicate that you can resize. That\u2019s fine!\n\nBut if `showSidebarBorder=True`, we don\u2019t change it when hovering. Should we make it darker or wider or both?\n\n### Why?\n\nWould feel a bit nicer + make it more discoverable that you can drag this to resize the sidebar. \n\n### How?\n\nNeeds a design!\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-10-18T02:42:43Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12803)\n"
+    }
+  ]
+}

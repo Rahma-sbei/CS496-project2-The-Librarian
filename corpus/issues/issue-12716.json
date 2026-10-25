@@ -1,0 +1,40 @@
+{
+  "id": "issue-12716",
+  "type": "issue",
+  "number": 12716,
+  "url": "https://github.com/streamlit/streamlit/issues/12716",
+  "title": "Long dialog starts at the bottom",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.dialog"
+  ],
+  "created_at": "2025-10-08T04:42:04Z",
+  "closed_at": "2026-07-19T12:02:40Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nIf a dialog is long, that means it gets a scrollbar at the right hand side, it always starts at the bottom, so the user has to scroll up to see first entries.\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-10-08T04:42:17Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-12716)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-08T07:41:38Z",
+      "body": "Btw this happens more often when the browser window is not in full size. I am not sure if that helps."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-10-13T15:46:26Z",
+      "body": "Thank you for reporting this issue, [USER]! \ud83d\ude4f\n\n### \ud83d\udd2c Reproduction App Available\n\nI've created a reproduction app for this issue:\n\n[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/gh-12716)\n\n**Direct link:** https://issues.streamlitapp.com/gh-12716\n\nThe issue has been confirmed. Note that the bug appears when **reopening** the dialog (not on first open), so try closing and reopening the dialog to see it.\n\n### Workaround\n\nUntil this is fixed, you can work around the issue by using `st.rerun()` to reset the scroll position:\n\n```python\n[USER].dialog(\"My Dialog\")\ndef my_dialog():\n    # Your dialog content\n    if st.button(\"Close and Reset\"):\n        st.rerun()  # This will reset scroll position\n```\n\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-19T12:02:40Z",
+      "body": "Closing this since it was fixed with the migration from basweb to react-aria."
+    }
+  ]
+}

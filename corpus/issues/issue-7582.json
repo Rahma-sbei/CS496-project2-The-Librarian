@@ -1,0 +1,35 @@
+{
+  "id": "issue-7582",
+  "type": "issue",
+  "number": 7582,
+  "url": "https://github.com/streamlit/streamlit/issues/7582",
+  "title": "st.selectbox doesn't highlight/scroll-to default selections beyond index value of 7",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.selectbox"
+  ],
+  "created_at": "2023-10-20T16:47:57Z",
+  "closed_at": "2026-06-14T19:55:36Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nst.selectbox won't highlight/scroll-to an item beyond index 7 (e.g., the first 8 items).   \r\n\r\n### Reproducible Code Example\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-7582)\r\n\r\n```Python\r\nimport streamlit as st\r\nweek = st.selectbox(\r\n    \"Week\",\r\n    [1,2,3,4,5,6,7,8,9,10],\r\n    index=8,\r\n    key=\"pt_week\"\r\n)\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n1.  Run the code above.   Notice \"9\" is the default value in the selector, but when you drop down the choice list, it isn't scrolled-to and highlighted.\r\n2. Change the index value in the code above to 7   Run the modified code.  Notice \"8\" is the default value in the selector and when you drop down the choice list, \"8\" is correctly highlighted and scrolled to as well.\r\n\r\n### Expected Behavior\r\n\r\nThe select box drop-down list should always scroll-to and highlight the default indexed choice, so that the user doesn't have to scroll through a long list to select a nearby choice\r\n\r\n### Current Behavior\r\n\r\nSelect box shows the indexed choice's value but does not scroll-to and highlight that choice in the dropdown list.\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version:\r\n- Python version:\r\n- Operating System:\r\n- Browser:\r\n\r\n\r\n### Additional Information\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-10-20T16:48:10Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-7582)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-10-25T06:49:33Z",
+      "body": "[USER] Thanks for reporting this issue. I was able to reproduce this [here](https://issues.streamlit.app/?issue=gh-7582). "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-14T19:55:37Z",
+      "body": "Closing since this has been fixed recently"
+    }
+  ]
+}

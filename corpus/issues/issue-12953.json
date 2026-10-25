@@ -1,0 +1,54 @@
+{
+  "id": "issue-12953",
+  "type": "issue",
+  "number": 12953,
+  "url": "https://github.com/streamlit/streamlit/issues/12953",
+  "title": "Turn `st.Page` into a proper class",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:multipage-apps"
+  ],
+  "created_at": "2025-11-06T01:00:36Z",
+  "closed_at": "2026-07-31T07:30:33Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nToday, `st.Page` isn't a class itself but returns an object of type `StreamlitPage`. Same for the return type of `st.navigation`. This is a bit confusing to users and in our docs. Can we change `st.Page`, so it's a proper class?\n\n### Why?\n\nLess confusion. \n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-11-06T01:00:49Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12953)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-10T04:59:13Z",
+      "body": "Hi [USER] , I can give this a try. Can you assign this issue to me ?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-11-10T22:28:28Z",
+      "body": "Feel free to just open a PR!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-19T03:57:01Z",
+      "body": "Hi, I\u2019d like to work on this issue. I\u2019ll start exploring the codebase and open a PR soon.\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-08T02:48:38Z",
+      "body": "Hello, I'd like to try working on this if that's okay. I've started a draft pull request with some progress, using Page as a wrapper class for the StreamlitPage. I would appreciate any advice or expectations on how this should work or be implemented."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-02-21T07:11:05Z",
+      "body": "\ud83d\udc4b  [USER] I noticed this issue was still open and opened a PR.   "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-28T18:37:48Z",
+      "body": "just curious was there something wrong with this PR?\nhttps://github.com/streamlit/streamlit/pull/14049"
+    }
+  ]
+}

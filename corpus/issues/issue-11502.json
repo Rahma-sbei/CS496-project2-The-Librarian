@@ -1,0 +1,44 @@
+{
+  "id": "issue-11502",
+  "type": "issue",
+  "number": 11502,
+  "url": "https://github.com/streamlit/streamlit/issues/11502",
+  "title": "st.fragment breaks sticky positioning of chat input field",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.chat_input",
+    "feature:st.fragment"
+  ],
+  "created_at": "2025-06-03T07:09:22Z",
+  "closed_at": "2026-07-22T09:02:31Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nHi,\n\nI've run into an issue when trying to use st.fragment in combination with st.chat_input. It seems that when wrapping my simple chat logic inside a [USER].fragment, the chat input no longer sticks to the bottom of the page as expected. \n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\n# using fragment breaks sticky positioning of the chat input field\n\n[USER].fragment\ndef simple_chat_test():\n    st.title(\"Simple Chat Test\")\n\n    if \"test_messages\" not in st.session_state:\n        st.session_state.test_messages = []\n        st.session_state.test_messages.append({\n            \"role\": \"assistant\", \n            \"content\": \"Hi! I'm a simple test bot. I'll respond 'Got it' to everything you say. Try typing something!\"\n        })\n\n    for message in st.session_state.test_messages:\n        with st.chat_message(message[\"role\"]):\n            st.markdown(message[\"content\"])\n\n    with st.expander(\"Test Content (to make page longer)\", expanded=False):\n        for i in range(20):\n            st.write(f\"This is test line {i+1}\")\n\n    if prompt := st.chat_input(\"Type anything here...\"):\n        st.session_state.test_messages.append({\"role\": \"user\", \"content\": prompt})\n        with st.chat_message(\"user\"):\n            st.markdown(prompt)\n\n        response = \"Got it\"\n        st.session_state.test_messages.append({\"role\": \"assistant\", \"content\": response})\n        with st.chat_message(\"assistant\"):\n            st.markdown(response)\n\n        st.rerun()\n\nif __name__ == \"__main__\":\n    simple_chat_test()\n```\n\n### Steps To Reproduce\n\nUse st.fragment\n\n### Expected Behavior\n\nst.chat_input stays fixed to the bottom of the page (sticky), as it does when running outside of a fragment.\n\n### Current Behavior\n\n The chat input is no longer sticky\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.45.0\n- Python version: 3.12.1\n- Operating System: Win 11\n- Browser:  Chrome 137.0.7151.55\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-06-03T07:09:34Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11502)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-06-03T23:27:01Z",
+      "body": "Hello [USER] , thank you for filing this issue!\n\nI can confirm that I am seeing the same behavior as you with the provided code. Thank you for providing such a great reproducible example!\n\nAs a workaround in the meantime, not using a fragment will render the chat layout as expected."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-06-04T10:30:13Z",
+      "body": "Another workaround would be to use `st._bottom.chat_input()` to enforce the chat input to be placed into the bottom container. chat input is only placed in the bottom if its used in the main page container. A fragment uses a dedicated container for its elements -> this is causing the chat input to be placed in-line. \n\nRelated feature request to expose the bottom container as an official part of the API:  https://github.com/streamlit/streamlit/issues/10722\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-06-09T11:46:18Z",
+      "body": "Changing this to `enhancement` since the current behaviour is expected and unlikely to be changed. We are planning to either add an explicit `position` parameter to chat input or to expose `st.bottom` (https://github.com/streamlit/streamlit/issues/10722) in our public API to allow users to explicitly put a chat input to the bottom of an app. Another related issue: https://github.com/streamlit/streamlit/issues/8564"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T09:02:31Z",
+      "body": "Closing this since the solution is to explicitly but this into the bottom container via `st.bottom.chat_input(...)` when used inside a fragment."
+    }
+  ]
+}

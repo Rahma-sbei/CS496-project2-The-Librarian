@@ -1,0 +1,44 @@
+{
+  "id": "issue-17112",
+  "type": "issue",
+  "number": 17112,
+  "url": "https://github.com/streamlit/streamlit/issues/17112",
+  "title": "st.button lost callback from a fragment > dialog > fragment",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P2",
+    "feature:callbacks",
+    "feature:st.button",
+    "feature:st.dialog",
+    "feature:st.fragment",
+    "area:execution-model"
+  ],
+  "created_at": "2026-09-24T11:09:13Z",
+  "closed_at": "2026-09-24T12:49:05Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nHello, since version 1.64 (previous was 1.59.2)\n\nSome buttons doesn't get rerun in a setup with multiple layers of fragment.\n\nfragment > dialog > fragment.\n\nIt was working on 1.59.2.\nIs it expected ? should I test with a fragment key ?\n\nThank you\n\n### Reproducible Code Example\n\n```Python\nimport sys\n\nimport streamlit as st\nfrom streamlit import runtime, session_state\nfrom streamlit.web import cli as stcli\n\n_COUNTER_KEY_SUFFIX = \"_counter_value\"\n\n\n[USER].fragment\ndef _render_button_in_dialog(page_key: str) -> None:\n    \"\"\"Fragment: increment button rendered inside the dialog.\"\"\"\n    counter_key = f\"{page_key}{_COUNTER_KEY_SUFFIX}\"\n    st.metric(\"Count\", session_state[counter_key])\n    if st.button(\"\u2795 Increment\", key=f\"{page_key}_increment_btn\", type=\"primary\"):\n        session_state[counter_key] += 1\n        st.rerun(scope=\"fragment\")\n\n\n[USER].fragment\ndef _render_button(page_key: str) -> None:\n    \"\"\"Fragment: open-dialog button.\"\"\"\n    counter_key = f\"{page_key}{_COUNTER_KEY_SUFFIX}\"\n\n    if counter_key not in session_state:\n        session_state[counter_key] = 0\n\n    [USER].dialog(\"Counter\", width=\"small\")\n    def _open_dialog() -> None:\n        _render_button_in_dialog(page_key)\n\n    st.button(\"\ud83d\udd22 Open Counter\", key=f\"{page_key}_open_btn\", on_click=_open_dialog)\n\n\ndef launch(page_key: str = \"counter\") -> None:\n    _render_button(page_key)\n\n\nif __name__ == \"__main__\":\n    if runtime.exists():\n        st.set_page_config(layout=\"centered\", page_title=\"Counter Demo\", page_icon=\"\ud83d\udd22\")\n        launch(page_key=\"standalone\")\n    else:\n        sys.argv = [\"streamlit\", \"run\", sys.argv[0]]\n        sys.exit(stcli.main())\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\nlabel should increment. rerun or callback triggered\n\n### Current Behavior\n\nno callback or rerun, button action is dropped.\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.64\n- Python version: 3.11\n- Operating System: Windows\n- Browser: Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-24T11:09:23Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-17112)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-24T12:19:03Z",
+      "body": "I was able to reproduce this here: https://issues.streamlit.app/?issue=gh-17112"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-24T12:19:45Z",
+      "body": "This is a regression in the `fragment \u2192 dialog \u2192 fragment` nesting: the Increment button stays visible, but its click never reruns the inner fragment. `[USER].dialog` is itself a `_fragment`. The repro opens that dialog from a fragment widget\u2019s `on_click`, so the dialog (and the nested `[USER].fragment` inside it) are registered during the callback. Since #16141 (in 1.64), callbacks bind `ThreadState.fragment_id` to the opener widget\u2019s fragment, so those dialog/inner fragments become **descendants of the opener**. The opener then still does its default fragment rerun without calling the dialog again; `clear_stale_descendants` evicts the nested callables while the modal remains on `event_dg`. Later clicks send the evicted id and `AppSession.request_rerun` drops them. In 1.59.2 callbacks did not set `fragment_id`, so the dialog was registered as a root fragment and survived. A fragment `key` would not fix this. [#17039](https://github.com/streamlit/streamlit/pull/17039) (full-app-scoped dialog lifetime) likely covers this on `develop`, but its e2e opens the dialog from `if st.button()` rather than `on_click`, so that path should still be verified.\n\n### Related Issues\n\n- [#17011](https://github.com/streamlit/streamlit/issues/17011) \u2014 Same eviction class: a dialog opened from a fragment stays on screen after the parent fragment reruns, but clicks stop working. Closed by #17039; this report is the `on_click` + nested inner fragment variant.\n- [#8591](https://github.com/streamlit/streamlit/issues/8591) \u2014 Opening a dialog from a button `on_click` historically made later dialog button clicks fail with a missing fragment id. Same callback-open pattern, without the extra inner `[USER].fragment`.\n- [#10283](https://github.com/streamlit/streamlit/issues/10283) \u2014 `st.dialog` inside `[USER].fragment` has inconsistent lifecycle (dismiss/reopen) compared with a top-level dialog. Same feature intersection, different failure mode.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-24T12:47:53Z",
+      "body": "Thanks for the report [USER] \n\nThis is the same bug as #17011. The fix is already on develop in #17039 ([Preserve dialogs across parent fragment reruns](https://github.com/streamlit/streamlit/pull/17039)). We re-ran this issue\u2019s repro against current develop after that merge: Increment updates Count as expected.\n\nIt will ship in the next release after 1.65 (next week). Until then, a workaround is to open the dialog from the parent fragment body (e.g. a session-state flag) rather than from on_click, so the dialog fragment is re-registered on the parent rerun.\n\nFor example:\n\n```\n[USER].fragment\ndef counter_dialog():\n    [USER].dialog(\"Counter\", width=\"small\")\n    def _open_dialog():\n        if \"count\" not in st.session_state:\n            st.session_state.count = 0\n        st.metric(\"Count\", st.session_state.count)\n        if st.button(\"Increment\", type=\"primary\"):\n            st.session_state.count += 1\n            st.rerun(scope=\"fragment\")\n    # Open from the fragment body, not on_click.\n    if st.button(\"Open Counter\"):\n        st.session_state.show_counter = True\n    if st.session_state.get(\"show_counter\"):\n        _open_dialog()\ncounter_dialog()\n```\n\nThis workaround is included in the repro app as well: https://issues.streamlit.app/?issue=gh-17112"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "issue-15892",
+  "type": "issue",
+  "number": 15892,
+  "url": "https://github.com/streamlit/streamlit/issues/15892",
+  "title": "st.tabs: widget rerun inside a tab renders all tabs' content stacked below the page (regression in 1.59.0)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "area:frontend",
+    "status:confirmed",
+    "priority:P1",
+    "feature:st.tabs"
+  ],
+  "created_at": "2026-07-08T03:31:48Z",
+  "closed_at": "2026-07-08T11:38:00Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n**Regression in 1.59.0** (1.58.0 is fine): when a widget inside an `st.tabs` tab triggers a rerun, the tab bar disappears and the content of **all** tabs renders stacked vertically down the page, as if the tabs container no longer exists. A browser reload restores the tabs until the next widget interaction.\n\nPossibly related to the tabs DOM rework in 1.59.0: in 1.58.0 each tab renders a `[data-baseweb=\"tab-panel\"]` element (4 tabs \u2192 4 panels, 1 visible); in 1.59.0 those elements are gone entirely.\n\n### Reproducible Code Example\n\n```python\nimport altair as alt\nimport numpy as np\nimport pandas as pd\nimport streamlit as st\n\nst.title(\"Tabs regression repro\")\n\nrng = np.random.RandomState(42)\ndf = pd.DataFrame({\"x\": range(20), \"y\": rng.rand(20)})\n\n\ndef tab_content(name: str) -> None:\n    st.metric(\"Metric\", name)\n    st.dataframe(df.head(3))\n    st.altair_chart(alt.Chart(df).mark_bar().encode(x=\"x:O\", y=\"y:Q\"), use_container_width=True)\n    st.altair_chart(alt.Chart(df).mark_line().encode(x=\"x:O\", y=\"y:Q\"), use_container_width=True)\n    st.subheader(\"Leaderboard\")\n    choice = st.selectbox(\"Date range\", [\"A\", \"B\", \"C\"], key=f\"{name}_sel\")\n    n = {\"A\": 5, \"B\": 10, \"C\": 15}[choice]\n    st.altair_chart(alt.Chart(df.head(n)).mark_bar().encode(x=\"y:Q\", y=\"x:O\"), use_container_width=True)\n\n\nnames = [\"All\", \"Indy\", \"Clarksville\", \"Fort Wayne\"]\nfor tab, name in zip(st.tabs(names), names):\n    with tab:\n        tab_content(name)\n```\n\n### Steps To Reproduce\n\n1. `pip install streamlit==1.59.0 altair` and run the app above.\n2. Stay on the first tab (\"All\").\n3. Change the \"Date range\" selectbox from \"A\" to \"B\".\n\n### Expected Behavior\n\nThe rerun re-renders the first tab's content in place; the other three tabs stay hidden behind the tab bar (this is the 1.58.0 behavior).\n\n### Current Behavior\n\nAfter the rerun the tab bar vanishes and the content of all four tabs is appended down the page in sequence. Measured headlessly (Playwright, counting `[data-testid=\"stVegaLiteChart\"]` elements with a non-null `offsetParent`): 3 charts visible before the selectbox change, all 12 visible after. The same script against 1.58.0 shows 3 before / 3 after.\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version (1.58.0).\n\n### Debug info\n\n- Streamlit version: 1.59.0 (broken), 1.58.0 (works)\n- Python version: 3.11\n- Operating System: reproduced on both macOS 15 and Raspberry Pi OS (Linux/arm64)\n- Browser: Chrome, and headless Chromium via Playwright\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-08T07:54:26Z",
+      "body": "### Triage summary\n\nThis is a **frontend regression in `st.tabs`** introduced in 1.59.0: when a widget inside a tab triggers a rerun, the tab bar disappears and the content of *all* tabs renders stacked vertically down the page.\n\n**Likely root cause:** PR #15328 (\"Remove `BaseWeb` for `Tabs`\") reworked the tabs DOM, replacing the old BaseWeb implementation (`[data-baseweb=\"tab-panel\"]`) with `react-aria-components`. This change first shipped in the `1.58.1.dev20260529` builds and was released as **1.59.0**, which matches the reporter's \"works in 1.58.0, broken in 1.59.0\" observation and the note that the `[data-baseweb=\"tab-panel\"]` elements are gone.\n\nIn the new implementation (`frontend/lib/src/components/elements/Tabs/`), inactive tab panels are force-mounted (`shouldForceMount`) and hidden **solely** via the CSS rule `&[inert] { display: none }`, relying on `react-aria-components` to keep the `inert` attribute on every non-selected panel. The symptom (all panels visible only after a widget-triggered rerun, restored by a full page reload) is consistent with the non-selected panels losing their `inert` attribute when the tab's content re-renders, so `display: none` no longer applies and every panel's content stacks down the page. This should be reproducible/coverable in a unit or e2e test by asserting that non-active panels still carry `inert` (are hidden) after a widget interaction, not just on first mount.\n\n### Related Issues\n\n- **#11344** \u2014 [Custom components rendered in non-active tabs rendered with height of 0](https://github.com/streamlit/streamlit/issues/11344): Same area (rendering/visibility of non-active `st.tabs` panels). Not a duplicate, but the closest existing `st.tabs` rendering bug.\n- **#15001** \u2014 [`st.vega_lite_chart` - width=\"stretch\", behaves differently versions x>1.52.2](https://github.com/streamlit/streamlit/issues/15001): Another `type:regression` bug involving charts inside `st.tabs`; the repro here also uses Vega/Altair charts inside tabs, so worth cross-checking though the root cause differs.\n- **#14492** \u2014 [Layout containers (tabs, expander, popover) should persist frontend state automatically without requiring key=](https://github.com/streamlit/streamlit/issues/14492): Related to how `st.tabs` frontend state is handled across reruns; tangential (an enhancement) but touches the same rerun/state area.\n\nNo exact duplicate of this specific 1.59.0 stacking regression was found among the open issues.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-08T08:18:34Z",
+      "body": "[USER] Thanks for reporting this regression! We are working on a fix and will release a patch later today."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-08T11:48:33Z",
+      "body": "## Update\n\nThis will be fixed in the patch 1.59.1 that will be released today."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-09T02:16:58Z",
+      "body": "Thanks for the quick fix!"
+    }
+  ]
+}

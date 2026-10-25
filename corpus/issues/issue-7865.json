@@ -1,0 +1,39 @@
+{
+  "id": "issue-7865",
+  "type": "issue",
+  "number": 7865,
+  "url": "https://github.com/streamlit/streamlit/issues/7865",
+  "title": "I would like to be able to select a language in the date_input component",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.date_input",
+    "area:localization"
+  ],
+  "created_at": "2023-12-21T07:51:16Z",
+  "closed_at": "2026-08-12T19:26:41Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nI would like to be able to select a language in the date_input component.\n\n### Why?\n\nI work at a Japanese company and our team provide an application created in Streamlit for internal use.\r\nThere are many users in our company who can only read Japanese and not English, so many users are confused when selecting date in `st.date_input`.\r\nI think it would help a lot of users if we could not only allow them to choose in Japanese, but also to choose their language.\n\n### How?\n\nImages : \r\n\r\nIt's Japanese Image. \r\n\r\n<img width=\"230\" alt=\"\u30b9\u30af\u30ea\u30fc\u30f3\u30b7\u30e7\u30c3\u30c8 2023-12-21 16 19 23\" src=\"https://github.com/streamlit/streamlit/assets/84609934/b031db10-d28b-4f96-a799-f0c502f2acea\">\r\n\r\n\r\ncode : \r\n```python\r\nstart_date: date = entry_form.date_input(\r\n    \"Enter Start Date\", key=\"start_date\", format=\"YYYY-MM-DD\", language = 'ja'\r\n)\r\n```\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-12-21T07:51:26Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-7865)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-02-23T03:00:34Z",
+      "body": "Is this issue being resolved? I have the same need."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-16T08:40:52Z",
+      "body": "this is exactly what i am looking for also"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-12-05T03:41:29Z",
+      "body": "need it too, please"
+    }
+  ]
+}

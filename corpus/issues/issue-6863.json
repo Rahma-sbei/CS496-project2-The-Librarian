@@ -1,0 +1,43 @@
+{
+  "id": "issue-6863",
+  "type": "issue",
+  "number": 6863,
+  "url": "https://github.com/streamlit/streamlit/issues/6863",
+  "title": "Add totals row to st.dataframe",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe"
+  ],
+  "created_at": "2023-06-20T02:14:42Z",
+  "closed_at": "2026-06-13T13:20:31Z",
+  "body": "Since dataframes often have line items that would be useful to total, it would be nice to have a dedicated \"totals\" option where that line stays at the bottom of the dataframe when sorting\n\nI think it would also work to include the totals line in a separated row below the main dataframe. I realize this workaround can be done on my own, but it seems messy to make it pretty, such as hiding the second dataframe's headers and making sure that all column widths are always the same\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-6863)",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-06-21T20:52:07Z",
+      "body": "Good idea. I think the feature we'd want here is to simply have a \"sticky\" row that's always at the bottom no matter how you sort. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-12-29T22:00:28Z",
+      "body": "This feature would require some changes to the underlying table UI library which are tracked [here](https://github.com/glideapps/glide-data-grid/issues/729)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-12-20T22:13:01Z",
+      "body": "Hi [USER] looks like glide added support for freezing rows via `freezeTrailingRows`. Any idea on how difficult it would be to support downstream? Total rows are just a subset of that.\r\n\r\nEdit: just realized that we would have to exclude the frozen row from sorting as well."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-10T19:19:18Z",
+      "body": "Hi [USER]. It would be great if st.dataframe can support pandas [styler.concat](https://pandas.pydata.org/docs/reference/api/pandas.io.formats.style.Styler.concat.html) as well. This is how I perform totals row at the moment via st.markdown, but I would love to move to st.dataframe. Thank you."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-13T13:20:31Z",
+      "body": "## Update \n\n`st.dataframe` in Streamlit 1.59+ will have a column statistics menu showing a variety of statistics based on the column type:\n\n<img width=\"415\" height=\"377\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/f407cf69-4ec0-4bd7-8d4d-07923621c6bd\" />\n\nClosing this since this likely covers the majority of use cases for a total row and we likely won't add a dedicated total row to `st.dataframe` anytime soon. Also, take a look at the official pivot table component for a table UI with a proper interactive total row: https://github.com/streamlit/streamlit-pivot-table\n\nPlease open a new feature request if you have a specific use case that would really benefit from a total row feature in `st.dataframe`."
+    }
+  ]
+}

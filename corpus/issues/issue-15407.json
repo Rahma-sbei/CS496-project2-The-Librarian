@@ -1,0 +1,53 @@
+{
+  "id": "issue-15407",
+  "type": "issue",
+  "number": 15407,
+  "url": "https://github.com/streamlit/streamlit/issues/15407",
+  "title": "App conversion tornado to starlette breaks page, when logged in",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "status:confirmed",
+    "feature:st.user",
+    "area:server",
+    "feature:st.login",
+    "feature:authentication"
+  ],
+  "created_at": "2026-06-02T19:30:41Z",
+  "closed_at": "2026-06-05T21:44:51Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen migrating an existing app from streamlit 1.56.0 to 1.58.0 server backend is changed from tornado to starlette. When using st.user.login() cookies are stored for 30 days. When the backend now is changed, the cookies prevent the page from loading. Once the cookies are deleted or expired everything works as usual.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nif not st.user.is_logged_in:\n  st.login()\nelse:\n  print(\"Hello World\")\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\nThe old cookies should be deleted, if the backend is changed or tokens are invalid.\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.58.0\n- Python version: 3.14.5\n- Operating System: debian\n- Browser: Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-02T19:30:55Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15407)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-03T13:24:44Z",
+      "body": "### Triage summary\n\nThis is a regression caused by the Tornado \u2192 Starlette migration (default server change introduced in 1.57.0 via PR #14553). When upgrading from 1.56.0 to 1.58.0, the browser still holds the `_streamlit_user` / `_streamlit_user_tokens` cookies that were originally signed by Tornado's `set_signed_cookie` scheme (`max_age_days=30`). The new server signs/verifies cookies via `itsdangerous.URLSafeTimedSerializer` in `lib/streamlit/web/server/starlette/starlette_app_utils.py::decode_signed_value`, which uses a completely different signature format. Because the two formats are incompatible, every old cookie fails verification \u2014 but `decode_signed_value` simply swallows `BadSignature` and returns `None` (see `_get_signed_cookie_from_request` in `lib/streamlit/web/server/starlette/starlette_auth_routes.py`), and the invalid cookies are never cleared on the response. The browser keeps re-sending them on every request, which can leave the app stuck on the loading screen / OAuth flow until the user manually deletes the cookies or they expire after ~30 days.\n\nThe expected behavior \u2014 as the reporter notes \u2014 is that the server should clear (or treat as absent and overwrite) auth cookies it cannot validate, so an upgrade from 1.56 \u2192 \u22651.57 does not require a manual cookie purge by every previously-logged-in user.\n\n### Related Issues\n\n- [#15193 \u2014 Auth cookies set by `st.login()` are session-scoped in 1.57.0 (regression from 1.56)](https://github.com/streamlit/streamlit/issues/15193): Same Tornado \u2192 Starlette cookie regression in the same code path (`_set_single_cookie`), already confirmed and fixed (restored 30-day `max_age`). Strong candidate for cross-reference / shared follow-up.\n- [#14991 \u2014 OAuth MismatchingStateError regression in 1.57.0 (works in 1.56.0)](https://github.com/streamlit/streamlit/issues/14991): Another `st.login` regression caused by the Starlette migration where stale session/cookie state from older versions interferes with the new auth flow.\n- [#15115 \u2014 OAuth authentication fails during token exchange with \"Invalid code verifier\"](https://github.com/streamlit/streamlit/issues/15115): A third 1.57.0 starlette-auth regression involving cookies/state being interpreted incorrectly by the new server \u2014 useful as a pattern for \"carry-over auth state breaks the new backend\".\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-04T18:16:51Z",
+      "body": "Hi [USER] [USER] i would like to work on this issue if no one is already handling it.\nFrom the triage summary it looks like invalid legacy auth cookies from the Tornado backend are not being cleared after the Starlette migration. I will try to reproduce the issue and add a regression test around invalid `_streamlit_user` / `_streamlit_user_tokens` cookies then submit a PR if the fix is straightforward.\nKindly  let me know if someone is already working on this or if there is a preferred approach as i am interested and excited to solve this since this is my first contribution here!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-04T19:18:14Z",
+      "body": "Hi [USER] ,\ngo ahead. Today is a public holiday in Germany, so nobody started developing....\n\nReproducing is quite simple..."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-05T13:07:51Z",
+      "body": "> Hi [[USER]](https://github.com/rahulrathnavel) , go ahead. Today is a public holiday in Germany, so nobody started developing....\n> \n> Reproducing is quite simple...\n\nHi![USER] That's very kind of you \ud83d\ude04Thanks for the Green flag i will try my best and ensure my first contribution here!\ud83d\ude01"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-08T08:53:49Z",
+      "body": "Hi [USER] and team \n\nI just noticed that #15420 was merged and issue #15407 has been closed as completed \u2014 congratulations on the quick turnaround!\n\nI wasn't aware of the parallel effort when I opened this PR. I'm happy to close it to keep the repo clean.\n\nFor what it's worth, my approach introduced a dedicated `InvalidAuthCookieMiddleware` that intercepts stale cookies at the HTTP layer and also closes WebSocket connections with code 1012 before session creation, driving the frontend into its PINGING_SERVER retry loop for a self-healing reconnect. If any of those ideas are useful as a follow-up or complement to #15420, feel free to cherry-pick \u2014 otherwise no worries at all.\n\nThanks for maintaining such a welcoming project. Looking forward to contributing again on a fresh issue! "
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "issue-8851",
+  "type": "issue",
+  "number": 8851,
+  "url": "https://github.com/streamlit/streamlit/issues/8851",
+  "title": "Preserve row selections when sorting `st.dataframe` on the frontend",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe"
+  ],
+  "created_at": "2024-06-08T04:05:53Z",
+  "closed_at": "2026-07-16T22:18:16Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\r\n- [X] I added a descriptive title and summary to this issue.\r\n\r\n### Summary\r\n\r\nWhen using `st.dataframe` with row selections (and not column selections), sorting the dataframe will clear away the row selections. Users can (partially) get around the issue using the search function in the dataframe toolbar which preserves row selections to make working with larger dataframes feasible.\r\n\r\n### Why?\r\n\r\nAlthough the search bar provides a workaround when handling large datasets, it's a very natural thing for a user to want to sort a dataframe to get to rows they want to select. Currently, they need to be told (or discover frustratingly) that they can't sort in the middle of making row selections.\r\n\r\n### How?\r\n\r\nPreserve the selection during frontend manipulation.\r\n\r\n### Additional Context\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-08T04:06:02Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8851)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-24T14:00:58Z",
+      "body": "Also, is there a way to preserve the selection state, when the table is being updated. For example:\r\nI have a st.dataframe with selection_mode = \"multi-row\" inside a function with experimental_fragment decorator, as I need to update the table on certain interval. As, a user if I select row(s), they get deselected while the table gets updated. Is there any work around for this?\r\nAny help is appreciated, Thank you!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-09T22:00:39Z",
+      "body": "> Also, is there a way to preserve the selection state, when the table is being updated. For example: I have a st.dataframe with selection_mode = \"multi-row\" inside a function with experimental_fragment decorator, as I need to update the table on certain interval. As, a user if I select row(s), they get deselected while the table gets updated. Is there any work around for this? Any help is appreciated, Thank you!\n\nExactly my situation. Would be great if selection, sorting and scroll position are preserved when the data table is updated.\n\nTo explain: This is necessary to create master detail views where the master shows a table, and the detail view enables the user to edit certain fields."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-15T13:30:26Z",
+      "body": "[USER] as per your comment on #11345 , you mentioned it might not be too complicated to persist row selections upon sorting for the `single-row` and `multi-row` selection modes. Is there anything I can do to help get that fixed - would you be open to PRs?\n\nPS - awesome to see that the selections are now correctly preserved with the new `single-row-required` mode!"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-16T15:44:25Z",
+      "body": "Prepared a fix [here](https://github.com/streamlit/streamlit/pull/16020)"
+    }
+  ]
+}

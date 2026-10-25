@@ -1,0 +1,31 @@
+{
+  "id": "issue-15921",
+  "type": "issue",
+  "number": 15921,
+  "url": "https://github.com/streamlit/streamlit/issues/15921",
+  "title": "Keyboard focus indicator is moving twice on the upload a file control in windows.",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:st.file_uploader",
+    "status:confirmed",
+    "priority:P3",
+    "area:accessibility"
+  ],
+  "created_at": "2026-07-09T10:18:54Z",
+  "closed_at": "2026-07-09T15:46:56Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nOn the Streamlit Playground page, the file upload functionality exposes two consecutive keyboard focus stops\u2014\"Upload a File\" and \"Browse files\"\u2014even though both controls trigger the same file upload action. When keyboard users navigate through the interface, focus first lands on the non-essential \"Upload a File\" section and then moves to the \"Browse files\" button, resulting in redundant navigation for a single function.\n\nThis behavior creates an unnecessary focus stop, making keyboard navigation less efficient and potentially causing confusion about which element should be activated. The file upload feature should provide a single keyboard-accessible focus target, with focus moving directly to the \"Browse files\" button.\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n1. Open the URL:  https://streamlit.io/playground?example=blank&code=H4sIAAAAAAAAA52QwUrEQAyG7_MUIV5aWBZWD8pCD8qyDyCIB5EydNI67LQzdFK2vfkOevfik_kEPoLpUF3BmyEwk-T7M5koZdvge4bIPenWWQYdJVAq8joSl0E3VFa-q22TpTtbdlTgzdDA5vzy6gJuKfQeV-D05Acu8GgNYZ4aJDY7sVvYDcHZSjPB3ldDBN_B3jqCu-C8NrNMncHH67P4koOdgC11HIHGoDtDPWRRtzQPeq_dQeLrRur5ovuHq6PlJ_n1-vuFDD_fXt7_TID5VoGYkLVMXQ6pLnjKzoaLRMMM4OqnwFOg4gGDqWVVaHw1zufo4oiPJ-pAU4G_WpebpYUs5gt5PhY6qwEAAA in edge/chrome browser.\n2. Playground Streamlit page will appear.\n3. Press tab key to reach to the 'Upload document' button and expand it.\n4. Press tab key to reach to the 'Upload a file' and 'Browse files' buttons.\n5. Verify whether keyboard focus indicator is moving twice on the upload a file control in windows or not.\n\n\n### Expected Behavior\n\nThe file upload feature should have only one keyboard-accessible focus stop. Keyboard focus shouldn't move to 'Upload a file' section, keyboard focus should only move to 'Browse File' button in windows.\n\n### Current Behavior\n\nWhen navigating with the keyboard, focus lands first on the \"Upload a File\" section and then moves to the \"Browse files\" button. Since both controls perform the same action, users encounter two focus stops for a single file upload function.\n\n**Refer Attachment:**\n\n1.  Keyboard focus indicator is moving twice on the upload a file control in windows.png\n2.  Keyboard focus indicator is moving twice on the upload a file control in windows.mp4\n\nhttps://github.com/user-attachments/assets/975692ae-9027-4195-afa4-3b502b4b1cd8\n<img width=\"3861\" height=\"1343\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/4c6077f9-cc74-480f-ada6-2db1d396331c\" />\n\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.40.1\n- Python version: 3.12.1\n- OS: Windows 11 25H2 (OS Build 26200.8655)\n- Browsers: Edge (Version 150.0.4078.48), Chrome (Version 150.0.7871.115)\n- URL: https://streamlit.io/playground?example=blank&code=H4sIAAAAAAAAA52QwUrEQAyG7_MUIV5aWBZWD8pCD8qyDyCIB5EydNI67LQzdFK2vfkOevfik_kEPoLpUF3BmyEwk-T7M5koZdvge4bIPenWWQYdJVAq8joSl0E3VFa-q22TpTtbdlTgzdDA5vzy6gJuKfQeV-D05Acu8GgNYZ4aJDY7sVvYDcHZSjPB3ldDBN_B3jqCu-C8NrNMncHH67P4koOdgC11HIHGoDtDPWRRtzQPeq_dQeLrRur5ovuHq6PlJ_n1-vuFDD_fXt7_TID5VoGYkLVMXQ6pLnjKzoaLRMMM4OqnwFOg4gGDqWVVaHw1zufo4oiPJ-pAU4G_WpebpYUs5gt5PhY6qwEAAA\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-09T10:19:04Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15921)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-09T12:28:31Z",
+      "body": "### Reproduction Summary\n\n**Confirmed** on Streamlit **1.59.1** (latest release) \u2014 this is not limited to the playground or the reporter's version (1.40.1).\n\n**Observed behavior:** Tabbing through a `st.file_uploader` widget produces two consecutive focus stops:\n\n1. The dropzone `<section>` container (`tabIndex=0`, `role=\"presentation\"`)\n2. The **Upload** button inside it (`<button>`, `tabIndex=0`)\n\nBoth elements open the same file picker dialog, so the first focus stop is redundant.\n\n**Root cause:** The `FileDropzone` component spreads `{...getRootProps()}` from react-dropzone onto the dropzone `<section>`. react-dropzone assigns `tabIndex: 0` by default, and the Upload `<button>` inside is a native focusable element. Since neither `noKeyboard` nor `tabIndex: -1` is passed to `getRootProps()`, both elements appear in the tab order.\n\n**Reproduction app:** https://issues.streamlit.app/?issue=gh-15921"
+    }
+  ]
+}

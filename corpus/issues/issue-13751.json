@@ -1,0 +1,32 @@
+{
+  "id": "issue-13751",
+  "type": "issue",
+  "number": 13751,
+  "url": "https://github.com/streamlit/streamlit/issues/13751",
+  "title": "Form \"Enter\" (or shortcut) does not send updated focused input field",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.number_input",
+    "feature:st.form"
+  ],
+  "created_at": "2026-01-29T16:31:59Z",
+  "closed_at": "2026-07-16T08:40:30Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nSince v1.53.0, I've noticed pressing \"Enter\" (or a defined shortcut key) on my form submit button does not send the focused field's updated input. \n\nExample:\nI have a simple st.form, it has 2 number_input and the form submit. each input and form has key assigned. Previously to 1.53.0, if I modified any number_input and hit \"Enter\" the form submitted and values are reflected in the rest of the page. Since 1.53.0, I either have to mouse click the actual \"Submit\" button or press 'Enter' again after the page re-runs. I do notice if I update both of the inputs, the first one is updated upon pressing 'Enter' so it seems to be a focus issue. I can update first input, tab to second, update, shift-tab back to first, press 'Enter' and it updates properly. Also if I click outside the input, then click back inside and press 'Enter' it also works.\n\n### Reproducible Code Example\n\n```Python\nwith st.form(key=\"outlier_criteria\", border=False):\n        f_cols = st.columns(1)\n        f_cols = st.columns(2)\n        hours_current = f_cols[0].number_input(\"Alert (Hours)\",1,24,1,key='alert_hours')\n        hours_historical = f_cols[1].number_input(\"History (Hours)\", 1,24,6, key='history_alert_hours')\n        st.form_submit_button(type='primary')\n```\n\n### Steps To Reproduce\n\n1. Have a st.form with an input field (number_input in my example)\n2. Update the input field, keep focus in that field and press 'Enter' (or defined shortcut)\n\n### Expected Behavior\n\nPressing 'Enter' or defined button shortcut should send form data including current, modified, in-focus input field. \n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-01-29T16:32:12Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-13751)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-01-30T14:57:42Z",
+      "body": "This bug report describes a regression where pressing Enter to submit a form does not include the updated value from the currently-focused `st.number_input` field. The user must either click the submit button, press Enter twice, or click outside the input before pressing Enter.\n\n**Potential Root Cause:** The issue likely stems from a race condition in the form submission timing. When Enter is pressed in `NumberInput.tsx`, the `handleKeyPress` handler calls `commitValue()` (which schedules a React effect to update the widget state manager) and then immediately calls `widgetMgr.submitForm()` synchronously. Since the widget state update happens asynchronously in a `useEffect` (via `useBasicWidgetState` hook), the form submission may copy widget states before the number input's new value has been propagated to the form's pending changes.\n\nThis timing issue may have been introduced or exacerbated by PR #10018 (commit d25aef32) which changed trigger events to be scheduled at the end of the event loop for batching purposes.\n\n### Related Issues\n\n1. **#9761 - [Allow st.form enter_to_submit to work for non-text elements](https://github.com/streamlit/streamlit/issues/9761)**: Directly related enhancement request noting that `enter_to_submit` behavior only works for text inputs, not for `st.number_input`, `st.radio`, or `st.dataframe` selections.\n\n2. **#11087 - [st.form, pressing 'Enter' keyboard button should auto focus to next input field](https://github.com/streamlit/streamlit/issues/11087)**: Related to Enter key behavior within forms - requests improved Enter key navigation between form fields.\n\n3. **#10959 - [time_input does not keep the entered value when tabbing out of it](https://github.com/streamlit/streamlit/issues/10959)**: Similar focus/value-commit issue where tabbing out of `st.time_input` resets the value instead of committing it, pointing to a broader pattern with input widget value synchronization.\n\n---\n*This is an automated triage comment using `opus-4.5-thinking`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

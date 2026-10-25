@@ -1,0 +1,29 @@
+{
+  "id": "issue-13246",
+  "type": "issue",
+  "number": 13246,
+  "url": "https://github.com/streamlit/streamlit/issues/13246",
+  "title": "Provide a compact style for `st.expander` and `st.status`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.expander",
+    "feature:st.status"
+  ],
+  "created_at": "2025-12-07T09:56:45Z",
+  "closed_at": "2026-05-15T10:24:21Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAdd a `type=\"compact\"` to `st.expander` and `st.status`, which renders the expander as a compact toggle. This is a common UI pattern used across many of the major agentic UIs to show agent thoughts:\n\n<img width=\"1066\" height=\"228\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/ed602e40-92d0-4983-802d-881cb17c8ab9\" />\n\n<img width=\"283\" height=\"86\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/c0bb5ff2-34b7-454c-a42f-706ca068a0cd\" />\n\n<img width=\"224\" height=\"58\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/3777d849-8b67-412f-8fc5-a56f6463adcf\" />\n\n<img width=\"775\" height=\"140\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/b257f047-cbe8-4e01-a928-28c02df24c17\" />\n\n### Additional Context\n\n- https://ai-sdk.dev/elements/components/reasoning",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-07T09:56:53Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-13246)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-02-06T17:23:31Z",
+      "body": "We could also do `border=False` to make it more coherent with `st.container`. But can see pros/cons both ways. "
+    }
+  ]
+}

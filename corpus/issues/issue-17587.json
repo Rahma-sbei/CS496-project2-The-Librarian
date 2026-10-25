@@ -1,0 +1,27 @@
+{
+  "id": "issue-17587",
+  "type": "issue",
+  "number": 17587,
+  "url": "https://github.com/streamlit/streamlit/issues/17587",
+  "title": "Allow Pillow 13 (raise upper bound to <14)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement"
+  ],
+  "created_at": "2026-10-20T21:52:13Z",
+  "closed_at": "2026-10-20T22:43:34Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nRaise the Pillow cap in `lib/pyproject.toml` from `<13` to `<14`.\n\n### Why?\n\n[Pillow 13.0.0](https://pillow.readthedocs.io/en/stable/releasenotes/13.0.0.html) fixes two critical and about a dozen high-severity CVEs. Projects that depend on Streamlit can't upgrade while the cap is `<13`.\n\n### How?\n\n```diff\n-  \"pillow>=9.2.0,<13\",\n+  \"pillow>=9.2.0,<14\",\n```\n\nThen regenerate `uv.lock`. Streamlit doesn't use any of the APIs that 13.0 removed, and the one `fromarray` call doesn't pass `mode`.\n\nOne behavior change: `st.image` with an `I`-mode `PIL.Image` and `output_format=\"PNG\"` now raises instead of silently clipping.\n\n### Additional Context\n\n#14881 and #15782 raised the lower bound but left the `<13` cap.\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-20T22:43:15Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-17587)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-10-20T22:43:34Z",
+      "body": "Closing as duplicate of https://github.com/streamlit/streamlit/issues/17586"
+    }
+  ]
+}

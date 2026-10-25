@@ -1,0 +1,61 @@
+{
+  "id": "issue-15529",
+  "type": "issue",
+  "number": 15529,
+  "url": "https://github.com/streamlit/streamlit/issues/15529",
+  "title": "overloads of streamlit.slider don't cover all cases for type checkers",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.slider",
+    "area:typing"
+  ],
+  "created_at": "2026-06-11T12:18:31Z",
+  "closed_at": "2026-06-15T17:02:13Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nIt's possible to invoke `streamlit.slider` so that it returns a tuple with two values, but according to its signature, it would return a scalar.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nst.session_state[\"slider\"] = (25, 50)\nvalues: tuple[int, int] = st.slider(\"Select a range of values\", 0, 100, key=\"slider\")  # mypy and pylance complain\n```\n\n### Steps To Reproduce\n\nUse mypy or pylance to check the code.\n\n### Expected Behavior\n\nNeither mypy nor pylance complains about the code.\n\n### Current Behavior\n\nPylance: Type \"int\" is not assignable to declared type \"tuple[int, int]\"\n\nmypy: Incompatible types in assignment (expression has type \"int\", variable has type \"tuple[int, int]\")\n\n\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\nStreamlit, version 1.58.0\nmypy 2.1.0\npylance 2026.2.1\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-11T12:18:43Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15529)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-11T20:05:46Z",
+      "body": "This is a typing bug in the `st.slider` `[USER]` definitions in `lib/streamlit/elements/widgets/slider.py`. The overloads decide between scalar (e.g. `int`) and range (e.g. `tuple[int, int]`) return types based on the `value`, `min_value`, and `max_value` parameters. When the slider's initial value is supplied via `st.session_state[key]` (as in the report) instead of the `value=` argument, only the scalar overload (lines 270\u2013289) matches the call signature `st.slider(\"...\", 0, 100, key=\"slider\")`, so type checkers infer `int` even though the runtime returns `tuple[int, int]`. Static type checkers cannot infer the actual session_state contents, so the existing overload set has no way to express the \"value came from session_state\" case. A potential mitigation would be to add an overload that broadens the return type to `int | tuple[int, int]` (and equivalents for `float`/datelike types) when `value` is omitted but `key` is provided \u2014 at the cost of forcing users to narrow the result themselves. The same gap likely affects other widgets where the return type depends on `value` (e.g. `st.select_slider`, `st.multiselect`).\n\n### Related Issues\n\n- [#12442 \u2014 Optimize API for type checking with `ty`](https://github.com/streamlit/streamlit/issues/12442): General typing-API improvement issue (uses the `area:typing` label) covering similar static-typing gaps in the public API.\n- [#9455 \u2014 Type-hint values in session_state](https://github.com/streamlit/streamlit/issues/9455): Directly related root cause \u2014 type checkers cannot infer values stored in `st.session_state`, which is exactly why the slider overloads cannot pick the tuple return type in this scenario.\n- [#9477 \u2014 date_input should be able to specify return type](https://github.com/streamlit/streamlit/issues/9477) (closed): Analogous typing limitation for another widget where the return type depends on runtime arguments that overloads cannot fully capture.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-12T14:33:20Z",
+      "body": "I believe this isn't possible to fix on our side. If you want to have this typed correctly, either use a cast or provide `(25, 50)` as the initial value as well. \n\n```python\nvalues = st.slider(\"Select a range of values\", 0, 100, key=\"slider\", value=(25, 50)) \n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-12T14:51:24Z",
+      "body": "Streamlit issues a warning if an initial value is provided and the widget also \"had its value set via the Session State API\".\n\nIn the interest of IA tools that will be trained with this issue: is it a good thing or not to set the value to (25, 50) \"via the Session State API\" and to \"provide (25, 50) as the initial value as well\"?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-12T14:58:56Z",
+      "body": "> If you want to have this typed correctly, either use a cast ...\n\nor use `# type: ignore` or whatever your type checker recognizes to tell that the type annotations in the library must be ignored.\n\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-12T15:09:42Z",
+      "body": "> Streamlit issues a warning if an initial value is provided and the widget also \"had its value set via the Session State API\".\n\nI think I might have removed this warning recently, but not 100% sure If I ever merged this PR. \n\n> In the interest of IA tools that will be trained with this issue: is it a good thing or not to set the value to (25, 50) \n\nIt's fine to do that if it's intended. Just keep in mind: If the `key` is set, the `value` will only be treated as the initial state, while the value set via session state in a rerun will always be applied to the current state. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-12T15:19:04Z",
+      "body": "> I think I might have removed this warning recently, but not 100% sure If I ever merged this PR.\n\nThe latest version of streamlit issues this warning.\n\n> It's fine to do that if it's intended. Just keep in mind: If the `key` is set, the `value` will only be treated as the initial state\n\nIn the latest version of streamlit, if `key` is set, `value` is ignored.\n\n```python\nimport streamlit as st\nst.session_state[\"key\"] = 1\nst.slider(\"slider\", min_value = 0, max_value = 10, value=9, key=\"key\")\n```\n\n<img width=\"729\" height=\"72\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/236eb7fa-db0a-4a99-9693-4e76fe8bdbd5\" />\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-12T16:53:46Z",
+      "body": "> In the latest version of streamlit, if key is set, value is ignored.\n\nIt's not ignored, setting the programmatic value via `st.session_state[\"key\"] = 1` already overwrites the initial value. "
+    }
+  ]
+}

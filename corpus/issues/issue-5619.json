@@ -1,0 +1,74 @@
+{
+  "id": "issue-5619",
+  "type": "issue",
+  "number": 5619,
+  "url": "https://github.com/streamlit/streamlit/issues/5619",
+  "title": "The app says \"Please wait...\" forever | streamlit running on via Databricks notebook",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:deployment",
+    "priority:P3"
+  ],
+  "created_at": "2022-10-28T10:37:29Z",
+  "closed_at": "2026-06-14T13:17:44Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nThe app says \"Please wait...\" forever | streamlit running on via Databricks notebook, when I tried the https://docs.streamlit.io/knowledge-base/deploy/remote-start \r\n\r\nstreamlit run my_app.py --server.enableCORS=false\r\nstreamlit run my_app.py --server.enableWebsocketCompression=false\r\n\r\n### Reproducible Code Example\r\n\r\n```Python\r\nhttps://raw.githubusercontent.com/StatsAI/Streamlit_RecSys/main/test_app.py\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n!pip install streamlit \r\n\r\nimport os\r\nbase_url='https://' + spark.conf.get(\"spark.databricks.workspaceUrl\")\r\nworkspace_id=spark.conf.get(\"spark.databricks.clusterUsageTags.orgId\")\r\ncluster_id=spark.conf.get(\"spark.databricks.clusterUsageTags.clusterId\")\r\ndashboard_port='8501'\r\npathname_prefix='/driver-proxy/o/' + workspace_id + '/' + cluster_id + '/' + dashboard_port\r\ndashboard_url=base_url + pathname_prefix + '/app'\r\nos.environ['STREAMLIT_REQUESTS_PATHNAME_PREFIX'] = pathname_prefix\r\nprint(os.environ.get('STREAMLIT_REQUESTS_PATHNAME_PREFIX'))\r\nprint(\"Once the dashboard is running, it can be accessed at this link:\\n\\n\" + dashboard_url)\r\n\r\n!streamlit run https://raw.githubusercontent.com/StatsAI/Streamlit_RecSys/main/test_app.py --server.port 8501 \r\n\r\nFor output example : \r\nCollecting usage statistics. To deactivate, set browser.gatherUsageStats to False.\r\n  You can now view your Streamlit app in your browser.\r\n  Network URL: http://10.25.252.86:8501\r\n  External URL: http://18.220.214.11:8501\r\n\r\nhttps://xxxxxxxxx.cloud.databricks.com/driver-proxy/o/xxxxxxxxx/xxxxxxxx/8501/app\r\n \r\n![image](https://user-images.githubusercontent.com/105917367/198564982-61477ee6-702d-420d-83e2-a537a290a334.png)\r\n\r\n\r\n\r\n### Expected Behavior\r\n\r\n_No response_\r\n\r\n### Current Behavior\r\n\r\n![image](https://user-images.githubusercontent.com/105917367/198565383-3b68726c-4dde-4abd-940b-2a6a598337e7.png)\r\n\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version:   version 1.14.0\r\n- Python version: 3.8.10\r\n- Operating System: 18.04.1-Ubuntu ( aws) \r\n- Browser: chrome\r\n\r\n\r\n\r\n### Additional Information\r\n\r\n_No response_\r\n\r\n### Are you willing to submit a PR?\r\n\r\n- [ ] Yes, I am willing to submit a PR!\r\n\r\n---\r\n\r\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\r\n\r\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-11-02T23:03:23Z",
+      "body": "Hi [USER],\r\n\r\nWanted to check -- have you previously been able to deploy apps on Databricks notebooks on previous versions of Streamlit? And does downgrading to version 1.13.0 fix things? I'll take a look to see if I can reproduce this error myself in the next few days, but it'd be helpful to get a bit more information."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-11-03T04:23:54Z",
+      "body": "[USER], I am trying 1st-time streamlit on databricks notebook, let me try to install streamlit 1.13.0 and update the result. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-11-03T05:56:47Z",
+      "body": "I'm having the same issue with Streamlit 1.14.0 on Google Cloud Run. \"Please wait...\" forever for 1.14, works fine on 1.13."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-11-03T07:40:38Z",
+      "body": "[USER] after installing \"Streamlit, version 1.13.0\" still getting \"Please wait...\"\r\n![image](https://user-images.githubusercontent.com/105917367/199668595-e0e9922e-5dbf-4b74-a420-87688793e86c.png)\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-11-03T23:33:31Z",
+      "body": "Thanks for checking [USER]. I wonder if this is an issue with how databricks notebooks work with streamlit rather than with streamlit itself. I'll have to give it a try myself when I have some free time, but my gut feeling is that this may require changes on the databricks notebook end rather than on ours.\r\n\r\n---\r\n\r\n[USER] thanks for pointing this out. It turns out the issue you're running into got introduced in 1.14.0 and seems unrelated to the issue filed here (even though the user-facing behavior looks the same). I have a PR with a fix out in https://github.com/streamlit/streamlit/pull/5642 that I'll be merging today, and we should have a patch release out sometime next week to resolve the problem."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-11-04T00:17:12Z",
+      "body": "[USER] Thank you for following up on my comment!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-02-09T05:58:40Z",
+      "body": "Hi friends, in case it's helpful.\r\n\r\nI've encountered what seems like the same problem on an AWS SageMaker notebook instance (notebook-al2-v2) over default `jupyter-server-proxy==3.2.1`.  I get the same indefinite \"please wait\" regardless of disabling CORS and web socket compression.\r\n\r\nThis affects Chrome, but not Safari.\r\n\r\nDowngrading to streamlit==1.13.0 solves the problem.  1.14.0-1.17.0 are afflicted.\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-03-31T11:45:48Z",
+      "body": "Morning al, [USER]  we are seeing the same issue, dont want to downgrade as there are features we need on later versions of Streamlit.  Is there a solution, i'm fairly confident the websocket requests are making it to the streamlit app, as ive turned up debugging, thus its passing the proxy properly.  To me it seems like the headers, specifically the cookie header, may be breaking things, in particular i think that because aws needs to add their auth cookies, in addition to the streamlit ones things may be breaking.  Ive looked through the release notes to better understand why 1.13 works but later versions dont and it seems that some changes have been made to auth on websockets, so that deepens my theory.  Its clearly not a browser issue as it works fine when running locally.  \r\n\r\nNothing complex to reproduce, run a basic sagemaker notebook,  pip install streamlit .... streamlit hello .... access the app from the browser via proxy https://....../proxy/8501 (fill in correct full path and port).  \r\n\r\nBe sure to check out the cookies being passed, they are quite large on the inital request. \r\n\r\nThis is a huge blocker for us as we really want to adopt streamlit as our standard for developing UIs via sagemaker.  \r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-03-31T11:48:01Z",
+      "body": "To add, perhaps there is a small chance that the proxy being used messes with the request/response headers, and still trying to dig into that a bit deeper, but would appreciate any help!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-04-01T20:34:09Z",
+      "body": "[USER], would love to see this resolved, but don't have a solution or any additional information."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T13:00:57Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-5619)\n"
+    }
+  ]
+}

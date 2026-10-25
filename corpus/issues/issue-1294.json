@@ -1,0 +1,268 @@
+{
+  "id": "issue-1294",
+  "type": "issue",
+  "number": 1294,
+  "url": "https://github.com/streamlit/streamlit/issues/1294",
+  "title": "Images sometimes do not appear",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression"
+  ],
+  "created_at": "2020-04-02T15:19:00Z",
+  "closed_at": "2020-10-09T00:40:56Z",
+  "body": "# Summary\r\nThe site randomly shows \"0\" for images inserted via st.image() and MediaFileManager logs \"Missing file\".\r\n\r\n## More information\r\nI have a couple of jpg images embedded with st.image() and randomly they will not render, instead there will just be a 0 shown instead. Reloading the page or rerunning the code fixes the problem. When I reload the page often enough one ore several of the images will break again and just show a 0. \r\n\r\nIn the terminal with --log_level error I receive\r\n\r\n    MediaFileManager: Missing file d8a7ff62725a8ab1609c9335ba2e85375f491027d91b3badb27a6ccd\r\n\r\nIn my complex multi-page streamlit app this happens very often, if I reload the page two or three times, one out of five images is likely broken. The simpler toy example below takes much longer to show the undesired behaviour, but it does so fairly consistently.\r\n\r\n# Steps to reproduce\r\nRun this code (ideally with --log_level error):\r\n```python\r\nimport streamlit as st\r\nif st.checkbox('checkbox'):\r\n    st.image(\"foo.jpg\")\r\n```\r\nToggle that checkbox repeatedly (this method is quicker than reloading the page) and look at the console output. Maybe rerun the code once in a while. (Of course you need to put any jpg image named \"foo.jpg\" in the same folder).\r\n\r\n## Actual behaviour\r\nSooner or later (5-50 clicks) the image will *not* be shown. Instead, in its place a 0 appears. A \"MediaFileManager: Missing file\" error is shown in the terminal.\r\n\r\n## Expected behaviour\r\nImages should always be shown.\r\n\r\n## Debug info\r\n- Streamlit version: 0.57.1\r\n- Python version: 3.6.9",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-04-06T21:56:55Z",
+      "body": "Hi [USER],\r\n\r\nThanks for the detailed report!  This is a known issue with some changes we made in #415 and I have a fix already in flight.\r\n\r\nI'll close this bug as soon as the fix is pushed into the next release.  Thanks for your patience!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-05-04T12:22:38Z",
+      "body": "Hi [USER],\r\n\r\nIs this bug fixed? It's causing a lot of trouble for me, and I'd love to upgrade if it's fixed. Unfortunately it's not trivial for me to check if it's fixed or not, because of two reasons:\r\n\r\n- [USER]'s short example worksforme already in my 0.52.2 installation, even thought my real-life app breaks often. I tried to play around with bigger and smaller images to reproduce, to no avail.\r\n- It's not trivial to upgrade my app from 0.52 to latest, because it's full of SessionState and such, and various hopefully-minor backward-incompatible changes break my code before I can even verify the \"images sometimes do not appear\" situation.\r\n\r\nI'd rather not suffer with the upgrade unless it's worth it, so even a simple yes/no would be greatly helpful. (A timeline if no is the answer, even more so.)"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-05-04T12:41:49Z",
+      "body": "Hi [USER] ,\r\n\r\nThe [fix](https://github.com/streamlit/streamlit/pull/1260) was merged 5 days ago. It's available now on the [nightly build](https://pypi.org/project/streamlit-nightly/).\r\n\r\nSessionState should work fine with the current version of Streamlit. Have you tried with the [updated gist](https://gist.github.com/tvst/036da038ab3e999a64497f42de966a92)?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-05-04T21:44:08Z",
+      "body": "Thanks! I haven't tried until you brought it to my attention, now I have. Indeed it seems to fix issue #1294, thanks a lot! But my code does not fully work with the new version, as it broke this hack by Tim Conkling: https://discuss.streamlit.io/t/show-more-items-functionality/1139/2 (Sorry for moving off topic. I'll stop discussing it here, and raise the issue there.)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-05-07T22:44:58Z",
+      "body": "Still experiencing an issue with this one, even on nightly (v0.59.1.dev20200506).\r\n\r\nCan see the issue with `streamlit hello` (Animation Demo) running on a web server. More of an issue over https, compared to http, but still get dropped frames either way.\r\n\r\nSeeing these errors scattered in the console...\r\n\r\n```\r\nGET https://example.com/media/fc5c3cc4b370b667d407fa2ac2a808348815d93eae8229f04ba030a1.jpeg 404\r\nGET https://example.com/media/e8c9d0a5997976f844e0886a2702f6f083647828c73e8354fcb64c06.jpeg 404\r\nGET https://example.com/media/55c9e43090bd59da85388e171d1f5d558775f5aca80567b7d019ae53.jpeg 404\r\n...\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-05-13T14:50:18Z",
+      "body": "I can confirm this is still an issue in `0.59.1.dev20200511` on Python 3.7.7\r\n\r\nEdit: For people Googling, we \"solved\" this by downgrading to `streamlit 0.55`"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-05-13T16:37:55Z",
+      "body": "Indeed, I was too quick to report that the issue is gone, sorry, it was probably just a statistical fluke. Frequency of occurrence might or might not have decreased, hard to tell."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-06-06T15:34:21Z",
+      "body": "I am experiencing the same behaviour with matplotlib plot that the are generated with input from sliders. Is this covered under this issue or should I create a new one?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-06-07T22:43:41Z",
+      "body": "I have the same issue. I am trying to display two different pyplot charts on the same script, more often than not the first chart is not displayed."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-06-08T01:24:05Z",
+      "body": "Same issue on my side with the version 0.61. It happens when displaying 2 pie chart created by the same function called twice. The first st.pyplot is not displayed.\r\n\r\nEdit : adding a sleep(0.2) after the pyplot() seems work as workaround"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-06-24T05:51:45Z",
+      "body": "I have the same issue, when using streamlit==0.61.0. Images will randomly be displayed as 0s.\r\nAdding sleep(0.2) after st.image() does not help."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-06-24T06:13:16Z",
+      "body": "Tried it with the current streamlit-nightly==0.62.1.dev20200621 and the issue still appears there as well, though perhaps a bit less often.\r\nAlso, in my case, reloading (by pressing \"r\"), does not help to make the image appear."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-06-30T08:41:20Z",
+      "body": "[USER] -- is it possible you can share a snippet of code that causes the problem to occur?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-07-07T10:25:34Z",
+      "body": "In my script that it shows 8 charts taken data by csv, with the version 0.56.0 was all ok (in local, in docker container local and in docker container on app engine (GCP)).\r\nThis issue started with version 0.59.0: the first 3 charts disappear.\r\nWith the version 0.62.0 in local and in docker container local the issue there isn't but on gcp i have the issue (more of 3 charts doesn't visualize) .\r\n\r\nOther problem: with the latest version (0.62.0) the script is slower to execute"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-07-07T21:07:31Z",
+      "body": "Hi [USER], could you share sample code that we can copy/paste and run to reproduce the issue? I'll be sure to try it both locally and on GCP.\r\n\r\nAlso, could you give a bit more info on what you're seeing with regards to the script being slower to execute?\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-07-20T11:32:47Z",
+      "body": "Hi [USER] .\r\nI apologize if I haven't answered before.\r\nAbout the longest time, in version 0.56.0 my script from when I see running appearing in the upper right corner to when it disappears takes 5 or 6 seconds.\r\nIn version 0.62.0 the same script takes 11 o 13 seconds.\r\n But I thought it depended on the grace period (KEEP_DELAY = 5)"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-08-12T23:51:21Z",
+      "body": "Repro steps:\r\n- Visit https://s4a-staging.streamlit.io/jrhone/simpleapp/master/streamlit_app.py/+/\r\n- Open chrome dev tools.. Network tab.. Click 'disable cache'\r\n- Toggle the checkbox really fast, for up to 20 seconds\r\n- At least one image should fail in this time, from my experience (500 status code in Network tab and `Missing file` message in server logs)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-09-08T14:13:56Z",
+      "body": "I'm also having this issue with Audio files. I am displaying 25 to a page and after listening to a certain number of them the page seems to break and I start getting errors like `MediaFileManager: Missing file 26ca29fef4998238a36e8c8e1f7e3310c455844c1f8e4c031cce5798`. At that point the only solution is to refresh the page."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-09-19T00:50:46Z",
+      "body": "Hey [USER] , can you provide a toy example where this repros?\r\n([USER] FYI)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-09-21T06:58:21Z",
+      "body": "I am not sure if it's related to this issue, but when I try the streamlit's [video example](https://github.com/streamlit/streamlit/blob/develop/examples/video.py).\r\nI add some videos to my local folder.\r\nWhen I open the example app in different tabs of a chrome at the same time, some of tabs can't show the videos in my local folder.\r\nIt also shows the error `14:30:09.132 MediaFileManager: Missing file 631c0f42e89b6eea44e7d3a130a8f8433cbca75af4c868f6b718d806`"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-10-01T18:18:33Z",
+      "body": "[USER] [USER] [USER] [USER] [USER] [USER] [USER] [USER] [USER] [USER] [USER]\r\n\r\nI've been working on the MediaFileManager missing file issues. I think I have a solution, but because this has been a tricky piece of code, I'm looking for some testers. Would you be willing to try it out with your use cases? I would greatly appreciate it. One thing I do recommend is if using pyplot, you supply a figure to `st.pyplot` See [our documentation for this](https://docs.streamlit.io/en/stable/api.html#streamlit.pyplot). It might save some headaches.\r\n\r\nYou can download the update from my dropbox.\r\n\r\n[https://www.dropbox.com/s/scqhnpo41ld8fla/streamlit-0.67.1-py2.py3-none-any.whl?dl=0](https://www.dropbox.com/s/scqhnpo41ld8fla/streamlit-0.67.1-py2.py3-none-any.whl?dl=0)\r\n\r\nFirst you uninstall streamlit\r\n\r\n```\r\n$ pip uninstall streamlit\r\n```\r\n\r\nThen you install the package using the wheel package.\r\n\r\n```\r\n$ pip install wheel\r\n$ pip install PATH/TO/streamlit-0.67.1-py2.py3-none-any.whl\r\n```\r\n\r\nOnce you are done testing it, you can uninstall it just like any other version.\r\n\r\n```\r\n$ pip uninstall streamlit\r\n```\r\n\r\nCurious on the code? I used it to help implement Range Requests on the server [https://github.com/streamlit/streamlit/pull/1967](https://github.com/streamlit/streamlit/pull/1967)\r\n\r\nI'm really hoping I cover all the issues you have found. \ud83d\ude0a"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-10-09T00:40:56Z",
+      "body": "We've QAed a lot of scenarios and feel comfortable that the change is an improvement. The change has been merged, and it will be in the next release."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-10-12T15:04:25Z",
+      "body": "[USER] thank you so much for taking the time to address this and I'm sorry I wasn't more responsive earlier. I installed the changes from your dropbox and everything works great now. All the MediaFileManager issues have disappeared!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-12-01T16:06:18Z",
+      "body": "Hi, \r\nI am experiencing the same issue with my app. My app works fine in local but once deployed into azure server the image is not rendering properly. This happens random and even for static images as well for WordCloud images. Do we have a fix for that? I am using the latest version. 0.71.0"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-12-01T21:13:00Z",
+      "body": "Hi [USER] !\r\n\r\nIt will be really difficult to debug without being able to run the code, so if you are able to share your code (or better, provide a toy example that illustrates the problem simply, that would make life a lot easier.\r\n\r\nHere are a couple thoughts that might help us solve the problem.\r\n\r\nThe MediaFileManager manages all the media in memory. At the end of the script run, all media that was not used in that run, is deleted (to conserve memory). Based on this, we should ensure everything working though I\u2019m curious with race cases (for example, is this an issue with multiple people requesting the website, perhaps that causes a problem)? Does this occur standalone when one user interacts with it?\r\n\r\nMatPlotlib is unfortunately not thread safe. So, one should not use st.pyplot with no figure. Even more protection is needed and matplotlib offers a locking mechanism, In another application, I wrote:\r\n\r\n```python\r\nimport matplotlib\r\nfrom matplotlib.figure import Figure\r\n\r\nmatplotlib.use(\"agg\")\r\n\r\n_lock = RendererAgg.lock\r\n\r\n# ...code...\r\n\r\nwith _lock:\r\n    fig = Figure()\r\n    ax = fig.subplots()\r\n    # ...perform work on ax\r\n    st.pyplot(fig)\r\n```\r\n\r\nYou can see it in action here: https://github.com/kmcgrady/book_reco/blob/master/books.py#L16\r\n\r\nHopefully that helps with a solution. If not and you can provide a simple example that causes the problem, please let me know."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-12-02T02:03:51Z",
+      "body": "Hi [USER] , Thanks for the quick reply. \r\n\r\nThe issue of image rendering I am facing is mostly after I deploy to azure machine. In local its working. I have 2 parts to it. \r\n1. Static Image (Logo) - sometimes it render but sometimes just the broken image icon. if I right click on the image and do a reload the image loads as it should be. \r\n![image](https://user-images.githubusercontent.com/55867374/100818143-89a15d00-346f-11eb-9ce1-1ec782586886.png)\r\n\r\n2. I am plotting a Word Cloud here. [wordcloud](https://pypi.org/project/wordcloud/)\r\n\r\n```\r\ndef TextWordCloud(app_name):\r\n    default_inputs = st.selectbox(\"\", \r\n    [\r\n            \"Choose your data\",\r\n            \"Sample Document : I recently joined Cloudera after working in ...\",\r\n            \"Upload your own file\"\r\n\r\n    ])\r\n    if (default_inputs == \"Sample Document : I recently joined Cloudera after working in ...\"):\r\n        with open('input/Sample_1_WordCloud.txt','r') as f:\r\n            text = f.read()\r\n            st.text_area(\"Sample Document - Text Preview\",text, height=200, key='dsta1')\r\n            if st.button(\"Run>\", key='wc_b_1'):\r\n                doc_wc_str_data = [{\"text\":text}]\r\n                response = get_response(build_response(doc_wc_str_data),app_name)\r\n                word_dict, noun_dict = get_word_cloud_array(response)\r\n                wc = WordCloud(background_color ='white', margin=2,min_font_size=6).fit_words(word_dict)\r\n                nc = WordCloud(background_color ='white', margin=2,min_font_size=6).fit_words(noun_dict)\r\n                time.sleep(2)\r\n                col1, col2 = st.beta_columns(2)\r\n                col1.markdown(\"#### Word Cloud \")\r\n                col1.image(wc.to_array(),use_column_width=True)\r\n                col2.markdown(\"#### Noun Cloud \")\r\n                col2.image(nc.to_array(),use_column_width=True) \r\n    elif (default_inputs == \"Upload your own file\"):\r\n        st.markdown('###### * Uploaded file with atleast 50 words!')\r\n        wc_uploaded_file = st.file_uploader(\"\", type=\"txt\", key='wc-up1')\r\n        print(wc_uploaded_file)\r\n        if wc_uploaded_file is not None:\r\n            #print(wc_uploaded_file)\r\n            bytes_data = wc_uploaded_file.read()\r\n            wc_str_data = bytes_data.decode(\"utf-8\")\r\n            wc_text = st.text_area(\"Document Text Preview\",wc_str_data, height=200, key='wcta1')\r\n            if st.button(\"Run>\", key='wc_b_2'):\r\n                doc_wc_str_data = [{\"text\":wc_str_data}]\r\n                response = get_response(build_response(doc_wc_str_data),app_name)\r\n                word_dict, noun_dict = get_word_cloud_array(response)\r\n                wc = WordCloud(background_color ='white', margin=2,min_font_size=6).fit_words(word_dict)\r\n                nc = WordCloud(background_color ='white', margin=2,min_font_size=6).fit_words(noun_dict)\r\n                time.sleep(2)\r\n                col1, col2 = st.beta_columns(2)\r\n                col1.markdown(\"#### Word Cloud \")\r\n                col1.image(wc.to_array(),use_column_width=True)\r\n                col2.markdown(\"#### Noun Cloud \")\r\n                col2.image(nc.to_array(),use_column_width=True)   \r\n    else:\r\n        st.write(\"** Select data from the above dropdown\")\r\n```\r\nAnd the image rendering happens like shown below;\r\n![image](https://user-images.githubusercontent.com/55867374/100818630-8b1f5500-3470-11eb-8595-f0f0984db584.png)\r\n\r\n![image](https://user-images.githubusercontent.com/55867374/100818646-91153600-3470-11eb-819b-aa69b391b706.png)\r\n\r\nIt would be great if you can help on this. Thanks."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-12-02T17:35:08Z",
+      "body": "Adding to the above issue; while I inspect the application on the browser for the image component, the image url generated as;\r\n`https://<Application URL>/media/1b25254261af69495b4fc9a637472aacad81157493ba5f698288e9da.png`\r\n\r\nIn the console I see;\r\n\r\nGET https://<Application URL>/media/1b25254261af69495b4fc9a637472aacad81157493ba5f698288e9da.png 404 status. for the broken image. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-12-03T22:32:52Z",
+      "body": "[USER] hmmmmm. I wonder if you can get logs from the server or perhaps run it in [debug logging mode](https://docs.streamlit.io/en/stable/streamlit_configuration.html#view-all-configuration-options)? I wonder if there's some caching layer in Azure that's breaking. The sidebar logo, should _not_ be a problem at the very least, so I'd target that as a trivial example to see if we can deduce _why_ that image cannot appear.\r\n\r\nAlternatively, I wonder if you deploy the application on [Streamlit Share](https://www.streamlit.io/sharing), does the issue still occur?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2020-12-23T04:40:46Z",
+      "body": "hey [USER], i'm having this issue on Streamlit Share with my books app (https://share.streamlit.io/tylerjrichards/book_reco/books.py) \r\nI've tried switching over to the newest Streamlit release (0.73), I have '_lock = RendererAgg.lock\r\n' in my code already, and I always use st.pyplot() with an explicit figure, but I keep getting a broken image and the 'MediaFileManager: Missing file' error. \r\n\r\nthis only happens on Streamlit sharing, but doesn't happen when I run the app locally. Any ideas?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-12-24T00:54:11Z",
+      "body": "[USER] I'll take a look and see if I can figure out the problem. It will be a couple weeks due to the holidays. I'll put something on my calendar in my new year to follow up."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-01-06T02:51:22Z",
+      "body": "Hey [USER] Just want to follow up. I spent some time today investigating it. I am reasonably confident on the problem and can reproduce it. In essence:\r\n\r\n* One specific process is running Streamlit and images (from pyplot in this case) are generated and stored in memory for that process.\r\n* Streamlit Share has multiple processes and a system designed to have messages/requests target the same process to grab the correct custom generated image/video/media.\r\n* That process fails when making image (and probably other media) requests. It's targeting any process, and if it targets the wrong one, the image will not be found. This is why you see some requests work and some don't (that may seem random).\r\n\r\nI had trouble by uploading the same code to my personal Streamlit share because there was no problem. That is because my service is only one process. When a process gets too much attention (as in your case when we marketed it for Streamlit Share), we add more resources to it and now we have multiple processes causing the issue. I was able to demonstrate this on my system by upping the number of processes.\r\n\r\nSo the easy workaround for you is to delete the app and redeploy it (thereby making it seem like a new single process app for now). I _believe_ that would work and would bypass some internal communication chain to reduce resources. If the app gets more attention, we can increase those resources again, but hopefully we'll have a fix in time. If you do that, let me know if that works/doesn't work. If that's unacceptable, I can look through my end and see if I can reduce the resources, just a little more red tape.\r\n\r\nTo summarize for [USER] I wonder if your Azure solution is creating multiple processes (at least more than 1) and creates the same problem above. If that's the case, I don't have a clear solution. We are spending a lot of time figuring our the solution for Streamlit Share that I can't speak for on Azure, but I am bringing it up as a big point for the team to think about prioritization at the very least."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2021-01-07T16:43:57Z",
+      "body": "hey [USER]! Thank you for the incredibly detailed response. I've been trying to fix this issue on my end as well the past couple days. I tried the solution of just deleting the app and redeploying it, but even after a day of the app being in the oven, it never actually built. \r\nMy next effort was to make an entirely new repo with the same files but a different repo name, and push that to Streamlit sharing, which ended up working perfectly well. My guess is that something on your end didn't allow my app to go from the multiple processes to single process for an app with the same repo name, but you definitely know better than me. Also, if I change the name of my original github repo, and then redeploy, everything works great again. \r\n\r\nthank you for your help, i'm super grateful for it. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-01-07T22:16:15Z",
+      "body": "Thanks [USER]! I informed our cloud team of the challenge you had redeploying. Hopefully they'll sort something out. Glad redeploying under a name worked."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-01-17T07:46:32Z",
+      "body": "I am still facing the same issue, any help is appreciated\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-01-20T01:56:38Z",
+      "body": "Hey Suvoo, can you open a new bug and include some more info? \r\n\r\nIn particular:\r\n1. Steps to reproduce (with example app or code, if possible!)\r\n2. Streamlit version\r\n3. Do you see this in Streamlit sharing? Or when deployed some other way?\r\n3. Do you see any errors in the browser's devtools' [console](https://developers.google.com/web/tools/chrome-devtools/console/javascript) and [network tab](https://developers.google.com/web/tools/chrome-devtools/network/issues)? \r\n\r\nThanks!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-01-20T13:43:39Z",
+      "body": "``` st.image(\"C:\\\\Users\\\\91865\\\\Desktop\\\\Streamlit Demo\\\\data\\\\sal.jpg\") ```\r\nThis produces an error and shows a 0 icon when used on the page, but using \r\n\r\n```\r\nfrom PIL import Image\r\nimage = Image.open('C:\\\\Users\\\\91865\\\\Desktop\\\\Streamlit Demo\\\\data\\\\sal.jpg') \r\nst.image(image) \r\n```\r\nWhile this works totally fine. I don't see why this happens"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-01-22T19:35:29Z",
+      "body": "Thanks Suvoo.  I just encountered this issue and your workaround using PIL fixed it.   Streamlit, version 0.73.0, Windows 10.   What baffles me is that the st.image/st.sidebar.image call is in a page base class for a multi-page app that has been running reliably for over a year - I'm getting this testing standalone a new page subclassed from the same base class as the others.  It's the first time I've ever seen this issue.   Weird.\r\n\r\n[USER] This is happening in the application we talked about a while back.  Here's a screen snip of a test.  The sidebar image is using Suvoo's workaround, the main frame one is the same filepath but provided directly to st.image.  The sidebar one is called from the base class, the main frame from the sub-classed application page\r\n\r\n![image](https://user-images.githubusercontent.com/1843761/105537152-79636c80-5cbf-11eb-8fbc-38986d67d8bf.png)\r\n\r\nKevin"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-05-10T13:41:27Z",
+      "body": "I was having this same issue when deploying to GCP App Engine and was able to solve it with help from the [USER] post above (thank you!). The key is multiple instances. If you use the default configs on App Engine you are going to have multiple instances (VMs) underlying your application and this is going to cause 404s to from the HTTP image fetch outside the websocket. When I force the instance count to 1, this issue goes away and all of the images render properly. Of course, I loose autoscaling which isn't ideal but at least the app works properly. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-05-19T12:01:58Z",
+      "body": "For those using GKE you can resolve this by making sure the application container's replicas is set to one\r\n```\r\nspec:\r\n  replicas: 1\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-02-16T09:30:17Z",
+      "body": "I had \"0\" showing instead of an image when trying to get the image from a server. My mistake was not writing \"http://\" before the url. adding it resolved the problem."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-04-06T17:58:21Z",
+      "body": "> I was having this same issue when deploying to GCP App Engine and was able to solve it with help from the [USER] post above (thank you!). The key is multiple instances. If you use the default configs on App Engine you are going to have multiple instances (VMs) underlying your application and this is going to cause 404s to from the HTTP image fetch outside the websocket. When I force the instance count to 1, this issue goes away and all of the images render properly. Of course, I loose autoscaling which isn't ideal but at least the app works properly.\r\n\r\nHi, is there any workaround for this? I'm deploying to GCP and several images are generated dynamically, so when using multiple instances some of them are replaces by the \"0\" and some of them are displayed. Of course this is not optimal and we're hoping to use Streamlit in production, but at the moment there's no reliable way to display all the images consistently. Is this address by Streamlit somehow or it's not fixable and should I try another library?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-04-08T17:24:41Z",
+      "body": "Hi there, I'm having the same issue. When I run the app locally it works fine, but when I deploy on Heroku, random plots everytime show \"0\" instead.\r\n\r\nI'm not even loading an image, what I'm doing is:\r\n```\r\nfig, ax = plt.subplots()\r\ndf.plot(..., ax=ax)\r\nst.pyplot(fig)\r\n```\r\n\r\nI'm having multiple pieces of code like this with different plots in the same streamlit page, every time, some are shown and some are not but they are not always the same."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-04-20T12:53:37Z",
+      "body": "Streamlit, version 1.8.1  still has the issue ... \r\n\r\n2022-04-20 08:45:37.024 InMemoryFileManager: Missing file 8f38e6ff47a0a683fe589238cf5f5db9c04efeaf6ed930e129ea082e.png"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-04-28T09:00:40Z",
+      "body": "Same problem (Streamlit 1.8.1):\r\n\r\n2022-04-28 10:53:36.820 InMemoryFileManager: Missing file c669431943be2067b62db57fdf9ba81deec9f17f2bdfaaa2df6fdc09.png"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-05-05T08:42:51Z",
+      "body": "Can confirm the issue. Only occurs in deployment though, not when running streamlit locally. It's a simple\r\n\r\nst.image(\"logo.webp\")\r\n\r\nError message: InMemoryFileManager: Missing file 1156bb4e04fc0aaf71e4a8dfcf917b11a54797812e23e860bf0dae28.jpeg"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-06-17T11:33:36Z",
+      "body": "Facing the same issue with version `1.10.0` when running on streamlit-cloud. \r\n\r\nThis error shows: `streamlit InMemoryFileManager: Missing file x.jpeg` and then logged out of my app. \r\n\r\nI'm using `streamlit-authenticator` but I don't think it has something to do with that according to what I read here."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-06-17T23:09:05Z",
+      "body": "I see numerous more cases of this issue happening in this thread. To be clear, here's what goes on below the hood:\r\n\r\n* images are loaded and stored in memory per script run.\r\n* images are only removed when the latest script run does not use images from the _previous_ script run.\r\n\r\nWith that in mind, this leads to some important outcomes.\r\n* If you have your streamlit app running with replicas behind a load balancer, _you will see issues_. The image is stored in the memory of the app where the script ran and is connected. If your request for the image is received with a different replica, it will not respond. The best solution is to enable some sort of sticky routing. We have some thoughts on this, but it's going to be a longer time to a solution.\r\n* If you are assuming that images are being received past the script run will be generated, this may present a problem. I imagine this less a use case.\r\n\r\nOutside of above, if you have a simple code example/repro steps to demonstrate the issue. It would be very helpful."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-10-05T14:20:21Z",
+      "body": "> I see numerous more cases of this issue happening in this thread. To be clear, here's what goes on below the hood:\r\n> \r\n> * images are loaded and stored in memory per script run.\r\n> * images are only removed when the latest script run does not use images from the _previous_ script run.\r\n> \r\n> With that in mind, this leads to some important outcomes.\r\n> \r\n> * If you have your streamlit app running with replicas behind a load balancer, _you will see issues_. The image is stored in the memory of the app where the script ran and is connected. If your request for the image is received with a different replica, it will not respond. The best solution is to enable some sort of sticky routing. We have some thoughts on this, but it's going to be a longer time to a solution.\r\n> * If you are assuming that images are being received past the script run will be generated, this may present a problem. I imagine this less a use case.\r\n> \r\n> Outside of above, if you have a simple code example/repro steps to demonstrate the issue. It would be very helpful.\r\n\r\nThanks for explaining the problem. My app runs with replicas behind a load balancer, I solved the 0-image problem  by using sticky routing. Adding the sticky-cookies-services annotation [here](https://github.com/nginxinc/kubernetes-ingress/tree/v2.3.1/examples/session-persistence) worked for me."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-10-07T17:46:08Z",
+      "body": "FYI in case other folks come across this, we were able to fix our images loading issue with this:\r\nhttps://cloud.google.com/run/docs/configuring/session-affinity"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-11-28T19:58:30Z",
+      "body": "My team solved this issue on Kubernetes on Azure by enabling Cookie Based Affinity, https://azure.github.io/application-gateway-kubernetes-ingress/features/cookie-affinity/"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "issue-5240",
+  "type": "issue",
+  "number": 5240,
+  "url": "https://github.com/streamlit/streamlit/issues/5240",
+  "title": "Impossible to highlight the selection text in `st.selectbox` to delete it all at once",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.selectbox"
+  ],
+  "created_at": "2022-08-26T16:13:04Z",
+  "closed_at": "2026-06-14T20:03:59Z",
+  "body": "### Summary\n\n- When using the `st.selectbox`, you cannot highlight the text of the current selection and delete it at once (e.g., using backspace key).\n- Sometimes it lets you highlight the selection text, but only when `st.selectbox` is not in focus (so backspace key doesn't do anything).\n- This means users are only able to delete any selection letter by letter.\n\n### Steps to reproduce\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-5240)\n\nCode snippet:\n\n```\nimport streamlit as st\nst.selectbox('Example options',options = ('option 1','option 2','option 3'))\n```\n\n**Expected behavior:**\n\nThe current selection text in `st.selectbox` can be highlighted while in focus (and e.g., deleted at once using backspace key). \n\n### Is this a regression?\n\nNo\n\n### Additional information\n\nThis is one of several UX issues detected for `st.selectbox`. Others are:\n\n- #4671 \n- #4901 \n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-5240)\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-08-29T08:07:45Z",
+      "body": "Hi [USER] , thanks for submitting this issue. This seems like more of an enhancement rather than a bug. However, this does seem like an odd thing and this would probably have to be looked into and prioritized by product. \r\n\r\nAs a workaround, you can click on it, do one backspace and then do a command + a or ctrl + a in order to select everything and backspace. \r\n\r\nLet me know if you still think this is a bug and we can have that discussion and I bring it up to the team."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-16T15:06:45Z",
+      "body": "not sure if it's my imagination but seems like this issue might be fixed in streamlit 1.39 ..."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-14T20:04:00Z",
+      "body": "This will be fixed in Streamlit 1.59+ with the migration of selectbox from baseweb to react-aria."
+    }
+  ]
+}

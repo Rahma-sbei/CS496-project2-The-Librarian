@@ -1,0 +1,29 @@
+{
+  "id": "issue-4320",
+  "type": "issue",
+  "number": 4320,
+  "url": "https://github.com/streamlit/streamlit/issues/4320",
+  "title": "Make picture size returned by camera_input consistent via parameter",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:st.camera_input"
+  ],
+  "created_at": "2022-01-26T13:56:54Z",
+  "closed_at": "2026-07-01T12:25:03Z",
+  "body": "st. camera_input returns a picture. The dimensions of that picture depend on the camera widget size as displayed in the browser. \n\n### Problem\n\nGetting randomly sized pictures from the camera_input widget is not exactly defined behaviour.\nThe documentation doesn't list any setting to request a certain dimension.\n\n```\nimport streamlit as st\nfrom PIL import Image\nimport numpy as np\n\nimgbuffer = st.camera_input('cam')\n\nif imgbuffer:\n    img = Image.open(imgbuffer)\n    imgnp = np.array(img)\n    st.write(imgnp.shape)\n```\n\n1. run snippet\n2. take picture\n3. resize browser window so that the widget is also resized\n4. take another picture\n\n### Solution\n\n**MVP:** No idea\n\n**Preferred solution:** Add a parameter to request a defined size, maybe a second one to set what to do if that size is not available from the device (upscaling, cropping, downscaling.). Add missing documentation if such a parameter already exists.\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-4320)",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-11-15T19:55:16Z",
+      "body": "Depending on the page / column width, the returned image can be oddly sized.\r\n\r\nI suggest that the default behavior be to request an image of a useful consistent size. I'm not sure what the default should be, but 480p, 720p, or 1080p seem like broadly supported and useful resolutions. See https://webrtchacks.github.io/WebRTC-Camera-Resolution/\r\n\r\nFor those desiring more control, why not adopt the web platform standard for video resolution constraints: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia#parameters"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-14T12:31:03Z",
+      "body": "ive submitted PR #15186 implementing this, adds a size=(width, height) parameter for consistent image dimension"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "issue-9906",
+  "type": "issue",
+  "number": 9906,
+  "url": "https://github.com/streamlit/streamlit/issues/9906",
+  "title": "Add 'key' to static widgets like st.link_button, st.popover",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:st.link_button"
+  ],
+  "created_at": "2024-11-22T15:14:15Z",
+  "closed_at": "2026-07-22T08:01:23Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nMost widgets have a `key` parameter - but not `st.link_button`. I can see why - because it is mostly \"static\", but it's still useful to be able to give an explicit key especially to map a specific style now that key can be used in the element class.\n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-22T15:14:26Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-9906)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-12-10T00:22:51Z",
+      "body": "hi [USER]! Can I work on this issue?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-12-16T08:07:35Z",
+      "body": "Hey [USER]! Thanks for offering to help. I think right now we don't want to do this since (as Arnaud pointed out in his initial post) only interactive widgets have a `key` parameter today. (The only exception to this is `st.container`, where we added `key` to allow CSS hacks on non-widget elements). I think there is a possibility we'll add `key` to more (including static) elements in the future but I'd like to first come up with a consistent model of how we do this before adding it to individual elements here and there. To be clear, this could take us a while because we have other priorities but I'll update here when I get to it!"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-01-03T15:39:09Z",
+      "body": "Wanted to +1 this as I've been wanting to define `key` for st.popover. Also renaming the issue to make it more generic"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-07T14:48:39Z",
+      "body": "I'd like to add that it would be helpful for columns too, as I am currently trying to figure out how to give one \"max-width\" when I cannot target it, due to a lack of \"anything\" specific about it..."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T08:01:23Z",
+      "body": "Closing this since `st.link_button` and `st.popover` provide a `key` argument. Adding `key` to other elements is tracked here: #9580 "
+    }
+  ]
+}

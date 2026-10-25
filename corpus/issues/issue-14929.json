@@ -1,0 +1,23 @@
+{
+  "id": "issue-14929",
+  "type": "issue",
+  "number": 14929,
+  "url": "https://github.com/streamlit/streamlit/issues/14929",
+  "title": "[Discussion] Embed Agent Friendly Code Score Badge",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:ai"
+  ],
+  "created_at": "2026-04-27T04:50:13Z",
+  "closed_at": "2026-06-12T20:27:19Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nHello team,\nI am Himanshu.\n\nI am working on a side project that scores repos for agent friendliness. Streamlit has an overall 90.8 score.\nWould it be possible to add a badge for it in the README?\n\nYou can use this -\n```\n[![Agent Friendly](https://agentfriendlycode.com/api/badge/github/streamlit/streamlit.svg)](https://agentfriendlycode.com/repo/60)\n```\n\n### The Badge\n[![Agent Friendly](https://agentfriendlycode.com/api/badge/github/streamlit/streamlit.svg)](https://agentfriendlycode.com/repo/60)\n\n### Breakdown of the score\nhttps://www.agentfriendlycode.com/repo/60\n\n---\n\n<img width=\"1885\" height=\"1172\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/45ef9862-10d9-4279-9e9c-6b7a7f681d5b\" />\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-27T04:50:23Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-14929)\n"
+    }
+  ]
+}

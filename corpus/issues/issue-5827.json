@@ -1,0 +1,84 @@
+{
+  "id": "issue-5827",
+  "type": "issue",
+  "number": 5827,
+  "url": "https://github.com/streamlit/streamlit/issues/5827",
+  "title": "Don't rerun on widget interaction",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:widgets",
+    "area:events"
+  ],
+  "created_at": "2022-12-07T22:36:38Z",
+  "closed_at": "2026-10-13T09:34:02Z",
+  "body": "When a user interacts with a widget, Streamlit always reruns the entire script. There are ways to get around this (forms, caching, ...) but sometimes it would be really useful to just do something like `st.slider(..., rerun=False)`. \n\nSee requests in this very popular forum post: https://discuss.streamlit.io/t/how-to-prevent-the-reloading-of-the-whole-page-when-i-let-the-user-to-perform-an-action/10800/7\n\nThis touches on the fundamental of Streamlit so we'll need to think this through carefully. No guarantees that we'll do this anytime soon! If you have use cases, please post them here (and upvote the issue!) so we can prioritize and see what's the best way to solve all problems. \n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-5827)\n",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2022-12-08T14:16:56Z",
+      "body": "Not 100% sure, but it seems a hypothetical \"rerun\" argument in widgets might overlap with the behavior of the \"key\" argument that already exists (which controls when widgets are reset)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-05-04T14:31:02Z",
+      "body": "An use case where this would be useful is a combination of a selectable dataframe (using streamlit aggrid) and an image gallery. The user would select which rows to display from the aggrid table.\r\n\r\nThe problem with the current streamlit design is that when the user selects a row in the table, all of the previously rendered images (from previous row selections) will be re-loaded. It's not a porblem when you select 2 or 3 rows, but it becomes a problem when you select more than 10-20 rows."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-07-19T07:25:18Z",
+      "body": "current roadblock that led me to this issue was:\r\n\r\n- Trying to setup a feedback form for users\r\n- Upon submission of feedback form (either by st.button or st.form..button), the page reloads and clears everything. \r\n- Tried st.forms, thought it would work but due to the nature of streamlit, it will force a reload of the script upon submission and clear everything\r\n\r\nExpectation is:\r\n\r\n- Upon submission of feedback form, only the form clears but everything else is remain outputted on the page.  \r\n- If user want to provide another feedback, the user can still look at the app output and submit another feedback.\r\n\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-08-22T12:34:54Z",
+      "body": "My current issue: https://discuss.streamlit.io/t/st-file-uploader-is-returning-to-login-page-after-file-upload/49717\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-10-31T17:44:55Z",
+      "body": "Pulled my hair out trying to implement this. Plsss implement this. Love streamlit but this is detering me away"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-11-01T02:34:55Z",
+      "body": "OK. This might be asking too much, but I am going to ask it anyway. In multi page setup I wish there was an option to freeze the pages and when navigating in between the pages you can maintain the data, results and values they are displaying. Most of my applications involve loading a large panda dataframe in a dashboard type page with lots of calculations. I wish I did not have to start fresh loading data and doing calculations all over again. I guess this requires streamlit to save the current state of the page completely and return it to the user when he/she goes back to the original page. This feature makes streamlit behave more like a regular application and, in my opinion, makes it more practical. \u00a0OK I said it knowing that it has zero chance to be implemented. Regardless, I am very thankful to streamlit team for their great work. Keep up the good work and have a wonderful night"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-01-09T18:30:57Z",
+      "body": "It would be a very useful feature, especially when it is necessary to generate just one specific component without the need for a rerun."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-12T14:44:10Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-16T16:04:23Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-19T20:16:31Z",
+      "body": "I have a use case where I am starting an execution chain using theis framework called crewai. The application is essentially a chatbot where the main widget I am using is st.chat_input().\r\n\r\nNow every time I interact with this widget, it reruns my script which starts the crew execution chain from the beginning which renders the chats messages on top of the pre existing ones which makes it not very efficient. \r\n\r\n1. Of course I used `st.session_state` to control this behavior but I realized that my crew execution chain actually stops ever time the widget is used. iI want my crew execution chain to continue. I have even tried using `st.forms()` for this but with little to no success.\r\n\r\n2. I also tried this: I wrapped the the render_chat_input() function with a [USER].experimental_fragment as shown below:\r\n```\r\n# Function to render the st.chat_input()\r\n[USER].experimental_fragment\r\ndef render_chat_message():\r\n        human_input = st.chat_input(\"Type your message here...\", key=\"user_input\", on_submit=handle_chat_input)\r\n```\r\nNow with this fragment rendered. The issue is that any interaction I have with this widget only updates this particular fragment. What I mean specifically by this is that when the session state state is changed in this fragment, it is not visible outside of this fragment. This is preventing my code logic from seeing the updates/changes made to the session state in the chat_input()\r\n\r\nI really love streamlit and I want to continue using it. Is there any text input or chat input based widget in streamlit that does not trigger a rerun of the application?\r\n\r\n\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-12-08T23:45:01Z",
+      "body": "Hi All,\r\n\r\nI wonder if the feature has been implemented? If not, what is the roadmap? what is an alternative?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-04-21T08:18:19Z",
+      "body": "## Update \n\nI wrote a spec for this recently: https://github.com/streamlit/streamlit/pull/14787, and we started implementing this for our widgets: https://github.com/streamlit/streamlit/pull/14828"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-10-13T09:35:31Z",
+      "body": "Starting with Streamlit 1.66, all relevant widgets support `on_change=\"ignore\"`. The widget updates in the browser without triggering a rerun, and Python receives the new value on the next rerun triggered by another interaction, such as a button click.\n\nThis also lets you build dynamic forms that `st.form` can't express, since some inputs can still rerun to update others:\n\n```python\nimport streamlit as st\n\nCITIES = {\"Germany\": [\"Berlin\", \"Munich\"], \"France\": [\"Paris\", \"Lyon\"]}\n\ncountry = st.selectbox(\"Country\", list(CITIES))  # Reruns to refresh the city options\ncity = st.selectbox(\"City\", CITIES[country], on_change=\"ignore\")\nname = st.text_input(\"Name\", on_change=\"ignore\")\n\nif st.button(\"Save\"):\n    st.write(f\"Saved {name} from {city}, {country}\")\n```\n\nSince ignored values only reach Python on the next rerun, use it for inputs where users don't expect an immediate reaction.\n"
+    }
+  ]
+}

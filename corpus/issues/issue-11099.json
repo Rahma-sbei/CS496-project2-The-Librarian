@@ -1,0 +1,28 @@
+{
+  "id": "issue-11099",
+  "type": "issue",
+  "number": 11099,
+  "url": "https://github.com/streamlit/streamlit/issues/11099",
+  "title": "Customize the blinking cursor in `st.write_stream`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.write_stream"
+  ],
+  "created_at": "2025-04-14T20:16:46Z",
+  "closed_at": "2026-06-09T20:58:15Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\n`st.write_stream` has a little blinking cursor at the end while it streams text. Different chat apps like ChatGPT or Claude use different characters here, so it would be great to let the user customize this. \n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-04-14T20:18:48Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-11099)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-09T20:58:14Z",
+      "body": "`st.write_stream` now accepts a `cursor` keyword argument for a custom cursor string (any character / emoji / Markdown), added in #12597 (merged 2025-09-24) \u2014 which covers customizing the cursor character as requested here.\n\nTwo notes: the default is now *no* cursor (pass e.g. `cursor=\"\u258f\"` to restore a glyph), and the kwarg controls the cursor *content*, not blink/animation styling. Closing as resolved \u2014 if you were specifically after blink/animation control rather than the character, please reopen and we'll track that as a separate enhancement."
+    }
+  ]
+}

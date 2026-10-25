@@ -1,0 +1,96 @@
+{
+  "id": "issue-2975",
+  "type": "issue",
+  "number": 2975,
+  "url": "https://github.com/streamlit/streamlit/issues/2975",
+  "title": "Server shutdown fails to exit while processing infinite loop",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "area:backend",
+    "feature:runtime"
+  ],
+  "created_at": "2021-03-18T00:13:56Z",
+  "closed_at": "2026-09-21T07:32:21Z",
+  "body": "### Summary\r\n\r\nPython process does not exit when shutting down the server while processing an infinite loop in a script\r\n\r\n### Steps to reproduce\r\n\r\nCode snippet: (using a recent SessionState prototype, before I fixed the implementation)\r\n\r\n```\r\nimport streamlit as st\r\n\r\nstate = st.get_state()\r\nst.write(\"printed something\")\r\nst.write(\"foobar\" in state) # this line infinite looped before I fixed the implementation\r\n```\r\n\r\nIf applicable, please provide the steps we should take to reproduce the bug:\r\n\r\n1. Run the above snippet against the [previous state prototype](https://github.com/AnOctopus/streamlit/tree/c17d119aef34ae1f15f0e7dff5051469d8bb745d) (I ran the react server as a separate process from the dev install of that commit, rather than running them together via a wheel, don't know if that affects this)\r\n2. C-c in the shell running the python server\r\n\r\n**Expected behavior:**\r\n\r\nPython server stops, process exits and control returns to my shell\r\n\r\n**Actual behavior:**\r\n\r\nLogs indicate server goes into the STOPPING state and then almost immediately the STOPPED state, but after 20 seconds it still has not exited the process. Sending SIGTERM repeatedly afterwards fails to cause the process to exit, and SIGKILL was required to regain control.\r\n\r\n### Is this a regression?\r\n\r\nUnknown\r\n\r\n### Debug info\r\n\r\n- Streamlit version: Session state prototype, as linked above, development install\r\n- Python version: 3.8.6\r\n- Using Conda? PipEnv? PyEnv? Pex?: Pipenv\r\n- OS version: Arch Linux\r\n- Shell version: Zsh 5.8\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-03-26T16:39:32Z",
+      "body": "Interesting. I wonder if the ScriptRunner is closing the thread when it receives the stop signal [USER] "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-05-06T18:37:00Z",
+      "body": "AFAICT this is working as expected.\r\n\r\nWhen you ctrl-c out of Streamlit (and at some other points, like when you click \"stop\" in the UI) we need to kill running thread(s), but Python doesn't actually have a way to kill threads. \r\n\r\nSo what we do is:\r\n1. Set a boolean when we want to kill a thread\r\n2. Before every st.foo command, we check if the thread running that command has the boolean set to True\r\n3. If True, raise a special exception. (Because exceptions kill threads)\r\n    _So the thread is now stopped \u2014 yay!_\r\n4. Handle the exception at the parent thread if needed\r\n\r\nThis works well any script where the interpreter often encounters an st.foo command. And it doesn't work at all when you have a loop that has no st.foo command. \r\n\r\nIn this case, the loop has no st command, so it runs forever. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-06-23T09:35:58Z",
+      "body": "Is there a graceful way of shutting down a streamlit app without killing the terminal?\r\n\r\n![Screenshot 2021-06-23 at 10 34 41](https://user-images.githubusercontent.com/11792905/123073872-ba96ae80-d40e-11eb-9eb9-d907c2b03b41.png)\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-06-25T19:06:24Z",
+      "body": "Hey [USER] I've been doing a bunch of spinning up and shutting down servers in the terminal it's usually pretty speedy. My only wonder is if something is long-running in the script that's failing to shut down. Are you doing anything special with threads or anything? Any code would be appreciated."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-06-28T07:54:46Z",
+      "body": "The structure of the app (also raised in #3230) is as follows:\r\n\r\n```python\r\nimport time\r\nimport streamlit as st\r\nfrom streamlit import caching\r\nfrom binance import Client\r\nclient = Client()\r\n\r\n[USER].cache(ttl=310, allow_output_mutation=True)\r\ndef get_data(timestamp=None)\r\n    client.get(...)\r\n    return df\r\n    \r\ntable = st.empty()\r\n\r\nwhile True:\r\n     # update every 5 mins\r\n     caching.clear_cache()  # not sure if needed\r\n     timestamp = dt.utcnow()\r\n     table.dataframe(get_data(timestamp))\r\n     time.sleep(300)  \r\n```"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-06-28T18:44:26Z",
+      "body": "It's possible [USER] that we can make the thread created to run the script a [daemon](https://docs.python.org/3/library/threading.html#threading.Thread.daemon) thread.\r\n\r\nThere is a note however.\r\n\r\n> Note Daemon threads are abruptly stopped at shutdown. Their resources (such as open files, database transactions, etc.) may not be released properly. If you want your threads to stop gracefully, make them non-daemonic and use a suitable signalling mechanism such as an Event.\r\n\r\nWe would need to investigate the implications of this. We expect more people to be connecting to databases etc than creating infinite loops in their code."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-06-28T19:07:44Z",
+      "body": "That's fair, though I do feel that continuously polling a REST API and displaying results is a pretty good use case?\r\n\r\nIf there's a better pattern for this, I'm all ears "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-07-01T06:38:48Z",
+      "body": "[USER] I've been thinking about this, and I came up with an idea on my personal time that might help. Essentially, I implemented a custom component that auto re-runs the app. This avoids the need of an infinite loop in the script. This improves the developer experience (shutting down while an infinite loop is running) while easing resources on the server with a tiny tradeoff from the user.\r\n\r\nhttps://github.com/kmcgrady/streamlit-autorefresh\r\n\r\nHere's a trivial example.\r\n\r\n```python\r\nimport streamlit as st\r\nfrom streamlit_autorefresh import st_autorefresh\r\n\r\n# Run the autorefresh about every 2000 milliseconds (2 seconds) and stop\r\n# after it's been refreshed 100 times.\r\ncount = st_autorefresh(interval=2000, limit=100, key=\"fizzbuzzcounter\")\r\n\r\n# The function returns a counter for number of refreshes. This allows the\r\n# ability to make special requests at different intervals based on the count\r\nif count == 0:\r\n    st.write(\"Count is zero\")\r\nelif count % 3 == 0 and count % 5 == 0:\r\n    st.write(\"FizzBuzz\")\r\nelif count % 3 == 0:\r\n    st.write(\"Fizz\")\r\nelif count % 5 == 0:\r\n    st.write(\"Buzz\")\r\nelse:\r\n    st.write(f\"Count: {count}\")\r\n```\r\n\r\nYour use case suggests this could work and may even simplify your work. Given the code structure, the new script would be:\r\n\r\n```python\r\nimport streamlit as st\r\nfrom streamlit_autorefresh import st_autorefresh\r\nfrom streamlit import caching\r\nfrom binance import Client\r\nclient = Client()\r\n\r\n# update every 5 mins\r\nst_autorefresh(interval=5 * 60 * 1000, key=\"dataframerefresh\")\r\n\r\n[USER].cache(ttl=310, allow_output_mutation=True)\r\ndef get_data(timestamp=None)\r\n    client.get(...)\r\n    return df\r\n\r\ncaching.clear_cache()  # not sure if needed\r\ntimestamp = dt.utcnow()    \r\nst.dataframe(get_data(timestamp))\r\n```\r\n\r\n\r\nThe only use case that I think this would hurt is one with complex UI implemented _before_ the infinite loop. That being said, proper caching could solve that challenge.\r\n\r\nLet me know if it helps or not. It's a simple component so feedback is appreciated."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-07-03T18:53:25Z",
+      "body": "Awesome! Will try that for my next proj :) "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-09-21T14:33:21Z",
+      "body": "This bug makes working with Kafka(-like) data sources tricky. The only workaround I've found so far was to add `st.empty` statements in loops. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-10-04T14:15:48Z",
+      "body": "We create a branch, where we are solved this, inside streamlit\r\nhttps://github.com/streamlit/streamlit/compare/develop...FloWide:force_exit_st\r\nWhat do you think [USER] ?\r\n\r\nThis daemon thread sends a `SystemExit` exception after a config timeout through python interpreter to all 'hanged' thread. \r\nSo when a 'hanged' thread runs a python code,  the python interpreter throws a `SystemExit`.\r\n\r\nSometimes when python hangs in OS call (`sleep`, `select`, `poll`, etc...) this not works, then we use forced signal killing after a longer configurable time.\r\n\r\nWhen no hanged thread, this has no effect."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-11-08T20:09:44Z",
+      "body": "[USER] That approach seems promising. Could you open a PR for it?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-02-27T15:45:30Z",
+      "body": "I've stumbled upon the same problem in #8181 (and #8182), but due to long running DWH SQL requests. Would be nice to be able to terminate threads in some way, including server stopping."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T12:56:58Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-2975)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-31T15:00:38Z",
+      "body": "This issue reports that the Streamlit server fails to exit cleanly when a user script is stuck in an infinite loop without any `st.*` commands. The root cause is a fundamental Python limitation: Python doesn't support forcefully terminating threads. Streamlit's current approach uses a cooperative mechanism where stop requests are checked only at \"interrupt points\" - specifically, when `st.*` commands are called (see `_maybe_handle_execution_control_request` in `script_runner.py`). If a script is in a tight loop without calling any Streamlit commands, it never reaches an interrupt point, so the stop signal is never processed. Since the script thread is created as a non-daemon thread, the Python process waits indefinitely for it to complete.\n\nA community contributor has proposed a solution using `ctypes.pythonapi.PyThreadState_SetAsyncExc` to inject a `SystemExit` exception into hung threads (referenced in the comments via a forked branch).\n\n### Related Issues\n\n- [#6494 - Infinite loop after breaking](https://github.com/streamlit/streamlit/issues/6494): Same underlying issue where while loops continue running even after the loop condition should break, because there's no `st.*` command inside the loop to trigger an interrupt point check.\n\n- [#6611 - Graceful Shutdown of Server](https://github.com/streamlit/streamlit/issues/6611): Request for programmatic server shutdown (`st.stop_server()`), related to shutdown mechanism improvements.\n\n- [#7688 - On session start/shutdown hooks](https://github.com/streamlit/streamlit/issues/7688): Request for shutdown hooks to properly clean up resources, which intersects with the broader shutdown handling architecture.\n\n---\n*This is an automated triage comment. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

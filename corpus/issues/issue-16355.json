@@ -1,0 +1,24 @@
+{
+  "id": "issue-16355",
+  "type": "issue",
+  "number": 16355,
+  "url": "https://github.com/streamlit/streamlit/issues/16355",
+  "title": "Support chart color theming options for light and dark themes",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:charts",
+    "feature:theming"
+  ],
+  "created_at": "2026-08-05T20:52:35Z",
+  "closed_at": "2026-08-07T22:40:23Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nMost theming options can be set separately in `[theme.light]` and `[theme.dark]`, but the chart color options (`chartCategoricalColors`, `chartSequentialColors`, `chartDivergingColors`) can only be set in the main `[theme]` section. It would be great if these could also be configured separately for light and dark themes.\n\n### Why?\n\nLight and dark themes often need different chart palettes (e.g. brighter colors on dark backgrounds). Streamlit already uses different default chart colors for light vs dark, but once you set custom chart colors, the same palette is used for both modes.\n\n### How?\n\nAllow `chartCategoricalColors`, `chartSequentialColors`, and `chartDivergingColors` in `[theme.light]` and `[theme.dark]`, same as most other theming options.\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-05T20:53:26Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-16355)\n"
+    }
+  ]
+}

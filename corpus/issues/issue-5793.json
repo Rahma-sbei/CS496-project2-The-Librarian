@@ -1,0 +1,108 @@
+{
+  "id": "issue-5793",
+  "type": "issue",
+  "number": 5793,
+  "url": "https://github.com/streamlit/streamlit/issues/5793",
+  "title": "Misconfigured _xsrf cookies",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "papercut",
+    "area:security",
+    "feature:st.file_uploader",
+    "area:deployment",
+    "status:confirmed",
+    "priority:P3"
+  ],
+  "created_at": "2022-11-30T12:59:03Z",
+  "closed_at": "2026-06-19T07:57:53Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nHi,\r\n\r\nI am running a Streamlit app on Azure, requiring authentication with AD, and `st.file_uploader` returns a 403 Forbidden error if `enableXsrfProtection` is on. It works locally, and I suspect that this is caused by the _xsrf cookie not getting though, because I can see the cookie in dev tools locally, but not when deployed.\r\n\r\nIn particular, the cookie is missing the SameSite and Secure attributes.\n\n### Reproducible Code Example\n\n_No response_\n\n### Steps To Reproduce\n\n1. Open any Streamlit app\r\n2. Open browser developer tools\n\n### Expected Behavior\n\nCookies have `SameSite=None; Secure` attribute.\n\n### Current Behavior\n\n_xsrf cookie is not transmitted when deployed on the cloud with SSO and HTTPS-only.\r\n\r\nLocally this is what I am getting:\r\n![image](https://user-images.githubusercontent.com/19314272/204801462-8a387f12-3df5-46e7-a9f6-69bd5293733d.png)\r\n\r\nPlus the deprecation warning:\r\n\r\n>Some cookies are misusing the recommended \u201cSameSite\u201c attribute\r\n>Cookie \u201c_xsrf\u201d does not have a proper \u201cSameSite\u201d attribute value. Soon, cookies without the \u201cSameSite\u201d attribute or with an invalid value will be treated as \u201cLax\u201d. This means that the cookie will no longer be sent in third-party contexts. If your application depends on this cookie being available in such contexts, please add the \u201cSameSite=None\u201c attribute to it. To know more about the \u201cSameSite\u201c attribute, read https://developer.mozilla.org/docs/Web/HTTP/Headers/Set-Cookie/SameSite\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.15.0\r\n- Python version: 3.10, 3.11\r\n- Operating System: Ubuntu 22.04 (WSL)\r\n- Browser: Firefox, Chrome\r\n- Virtual environment: yes\r\n\n\n### Additional Information\n\nThis has been touched on in https://github.com/streamlit/streamlit/issues/2517 and particularly https://github.com/streamlit/streamlit/issues/2517#issuecomment-1321281460. Feel free to close if you consider this is a duplicate, but I believe that the cookie configuration and Streamlit overwriting Jupyter's cookies are two different issues.\r\n\r\nThere are multiple reports of this on the forum:\r\n\r\nhttps://discuss.streamlit.io/t/deployment-on-azure-ad-authentication-enabled-st-file-uploader-403-forbidden/30898\r\n\r\nhttps://discuss.streamlit.io/t/azure-ad-xsrf-protection-and-st-file-uploader/33612\r\n\r\nhttps://discuss.streamlit.io/t/deployment-on-azure-appservice-ad-authentication-enabled-st-file-uploader-403-forbidden/5839\r\n\r\nhttps://discuss.streamlit.io/t/file-uploader-403-error-when-embedding-streamlit-app-in-iframe/24109\r\n\r\nWhether they all have the same underlying cause, I cannot tell.\n\n### Are you willing to submit a PR?\n\n- [ ] Yes, I am willing to submit a PR!",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-12-30T03:36:38Z",
+      "body": "Hi [USER] Thanks for the report! I'll do some investigation on this one!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-11-04T00:54:33Z",
+      "body": "If I'm not mistaken, this issue should maybe be reopened as https://github.com/streamlit/streamlit/pull/7482 reverted the fix. [USER]\r\n\r\nThanks!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-11-28T14:58:52Z",
+      "body": "I can confirm this is still an issue with Streamlit version 1.28 and Python 3.10"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-01-19T13:49:44Z",
+      "body": "This is still an issue on **Streamlit 1.30**"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-01-22T14:54:17Z",
+      "body": "> This is still an issue on **Streamlit 1.30**\r\n\r\n+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-02-16T00:10:27Z",
+      "body": "Yeah, I'm still running into this issue on **Streamlit 1.31.0** unfortunately."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-03T17:39:44Z",
+      "body": "It looks like this PR by [USER] would have fixed the issue, but broke the file uploader in safari so it had to be reverted: https://github.com/streamlit/streamlit/pull/7482. \r\n\r\nIs there a way I can help debug the file uploader issue in Safari, assuming the cause of the issue isn't already known? I would like to help get a fix for this issue in if possible."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-09T18:05:49Z",
+      "body": "I have been struggling with Axios errors on file uploads for the past day.  Some of my deployments are behind NGINX, others are behind TornadoServer.  There is no combination of Streamlit version and proxy type that gives consistent good results -- some of my deployments work, others don't, with seemingly identical configurations. (The problems don't happen when I directly connect to Streamlit, either locally or when it is running in Kubernetes and I port-forward it.)\r\n\r\nI suspect the 403 comes from https://github.com/streamlit/streamlit/blob/55d6a870779bb19527b144fbc73fbfbb150d728f/lib/streamlit/web/server/component_request_handler.py#L50 .  I would love to see some debug-level logging for these 403s, to confirm if they are the reason, and what the path problem is."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-05-13T17:49:18Z",
+      "body": "[USER] Yes, currently, we do not expose internal logs (especially those produced by Tornado) to the final user. \r\n\r\nBut this `compoment_request_handler` should be involved only when you use a custom component in your streamlit app. \r\n\r\nIf you see just file_uploader behind the reverse proxy, one thing I can recommend to check is `_streamlit_xsrf` is a whitelisted cookie name, since a couple of releases ago we renamed our `_xsrf` cookie to `_streamlit_xsrf` : https://github.com/streamlit/streamlit/pull/7744\r\n\r\nPlease also see this discussion on the forum: https://discuss.streamlit.io/t/strange-bug-in-st-file-uploader/59871/2\r\n\r\nHope this will be helpful"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-13T18:26:39Z",
+      "body": "[USER] Thank you for your reply.\r\n\r\nI develop in an environment where I do not have access to the NGINX proxy.  I am sure many other Streamlit library users do not understand or do not administer their proxies.\r\n\r\nI am not suggesting that logs be exposed to a Streamlit user.  I am suggesting that when the status is set to 403, it would be helpful to SREs and developers to do a `_LOGGER.debug(\"ComponentRequestHandler: GET %s forbidden (component_root %s)\", abspath, component_root)` so that the problem can be diagnosed more quickly.  (Or possibly `_LOGGER.info` level.)\r\n\r\nI was able to get my code working with `--server.enableXsrfProtection=false` but I am still trying to understand if a cookie was dropped, by which component, and what `browser.serverAddress` Streamlit believes it is deployed on."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-24T09:17:53Z",
+      "body": "Any updates on this issue?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-05T11:08:59Z",
+      "body": "Any updates on this issue ? We are deploying streamlit application to Azure App service with Azure AD authentication and have the same issue with file upload. Could you kindly clarify if this is addressed in any of the recent versions or if there is a plan to address the same ? "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-10T00:18:13Z",
+      "body": "[USER] Was this issue resolved by https://github.com/streamlit/streamlit/pull/9304 and can be closed?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-01T14:24:12Z",
+      "body": "I have a similar issue with a Streamlit 1.38.0 app behind a reverse proxy which returns 403 on a file upload even with the modified cookie with `SameSite=None; Secure` attributes set.\r\n\r\nHere is the flow.\r\n1. The app loads some JS and executes XHR GET `/_stcore/health` request.\r\n2. `Set-Cookie` header presents in the response but the cookie is ignored by a browser. It looks to be related to `credentials` [fetch option](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie). It would be great if Streamlit team can re-check this.\r\n2.1. If you open `/_stcore/health` in another browser tab, you can see the cookie is accepted by the browser.\r\n\r\n[USER], maybe this is your case.\r\n\r\n[USER], could you confirm that the flow is described correctly and suggest some ideas except `--server.enableXsrfProtection=false` mentioned above?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T13:06:18Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-5793)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-10T18:45:47Z",
+      "body": "This issue reports that the `_xsrf` (XSRF/CSRF protection) cookie is missing the `SameSite=None; Secure` attributes, which causes `st.file_uploader` to return 403 Forbidden errors when Streamlit apps are deployed behind reverse proxies, SSO authentication (like Azure AD), or embedded in iframes. Modern browsers require `SameSite=None; Secure` for cookies to be transmitted in cross-origin contexts.\n\n**Root Cause Analysis:** The XSRF cookie is set in `lib/streamlit/web/server/routes.py` (line 202-206) using `self.set_cookie()`, but the `xsrf_cookie_kwargs` dictionary (which would contain cookie attributes) is not configured with `SameSite` or `Secure` options anywhere in the codebase. The Tornado settings in `lib/streamlit/web/server/server.py` only define the cookie name (`\"xsrf_cookie_name\": \"_streamlit_xsrf\"`) without additional cookie attributes. To fix this, the server would need to configure `xsrf_cookie_kwargs` with appropriate `SameSite` and `Secure` values, potentially as configurable options.\n\n### Related Issues\n\n- **#9397** - [Axios 403 error with file uploader when site is embedded in Iframe](https://github.com/streamlit/streamlit/issues/9397) \u2014 Very closely related; reports the same 403 error with `st.file_uploader` in iframes, with explicit mention that the `_streamlit_xsrf` cookie is missing the `SameSite` attribute.\n\n- **#9719** - [BUG: Unable to upload files due to both AxiosError (Network and 403)](https://github.com/streamlit/streamlit/issues/9719) \u2014 Similar symptoms with file uploads failing in Kubernetes deployments, likely caused by the same underlying CORS/XSRF cookie configuration issues.\n\n- **#2517** - [Streamlit removes _xsrf cookie even with 'server.enableXsrfProtection=False'](https://github.com/streamlit/streamlit/issues/2517) \u2014 Related issue that discusses the same `SameSite`/`Secure` cookie problem (see [comment #1321281460](https://github.com/streamlit/streamlit/issues/2517#issuecomment-1321281460) which provides detailed analysis and potential fixes).\n\n---\n*This is an automated triage comment. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-25T22:49:46Z",
+      "body": "I'm using a proprietary webapp based gui (no clue if built on electron, vscode, or what), and packaged an extension for it wrapping a streamlit app in an iframe.\nFile uploaded was broken with AxiosError 403, and I was able to narrow the problem down to the xsrf cookie being invalidly treated. (Ex, in normal conditions, deleting the cookie and uploading a file would also cause this error).\n\nPatching streamlit per the #7358 PR (setting the `_streamlit_xsrf` cookie to Same-Site: None , Secure = True/Set ) fixed this issue.\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Set-Cookie\n\nI believe per MDN docs \"Some browsers use Lax as the default value if SameSite is not specified\", which are chromium based browsers; FF and safari don't do this.\nSo, for us, the problem was \"browser\"-specific: whatever this \"browser\" is setting it to by default breaks validation.\nFWIW, applying the above patch fixed it in this \"browser\" and didn't break chromium based browsers.\n\nI'd look forward to this issue getting resolved, or an equivalent patch being made known, during the starlette migration. "
+    }
+  ]
+}

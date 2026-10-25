@@ -1,0 +1,33 @@
+{
+  "id": "issue-315",
+  "type": "issue",
+  "number": 315,
+  "url": "https://github.com/streamlit/streamlit/issues/315",
+  "title": "Allow writing to Streamlit from multiple threads",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:threading/processing"
+  ],
+  "created_at": "2019-10-08T05:33:29Z",
+  "closed_at": "2026-07-24T16:11:16Z",
+  "body": "See a possible solution here: https://gist.github.com/tvst/fa33b9dcb58040cbcb0ea376146d4e8c\r\nand see https://discuss.streamlit.io/t/live-plot-from-a-thread/247 for context.\r\n\r\nA few thoughts on that Gist:\r\n1. Can we make that API match the one from `st`? That is, it would be great if methods from the `main` `DeltaGenerator` were accessible as `thread_safe_st.foo` rather than from `thread_safe_st.main.foo`\r\n2. Even better, can the user just pass the `st` object itself to the other thread? Why do we need `ThreadSafeSt` at all?\r\n3. If it turns out that a `ThreadSafeSt` _is_ needed, we should come up with a better name for it. Something like`StreamlitContext` sounds good to me, but we already have a `ReportContext` in our codebase, so it may be confusing. Maybe rename `ReportContext` in the process?\r\n\r\n---\r\n\r\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\r\n\r\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\r\n",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2019-10-16T04:21:35Z",
+      "body": "Seems like it's pretty straightforward to address point 2 by extending ThreadSafeSt like this:\r\n\r\n```\r\nclass ThreadSafeSt():\r\n    # ... original class body\r\n\r\n    def __getitem__(self, item):\r\n        return self.main[item]\r\n\r\n    def __getattr__(self, item):\r\n        return getattr(self.main, item)\r\n```\r\n\r\nHaven't tested it extensively, but it seems to work well enough for my purposes!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-24T16:11:07Z",
+      "body": "This issue seems to be largely covered by the parallel fragment feature. If you have a use case that is not, please let us know. See [Run fragments in parallel](https://docs.streamlit.io/develop/concepts/architecture/fragments#run-fragments-in-parallel) (and the [st.fragment API reference](https://docs.streamlit.io/develop/api-reference/execution-flow/st.fragment))."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-24T16:11:15Z",
+      "body": "This issue seems to be largely covered by the parallel fragment feature. If you have a use case that is not, please let us know. See [Run fragments in parallel](https://docs.streamlit.io/develop/concepts/architecture/fragments#run-fragments-in-parallel) (and the [st.fragment API reference](https://docs.streamlit.io/develop/api-reference/execution-flow/st.fragment))."
+    }
+  ]
+}

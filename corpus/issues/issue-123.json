@@ -1,0 +1,23 @@
+{
+  "id": "issue-123",
+  "type": "issue",
+  "number": 123,
+  "url": "https://github.com/streamlit/streamlit/issues/123",
+  "title": "Connection error message reports the wrong command line when running from url",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "priority:P2"
+  ],
+  "created_at": "2019-09-17T17:43:39Z",
+  "closed_at": "2019-10-02T19:59:24Z",
+  "body": "# How to repro:\r\n1. Run a script from url. For example:\r\n```\r\nstreamlit run https://github.com/streamlit/demo-self-driving/blob/master/app.py\r\n```\r\n2. Interrupt the script and look at the UI\r\n3. Wait until the Connection Error message shows up (30 sec or less)\r\n\r\n# What should happens\r\nThe command line reported on the error message reflects the url we have run the script from\r\n\r\n# What happens\r\nWe show the temporary file in the error message",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2019-09-17T17:44:59Z",
+      "body": "<img width=\"549\" alt=\"Screen Shot 2019-09-17 at 9 39 46 AM\" src=\"https://user-images.githubusercontent.com/6821233/65065894-2e518080-d938-11e9-8e37-0a48fb7d271c.png\">\r\n"
+    }
+  ]
+}

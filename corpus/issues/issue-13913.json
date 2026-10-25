@@ -1,0 +1,39 @@
+{
+  "id": "issue-13913",
+  "type": "issue",
+  "number": 13913,
+  "url": "https://github.com/streamlit/streamlit/issues/13913",
+  "title": "Add anchors=False parameter to st.markdown()",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:markdown"
+  ],
+  "created_at": "2026-02-11T15:36:43Z",
+  "closed_at": "2026-06-28T22:33:39Z",
+  "body": "### Summary\n\nAdd an `anchors=False` parameter to `st.markdown()` to disable automatic anchor links on headers within markdown content. Currently, `st.header()` and `st.subheader()` support `anchor=False`, but there's no way to disable anchors for headers (h1-h6) rendered via `st.markdown()`.\n\n### Why?\n\nWhen using markdown headers (`###`, `####`, etc.) for styling purposes (e.g., to get larger text) rather than for navigation, the auto-generated anchor links can be confusing for users. The current workarounds are:\n- Use raw HTML instead of markdown headers\n- Only use `st.header()`/`st.subheader()` which support `anchor=False`, but these don't cover h4-h6\n\n### How?\n\nIntroduce a new parameter to `st.markdown()`:\n\n```python\nst.markdown(\"### My heading\", anchors=False)\n```\n\nThis would disable anchor links for all headers in that markdown block.\n\n### Additional Context\n\nThis came from an internal discussion. The existing `anchor=False` on `st.header()` and `st.subheader()` is great, but extending this to `st.markdown()` would provide a complete solution for users who want styled text without navigation anchors.",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-02-11T17:27:17Z",
+      "body": "Related #7638 "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-02-11T18:09:28Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-13913)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-02-13T02:18:24Z",
+      "body": "[USER] Could you confirm expected behavior for `st.markdown(..., anchors=False)`?\n\nShould it:\n\n- hide only the anchor link UI/hover affordance, but still keep heading ids for #hash deep-linking,\nor\n- disable heading `id` generation entirely (no deep-link targets)?\n\nIf you prefer the first option, then will push a patch shortly."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-02-17T22:01:09Z",
+      "body": "Related: https://github.com/streamlit/streamlit/issues/7501"
+    }
+  ]
+}

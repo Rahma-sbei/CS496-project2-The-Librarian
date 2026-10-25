@@ -1,0 +1,75 @@
+{
+  "id": "issue-8488",
+  "type": "issue",
+  "number": 8488,
+  "url": "https://github.com/streamlit/streamlit/issues/8488",
+  "title": "Native asyncio support",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:server",
+    "area:backend",
+    "area:threading/processing"
+  ],
+  "created_at": "2024-04-12T08:02:49Z",
+  "closed_at": "2026-09-21T22:53:42Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nStreamlit needs native asyncio support.\n\nI would like to point the following:\n\n- asyncio interface is also important for snowflake, so usability or applicability of that should be a no brainer\n- all modern databases have async interfaces and they will only expand with time\n- streamlit is based on asyncio itself, so at least properly exposing the original tornado's event loop would also not require to much work for you\n\nKnown problems for now:\n- when using asyncio.run() -> RuntimeError: Event loop is closed if the requests follow concurrently in the tornado eventlets\n- every eventlet with own event loop -> tasks are getting to the wrong event loop\n- cached event loop for all eventlets through session state -> best for now, gets event loop is closed when multile sessions are acessing the app simultaneously\n\nSo with that said, very ugly workaround that I found working best for now:\n\n```python\n[USER].cache_resource(show_spinner=False)\ndef get_event_loop():\n    loop = asyncio.new_event_loop()\n    asyncio.set_event_loop(loop)\n    return loop\n\n\nif not st.session_state.get(\"event_loop\"):\n    st.session_state[\"event_loop\"] = get_event_loop()\n```\n\nthen pass that event loop wherever your data is coming from, here is motor example:\n\n```python\nasync def setup_db(force=False):\n    if force or not st.session_state.get(\"db_client\"):\n        with st.spinner(\"Loading...\"):\n            client = AsyncIOMotorClient(\n                os.environ[\"MONGODB_URI\"],\n                tls=MONGODB_TLS,\n                io_loop=st.session_state[\"event_loop\"],\n            )\n            st.session_state[\"db_client\"] = await init_database(client=client)\n            return client\n```\ninit_database is a call to beanie's init database\n\nI understand that making the entire framework async would require too much work and would prb confuse the ML/AI crowd too much, but streamlit is such a gorgeous framework, the only place it fails in misery is the async\n\n\n### Why?\n\nAsyncio data technologies should be natively or at least easily accessible from streamlit apps.\n\n### How?\n\nRuns with asyncio.run() should not result to errors.\nConcurrent access also should not be broken.\nAsyncio loop from tornado app should be available in the scripts.\n\nHandling st.* calls async seems quite unimaginable, but at least the functioning asyncio in the eventlets would give us a lot.\n\nAlso async support for on_change and on_click callbacks and caching functions.\n\n\n### Additional Context\n\nRelated issues:\n- https://github.com/streamlit/streamlit/issues/744\n- https://github.com/streamlit/streamlit/issues/8308\n- https://github.com/streamlit/streamlit/issues/12076",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-12T08:03:02Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8488)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-02T07:53:38Z",
+      "body": "2024 and no async support... yet, gonna thumbs this up 10 times\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-31T18:18:01Z",
+      "body": "Hello -\r\n\r\nJust a bit of experimentation around Streamlit, threads, and asyncio.\r\n\r\nMy understanding:\r\n- Every time a re-render is required (state change, user interaction, etc), a new thread is created and the script is run fresh. The old thread, if it hasn't already completed the script, may keep going (due to fastRerun) but any interaction with st objects will throw a Shutdown Exception.\r\n- Streamlit does not care about asyncio, rather only if the thread has terminated or not.\r\n\r\nI'm not sure how scalable this is -- threads will be active for each user potentially -- but my approach has been:\r\n- Use asyncio.run() at the end of the script. This will create a new event loop for the thread (and render).\r\n- The asyncio loop has tasks, which may run forever, *must* frequently interact with st (e.g. st.session_state) to trigger potential Shutdown exceptions to clean up the threads.\r\n- If the asyncio loop ends early, then the \"Running\" indicator stops. So you can see the thread is still busy.\r\n\r\nI haven't done scaled testing, but this approach seems to be working sensibly in my tests."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-14T13:08:30Z",
+      "body": "Having done a bunch of experimentation myself I have a few things to add.  There is a lot of inaccurate information floating around on the web about this subject.  The really important thing to remember is what's mentioned in the comment by [USER] above:\n\n> Every time a re-render is required (state change, user interaction, etc), a new thread is created and the script is run fresh. The old thread, if it hasn't already completed the script, may keep going (due to fastRerun) but any interaction with st objects will throw a Shutdown Exception.\n\nThis means that whlie you can use `asyncio.run()` in your script (the [Medium post](https://sehmi-conscious.medium.com/got-that-asyncio-feeling-f1a7c37cab8b) unfortunately linked from Streamlit's own documentation falsely claims otherwise), you can't allow any interaction with your app while the event loop is running, and any tasks you launch on it can't reliably access `st.` functions for the reasons mentioned above.  It will also lead to a possibly large number of threads being created since, as mentioned above, the resulting asyncio event loop may run forever.\n\nWhile you can manually create an event loop, set it for the current thread, and recover it on future invocations of your script **in that same thread**, this isn't particularly useful because your script code may or may not (actually won't, probably) run on that thread.  You also can't, for example, call `run_until_complete` on the event loop for [well-known reasons](https://github.com/python/cpython/issues/66435).\n\nAlso, despite what said Medium post claims, calling `asyncio.get_running_loop` **definitely does not** return Streamlit's own event loop, as it will always be on a different thread than the one that runs your script.  This is, of course, what this bug is actually about :-)  If you don't care about security, reliability, stability, etc, and you don't want to call `st.` functions from your tasks, you can get it by calling `_get_async_objs()` on the session runtime.  For instance:\n\n```python\nimport asyncio\nimport time\nimport streamlit as st\n\nloop = st.runtime.get_instance()._get_async_objs().eventloop\n\nasync def do_nothing(seconds):\n    await asyncio.sleep(3)\n    print(\"HELLO WORLD\", seconds)\n\nif st.button(label=\"Do something\"):\n    loop.create_task(do_nothing(time.time()))\n\nif st.button(label=\"Do something else\"):\n    st.toast(\"Hello!\")\n```\n\nThe best workaround for the moment, if you need to use asyncio for something, is probably to explicitly create a separate thread to run asyncio tasks, using `add_script_run_ctx` to give it access to the session state so that it can communicate with the rest of the UI."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-14T14:46:45Z",
+      "body": "I also don't really see how a solution to this problem could easily be implemented in Streamlit.  Conceptually, what is necessary, is what the original poster's \"ugly workaround\" is supposed to do, and what the Medium post claims Streamlit does, but which neither of them actually do, namely creating (possibly on demand) an event loop for each session context which script code can use to launch tasks.  Why this doesn't work:\n\n- Simply creating an event loop doesn't actually start it!  So calling `create_task` on said loop will not do anything at all.\n- Running an event loop is a blocking, non-reentrant operation.   Obviously a Streamlit `AppContext` (which runs in the main thread) can't do this.   But also a Streamlit `ScriptRunner` (which runs in its own thread) can't do this either, because there could be any number of threads for a given session context.\n\nI don't claim to really understand Streamlit's architecture but it seems like a possible implementation woud be to create a separate thread for each script context, run an event loop there, and somehow give script code access to this event loop so that it can create and wait on tasks launched in it.  The evil solution would be to do magic on `await` in script code to make it do that ;-)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-14T17:43:23Z",
+      "body": "Here's a sketch of how you can do what's mentioned in the previous comment.  There are a couple of caveats:\n\n- Accessing the ui from a coroutine doesn't work for some reason, most likely because at the moment when you might want to do so, the script is no longer actually running, or a new script runner has been started (this is not clear to me).\n- There is no signal handling possible in the local event loop.  So you have to hit Control-C multiple times to stop the server, and you will get an \"Event loop is closed\" exception.\n- Any running tasks will do ... something undefined, I think ... if you stop the event loop, and Python will complain about this.\n\nGist here: https://gist.github.com/dhdaines/574d58eed7da9c459e3ef2b50a3ac27b\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-01T05:27:15Z",
+      "body": "While not officially supported, I think Streamlit mostly works with this simple pattern (my [user-space effort towards easier concurrency](https://concurrency.streamlit.app/) is based on this and other workarounds):\n\n```py\n# a_page.py\nimport asyncio\nimport streamlit as st\n\nasync def task1(): ...\n\nasync def task2(): ...\n\nasync def main():\n  res1, res2 = await asyncio.gather(task1(), task2())\n  # update widgets if required \n\nasyncio.run(main())\n```\n\nA Streamlit `scriptThread` is a 'clean' one without an event loop, just as `asyncio.run()` requires. A new event loop will get created, used, and shutdown properly. Code in coroutines have access to `ScriptRunContext` and should still work.\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-01T05:48:01Z",
+      "body": "> reuse tornado's event loop\n\nWhile not impossible this looks risky to me:\n\n1. An eventloop for net IO should be kept away from possibly blocking code. Like a `async def fun(): a_slow_long_function()`\n2. When `ScriptRunContext` and other thread-local object are involved, they may get leaked during interleaved coroutine execution.\n    - This applies to other shared event loop solutions. IMO an event loop should not be shared at a scope larger than Streamlit session.\n\n> possiblity of leaked or forever-spinning user-created event loop\n\nYes, a solution should take care of this. I'm still trying to.\n\nMy current thought is to expose script run / session shutdowns to user code, and allow some form of cancellation (forced or cooperative)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-09T06:26:47Z",
+      "body": "Until this is fixed, there is possibility to use nest_asyncio, However nested event loops might have performance impact, \n```\npip install nest_asyncio\n\nimport nest_asyncio\nnest_asyncio.apply()\n```\n\nAnd then at least for me everything works as expected, I am using streamlit with combination with AutoGen AssistantAgent"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-11T15:58:39Z",
+      "body": "Hey Everyone! I am working on a project Parallel Fragments that will help optimize the performance of certain apps, particularly ones that are doing a lot of data loading, for e.g. BI dashboards.\n\nI want to share with you the prototype branch that has a wheel file: https://github.com/streamlit/streamlit/pull/14443\nAnd also a demo app that I made for the feature: https://parallel-fragments.streamlit.app/\n\nIf you are interested in a more detailed overview of the feature, the product and tech specs are also merged into the codebase in the `specs` directory. \n\nIf you have any feedback let me know!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-21T22:53:42Z",
+      "body": "Hey Everyone, \n\nAn update on this conversation. We have recently shipped two features in 1.64 that address two major themes for async support. \n\n1. [Async Library Support](https://github.com/streamlit/streamlit/commit/e2f0715bf48599d7f7ff89ddc538a1f0dde7d130)\n2. [Async Caching Support](https://github.com/streamlit/streamlit/pull/16168)\n\nThe remaining large theme I see in this issue is background task execution and that is being tracked by a more specific issue here: https://github.com/streamlit/streamlit/issues/6687 -- support for this is in progress and expected around the end of October. I will be sharing a prototype in that issue soon. \n\nAlso, note that `st.fragment(parallel=True)` (mentioned above) shipped and is a great way to optimize dashboards. \n\nIf I have missed some use case that you have -- please open a more specific issue with your use case and I will take a look \ud83d\ude4f "
+    }
+  ]
+}

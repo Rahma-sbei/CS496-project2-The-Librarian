@@ -1,0 +1,38 @@
+{
+  "id": "issue-15411",
+  "type": "issue",
+  "number": 15411,
+  "url": "https://github.com/streamlit/streamlit/issues/15411",
+  "title": "Sidebar always expanded",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.sidebar"
+  ],
+  "created_at": "2026-06-03T08:17:07Z",
+  "closed_at": "2026-06-09T17:57:11Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nI would like to make it so that the sidebar can never be collapsed (i.e. always expanded).\n\n### Why?\n\nOur app has important input widgets in the sidebar. A user immediately closed the sidebar and forgot it had ever existed, so they didn't know to look for the re-expand toggle. They were then unable to use the app.\n\n### How?\n\nAn option in st.set_page_config() for example.\n\n### Additional Context\n\nI have looked for a similar issue about keeping the sidebar always collapsed and couldn't find one.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-03T08:17:17Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-15411)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-04T18:03:10Z",
+      "body": "I would like to help implement this. I have a clear use case for this in my own production apps where the sidebar contains critical application navigation. Please let me know if you would like me to draft a proposal for how this could be added to st.set_page_config or another configuration parameter"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-04T19:29:04Z",
+      "body": "Hi [USER], thanks for your enhancement request submission!\n\nThough we don't have this as an option in `st.set_page_config` at this point, I wanted to offer the following workaround in the interim:\n```python\nimport streamlit as st\n\nst.set_page_config(initial_sidebar_state=\"expanded\")\n\n# Hides the collapse button so the user is no longer able to close the sidebar\nst.html(\"\"\"\n    <style>\n        [data-testid=\"stSidebarCollapseButton\"] {\n            display: none;\n        }\n    </style>\n\"\"\")\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-05T07:37:27Z",
+      "body": "Thank you [USER] - that workaround works perfectly for now."
+    }
+  ]
+}

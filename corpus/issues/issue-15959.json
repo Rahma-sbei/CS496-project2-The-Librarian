@@ -1,0 +1,37 @@
+{
+  "id": "issue-15959",
+  "type": "issue",
+  "number": 15959,
+  "url": "https://github.com/streamlit/streamlit/issues/15959",
+  "title": "`st.multiselect` options render below `st.popover`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "status:confirmed",
+    "priority:P0",
+    "feature:st.multiselect",
+    "feature:st.popover"
+  ],
+  "created_at": "2026-07-13T11:18:53Z",
+  "closed_at": "2026-07-14T19:20:47Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen clicking on a `st.multiselect` widget used within a `st.popover`widget, the options are rendered below the popover (z-index).\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nwith st.popover(\"Popover\"):\n    items = st.multiselect(\"Multiselect\", [\"option_1\", \"option_2\"])\n```\n\n### Steps To Reproduce\n\n1. Click on Popover\n2. Click on Multiselect\n\n### Expected Behavior\n\nOptions are rendered on top of the popover.\n\n### Current Behavior\n\nOptions are rendered below of the popover.\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.59.2\n- Python version: 3.13.4\n- Operating System: MacOS 26.5.1\n- Browser: Safari 26.5\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-13T11:19:06Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15959)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-13T12:33:51Z",
+      "body": "### Triage summary\n\nThis is a confirmed **z-index / stacking regression**: when an `st.multiselect` (or other BaseWeb-based widget) lives inside an `st.popover`, its options dropdown renders *behind* the popover body instead of on top of it.\n\n**Likely root cause:** PR [#15339](https://github.com/streamlit/streamlit/pull/15339) (\"Remove `BaseWeb` for `Popover`\") migrated `st.popover` away from BaseWeb to `[USER]/react`. The popover body is now portalled to `document.body` with an explicit `zIndex: theme.zIndices.popup !important` (see `frontend/lib/src/components/elements/Popover/styled-components.ts` \u2192 `StyledPopoverBody`, using `getOverlayZIndex` in `shared/Base/styled-components.ts`). Meanwhile `st.multiselect` still uses BaseWeb, and BaseWeb overlays render inside the shared \"BaseWeb layer host\" created in `RootStyleProvider.tsx`, which is a `position: fixed` container also pinned to `theme.zIndices.popup`.\n\nBecause both the popover body and the BaseWeb layer host resolve to the **same** `popup` z-index, stacking falls back to DOM order. The BaseWeb layer host is mounted at app startup (early), while the popover's `FloatingPortal` is appended when it opens (later), so the popover body wins the tie and paints over the multiselect dropdown. Before #15339, `st.popover` itself was a BaseWeb overlay in the same layer host, so a later-opened dropdown naturally stacked above it \u2014 hence this worked in previous versions. This should also affect other still-on-BaseWeb overlays used inside a popover (e.g. `st.date_input` / `st.time_input`), whereas already-migrated widgets like `st.selectbox` are appended after the popover and render correctly.\n\n### Related Issues\n\n- [#9340 \u2014 Popover is truncated when app is oembedded](https://github.com/streamlit/streamlit/issues/9340): Also a popover layering/positioning bug where \"positioning or z-index needs adjustment\"; same z-index/stacking family.\n- [#8322 \u2014 Alignment issue with help tooltips inside st.popover](https://github.com/streamlit/streamlit/issues/8322): A nested overlay (tooltip) inside `st.popover` is clipped/mis-positioned \u2014 same theme of sub-overlays inside a popover not layering correctly.\n- [#10239 \u2014 Dynamic popover height](https://github.com/streamlit/streamlit/issues/10239): Involves a dropdown expanding inside `st.popover` and being cut off; related interaction between a popover and a widget's dropdown, though about height rather than z-index.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-13T13:01:47Z",
+      "body": "Thanks for reporting this [USER] , I was able to reproduce it on 1.59.0, repro app here: https://issues.streamlit.app/?issue=gh-15959"
+    }
+  ]
+}

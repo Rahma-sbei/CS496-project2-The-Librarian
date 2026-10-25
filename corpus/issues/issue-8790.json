@@ -1,0 +1,48 @@
+{
+  "id": "issue-8790",
+  "type": "issue",
+  "number": 8790,
+  "url": "https://github.com/streamlit/streamlit/issues/8790",
+  "title": "Support client-side validation via regex pattern for `st.text_input` ",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.text_input"
+  ],
+  "created_at": "2024-05-29T14:58:20Z",
+  "closed_at": "2026-08-03T06:43:35Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\r\n- [X] I added a descriptive title and summary to this issue.\r\n\r\n### Summary\r\n\r\nAdd support for client-side regex validation in `st.text_input`. This is already supported for the `column_config.TextColumn` via the `validate` parameter.\r\n\r\n### Why?\r\n\r\nClient-side validation is a lot more efficient since it doesn't require triggering an app rerun. It also makes it easier to validate user input and can provide a more user-friendly behavior. \r\n\r\n### How?\r\n\r\nAdd a `validate` parameter that supports a regex pattern (same behavior as with `TextColumn`): \r\n \r\n```python\r\nst.text_input(\"Streamlit Widget\", validate=\"^st\\.[a-z_]+$\")\r\n```\r\n\r\nIf the input does not conform with the pattern, it must somehow show information about the pattern to the user.\r\n\r\n### Additional Context\r\n\r\nBasic HTML input elements also support client-side validation via the `pattern` property: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#pattern \r\n\r\nA related feature would be to support [input masks](https://baseweb.design/components/input/#maskedinput) in addition to the pattern validation. This feature is also somewhat related to https://github.com/streamlit/streamlit/issues/6704. ",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-05-29T14:58:31Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8790)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-05-29T15:50:52Z",
+      "body": "> it must somehow show information about the pattern to the user\r\n\r\nI think that's the tricky part here. Maybe we also need some parameter where the dev can define an error message/warning that is shown?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-05-29T16:37:34Z",
+      "body": "Yep, agree. We could do something like show a default error message that includes the validation pattern and allow to customize the message if you provide a tuple: `validate=(\"^st\\.[a-z_]+$\", \"The text needs to start with st.\")` "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-08T22:35:03Z",
+      "body": "Just a heads up, that this would be very nice if this played nicely with forms. \r\n\r\nI'm unsure how it could be done to give the user enough flexibility to decide how and where to show the error message? I intuitively think of something like an `st.error` below the widget. But maybe sometimes one wants something else."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-10-07T19:54:14Z",
+      "body": "Thank you [USER] for opening this issue! I believe that incorporating validation logic for input fields is one of the most crucial enhancements needed in the current Streamlit framework.\r\n\r\nMost front-end frameworks include some form of validation logic/UI. Here are two examples:\r\n\r\n**Tailwind UI:**\r\n<img width=\"438\" alt=\"Screenshot 2024-10-07 at 9 42 01\u202fPM\" src=\"https://github.com/user-attachments/assets/9dae747d-28d8-4854-b04c-d5e31eea56ed\">\r\n\r\n**Bootstrap:**\r\n<img width=\"779\" alt=\"Screenshot 2024-10-07 at 9 41 53\u202fPM\" src=\"https://github.com/user-attachments/assets/ae4a2276-cb71-460c-a26d-d08b5110479c\">\r\n\r\nWhile client-side validation with regex would be useful, it has its limitations. Allowing developers to pass a custom validation function would be more versatile, enabling validation logic that can include database queries and other complex checks. This approach would also generalize the validation logic to all input components, not just text inputs. For instance, I have a use case where I need to ensure that the second date input is later than the first date input.\r\n\r\nThere are many ways to implement this. A possible implementation could allow any function that returns `None` if the input is valid, or a string with an error message if it is not.\r\n\r\nHere\u2019s a simple example:\r\n```python\r\nst.text_input(\r\n    \"Email address\",\r\n    validate=lambda x: None if \"@\" in x else \"Please enter a valid email address\",\r\n)\r\n```\r\n\r\nAnd a more advanced example:\r\n```python\r\nst.text_input(\r\n    \"Email address\",\r\n    validate=utils.check_if_email_address_is_in_database,\r\n)\r\n```\r\n\r\nI am not an expert in fragments. But maybe we can use fragments to ensure that we can have custom validation logic without requiring a full rerun?\r\n\r\nFor future reference, this issue seems tangentially related to [issue #7165](https://github.com/streamlit/streamlit/issues/7165)."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-03T06:45:47Z",
+      "body": "## Update\n\n`st.text_input` now supports client-side regex validation via a new `validate` parameter. This will be available in Streamlit `1.62+`.\n\n```python\nemail = st.text_input(\n    \"Email\",\n    validate=(r\"^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$\", \"Enter a valid email address.\"),\n)\n```\n\nInvalid non-empty values are not submitted, and the custom message is shown when validation fails."
+    }
+  ]
+}

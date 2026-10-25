@@ -1,0 +1,38 @@
+{
+  "id": "issue-7187",
+  "type": "issue",
+  "number": 7187,
+  "url": "https://github.com/streamlit/streamlit/issues/7187",
+  "title": "st.selectbox user experience is confusing.",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.selectbox"
+  ],
+  "created_at": "2023-08-16T23:59:01Z",
+  "closed_at": "2026-07-22T07:39:54Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nThe selectbox UI could be clearer to users.  In our use case editing the selectbox makes no sense.   The arrow key interactions were difficult because the selected row would go off-screen rather than autoscrolling to keep the selected item in view.  When arrowing around, the UI was expected to update rather than require the enter key.\n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-7187)\n\n```Python\nimport streamlit as st\n\n\nselection = st.selectbox(\"My List Box\", [ f'Option {i}' for i in range(1,100) ] )\n```\n\n\n### Steps To Reproduce\n\nRun the program, edit the text in select box, and then arrow around in the selectbox until the highlighted line disappears off the top or bottom of the listbox.\n\n\n### Expected Behavior\n\nI expect select boxes to at least optionally be read-only (my 90% default is read-only)\nI expect select boxes to have more than one item visible. Optionally, depending on screen space, I'm fine specifying the height in pixels or items.\nI expect select boxes to keep the selected item visible under all conditions while using arrow keys.\nI would like to optionally be able to control whether arrowing in the list box triggers a change in the UI\n\n### Current Behavior\n\nI watched users interact with the selectbox UI I made for them and was shocked by their confusion.\n\n1) Several users immediately started EDITING the text, which confused me as I watched!  This is the very last thing I expected a selectbox to allow. It never occurred to me to type.  My use case is selecting options, not free-form text entry.  This became a pseudo-feature for longer lists, acting as a filter only showing items that matched the typed text (this could be very useful as some UI toolkits have this type of widget). A `read_only=True`  or `filter_mode=True` could be useful.\n2) Part of the reason for these issues was that selectboxes show one item until you interact with them, so they look like a text boxes.  It would be nice to have a `visible_items` parameter to allow control of vertical space.  Having only one item visible obscures the fact that there could be more than one, though admittedly, the height of 1 is optimal for vertical space.\n3) The arrow keys act oddly.  Users are used to arrowing up/down and having the selected item change, and when the selected item gets to the top or bottom, the UI should scroll to keep giving feedback on what is selected. In Steamlit, the highlighted item goes off-screen, breaking the UI feedback.\n4) It would be nice if arrowing \"triggered\" a UI update to give immediate feedback.  I see the need for arrowing + enter key to trigger the change for use cases that are expensive in time.  An `auto_update=True` might be nice.\n\n### Is this a regression?\n\nNO\n\n### Debug info\n\n- Streamlit version: 1.25\n- Python version: 3.10\n- Operating System: Windows 10\n- Browser: Chrome\n\n\n### Additional Information\n\nI \u2764\ufe0f streamlit.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-08-16T23:59:13Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-7187)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-08-26T20:22:31Z",
+      "body": "Sry, can't pass this.\r\n\r\n> I expect select boxes to at least optionally be read-only (my 90% default is read-only)\r\n\r\nSelectbox is read-only, always. You can type to filter items, but you can't add new value currently, unless I missed something. Btw, that fuzzy filtering (by typing) is a killer (awesome) feature when you have large amounts of data.\r\n\r\n> I expect select boxes to have more than one item visible. Optionally, depending on screen space, I'm fine specifying the height in pixels or items.\r\n\r\nNot sure how you get one item, unless you give single option only. **Some sample code / demo / screencast would be great.**\r\n\r\n> I expect select boxes to keep the selected item visible under all conditions while using arrow keys.\r\n\r\nWas able to repeat this (I don't really use arrowing before filtering, so never noted this; after filtering normally there are only a few options left, easily selectable with arrows) scrolling with keys only. **Looks like a bug** to me.\r\n\r\n> I would like to optionally be able to control whether arrowing in the list box triggers a change in the UI\r\n\r\nSelection (i.e. user confirmed action) reruns the script. Could you elaborate why you want updates on scrolling (i.e. when user hasn't yet confirmed his selection)?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-03-25T18:43:44Z",
+      "body": "The arrowing enhacement is also tracked here: https://github.com/streamlit/streamlit/issues/4671"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T07:39:39Z",
+      "body": "Closing this since we applied related improvements recently to `st.selectbox`"
+    }
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "id": "issue-7311",
+  "type": "issue",
+  "number": 7311,
+  "url": "https://github.com/streamlit/streamlit/issues/7311",
+  "title": "Add a \"position\" parameter/property to st.sidebar in order to be able to display the sidbar at LEFT, TOP, RIGHT of the screen",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:st.sidebar"
+  ],
+  "created_at": "2023-09-12T09:43:44Z",
+  "closed_at": "2026-09-08T06:54:30Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAdd possibility to display  the st.sidebar on different positions on the screen (i.e. LEFT or TOP or RIGHT)\n\n### Why?\n\nSidebar seems to be fixed at the left side of the screen - more customization possibilities would be great\n\n### How?\n\nadding a \"position\" parameter to exiting st.sidebar (with possibility to  select the whished positioing for the sidebar: LEFT, TOP, RIGHT, BOTTOM?)\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-09-12T09:43:57Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-7311)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-09-13T15:53:32Z",
+      "body": "Hey, can I ask why you'd want to show the sidebar in a different position?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-09-13T20:54:19Z",
+      "body": "Because I would appreciate as much flexibility as possible when it comes to site layout. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-10-03T19:52:58Z",
+      "body": "Top-level menu would be great, but, personally, I don't see current sidebar there"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-01-31T05:30:51Z",
+      "body": "Not sure for top and bottom but would definitely like to have the option to have the sidebar on the right of the screen."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-08T06:54:30Z",
+      "body": "Closing this in favor of: \nhttps://github.com/streamlit/streamlit/issues/1980\nhttps://github.com/streamlit/streamlit/issues/8186\n\nWe also provide a `st.bottom` container to place elements at the bottom and a `position=\"top\"` to place the navigation bar at the top of the app."
+    }
+  ]
+}

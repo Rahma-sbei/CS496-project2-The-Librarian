@@ -1,0 +1,22 @@
+{
+  "id": "issue-11173",
+  "type": "issue",
+  "number": 11173,
+  "url": "https://github.com/streamlit/streamlit/issues/11173",
+  "title": "Streamlit is written the way all software should be written.",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:kudos"
+  ],
+  "created_at": "2025-04-24T00:09:36Z",
+  "closed_at": "2026-07-22T09:21:57Z",
+  "body": "### Message\n\nI can just import streamlit and do streamlit.write() and it does something.  Amazing.  I can set up a whole app in just a few lines.\n\nThere are many, many other libraries that take 40 to 50 lines to set up absolutely anything.  Some libraries take 2 whole pages just to set up a database.  I really appreciate the effort you guys have put into making everything simple for the user.",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-04-24T14:57:59Z",
+      "body": "Thank you so much, very appreciated! We forwarded this to the team :)"
+    }
+  ]
+}

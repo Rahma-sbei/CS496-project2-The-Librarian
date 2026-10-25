@@ -1,0 +1,93 @@
+{
+  "id": "issue-8901",
+  "type": "issue",
+  "number": 8901,
+  "url": "https://github.com/streamlit/streamlit/issues/8901",
+  "title": "Reconnect to existing sessions instead of creating new upon unclean websocket close.",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "papercut",
+    "area:network",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.session_state",
+    "area:server"
+  ],
+  "created_at": "2024-06-14T08:55:11Z",
+  "closed_at": "2026-07-31T07:40:55Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nSimilar to the issues linked, if the network connection is intermittent/flaky the existing session is lost and a new one created, causing unpleasant/unexpected user experience.\r\n\r\nSee:\r\n\r\nhttps://github.com/streamlit/streamlit/issues/1386\r\nhttps://github.com/streamlit/streamlit/issues/1628\r\nhttps://github.com/streamlit/streamlit/issues/6442\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\r\nimport time\r\n\r\nif \"counter\" not in st.session_state:\r\n    st.session_state.counter = 0\r\n\r\nst.write(f\"Run count = {st.session_state.counter}\")\r\n\r\nst.session_state.counter += 1\r\n\r\ntime.sleep(3)\r\n\r\nst.rerun()\n```\n\n\n### Steps To Reproduce\n\n1. Run the reproducible code example provided in streamlit on one server host.\r\n2. Observe the \"Run count = X\" increase steadily in a client host different from the server host.\r\n3. Disable the client network connection and wait for some arbitrary time duration.\r\n4. Re-enable the client network connection.\r\n5. Observer the \"Run count = X\" start from zero again.\n\n### Expected Behavior\n\nThe user session should be restored so they may continue where they left off in the face of their network/internet connection being flaky (packet drops, high latency etc) causing unclean websocket close behind the scenes.\n\n### Current Behavior\n\nObserve streamlit warning log \"Session with id %s is already connected! Connecting to a new session.\" and user loses their streamlit session and starts afresh.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.35\r\n- Python version: 3.10\r\n- Operating System: Windows 11\r\n- Browser: Chrome/Firefox\r\n\n\n### Additional Information\n\nI have been able to make a potentially naive code change (will link a PR as a proposal to this issue) which I am unable to run against full test suite because I have been unable to build the streamlit project. I have been able to test partially by modifying the python code in my installed streamlit venv.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-14T08:55:23Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-8901)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-25T17:52:54Z",
+      "body": "Hey [USER] Thank you for the issue. We implemented some changes in the past that will reconnect the session. We specify 2 minutes as the timeout [source](https://github.com/streamlit/streamlit/pull/5856/files#diff-bf73120ebafb93fc2f55c8ba0c54896a1e1c72d5c99e7ef4931f615b38b908a3R39).\r\n\r\n Can you confirm that these issues are within the timeout window?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-25T18:04:00Z",
+      "body": "Yes I confirm.\n\nIt appears to me the session is preserved and it is actually \"re identified\" but instead of reconnect it's replaced with a new one.\n\nMy PR seems to address this by reconnecting to the existing session."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-25T18:11:32Z",
+      "body": "[USER] my PR is #8902 "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-25T18:31:39Z",
+      "body": "Sounds good. [USER] will have a look into this. Thank you!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-25T18:47:39Z",
+      "body": "Hi [USER] -- sorry for the delay in getting to this. I've been meaning to but have been heads down wrapping up some `[USER].fragment` related work so haven't found the time to look into this issue + your PR.\r\n\r\nI remember trying more or less the exact same repro steps when initially implementing our websocket reconnect behavior and remember things working as expected, so I'll want to double-check that I can reproduce the issue you're running into (I'll be able to investigate in the next few days). I think we can make the changes suggested in your PR with some small edits, though, and I'll leave a review on that.\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-25T18:52:01Z",
+      "body": "Hey [USER] no worries, appreciate your looking at this, thank you."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-23T14:55:05Z",
+      "body": "I face the same issue and it has gotten worse in the last 15 days. Users cannot be logged in more than 1-3 mins"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-24T08:54:44Z",
+      "body": "any updates on this? A frequent scenario for us is this: whenever users unplug their laptops from their docking stations, the internet connection is interrupted for a few seconds and their progress is lost. It would be great if the sessions could be reconnected to.\r\n\r\nAs a side note, it would also be great if sessions could be stored on the server for a longer time. We are currently working arounf this by pickling the session state, but it would be great if there were a native solution."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-22T16:40:16Z",
+      "body": "Gentle nudge."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-01T03:58:00Z",
+      "body": "Any solution for this? I keep getting message \"Connecting to a new session.\""
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-01T07:50:02Z",
+      "body": "We see this exactly every 20 minutes for every websocket. This with our servers hosted at Render.com. Do you see the same interval? Where are you hosting?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-27T12:45:14Z",
+      "body": "Any advice as to how to customize the ttl_seconds or whether it'll have any unexpected cascading effects?\n[reference](https://github.com/streamlit/streamlit/pull/5856/files#diff-bf73120ebafb93fc2f55c8ba0c54896a1e1c72d5c99e7ef4931f615b38b908a3R39)\n\n```\nclass MemorySessionStorage(SessionStorage):\ndef __init__(\n        self,\n        maxsize: int = 128,\n        ttl_seconds: int = 2 * 60,  # 2 minutes\n    ) -> None:\n```"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-31T15:01:08Z",
+      "body": "This issue reports that when a WebSocket connection closes uncleanly (e.g., due to network disruptions), Streamlit creates a new session instead of reconnecting to the existing one, causing users to lose their session state.\n\n**Root cause analysis:** The issue originates in `lib/streamlit/runtime/websocket_session_manager.py` in the `connect_session()` method. When a client attempts to reconnect with an existing session ID, the code checks if that session is already in `_active_session_info_by_id` (line 103). If it is, a warning is logged (\"Session with id %s is already connected!\") and a **new** session is created instead. The session can only be restored from storage if it's NOT currently active.\n\nThe core problem is a race condition: on an unclean WebSocket close, the server may not have detected the disconnect yet, so the session remains \"active\" in memory. When the client quickly reconnects with the same session ID, the server sees it as \"already connected\" and creates a new session instead of allowing reconnection. A potential fix would need to handle this case by either closing the existing connection first, implementing a grace period, or using a different strategy for tracking active vs. disconnected sessions.\n\n### Related Issues\n\n1. **[#9031](https://github.com/streamlit/streamlit/issues/9031)** - \"Current recommended way to deal with restarted Streamlit sessions\" - Directly related issue where users request better session recovery mechanisms after unexpected restarts.\n\n2. **[#11012](https://github.com/streamlit/streamlit/issues/11012)** - \"Preserve session state (e.g. in file, database, or localstorage)\" - Related enhancement request for persisting session state across browser sessions, which would help mitigate the impact of session loss.\n\n3. **[#12108](https://github.com/streamlit/streamlit/issues/12108)** - \"Frequent websocket connection drops on higher ping_interval\" - Related WebSocket stability issue that can trigger the reconnection problem described in this issue.\n\n---\n*This is an automated triage comment. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

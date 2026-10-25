@@ -1,0 +1,54 @@
+{
+  "id": "issue-11970",
+  "type": "issue",
+  "number": 11970,
+  "url": "https://github.com/streamlit/streamlit/issues/11970",
+  "title": "Issue with creating a multi-page Streamlit app with custom navigation in the sidebar.",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:cannot-reproduce",
+    "feature:multipage-apps"
+  ],
+  "created_at": "2025-07-17T17:39:56Z",
+  "closed_at": "2026-07-19T12:18:39Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nif I create a file called **.streamlit/config.toml** and add the following lines to it:\n```\n[client]\nshowSidebarNavigation = false\n```\n\nThe sidebar should no longer show the files in the /pages folder\nIt doesnt work and reloading the app also didnt help.\n\nReference : [](https://docs.streamlit.io/develop/tutorials/multipage/st.page_link-nav)\n\n\n### Reproducible Code Example\n\n```Python\n[client]\nshowSidebarNavigation = false\n```\n\n### Steps To Reproduce\n\nProvided above\n\n### Expected Behavior\n\n It should work since the settings are provided in .toml file.\n\n### Current Behavior\n\nStreamlit suppression of sidebar navigation not working.\n\n### Is this a regression?\n\nNo\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-17T17:40:13Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11970)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-21T14:21:23Z",
+      "body": "[USER] thank you for filing this issue. Unfortunately, I haven't been able to reproduce it with a simple multi-page example. Perhaps if you could provide more details on your setup it could help debug the issue. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-28T19:34:36Z",
+      "body": "Hi [USER] : JFYI, this is an issue when running Streamlit within a Snowflake environment - not with standalone Streamlit. Could you please take a relook into the issue. Thanks!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-28T19:56:15Z",
+      "body": "> Hi [[USER]](https://github.com/sfc-gh-lwilby) : JFYI, this is an issue when running Streamlit within a Snowflake environment - not with standalone Streamlit. Could you please take a relook into the issue. Thanks!\n\nWould it be possible to share details of your directory structure in your Streamlit embedded stage? If you don't want to post these things here, you could reach out via support. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-29T13:40:26Z",
+      "body": "The Streamlit app was created entirely within Snowsight - it wasn't created from files that already existed in a stage. As far as I can tell this way of creating a Streamlit app does not create a stage (or at least not one that is user accessible) so it's not possible to list the directory structure.\nIf it helps, the list of files and their paths are as follows:\nFile Name\t        Path\nstreamlit_app.py\tsnow://streamlit/STREAMLIT_APPS.DEMO.PS6SQJQP5JBC84NI/versions/live/streamlit_app.py\nenvironment.yml\tsnow://streamlit/STREAMLIT_APPS.DEMO.PS6SQJQP5JBC84NI/versions/live/environment.yml\npages/product_mgmt.py\tsnow://streamlit/STREAMLIT_APPS.DEMO.PS6SQJQP5JBC84NI/versions/live/pages/product_mgmt.py\n.streamlit/config.toml\tsnow://streamlit/STREAMLIT_APPS.DEMO.PS6SQJQP5JBC84NI/versions/live/.streamlit/config.toml\n\nSteps to re-create:\n1. In Snowsight, go to Projects > Streamlit and create a new Streamlit App \n2. Create a \"pages\" folder and add a python file to it\n3. Re-run the app. A sidebar will appear with link with the same name as the file created in the \"pages\" folder\n-- All expected, standard, behaviour\n4. Create a folder called \".streamlit\". Add a file to this folder called config.toml\n5. Edit the config.toml and add this:\n[client]\nshowSidebarNavigation = false\n\n6. Reboot the Streamlit app\n7. The sidebar navigation should have disappeared; however it is still there\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-29T15:32:47Z",
+      "body": "> snow://streamlit/STREAMLIT_APPS.DEMO.PS6SQJQP5JBC84NI/versions/live/streamlit_app.py environment.yml snow://streamlit/STREAMLIT_APPS.DEMO.PS6SQJQP5JBC84NI/versions/live/environment.yml pages/product_mgmt.py snow://streamlit/STREAMLIT_APPS.DEMO.PS6SQJQP5JBC84NI/versions/live/pages/product_mgmt.py .streamlit/config.toml snow://streamlit/STREAMLIT_APPS.DEMO.PS6SQJQP5JBC84NI/versions/live/.streamlit/config.toml\n> \n\nStreamlits have an embedded, versioned stage that has the code files. `snow://streamlit/` is the url prefix for a Streamlit stage. Maybe there isn't a lot of documentation on this, sorry if it was unclear terminology. \n\nThanks, this is what I was wanting to see, I will post this also internally for the Streamlit in Snowflake team. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-19T12:18:39Z",
+      "body": "Closing this since we have not been able to reproduce this issue. "
+    }
+  ]
+}

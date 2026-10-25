@@ -1,0 +1,35 @@
+{
+  "id": "issue-6327",
+  "type": "issue",
+  "number": 6327,
+  "url": "https://github.com/streamlit/streamlit/issues/6327",
+  "title": "Integrate ipyaggrid into streamlit",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe",
+    "type:possible-component",
+    "status:unlikely"
+  ],
+  "created_at": "2023-03-16T23:03:28Z",
+  "closed_at": "2026-07-22T09:55:27Z",
+  "body": "### Problem\n\nI'd like the feature in streamlit to: \n1. keep the multiindex of the table for easier user reading experience\n2. be able to filter, select, aggregate the data in the app. \n\n### Solution\nThe streamlit-aggrid package is great, it can solve the feature 2, but not for feature 1. But I found this ipyaggrid package which seems a very strong package for table display, so would like this feature to be added. \nhttps://medium.com/[USER].borderies/harnessing-the-power-of-ag-grid-in-jupyter-3ae27fb21012\n\n### Additional context\n![image](https://user-images.githubusercontent.com/126653134/225771344-4b99ec17-9352-4e60-97e3-393ee6a547f2.png)\n\n![image](https://user-images.githubusercontent.com/126653134/225771590-250f36bd-638a-44e8-80fe-b01e5d7ef4fc.png)\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://flat.badgen.net/https/api.views-badge.org/badgen/st-issue-6327)\n",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-03-16T23:25:45Z",
+      "body": "Hey [USER]! Thanks for suggesting this. We're currently working on adding a bunch of the abilities of aggrid to `st.dataframe` in Streamlit natively (e.g. editability, advanced data types, selection). See [our roadmap](https://roadmap.streamlit.app/) for details. We don't have any plans to further integrate with aggrid at the moment. If you need the specific abilities of aggrid or ipyaggrid, your best bet is to either create a custom component based on it or convince the maintainer of the streamlit-aggrid package to do that (cc [USER]) \u2013 might make sense to file an issue over there so Pablo is aware of it! Going to leave this open for now so others can see but marking it as unlikely.  "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-03-18T00:09:17Z",
+      "body": "Thank you! Looking forward to the new features in st.dataframe!\r\n\r\nIs there any tutorial to build up a component myself?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-03-27T17:13:46Z",
+      "body": "Related to: #7723 & #10747 "
+    }
+  ]
+}

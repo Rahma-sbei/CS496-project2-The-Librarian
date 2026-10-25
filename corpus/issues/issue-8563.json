@@ -1,0 +1,61 @@
+{
+  "id": "issue-8563",
+  "type": "issue",
+  "number": 8563,
+  "url": "https://github.com/streamlit/streamlit/issues/8563",
+  "title": "Add alt text to images & charts for improved accessibility",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe",
+    "feature:charts",
+    "feature:st.image",
+    "area:accessibility"
+  ],
+  "created_at": "2024-04-25T12:46:05Z",
+  "closed_at": "2026-09-30T07:04:39Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\r\n- [X] I added a descriptive title and summary to this issue.\r\n\r\n### Summary\r\n\r\nAdd a way for developers to add alt text to commands such as `st.image` and chart objects.\r\n\r\n### Why?\r\n\r\nFor accessibility reasons, images, charts, and other visualizations should always have [alt text](https://www.w3.org/WAI/tutorials/images/tips/) that describes the content. \r\n\r\n### How?\r\n\r\nThis should probably be a parameter that the developer can set since we can't automatically generate alt text (even though this might be a cool LLM application \ud83d\ude09 ). Maybe just a parameter `alt` or `alt_text` or `alternative_text` that accepts a string. \r\n\r\nElements for which we could/should add this:\r\n- st.image\r\n- st.dataframe and st.table (see [this article on accessible tables](https://www.albany.edu/web-services/accessibility/accessibility-basics/5-creating-accessible-tables))\r\n- all [chart elements](https://docs.streamlit.io/develop/api-reference/charts)\r\n\r\nNote that some of these elements also have other parameters to describe the content (e.g. `st.image` has a `caption` parameter), so we'd have to see how these two work together. \r\n\r\n### Additional Context\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-25T12:46:15Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8563)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-21T19:05:12Z",
+      "body": "Ideally, the caption would be used if present and no alt text provided. \r\n\r\nIt would be nice if st.image printed a console warning and explanation when no alt text was set."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-24T12:35:47Z",
+      "body": "> Ideally, the caption would be used if present and no alt text provided.\r\n> \r\n> It would be nice if st.image printed a console warning and explanation when no alt text was set.\r\n\r\nThe caption and the alt text are for different purposes. While the caption helps users relate to the text, the alt text provides a textual alternative for screen readers, describing the image and making the content accessible to all. Therefore, we need to be able to use both effectively.\r\n\r\n[Here](https://www.stylemanual.gov.au/content-types/images/alt-text-captions-and-titles-images) is an exemple:\r\n\r\n```\r\n<figure>\r\n<figcaption>Figure 3: Kangaroo numbers in Victoria from 1880 to 1980</figcaption>\r\n<img src=\"kangaroo.svg\" alt= \"Line graph showing a doubling of kangaroo numbers from 1880 to 1980\">\r\n... </figure>\r\n```"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-08T22:25:58Z",
+      "body": "# Update\r\n\r\nWe haven't started working on this yet, but we definitely want to have it and given the big amount of upvotes recently, I guess we'll prioritize this in the short- or medium-term. I also think this should be relatively easy to spec out and implement, so no major risks other than other projects taking up our time. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-01-20T01:39:47Z",
+      "body": "Any update on this? It would be great to be able to provide alt text for blind users without caption for sighted users."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-01-20T18:27:12Z",
+      "body": "I think we should apply this to `st.image`, `st.dataframe` and `st.data_editor` and all chart commands. It should be one parameter that can be used across all of them, probably either:\n\n1. `alt` or `alt_text` or something similar: standard and very well understood, but technically the HTML alt attribute only exists for images\n2. `accessible_description` or `accessible_text` or something similar: bit more generic and potentially more correct than `alt`; need to check with accessibility guidelines which term is correct here though\n\nAnd then under the hood we should set whichever HTML attribute is the \"best\" one for that specific element. For images probably the HTML `alt` attribute, for dataframes/charts probably one of the `aria` attributes. Need to look into accessibility best practices what works well. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-03-12T23:40:44Z",
+      "body": "This is a feature enhancement request to add alt text support to `st.image`, `st.dataframe`/`st.table`, and all chart elements for improved accessibility. Currently, `st.image` uses a generic key as the `alt` attribute on `<img>` tags (see `ImageList.tsx`), and chart elements have no alt text or ARIA description support in their protobuf definitions or frontend components. Implementing this would require adding an `alt_text` (or similar) parameter to the Python API for each affected element, extending the corresponding protobuf messages, and updating the frontend components to render the provided alt text. The relationship between `st.image`'s existing `caption` parameter and the new alt text would need to be defined (caption is visual, alt text is for screen readers).\n\n### Related Issues\n\n- **[#12873 - 508 Compliance - Add Alt=\"\" tag to decorative elements](https://github.com/streamlit/streamlit/issues/12873)**: Closely related accessibility request focused on adding empty `alt=\"\"` to *decorative* elements (like icons in selectboxes) to prevent screen reader clutter. This issue (#8563) covers adding *descriptive* alt text to content elements like images and charts \u2014 complementary but distinct scope.\n- **[#8399 - Basic accessibility web features](https://github.com/streamlit/streamlit/issues/8399)**: Broader request for basic web accessibility features (page lang attribute, accessible link naming, structural compliance). Alt text for images/charts would fall under this umbrella of accessibility improvements.\n- **[#10119 - Fullscreen label for `st.image`](https://github.com/streamlit/streamlit/issues/10119)**: Request to add descriptive labels/context to images in fullscreen mode. While focused on visual descriptions rather than screen reader accessibility, both involve adding metadata/descriptions to `st.image` and could share implementation patterns.\n\n---\n*This is an automated triage comment using `opus-4.6-thinking`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-30T07:04:39Z",
+      "body": "Closing this as completed.\n\n**What shipped**: keyword-only `alt=` so authors can give an accessible name to the surfaces this issue called for \u2014 `st.image`, `st.dataframe` / `st.table`, and the chart commands \u2014 plus related media and embeds covered by the approved product spec ([#16937](https://github.com/streamlit/streamlit/pull/16937) / specs/2026-09-14-element-alt-text/product-spec.md).\n\n**Representative PRs**: [#16568](https://github.com/streamlit/streamlit/pull/16568) (audio/video), [#17040](https://github.com/streamlit/streamlit/pull/17040) (iframe), [#17041](https://github.com/streamlit/streamlit/pull/17041) (altair_chart, vega_lite_chart), [#17069](https://github.com/streamlit/streamlit/pull/17069) (line_chart, bar_chart, area_chart, scatter_chart), [#17080](https://github.com/streamlit/streamlit/pull/17080) (echarts_chart), [#17081](https://github.com/streamlit/streamlit/pull/17081) (plotly_chart), [#17085](https://github.com/streamlit/streamlit/pull/17085) (graphviz_chart), [#17086](https://github.com/streamlit/streamlit/pull/17086) (map, pydeck_chart), [#17095](https://github.com/streamlit/streamlit/pull/17095) (table), [#17096](https://github.com/streamlit/streamlit/pull/17096) (mermaid_chart), [#17118](https://github.com/streamlit/streamlit/pull/17118) (pdf), [#17125](https://github.com/streamlit/streamlit/pull/17125) (dataframe/data_editor), [#17136](https://github.com/streamlit/streamlit/pull/17136) & [#17137](https://github.com/streamlit/streamlit/pull/17137) (image/pyplot). Agent guidance: [#17201](https://github.com/streamlit/streamlit/pull/17201).\n\n`caption` stays the visible label on `st.image`; alt is the assistive name (independent, including decorative `alt=\"\"` on image/pyplot only)."
+    }
+  ]
+}

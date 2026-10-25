@@ -1,0 +1,38 @@
+{
+  "id": "issue-11420",
+  "type": "issue",
+  "number": 11420,
+  "url": "https://github.com/streamlit/streamlit/issues/11420",
+  "title": "Officially support bootstrap.run",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:deployment"
+  ],
+  "created_at": "2025-05-21T02:57:38Z",
+  "closed_at": "2026-06-16T19:57:42Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nHi,\n\nStreamlit supports running the app via cli streamlit run your_app.py\n\nI request bootstrap.run to be supported, and documented, so it can run within python.\nso streamlit apps can be distributed standalone with frameworks like nuitka.\n\n\nfrom streamlit import config as _config\nfrom streamlit.web.bootstrap import run\n_config.set_option(\"server.headless\", True)\nrun('your_app.py', args=[], flag_options=[], is_hello=False)\n\nBut method run it\u2019s not stable, nor documented.\nIt\u2019s an internal method\n\nThank you,\nRobert\n\n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-21T02:58:04Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-11420)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-21T16:29:54Z",
+      "body": "Hi [USER], thanks for filing this enhancement request. We'll take a look at it."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-10-17T05:56:34Z",
+      "body": "Related: https://github.com/streamlit/streamlit/issues/9450"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-16T19:56:09Z",
+      "body": "## Update\n\nStreamlit 1.59 introduces an officially supported alternative to calling the internal `streamlit.web.bootstrap.run` API directly.\n\nThe new public API is:\n\n```python\nimport streamlit as st\n\napp = st.App(\"your_app.py\")\n\nif __name__ == \"__main__\":\n    app.run()\n```\n\n`App.run()` starts a local Streamlit server for the app and supports programmatic config overrides:\n\n```python\napp.run(config={\"server.headless\": True, \"server.port\": 8502})\n```\n\nSo instead of documenting `bootstrap.run` as a stable public API, we now have a supported public entry point for launching an `st.App` from Python code. This is planned to ship in Streamlit 1.59.\n"
+    }
+  ]
+}

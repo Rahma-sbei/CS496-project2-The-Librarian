@@ -1,0 +1,35 @@
+{
+  "id": "issue-16429",
+  "type": "issue",
+  "number": 16429,
+  "url": "https://github.com/streamlit/streamlit/issues/16429",
+  "title": "bug: `st.pyplot` crashes with an opaque PIL error for `format=\"pdf\"`, `\"eps\"`, `\"ps\"`, `\"svgz\"`",
+  "state": "closed",
+  "state_reason": "not_planned",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P4",
+    "feature:st.pyplot"
+  ],
+  "created_at": "2026-08-09T21:37:58Z",
+  "closed_at": "2026-08-10T15:46:46Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n`st.pyplot` forwards `**kwargs` to `savefig`, so `format=` accepts anything Matplotlib supports. But only raster output survives the image path. `format=\"svg\"` was fixed in #16283; the remaining vector formats still fail, and they fail with an error from inside PIL that names neither the format nor a way forward.\n\n`svgz` is the odd one out: it is simply gzipped SVG, so it is renderable in principle \u2014 the gzip magic bytes just aren't recognised as SVG and get handed to PIL instead.\n\n### Reproducible Code Example\n\n```python\nimport matplotlib.pyplot as plt\nimport streamlit as st\n\nfig, ax = plt.subplots()\nax.plot([1, 2, 3], [1, 2, 3])\n\nst.pyplot(fig, format=\"pdf\")   # UnidentifiedImageError\nst.pyplot(fig, format=\"eps\")   # OSError\nst.pyplot(fig, format=\"ps\")    # OSError\nst.pyplot(fig, format=\"svgz\")  # UnidentifiedImageError\n```\n\n### Steps To Reproduce\n\n1. Run an app containing any one of the four calls above.\n2. The app raises from inside PIL rather than reporting anything about the format.\n\n### Expected Behavior\n\n- `svgz` should render, since it is gzipped SVG and SVG already renders.\n- `pdf` / `eps` / `ps` cannot be rasterised without an external tool (Ghostscript or Poppler), which Streamlit does not bundle. These should fail with a clear message that names the format and points at `format=\"png\"` or `format=\"svg\"`.\n\n### Current Behavior\n\nEach format reaches PIL and raises there. Sniffing the buffer the way the current SVG check does shows why:\n\n```\nformat  first bytes                        detected as SVG?  PIL result\npng     b'\\x89PNG\\r\\n\\x1a\\n\\x00\\x00\\x00\\r'  False            OK\nsvg     b'<?xml versio'                     True             (bypasses PIL)\npdf     b'%PDF-1.4\\n%\\xac\\xdc'              False            UnidentifiedImageError\neps     b'%!PS-Adobe-3'                     False            OSError\nps      b'%!PS-Adobe-3'                     False            OSError\nsvgz    b'\\x1f\\x8b\\x08\\x00p\\xf0xj\\x02\\xff'  False            UnidentifiedImageError\n```\n\n`svgz` starts with the gzip magic `\\x1f\\x8b`, so the existing `<svg` / `<?xml` check cannot see the SVG inside it. `eps` and `ps` share the `%!PS-Adobe-3` prefix, so they are indistinguishable by magic bytes and are both PostScript.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n- [x] No, this is a new problem.\n\nNot a regression \u2014 these formats have never worked. #16283 fixed `format=\"svg\"` only; this is the remainder of the same class of bug.\n\n### Debug info\n\n- Streamlit version: `develop` (verified at `97eada51b4`)\n- Python version: 3.14.5\n- Operating System: macOS 15.5\n- Matplotlib backend: Agg\n\n### Additional Information\n\nRelated: #16283 (fixed `format=\"svg\"`), #11489 (the original SVG crash report).\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-10T08:50:13Z",
+      "body": "`st.pyplot` forwards `format=` to Matplotlib `savefig`, but after save only plain SVG is special-cased before the image path. In `lib/streamlit/elements/pyplot.py`, `marshall()` sniffs for `<svg` / `<?xml`\u2026`<svg` and otherwise hands the buffer to `marshall_images` \u2192 PIL. That works for PNG/JPEG and for the SVG fix from #16283, but fails for `pdf`/`eps`/`ps` (opaque PIL/`OSError`) and for `svgz` (gzip magic `\\x1f\\x8b` hides the SVG). Expected fix: gunzip/`svgz` into the SVG path; reject unsupported vector formats with a clear error pointing at `png` or `svg`.\n\n### Related Issues\n\n- https://github.com/streamlit/streamlit/issues/11489 \u2014 Same class of bug: `format=\"svg\"` crashed in PIL because SVG bytes were treated as raster. Fixed by #16283; this issue covers the remaining formats.\n- https://github.com/streamlit/streamlit/pull/16283 \u2014 The SVG sniff/bypass that left `pdf`/`eps`/`ps`/`svgz` on the broken PIL path.\n\nNo open duplicates found; #9660 (`st.pyplot` cold-start render failures) is unrelated.\n\n---\n*This is an automated triage comment using `cursor-grok-4.5-high`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-10T09:04:30Z",
+      "body": "A bit of additional context here: the kwargs support in `st.pyplot` is something that we have intended to deprecate (and eventually remove) for a long time. We also had kwargs support for `st.plotly`, `st.altair_chart`, and `st.vega_lite_chart`, but removed it last year. Pyplot is the least important chart type; that's why we haven't done this deprecation yet. But instead of fixing up these aspects, we should just deprecate it and remove it in a couple of months.\n\nA couple of related metrics: only ~0.7% of all `st.pyplot` uses pass in custom kwargs, and there has been only a single usage of `format` within the last couple of days."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-10T15:46:46Z",
+      "body": "Closing per [USER]'s comment on the fix PR (#16430): kwargs support in `st.pyplot` is planned for deprecation, so extending it to non-raster `format=` values isn't the right path forward. The upcoming deprecation of `**kwargs` on `st.pyplot` will retire this whole class of bug."
+    }
+  ]
+}

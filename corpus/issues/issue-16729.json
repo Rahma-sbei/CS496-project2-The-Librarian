@@ -1,0 +1,28 @@
+{
+  "id": "issue-16729",
+  "type": "issue",
+  "number": 16729,
+  "url": "https://github.com/streamlit/streamlit/issues/16729",
+  "title": "Support inline tooltips in Markdown (hover text), e.g. via a `:tooltip[...]` directive",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:markdown"
+  ],
+  "created_at": "2026-08-30T15:03:11Z",
+  "closed_at": "2026-08-30T15:04:55Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAdd a way to include inline text in Markdown that shows a tooltip when hovered \u2014 like abbreviations/glossary terms with an explanation on hover. This could be exposed as a new Markdown directive, and #12474 (show footnotes as tooltips) could be generalized to cover this.\n\n### Why?\n\nIt's common to want to annotate a word or phrase with extra context that appears on hover \u2014 glossary terms, acronym expansions, definitions, or short explanations \u2014 without cluttering the main text. Today there's no native way to do this in Streamlit Markdown; users resort to raw HTML (`<abbr>`/`title`) which is limited and not always allowed. A first-class inline tooltip makes docs, dashboards, and explanatory text much richer.\n\n### How?\n\nAdd a Markdown directive for inline tooltips, where the bracketed text is displayed and the `text` attribute is shown on hover:\n\n```\nThe :tooltip[HTML]{text=\"Hyper Text Markup Language\"} specification...\n\n:tooltip[Streamlit]{text=\"Open-source app framework for Machine Learning and Data Science teams.\"}\n```\n\nNotes:\n- The visible text (`[...]`) renders inline; hovering shows the tooltip `text`.\n- Works wherever Streamlit Markdown is rendered (`st.markdown`, `st.write`, captions, etc.).\n- Consider whether the tooltip `text` itself supports Markdown.\n- **Alternative / complementary:** generalize #12474 (footnotes \u2192 tooltips). Markdown footnotes could render as hover tooltips, giving a standard-Markdown path to the same result; the `:tooltip[...]` directive is the more explicit, inline alternative.\n\n### Additional Context\n\n- Related: #12474 (show markdown footnotes as tooltips) \u2014 this issue proposes a more generic, directive-based approach to inline hover text.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-30T15:03:21Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-16729)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-30T15:04:55Z",
+      "body": "Superseded by #12474, which now covers both approaches (footnotes-as-tooltips and a `:tooltip[...]` directive). Consolidating the discussion there."
+    }
+  ]
+}

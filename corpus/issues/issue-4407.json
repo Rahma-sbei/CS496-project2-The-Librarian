@@ -1,0 +1,23 @@
+{
+  "id": "issue-4407",
+  "type": "issue",
+  "number": 4407,
+  "url": "https://github.com/streamlit/streamlit/issues/4407",
+  "title": "Make caching benchmarkable",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:cache"
+  ],
+  "created_at": "2022-02-16T07:23:19Z",
+  "closed_at": "2026-07-22T09:25:48Z",
+  "body": "I currently have the challenge that I have a streamlit application which heavily uses st.experimental_singleton and st.experimental_memo due to performance reasons. The Problem is that sometimes it happens that the RAM usage of the application spikes and I don't know which of the cached functions, if any, are the culprits. \r\n\r\nIt would be great if there was some kind of profiling mode that prints how much RAM each of the cached functions takes up.\r\n\r\n---\r\n\r\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\r\n\r\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-05-15T21:21:49Z",
+      "body": "Yup, we want to have a few debugging functionalities similar to what you propose. Never made it to the top of our priority list but I hope we get to it at some point! You can follow at roadmap.streamlit.app"
+    }
+  ]
+}

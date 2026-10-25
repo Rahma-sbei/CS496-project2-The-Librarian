@@ -1,0 +1,45 @@
+{
+  "id": "issue-15829",
+  "type": "issue",
+  "number": 15829,
+  "url": "https://github.com/streamlit/streamlit/issues/15829",
+  "title": "Screen reader does not announce the list information on the 'Tools Menu' combo box list item in windows.",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:awaiting-user-response",
+    "feature:st.selectbox",
+    "area:accessibility"
+  ],
+  "created_at": "2026-07-06T10:51:22Z",
+  "closed_at": "2026-07-30T09:01:58Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nScreen reader does not announce the list information on the 'Tools Menu' combo box list item in windows. Screen reader users will be impacted as they will not receive list position and count information in the \u201cTools Menu\u201d combo box. This makes it difficult for them to understand context and navigate efficiently through the list items.\n\n\n### Reproducible Code Example\n\n```Python\nhttps://streamlit.io/playground?example=blank&code=H4sIAAAAAAAAA7VSzWrCQBC--xRDeklACm0PQqGHmFKx1BKi4KFIWeMQB_fH7s6K9uRD-IQ-STepKWnvXeYy883M983M9khtjWVwbFEoSQzCBacXnuNrJpYYR0Nfwc3tYHB3D2kxTqHAD08WV5ALi5rhfDzBFCWWDDNjZJQ0xSva0QptHLwrOJ-OwbpZECuy1lgHcyE3aCGtQq_kkvmvVqtzfrlGUeuLajUOFGoPcUdgcpnDNaGl2Xczoz689SC86M_w9TKi_jc0mqcZDEVoQBohM9p5tWUyGnIpdJv1PM8yyF7Gr5BbKklXMF0jcgsXTzkU5DYwEWxp34ZTW66JA6u3-KvdhCQ6NoFwRqphbpHMqC2Gk9IOIdVCHhy5FpuF6zfUbAVjdejWhCPDoyl9mJt_CtLPmnhkdq3qACz6sMHDQ8T1mt6bNSX1T_oCf1vCjmUCAAA\n```\n\n### Steps To Reproduce\n\n1. Open the URL: [Playground \u2022 Streamlit](https://streamlit.io/playground?example=blank&code=H4sIAAAAAAAAA7VSzWrCQBC--xRDeklACm0PQqGHmFKx1BKi4KFIWeMQB_fH7s6K9uRD-IQ-STepKWnvXeYy883M983M9khtjWVwbFEoSQzCBacXnuNrJpYYR0Nfwc3tYHB3D2kxTqHAD08WV5ALi5rhfDzBFCWWDDNjZJQ0xSva0QptHLwrOJ-OwbpZECuy1lgHcyE3aCGtQq_kkvmvVqtzfrlGUeuLajUOFGoPcUdgcpnDNaGl2Xczoz689SC86M_w9TKi_jc0mqcZDEVoQBohM9p5tWUyGnIpdJv1PM8yyF7Gr5BbKklXMF0jcgsXTzkU5DYwEWxp34ZTW66JA6u3-KvdhCQ6NoFwRqphbpHMqC2Gk9IOIdVCHhy5FpuF6zfUbAVjdejWhCPDoyl9mJt_CtLPmnhkdq3qACz6sMHDQ8T1mt6bNSX1T_oCf1vCjmUCAAA) in edge/chrome browser in windows.\n2. Playground page will appear.\n3. Press tab key to reach to the 'Tools Menu' combo box and activate it.\n4. Verify whether screen reader announces the list information on the 'Tools Menu' combo box list item in windows.\n\n### Expected Behavior\n\nScreen reader should announce the list information with list count and position of the list items on the 'Tools Menu' combo box list item in windows. Screen reader should announce as List with 10 items and when focus moves to first list item, it should announce as '*GWAC Baseline Consumption Plan 1 of 10**\n\n### Current Behavior\n\nScreen reader does not announce the list information on the 'Tools Menu' combo box list item in windows.  It is just announcing the name of the list item.\n\nhttps://github.com/user-attachments/assets/f912a2ec-1b46-43b0-9aee-406e72bcc464\n\n\n<img width=\"1949\" height=\"1186\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/40835da5-5e6a-4b55-a57d-7151ed90eb81\" />\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.40.1\n- Python version: 3.12.1\n- Operating System: Windows 11 Version 25H2 (OS Build 26200.8390)\n- Browser: Edge Version 150.0.4078.48 \n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-06T10:51:32Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15829)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-06T12:25:29Z",
+      "body": "### Analysis\n\nThis is an **accessibility (a11y) bug** affecting `st.selectbox`. The reporter's \"Tools Menu combo box\" is a standard `st.selectbox` (confirmed by decoding the playground repro, which calls `st.selectbox(\"Tools menu\", [...10 options...])`). When the dropdown is open, Windows screen readers announce only the option label and not the list position/count (e.g. \"GWAC Baseline Consumption Plan, 1 of 10\"), so users can't tell how many options exist or where they are in the list.\n\n**Potential root cause:** `st.selectbox` was recently migrated from BaseWeb to `react-aria-components` (`ComboBox` + `ListBox`/`ListBoxItem`, see `frontend/lib/src/components/shared/Dropdown/Selectbox.tsx`, PR #15438). The options are rendered as `role=\"option\"` inside a `role=\"listbox\"` that lives in a Floating UI portal, and the input uses the combobox + `aria-activedescendant` pattern. With that pattern, real focus stays on the input, so Windows screen readers (Narrator/JAWS/NVDA) rely on explicit `aria-setsize`/`aria-posinset` on each option to announce \"X of Y\". The Streamlit source does not set these attributes (no `aria-setsize`/`aria-posinset` references in `frontend/lib/src`), and they are not emitted for a fully-rendered (non-virtualized) RAC list \u2014 which matches the reported symptom of the count/position being omitted. Note the issue was filed against 1.40.1 (BaseWeb era) but the linked playground runs current code, so the gap is present in the new implementation too. A maintainer should verify against a live screen reader.\n\n### Related Issues\n\n- [#12873 \u2014 508 Compliance - Add Alt=\"\" tag to decorative elements](https://github.com/streamlit/streamlit/issues/12873): Closely related \u2014 another screen-reader accessibility issue specifically on selectbox/dropdown widgets (the decorative chevron being announced). Both concern how `st.selectbox` is exposed to assistive technology.\n- [#8399 \u2014 Basic accessibility web features](https://github.com/streamlit/streamlit/issues/8399): General accessibility tracking issue covering accessible naming/structure for compliance; this list-semantics gap fits under the same umbrella.\n- [#8563 \u2014 Add alt text to images & charts for improved accessibility](https://github.com/streamlit/streamlit/issues/8563): Another screen-reader-focused a11y request (describing content to assistive tech); related by area, not a duplicate.\n\nNo exact duplicate was found in the open issues.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-07T14:53:46Z",
+      "body": "[USER] I looked into this and it should be working if you use the latest release 1.59.0 that went out yesterday. This release updates selectbox to use React Aria from BaseWeb. The playground is using an older version, so it won't be working yet. \n\nWould you be able to verify this using 1.59.0 on your windows environment with your screen reader? "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-13T11:33:26Z",
+      "body": "[USER], Thanks for the update. We are checking on this with our Dev team. Once we get update from them, we will confirm you back."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-30T09:01:58Z",
+      "body": "Closing this since its expected to work fine in the latest version of Streamlit. "
+    }
+  ]
+}

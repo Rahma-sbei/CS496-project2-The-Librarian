@@ -1,0 +1,39 @@
+{
+  "id": "issue-17097",
+  "type": "issue",
+  "number": 17097,
+  "url": "https://github.com/streamlit/streamlit/issues/17097",
+  "title": "Support for websockets >= 17.x",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:dependencies",
+    "area:server"
+  ],
+  "created_at": "2026-09-24T03:01:03Z",
+  "closed_at": "2026-09-25T08:07:36Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nI am unable to upgrade to Streamlit 1.64.0 because it enforces a strict upper bound on the websockets package (<17). My project requires websockets>=17.1, causing pip dependency resolution to fail.\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n1. Create a virtual environment.\n2. Attempt to install both packages via pip by running:\n`pip install streamlit==1.64.0 \"websockets>=17.1\"`\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\nThe conflict is caused by:\n    The user requested websockets>=17.1\n    streamlit 1.64.0 depends on websockets<17 and >=12.0.0\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n* Streamlit version: 1.64.0\n* Python version: 3.10\n* Operating System: Windows\n* Package manager: pip\n\n### Additional Information\n\nThe `websockets` package recently released version 17.x. Bumping the upper bound constraint in Streamlit's dependencies would prevent installation blocks for projects relying on modern websockets versions.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-24T03:01:17Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-17097)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-24T12:11:45Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-17097)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-24T12:12:04Z",
+      "body": "I think this is more of an enhancement, but looking into bumping the supported version. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-24T12:14:11Z",
+      "body": "This is a packaging enhancement, not a Streamlit runtime bug. Streamlit 1.64.0 (and current `develop`) declares `websockets>=12.0.0,<17` in `lib/pyproject.toml`, so `pip install streamlit==1.64.0 \"websockets>=17.1\"` cannot resolve. The `<17` cap was added in #15948 as the standard \u201cnext unreleased major\u201d bound; Streamlit does not import `websockets` in production code and instead uses it as uvicorn\u2019s WebSocket implementation (`ws=\"websockets-sansio\"` in `starlette_server.py`). Bumping to `<18` is reasonable once 17.x is verified with that uvicorn path. That check matters because #16030 showed websockets 16.1 broke non-ASCII handshake headers, and the `websockets` maintainer planned to reintroduce that change as a documented break in 17.0 pending an uvicorn fix ([Kludex/uvicorn#3035](https://github.com/Kludex/uvicorn/issues/3035)). The lockfile is still on `websockets==16.1.1`.\n\n### Related Issues\n\n- [#16030](https://github.com/streamlit/streamlit/issues/16030) \u2014 Closed regression where websockets 16.1 broke WebSocket handshakes with non-ASCII proxy/auth headers. Directly relevant: the 17.x major was called out as the version that would reintroduce that breaking change, so compatibility with uvicorn must be confirmed before raising Streamlit\u2019s cap.\n- [#15421](https://github.com/streamlit/streamlit/issues/15421) \u2014 Same class of request: raise a server-stack dependency bound (`starlette`) so Streamlit can install alongside a newer major.\n- [#15022](https://github.com/streamlit/streamlit/issues/15022) \u2014 Windows `WinError 121` noise in the uvicorn/websockets read loop after the Starlette migration. Not a duplicate, but it is another signal that WebSocket-layer upgrades in this stack need careful validation.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

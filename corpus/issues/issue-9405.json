@@ -1,0 +1,114 @@
+{
+  "id": "issue-9405",
+  "type": "issue",
+  "number": 9405,
+  "url": "https://github.com/streamlit/streamlit/issues/9405",
+  "title": "st.dialog Does Not Close Immediately After User Action if Followed by Blocking Operation (e.g. time.sleep(15))",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:st.dialog"
+  ],
+  "created_at": "2024-09-05T04:52:42Z",
+  "closed_at": "2026-09-09T20:20:13Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen using `st.dialog` to collect feedback from a user, if the feedback submission is followed by a blocking operation (e.g., `time.sleep(15)`), the dialog's title remains visible on the screen until the blocking operation is complete. This creates a poor user experience because the user may expect the dialog to disappear immediately after submitting their input, but the dialog remains visible until the blocking operation finishes.\r\n\n\n### Reproducible Code Example\n\n```Python\nimport time\r\nimport streamlit as st\r\n\r\n[USER].dialog(\"Cast your vote\")\r\ndef vote(item):\r\n    st.write(f\"Why is {item} your favorite?\")\r\n    reason = st.text_input(\"Because...\")\r\n    if st.button(\"Submit\"):\r\n        st.session_state.vote = {\"item\": item, \"reason\": reason}\r\n        st.rerun()\r\n\r\nif \"vote\" not in st.session_state:\r\n    st.write(\"Vote for your favorite\")\r\n\r\n    if st.button(\"A\"):\r\n        vote(\"A\")\r\n    if st.button(\"B\"):\r\n        vote(\"B\")\r\nelse:\r\n    time.sleep(15)\r\n    f\"You voted for {st.session_state.vote['item']} because {st.session_state.vote['reason']}\"\n```\n\n\n### Steps To Reproduce\n\n1. Use the provided code below to mimic collecting user feedback using `st.dialog`.\r\n2. After the user submits their feedback, the code simulates a blocking operation using `time.sleep(15)`.\r\n3. Notice that the dialog's title (\"Cast your vote\") remains visible for the full 15 seconds while `time.sleep(15)` is running.\n\n### Expected Behavior\n\nThe dialog should close immediately after the user submits their input, regardless of any blocking operation that follows, so that the UI responds promptly to the user's action.\n\n### Current Behavior\n\nThe dialog remains open until the blocking operation (`time.sleep(15)`) is completed. This means the title \"Cast your vote\" is displayed on the screen for 15 seconds.\r\n\r\n![2024-09-04_21-39-12 (1)](https://github.com/user-attachments/assets/f664f9f7-24cf-4b3b-8fad-d5fdcf0dcfdb)\r\n\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.37.1\r\n- Python version: 3.9\r\n- Operating System: Mac OS / Linux Ubuntu \r\n- Browser: Chrome \r\n\n\n### Additional Information\n\n### GIF:\r\n_Attach a GIF that shows the issue occurring._\r\n\r\n### Additional Context:\r\n\r\nI plan to use `st.dialog` to collect user confirmation before running a long operation. However, due to this behavior, the dialog title remains visible until the operation completes, making the user experience confusing. Ideally, the dialog should close immediately after the user interaction, regardless of subsequent operations.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-05T04:52:52Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9405)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-05T11:27:15Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Visits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fstreamlit%2Fstreamlit%2Fissues%2F9405&title=visits&edge_flat=false)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-05T11:33:02Z",
+      "body": "Hey [USER], thanks for opening the issue! I agree that the flow in the example is not great.\r\nFor some background, right now we clean up stale nodes (e.g. the dialog after triggering st.rerun) after a `finished session` message. This means that the cleanup is only triggered _after_ the rerun is finished (here after the sleep), not when a new session / run starts.\r\n\r\nI believe for handling this in a nicer way, we probably would need to expose the `close` function to the dialog so that you could manually indicate to the web app that you want to close it.\r\nHowever, here is a (little bit hacky) way of doing this right now:\r\n\r\n```python\r\ndef cb():\r\n    st.markdown(\"<script>document.querySelector('[aria-label=\\\"Close\\\"]').click()</script>\", unsafe_allow_html=True)\r\n\r\n[USER].dialog(\"Cast your vote\")\r\ndef vote(item):\r\n    st.write(f\"Why is {item} your favorite?\")\r\n    reason = st.text_input(\"Because...\")\r\n    if st.button(\"Submit\", on_click=cb):\r\n        st.session_state.vote = {\"item\": item, \"reason\": reason}\r\n        st.session_state.dialog_closed = True\r\n        st.rerun()\r\n```\r\n\r\nI have marke the issue as enhancement and not bug, because theoretically this is expected behavior in the current Streamlit execution model. cc [USER]"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-25T16:06:56Z",
+      "body": "[USER] I tried your suggestion and it's not working. I wonder if there's a typo, possibly here ```'[aria-label=\\\"Close\\\"]'```, since the string \"Close\" isn't referenced as where? Further guidance would be greatly appreciated!"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-25T16:41:05Z",
+      "body": "[USER] The dialog's dismiss button should have the aria-label set like this:\r\n![Screenshot 2024-09-25 at 18 40 24](https://github.com/user-attachments/assets/d87b4705-bab3-4258-b29c-9f2b2641f60c)\r\n\r\n![Screenshot 2024-09-25 at 18 40 51](https://github.com/user-attachments/assets/0c5a4faf-eecc-4e9e-8963-1a37646c597d)\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-25T17:07:25Z",
+      "body": "[USER] Thank you for your quick response. I must be missing something, because it's not working for me. Here is my code (using Streamlit, version 1.34.0):\r\n```python\r\nimport time\r\n\r\nimport streamlit as st\r\n\r\n\r\ndef cb():\r\n    st.markdown(\r\n        \"<script>document.querySelector('[aria-label=\\\"Close\\\"]').click()</script>\",\r\n        unsafe_allow_html=True,\r\n    )\r\n\r\n\r\n[USER].experimental_dialog(\"Dialog\")\r\ndef show_dialog():\r\n    st.write(\"Click close button\")\r\n    if st.button(\"Close\"):\r\n        st.session_state.dialog_closed = True\r\n        st.rerun()\r\n\r\n\r\nif \"dialog_closed\" not in st.session_state:\r\n    show_dialog()\r\nelse:\r\n    st.write(\"about to sleep, and dialog should be closed\")\r\n    time.sleep(10)\r\n```"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-25T17:09:11Z",
+      "body": "[USER] Ahh yeah, maybe the `aria-label` did not exist in `1.34`. Is there anything specific that prevents you from upgrading to the latest version `1.38`?\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-25T17:13:06Z",
+      "body": "I will look into upgrading, if that is what is required. Ultimately, I would prefer not to upgrade, to avoid having to retest everything or potential break something that was missed."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-25T17:21:05Z",
+      "body": "Just tried the following code on Streamlit, version 1.38.0, and still not working.\r\n```python\r\nimport time\r\n\r\nimport streamlit as st\r\n\r\n\r\ndef cb():\r\n    st.markdown(\r\n        \"<script>document.querySelector('[aria-label=\\\"Close\\\"]').click()</script>\",\r\n        unsafe_allow_html=True,\r\n    )\r\n\r\n\r\n[USER].dialog(\"Dialog\")\r\ndef show_dialog():\r\n    st.write(\"Click close button\")\r\n    if st.button(\"Close\", on_click=cb):\r\n        st.session_state.dialog_closed = True\r\n        st.rerun()\r\n\r\n\r\nif \"dialog_closed\" not in st.session_state:\r\n    show_dialog()\r\nelse:\r\n    st.write(\"about to sleep, and dialog should be closed\")\r\n    time.sleep(10)\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-25T19:26:41Z",
+      "body": "[USER] Do you see anything wrong with this approach?\r\n```python\r\nimport time\r\n\r\nimport streamlit as st\r\nimport streamlit.components.v1 as components\r\n\r\n\r\n[USER].experimental_dialog(\"Dialog\")\r\ndef show_dialog():\r\n    st.write(\"Click close button\")\r\n\r\n    if st.button(\"Close\"):\r\n        st.session_state.dialog_closed = True\r\n        st.rerun()\r\n\r\n\r\nif \"dialog_closed\" not in st.session_state:\r\n    show_dialog()\r\nelse:\r\n    components.html(\r\n        \"\"\"\\\r\n<script>\r\nparent.document.querySelector('div[data-baseweb=\"modal\"]').remove();\r\n</script>\r\n\"\"\",\r\n        height=0,\r\n        scrolling=False,\r\n    )\r\n    with st.spinner(\"about to sleep, and dialog should be closed\"):\r\n        time.sleep(5)\r\n    st.write(\"Done\")\r\n```"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-25T20:33:34Z",
+      "body": "> [USER] Do you see anything wrong with this approach?\r\n> \r\n> ```python\r\n> import time\r\n> \r\n> import streamlit as st\r\n> import streamlit.components.v1 as components\r\n> \r\n> \r\n> [USER].experimental_dialog(\"Dialog\")\r\n> def show_dialog():\r\n>     st.write(\"Click close button\")\r\n> \r\n>     if st.button(\"Close\"):\r\n>         st.session_state.dialog_closed = True\r\n>         st.rerun()\r\n> \r\n> \r\n> if \"dialog_closed\" not in st.session_state:\r\n>     show_dialog()\r\n> else:\r\n>     components.html(\r\n>         \"\"\"\\\r\n> <script>\r\n> parent.document.querySelector('div[data-baseweb=\"modal\"]').remove();\r\n> </script>\r\n> \"\"\",\r\n>         height=0,\r\n>         scrolling=False,\r\n>     )\r\n>     with st.spinner(\"about to sleep, and dialog should be closed\"):\r\n>         time.sleep(5)\r\n>     st.write(\"Done\")\r\n> ```\r\n\r\nIf it works for you, this should be fine for now \ud83d\ude42 \ud83d\udc4d It might not work in more strict environments / deployments when for example a CSP is used and, thus, the iframe used by `components.html` is not accessible like this, but other than that it should be ok!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-12-18T06:36:55Z",
+      "body": "> I believe for handling this in a nicer way, we probably would need to expose the `close` function to the dialog so that you could manually indicate to the web app that you want to close it.\r\n> However, here is a (little bit hacky) way of doing this right now:\r\n\r\nYes, please expose the 'close' function. We have an AI Chat App using the dialog to get some user input but the the modal won't close until we have finished streaming the AI response"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-01T18:50:55Z",
+      "body": "Hi there.  I have the same use case as [USER] and none of the suggested workarounds are working for me.  Currently using version 1.44.\n\nI tried running `<script>document.querySelector('[aria-label=\\\"Close\\\"]').click()</script>` directly in the browser console when the dialog is open and it indeed closes it, but when I run \n```\nst.markdown(\n        \"<script>document.querySelector('[aria-label=\\\"Close\\\"]').click()</script>\",\n        unsafe_allow_html=True,\n    )\n```\nnothing happens."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-01T19:42:22Z",
+      "body": "[USER] Try this brother. It works for me:\n\n```python\ndef close_dialog():\n    components.html(\n        \"\"\"\\\n<script>\ndocument.addEventListener('DOMContentLoaded', function() {\n    const modal = parent.document.querySelector('div[data-baseweb=\"modal\"]');\n    if (modal) {\n        // Apply a fade-out transition\n        modal.style.transition = 'opacity 0.5s ease';\n        modal.style.opacity = '0';\n\n        // Remove the modal after the fade-out effect finishes\n        setTimeout(function() {\n            modal.remove();\n        }, 500);  // Time corresponds to the transition duration (0.5s)\n    }\n});\n</script>\n        \"\"\",\n        height=0,\n        scrolling=False,\n    )\n\n\n[USER].dialog(\"Alert\")\ndef alert_dialog(message):\n    st.warning(message)\n    if st.button(\"OK\"):\n        close_dialog()\n        st.rerun()\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-29T16:54:44Z",
+      "body": "This worked for me too!, Thank you!\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-06-01T23:41:08Z",
+      "body": "None of the solutions worked for me"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-06-02T13:47:57Z",
+      "body": "> None of the solutions worked for me\n\n[USER] Try this working example that clearly illustrates both the problem and its solution.\n\n```python\nimport time\n\nimport streamlit as st\nimport streamlit.components.v1 as components\n\nSLEEP_SECONDS = 5\n\n\ndef close_dialog():\n    components.html(\n        \"\"\"\\\n<script>\ndocument.addEventListener('DOMContentLoaded', function() {\n    const modal = parent.document.querySelector('div[data-baseweb=\"modal\"]');\n    if (modal) {\n        // Apply a fade-out transition\n        modal.style.transition = 'opacity 0.5s ease';\n        modal.style.opacity = '0';\n\n        // Remove the modal after the fade-out effect finishes\n        setTimeout(function() {\n            modal.remove();\n        }, 500);  // Time corresponds to the transition duration (0.5s)\n    }\n});\n</script>\n        \"\"\",\n        height=0,\n        scrolling=False,\n    )\n\n\n[USER].dialog(\"\u26a0\ufe0f Warning: Long Operation Ahead\")\ndef disclaimer_dialog():\n    st.warning(\n        f\"This operation will block the app for {SLEEP_SECONDS} seconds. Do you want to continue?\"\n    )\n    col1, col2 = st.columns(2)\n    with col1:\n        if st.button(\"OK\"):\n            st.session_state.accepted_disclaimer = True\n            st.rerun()\n    with col2:\n        if st.button(\"Cancel\"):\n            st.session_state.accepted_disclaimer = False\n            st.rerun()\n\n\n# Initialize state\nst.session_state.setdefault(\"accepted_disclaimer\", False)\nst.session_state.setdefault(\"close_before_blocking\", False)\n\n# Main UI\nif not st.session_state.accepted_disclaimer:\n    st.subheader(\"Demo: Streamlit Dialog Behavior\")\n\n    st.session_state.close_before_blocking = st.checkbox(\n        \"Close dialog before blocking operation\",\n        value=st.session_state.close_before_blocking,\n    )\n\n    if st.button(\"Show Dialog\"):\n        disclaimer_dialog()\nelse:\n    if st.session_state.close_before_blocking:\n        close_dialog()\n\n    st.subheader(\"Blocking Operation in Progress\")\n    pbar = st.progress(0, text=f\"Sleeping... 0/{SLEEP_SECONDS}\")\n    for i in range(SLEEP_SECONDS):\n        time.sleep(1)\n        pbar.progress((i + 1) / SLEEP_SECONDS, text=f\"Sleeping... {i + 1}/{SLEEP_SECONDS}\")\n    st.success(\"Done!\")\n\n    # Reset state\n    st.session_state.accepted_disclaimer = False\n\n    st.button(\"OK\")\n```\n\nIt that doesn't work for you, then it's probably a browser issue."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-19T08:35:55Z",
+      "body": "I tried both solutions suggested by [USER], and they work.\n\nThank you!\n\nFor the second solution I noticed this:\n\n<img width=\"940\" height=\"656\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/936f0273-3851-4235-93f4-4155bf0cbe91\" />\n\nFade effect works great, but for some reason it creates that weird white space:\n\n<img width=\"940\" height=\"656\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/5c1e2171-3272-49f8-b4f6-42ae4afc1f57\" />"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-30T13:55:26Z",
+      "body": "In my case, at version 1.52.2, all mentioned approaches above did not work.\n\nBut this worked:\n\n```python\nimport streamlit as st\nimport time\n\ndef set_dialog_invisible():\n    \"\"\"Set the dialog to invisible using JavaScript.\"\"\"\n    css = f\"\"\"\n    <style>\n        div[data-baseweb=\"modal\"] {{\n            display: none !important;\n        }}\n    </style>\n    \"\"\"\n    st.markdown(css, unsafe_allow_html=True)\n\n# Make sure this state exists\nif \"dialog_closed \" not in st.session_state:\n    st.session_state.dialog_closed = False\n\n# This dialog is not dismissable with the \"X\" (Close) button\n[USER].dialog(\"My Dialog\", dismissable=False)\ndef my_dialog()\n    st.write(\"Click close button\")\n        if st.button(\"Close\"):\n            st.session_state.dialog_closed = True\n            st.rerun()\n\nif st.session_state.dialog_closed:\n    # This makes sure, that the closed dialog will be invisable, while rerun() is running\n    set_dialog_invisible()\n    # Start a long task, after dialog was closed\n    st.write(\"Long task started...\")\n    time.sleep(10)\n    st.write(\"Finish!\")\n    # Reset state\n    st.session_state.dialog_closed = False\nelse:\n    my_dialog()\n\n```\n\nWorkflow explained:\n1. Open this page and the dialog will open instantly (since the session state `dialog_closed=False`)\n2. Close the Dialog with the button (this will trigger the `st.rerun()` and set `dialog_closed=True`)\n3. With the rerun the `dialog_closed` state will call `set_dialog_invisible()` and start a long task\n\n\nThe most important change are:\n- `!important` for the style definition\n- call `set_dialog_invisible()` in the rerun, and not before"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "issue-7100",
+  "type": "issue",
+  "number": 7100,
+  "url": "https://github.com/streamlit/streamlit/issues/7100",
+  "title": "st.date_input does not recognize two-digit, keyed-in, day for end date if valid single-digit day exists",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.date_input",
+    "upstream"
+  ],
+  "created_at": "2023-07-31T22:12:34Z",
+  "closed_at": "2026-08-12T19:26:41Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\n[Raised as an issue in the forum by krg_gmail.](https://discuss.streamlit.io/t/problem-to-manually-enter-a-date/48351)\r\n\r\nWhen trying to type in the dates for a ranged date selector, if the end-date can be validly completed with a single-digit day, the picker will prefer/force a single-digit day for the end and not correctly interpret what was typed.\r\n\r\n![2023-07-31_15-09-25 (1)](https://github.com/streamlit/streamlit/assets/135349133/b0c8997b-a31b-41f1-8334-33c746b9d378)\r\n\r\n\r\n### Reproducible Code Example\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-7100)\r\n\r\n```Python\r\nimport streamlit as st\r\nfrom datetime import date\r\n\r\nst.date_input('date', value=(date(2023,1,1),date(2023,1,2)))\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n1. Click into the date picker\r\n2. Type \"2023010120230112\" (2023-01-01, 2023-01-12)\r\n3. It will result in (2023-01-01, 2023-01-01) when you type the penultimate digit, then (2023-01-01, 2023-01-02) when you type the final digit.\r\n\r\n### Expected Behavior\r\n\r\nThe dates should be accepted as typed.\r\n\r\n### Current Behavior\r\n\r\nIf a valid single-digit day exists to complete the end date, it will be preferred by the widget over the attempted two-digit day that was keyed.\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version:\r\n- Python version:\r\n- Operating System:\r\n- Browser:\r\n\r\n\r\n### Additional Information\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-08-01T09:27:56Z",
+      "body": "[USER] Thanks for reporting this issue :) I was able to reproduce this [here](https://issues.streamlit.app/?issue=gh-7100). This seems to be also an issue in the underlying baseweb datepicker component (the same happens if you select the `range` version [here](https://baseweb.design/components/datepicker/#datepicker)):\r\n\r\n\r\nhttps://github.com/streamlit/streamlit/assets/2852129/a95fdd17-d612-4329-95bb-9809119f8e5e\r\n\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-18T08:53:23Z",
+      "body": "[USER] This no longer seems to be an issue on that site (at least I can't reproduce it the same way you have in your video). Is there plans to upgrade the component to take advantage of this fix?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-20T00:02:56Z",
+      "body": "When I try to use the ranged datepicker on the baseweb component directly, I am not able to key in a ranged date at all. The visual selection is not matching what I'm typing. I can only update the output through the graphical input. (...in both Chrome and Firefox.)"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T13:12:18Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-7100)\n"
+    }
+  ]
+}

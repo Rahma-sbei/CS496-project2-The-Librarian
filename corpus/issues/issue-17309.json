@@ -1,0 +1,37 @@
+{
+  "id": "issue-17309",
+  "type": "issue",
+  "number": 17309,
+  "url": "https://github.com/streamlit/streamlit/issues/17309",
+  "title": "Tooltips render far above the hovered element in 1.65.0",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "area:frontend",
+    "status:needs-triage",
+    "feature:st.pydeck_chart",
+    "feature:tooltip"
+  ],
+  "created_at": "2026-10-07T15:43:58Z",
+  "closed_at": "2026-10-07T20:14:29Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nStarting in 1.65.0, pydeck tooltips appear far above the hovered object, often off-screen.\nThe same app works correctly on 1.64.0.\n\n### Reproducible Code Example\n\n```Python\nimport pydeck as pdk\nimport streamlit as st\n\nst.write(f\"Streamlit {st.__version__}\")\n\ndata = [{\"position\": [-98.35, 39.5], \"name\": \"Test point\"}]\n\nst.pydeck_chart(\n    pdk.Deck(\n        initial_view_state=pdk.ViewState(latitude=39.5, longitude=-98.35, zoom=4),\n        layers=[pdk.Layer(\"ScatterplotLayer\", data, pickable=True, get_position=\"position\",\n                          get_fill_color=[255, 0, 0], radius_min_pixels=10)],\n        tooltip={\"text\": \"{name}\"},\n    )\n)\n```\n\n### Steps To Reproduce\n\nRun the app with streamlit==1.65.0.\nHover over the red dot.\n\n### Expected Behavior\n\nTooltip appears next to the cursor, as it does in 1.64.0.\n\n### Current Behavior\n\nTooltip appears offset far above the cursor, often off-screen.\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.65.0 (bug), 1.64.0 (works)\n- Python version: 3.13\n- pydeck 0.9.3\n- Operating System: macOS\n- Browser: Safari version 27\n\n### Additional Information\n\nPossibly related: 1.65.0 changed st.pydeck_chart (new alt parameter, PR #17086).",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-07T15:44:10Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-17309)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-07T16:05:21Z",
+      "body": "\u26a0\ufe0f **AI Triage Failed**\n\nThe AI triage job failed to complete. Please check the [workflow run](https://github.com/streamlit/streamlit/actions/runs/37647153301) for details.\n\nYou can retry by adding the `ai-review` label again or manually triggering the workflow."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-07T16:15:09Z",
+      "body": "This is a regression in `st.pydeck_chart` hover tooltips. On 1.65.0 the tooltip is drawn far above the hovered object and often off-screen; the same app is correct on 1.64.0. The new `alt` parameter (#17086) only sets an accessible name and does not affect placement.\n\n1.65.0 bumped `[USER].gl/*` from 9.3.11 to 9.4.0 (#16924). deck.gl 9.4 (`TooltipWidget.onHover`, visgl/deck.gl#10491) positions the tooltip at `info.x/y` plus `getCanvasBounds()`, which is the canvas rectangle minus the `.deck-widgets-root` rectangle. `[USER].gl/react` renders that root as an unstyled sibling after `.deck-events-root` (`height: 100%`). The root therefore sits at the bottom of the chart, while the tooltip is absolutely positioned against the chart wrapper. For the default 500px chart that subtracts about one chart-height from the tooltip `translateY`, which matches a tooltip landing far above the cursor. Streamlit\u2019s `createTooltip` in `useDeckGl.tsx` only supplies text or HTML; it does not set coordinates.\n\n### Related Issues\n\nNo open issue looks like a duplicate of this positioning regression.\n\n- [#2242](https://github.com/streamlit/streamlit/issues/2242) is an older, closed report about pydeck tooltips together with a basemap when embedding deck HTML. It is a different problem and should not be treated as a duplicate.\n\n---\n*This is an automated triage comment using `grok-4.7-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

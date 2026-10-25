@@ -1,0 +1,48 @@
+{
+  "id": "issue-15455",
+  "type": "issue",
+  "number": 15455,
+  "url": "https://github.com/streamlit/streamlit/issues/15455",
+  "title": "st.login regression on streamlit 1.58.0 (streamlit cloud) - \"Missing provider for OAuth callback\"",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:community-cloud",
+    "status:confirmed",
+    "priority:P1",
+    "area:server",
+    "feature:st.login",
+    "feature:authentication"
+  ],
+  "created_at": "2026-06-06T06:33:29Z",
+  "closed_at": "2026-06-15T14:54:07Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nAfter upgrading from Streamlit **1.56.0 \u2192 1.58.0**, `st.login()` fails on Streamlit Cloud with the following log messages:\n\n```\nMissing provider for OAuth callback; this often indicates a stale or replayed\ncallback (for example, from browser back/forward navigation).\n```\n\nThe app works correctly on a local machine with identical code and secrets. \n\nRolling back to **1.56.0 + Authlib 1.6.11** resolves the issue on Streamlit Cloud entirely.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nif not st.user.is_logged_in:\n    if st.button(\"Log in\"):\n        st.login()\nelse:\n    if st.button(\"Log out\"):\n        st.logout()\n    st.write(f\"Hello, {st.user.name}!\")\n```\n\n### Steps To Reproduce\n\n1. Attempt to log in via the OAuth provider\n2. Observe \"Missing provider for OAuth callback\" in app logs; login fails\n\n### Expected Behavior\n\nOAuth login completes successfully, as it did on 1.56.0.\n\n### Current Behavior\n\nLogin fails with `Missing provider for OAuth callback`. The error is consistent\nand reproducible on Community Cloud but never occurs locally (secrets.toml is identical on Streamlit Cloud and local machine except for redirect_uri).\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.58.0 (regression from 1.56.0)\n- Python version: 3.13\n- Authlib version: 1.6\n- Deployed on Streamlit Community Cloud \n- OAuth provider: Google Identity\n- Browser: Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-06T06:33:38Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15455)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-06T07:42:04Z",
+      "body": "### Analysis\n\nThis is a reproducible `st.login` regression between 1.56.0 \u2192 1.58.0 that manifests only on Streamlit Community Cloud (works locally with identical config). The warning `Missing provider for OAuth callback` originates in `_auth_callback()` in [`lib/streamlit/web/server/starlette/starlette_auth_routes.py`](https://github.com/streamlit/streamlit/blob/develop/lib/streamlit/web/server/starlette/starlette_auth_routes.py) and is emitted when `_get_provider_by_state()` fails to find an entry of the form `_state_{provider}_{state_code}` in `request.session` that matches the `state` query parameter returned by the OAuth provider.\n\nThe likely root cause is the same class of regression introduced when 1.57.0 made Starlette the default server and removed Tornado (PR #14553): OAuth state is now carried in the Starlette signed session cookie (via `SessionMiddleware`) rather than via Tornado's signed cookie infrastructure or an in-memory cache. If the session cookie is not delivered to `/oauth2callback` (e.g., dropped due to a `SameSite`/cross-origin redirect, stale chunked cookies from the pre-Starlette format on the Community Cloud subdomain, cookie size, or being routed to a different replica with a rotated cookie secret), the state lookup fails and we hit this exact log line. A previous instance of this pattern (`MismatchingStateError`) was fixed in #15048, and a very recent follow-up to actively clear stale/invalid auth cookies landed in #15420 (Jun 5, 2026) \u2014 this fix is post-1.58.0 and may already address the reporter's case once released; otherwise the residual Community-Cloud-specific failure should be debugged from there.\n\nThe reporter's mitigation of pinning `streamlit==1.56.0 + Authlib==1.6.11` is consistent with this being a Starlette-auth migration regression rather than a user-config issue.\n\n### Related Issues\n\n- [#14991](https://github.com/streamlit/streamlit/issues/14991) \u2014 *OAuth MismatchingStateError regression in 1.57.0 (works in 1.56.0)*. Closed; same Starlette-auth migration regression family (OAuth state lookup failing on cloud deployments), fixed in #15048 by moving state into the session cookie. The 1.58.0 symptom reported here is the next-layer failure mode (session present/absent vs. state mismatch).\n- [#15407](https://github.com/streamlit/streamlit/issues/15407) \u2014 *App conversion tornado to starlette breaks page, when logged in*. Closed; covers stale Tornado-era `_streamlit_user` cookies surviving across the 1.56\u21921.58 upgrade and breaking the new Starlette auth flow. Fix in #15420 explicitly clears legacy root-path / invalid auth cookies during login \u2014 directly relevant to anyone whose users had logged in on 1.56.0 before the Community Cloud upgrade.\n- [#13773](https://github.com/streamlit/streamlit/issues/13773) \u2014 *Google Auth does not work with multiple replicas*. Open; related shared-failure mode where the OAuth round-trip is split across hosts/replicas and cookies/state don't survive, which can produce the same \"missing provider\" signature on multi-instance deployments like Community Cloud.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-07T14:06:39Z",
+      "body": "Thanks for reporting this. I reproduced it on the latest main branch. The root cause looks like a missing bounds check in the iteration logic. Would be great to see this addressed."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-08T22:36:43Z",
+      "body": "Good news. This should just requires a change in Community Cloud because we filter cookies that are not specified. With our change to Starlette the OAuth state cookie gets lost. I am working on getting it changed, and I expect it to be fixed this week."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-15T14:54:07Z",
+      "body": "Hey [USER] I believe the change is now on Community Cloud and should work for you. Let me know if you see otherwise. Going to close this issue for now, but I will continue to monitor this over the next week in case you see any issues."
+    }
+  ]
+}

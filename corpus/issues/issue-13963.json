@@ -1,0 +1,36 @@
+{
+  "id": "issue-13963",
+  "type": "issue",
+  "number": 13963,
+  "url": "https://github.com/streamlit/streamlit/issues/13963",
+  "title": "Back button changes URL query params but not `st.query_params` until user leaves page and comes back",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:query-params",
+    "feature:multipage-apps"
+  ],
+  "created_at": "2026-02-16T14:33:10Z",
+  "closed_at": "2026-09-16T20:33:01Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen using `st.query_params` to modify the current URL, new items are added to the browser history so one can navigate forwards and backwards to the URLs that have previously been set.\n\n- On using the forwards and backwards buttons in the browser, the URL changes as expected, but calls to `st.query_params` see only the final version of the URL.\n    - This only happens if `st.navigation` is used - if the app is single-page, the forwards and backwards buttons don't trigger a rerun of the back end at all (as in #13853). \n- If the user navigates to a different page, the forwards and backwards buttons DO cause the `st.query_params` to change.\n\n### Reproducible Code Example\n\n```Python\nimport datetime\n\nimport streamlit as st\n\ndef page():\n    st.write(datetime.datetime.now())\n\n    if st.button(\"Increment Query Param\"):\n        value = int(st.query_params.get(\"value\", \"0\"))\n        st.query_params[\"value\"] = value + 1\n\n    st.write(st.query_params)\n\nst.navigation([\n    st.Page(page, title=\"Query Params\", default=True),\n    st.Page(lambda: None, title=\"Other Page\", url_path=\"other\"),\n]).run()\n```\n\n### Steps To Reproduce\n\n1. Open the app URL in a browser\n2. Press the \"Increment Query Param\" button twice - the URL should now end `?value=2`\n3. Press the browser's back button\n4. Press the browser's forwards button\n5. Click on \"Other Page\" in the nav bar\n6. Press the browser's back button\n7. Press the browser's back button again\n\n### Expected Behavior\n\n1. The URL has no query parameters and the printed `st.query_params` are empty\n2. The URL ends with `?value=2` and the printed `st.query_params` shows `\"value\": \"2\"`\n3. The URL ends with `?value=1` and the printed `st.query_params` shows `\"value\": \"1\"`\n4. The URL ends with `?value=2` and the printed `st.query_params` shows `\"value\": \"2\"`\n5. The URL has no query parameters, no content is shown\n6. The URL ends with `?value=2` and the printed `st.query_params` shows `\"value\": \"2\"`\n7. The URL ends with `?value=1` and the printed `st.query_params` shows `\"value\": \"1\"`\n\n### Current Behavior\n\nAfter step 3: the printed `st.query_params` shows `\"value\": \"2\"` (the timestamp and URL do update, but the `st.query_params` appear to be cached)\n\nNotes:\n- after steps 5 and 6 (navigate to a different page and back), step 7 (apparently identical to step 3) works as expected\n- replacing step 5 with \"navigate to an external site\" also makes step 7 work, albeit now in a new session\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: `1.54.0`\n- Python version: `3.11.11`, `3.13.1`\n- Operating System: `Windows 11`\n- Browser: `Edge 145.0`, `Chrome 145.0`, `Firefox 147.0`\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-02-16T14:33:19Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-13963)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-02-16T16:45:50Z",
+      "body": "This is a bug where browser back/forward navigation on the **same page** sends stale query parameters to the server, causing `st.query_params` to reflect the wrong values. The root cause is in the frontend `onHistoryChange` handler in `App.tsx`. When the browser's `popstate` event fires, the browser URL updates correctly, but `App.getQueryString()` reads from `this.state.queryParams` (which still holds the last server-set value) rather than from `document.location.search`. The `onHistoryChange` handler calls `onPageChange` with `preserveQueryParams=true` but does not pass the actual URL query string, so the stale state value is sent to the server in the rerun `BackMsg`. This issue was partially addressed in PR #13129 (which fixed cross-page back navigation for #9279), but the same-page case was not covered.\n\nA potential fix would be to have `onHistoryChange` explicitly read and pass `document.location.search` as the `queryString` parameter to `onPageChange`, ensuring the actual browser URL query string is sent to the server instead of the stale React state.\n\n### Related Issues\n\n- **#13853** - [Back button doesn't work with elements synced with query params](https://github.com/streamlit/streamlit/issues/13853): Very closely related \u2014 reports that browser back button doesn't trigger a rerun for single-page apps using `st.query_params`. The current issue (#13963) notes this same single-page behavior and extends it to the multipage case where reruns do occur but with stale params.\n- **#9279** (closed) - [Query Params not preserved on first script run after using browser \"back\" button](https://github.com/streamlit/streamlit/issues/9279): The predecessor bug where query params were lost on cross-page back navigation. It was fixed in PR #13129 by adding `preserveQueryParams`, but that fix introduced the stale-state behavior described in this issue for same-page navigation.\n- **#9878** - [Moving slider generates empty window.history states](https://github.com/streamlit/streamlit/issues/9878): Related browser history management issue where widget interactions create spurious history entries, compounding back-button navigation problems.\n\n---\n*This is an automated triage comment using `opus-4.6-thinking`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-05T13:26:55Z",
+      "body": "Hi, I was checking in to see if this bug has been fixed as I currently have the same issue. I followed the PRs related but saw they were marked stale and never merged. Is there a fix around this or is this of less priority. I use version 1.56.0. Thanks."
+    }
+  ]
+}

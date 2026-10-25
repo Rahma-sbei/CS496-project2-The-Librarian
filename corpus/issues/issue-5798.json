@@ -1,0 +1,28 @@
+{
+  "id": "issue-5798",
+  "type": "issue",
+  "number": 5798,
+  "url": "https://github.com/streamlit/streamlit/issues/5798",
+  "title": "Optimize Streamlit core static files and library imports to reduce app startup time",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:performance"
+  ],
+  "created_at": "2022-12-01T12:51:24Z",
+  "closed_at": "2026-06-14T19:59:38Z",
+  "body": "### Problem\n\nStreamlit apps always take a few moments to load. One reason for this is the amount and size of the several static files that need to be fetched; another, the libraries that need to be imported in the .py files.\n\n### Solution\n\nA combination of the following:\n- Reduce amount of files in `streamlit/static/static` that are fetched with GET requests.\n- Reduce size of files in `streamlit/static/static` that are fetched with GET requests.\n- Lazy loading of static files (for example, currently the files in `streamlit/static/vendor` are always loaded in `streamlit/static/index.html`, even though not all apps might use bokeh and graphviz widgets).\n- Lazy loading of libraries imported in the .py files.\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-5798)\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-12-01T14:16:39Z",
+      "body": "> * bokeh\r\n\r\nThis issue is covered by https://github.com/streamlit/streamlit/issues/5528"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-14T19:59:38Z",
+      "body": "Closing this since we have applied a lot of optimizations around these areas"
+    }
+  ]
+}

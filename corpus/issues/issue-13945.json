@@ -1,0 +1,33 @@
+{
+  "id": "issue-13945",
+  "type": "issue",
+  "number": 13945,
+  "url": "https://github.com/streamlit/streamlit/issues/13945",
+  "title": "Make widgets use 14px font size",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:widgets"
+  ],
+  "created_at": "2026-02-13T19:42:33Z",
+  "closed_at": "2026-05-14T18:40:23Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nOur widgets currently mix 16px and 14px font sizes. Some widgets are completely 14px (e.g. `st.pills`) while others are completely 16px (e.g. `st.checkbox`), and others use 16px for their value and 14px for their label (e.g. `st.selectbox). Let's unify to make all of them 14px. \n\n### Why?\n\nMore coherent and modern look. \n\n### How?\n\nNotes:\n- This should also affect some non-widget elements like `st.expander`. \n- The only elements that should stay 16px are normal text (e.g. via `st.markdown`) and status elements (e.g. `st.warning`). \n- We should probably adjust icon sizes as well. We currently use 20px icons (for 16px font size), but should move to 16px icons with 14px font size (same as e.g. the sidebar navigation today). \n\nElements affected: \n- st.button, st.download_button, st.link_button\n- st.page_link\n- st.toggle\n- st.checkbox\n- st.radio\n- st.selectbox (incl. dropdown)\n- st.multiselect (incl. dropdown)\n- st.color_picker dropdown\n- st.number_input\n- st.date_input, st.time_input, st.datetime_input (incl. dropdowns)\n- st.text_input\n- st.text_area\n- st.audio_input error text\n- st.file_uploader (currently being revamped)\n- st.camera_input (incl. error text)\n- st.expander, st.status\n- st.popover\n- st.chat_input\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-02-13T19:42:58Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-13945)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-02-24T05:53:15Z",
+      "body": "\ud83d\udc4b I'll try updating the st.button, st.download_button, st.link_button, st.page_link components"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-02-25T12:47:38Z",
+      "body": "best option will be to make this configurable using .toml "
+    }
+  ]
+}

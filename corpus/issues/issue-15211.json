@@ -1,0 +1,32 @@
+{
+  "id": "issue-15211",
+  "type": "issue",
+  "number": 15211,
+  "url": "https://github.com/streamlit/streamlit/issues/15211",
+  "title": "`unsafe_allow_html=True` in single-line `st.markdown` breaks `help` parameter.",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:frontend",
+    "feature:markdown",
+    "status:confirmed",
+    "priority:P3",
+    "feature:tooltip"
+  ],
+  "created_at": "2026-05-16T14:21:50Z",
+  "closed_at": "2026-05-19T17:12:12Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nIf the `unsafe_allow_html` parameter is set to `True` in `st.markdown()`, and the contents aren't followed by a double carriage return, then if the `help` parameter is also used, it's rendered as `:help[]` rather than as the actual help icon. This is obviously not helpful.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\n# This doesn't work.\nst.markdown(\"<p>an example</p>\", unsafe_allow_html=True, help=\"test\")\n\n# This \"works\" but the help icon is on the next line, not at the end of the first line.\nst.markdown(\"\"\"\n<p>an example</p>\n\n\"\"\", unsafe_allow_html=True, help=\"test\")\n```\n\n### Steps To Reproduce\n\nSee reproducible code example, repeated here for good measure:\n\n1. Put this in your streamlit file:\n```\nimport streamlit as st\n\nst.markdown(\"<p>an example</p>\", unsafe_allow_html=True, help=\"test\")\n```\n\n2. Look at rendered output.\n\n### Expected Behavior\n\nThe help should be rendered as a proper help icon with hover text. I don't want to have to put the help icon on the next line, I want it to be at the end of the one-line block where I put it!\n\n### Current Behavior\n\nThe above code produces this on the Streamlit page:\n\nan example  \n:help[]\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.57\n- Python version: 3.14\n- Operating System: Windows x64\n- Browser: Firefox\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-16T14:21:59Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15211)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-18T16:04:15Z",
+      "body": "### Issue Analysis\n\nThis is a frontend rendering bug in `st.markdown`. When `help` is supplied (and the markdown is not LaTeX or a single badge), the frontend appends a remark text directive marker to the body \u2014 i.e. `` `${body} :help[]` `` in [`Markdown.tsx`](https://github.com/streamlit/streamlit/blob/develop/frontend/lib/src/components/elements/Markdown/Markdown.tsx#L77-L94). A custom remark plugin then transforms `:help[]` into the inline help icon, with the actual tooltip text supplied via `HelpTextContext`.\n\nThe bug occurs because of how CommonMark handles raw HTML: when `unsafe_allow_html=True` and the body starts with block-level HTML on a single line (e.g. `<p>an example</p>`), the parser treats the entire line as a raw HTML block. Anything appended on that same line \u2014 including the ` :help[]` directive marker \u2014 is consumed as part of the HTML block and is never parsed as a text directive, so it leaks through as the literal text `:help[]`. Adding a blank line after the HTML closes the HTML block and lets `:help[]` be parsed as its own paragraph, which is why the workaround in the issue \"works\" (but at the cost of placing the icon on a new line).\n\nA likely fix is to special-case `allowHtml && help` similarly to how the LaTeX case is already handled \u2014 render the body via `StreamlitMarkdown` and render an `InlineTooltipIcon` next to it inside `StyledLabelHelpWrapper`, rather than relying on the `:help[]` directive that doesn't survive inside an HTML block.\n\n### Related Issues\n\n- [#7371 - Inconsistent display of 'help' in st.markdown](https://github.com/streamlit/streamlit/issues/7371) \u2014 Another confirmed bug about `help` rendering inconsistencies in `st.markdown` (visual difference vs. `st.title`); likely overlaps with the same code path in `Markdown.tsx`.\n- [#6718 - Widget help parameter should accept an html string](https://github.com/streamlit/streamlit/issues/6718) \u2014 Related interaction between the `help` parameter and HTML, though the direction is reversed (HTML inside `help`).\n- [#8322 - Alignment issue with help tooltips inside st.popover](https://github.com/streamlit/streamlit/issues/8322) \u2014 A different but adjacent bug about help-tooltip rendering quirks; relevant if a fix touches the shared tooltip/help-icon rendering pipeline.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

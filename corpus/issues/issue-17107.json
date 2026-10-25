@@ -1,0 +1,25 @@
+{
+  "id": "issue-17107",
+  "type": "issue",
+  "number": 17107,
+  "url": "https://github.com/streamlit/streamlit/issues/17107",
+  "title": "Dialog crashes on keydown events without a key",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:frontend",
+    "status:confirmed",
+    "priority:P3"
+  ],
+  "created_at": "2026-09-24T09:17:02Z",
+  "closed_at": "2026-09-25T08:06:52Z",
+  "body": "### Summary\n\n`st.dialog` with `dismissible=False` attaches a capture-phase document `keydown` listener that calls `e.key.toLowerCase()` without checking that `key` is a string. A synthetic `keydown` with no `key` throws `TypeError: Cannot read properties of undefined (reading 'toLowerCase')`.\n\nThis is the same event class as #17082 (`GlobalHotkeys`), but a separate listener. #17082 / PR #17105 only guards `GlobalHotkeys`. The dialog handler still throws while a non-dismissible dialog is open.\n\n### Minimal reproduction\n\n1. Open a non-dismissible dialog (`st.dialog(..., dismissible=False)`).\n2. Dispatch:\n\n```js\ndocument.dispatchEvent(new Event(\"keydown\"))\n```\n\nExpected: ignored (there is no key to match as `r`).\nActual: uncaught TypeError from `Dialog.tsx` `handleRKeySuppress`.\n\n### Notes\n\n- The listener is only attached while a non-dismissible dialog is open (`capture=true`).\n- Do not `preventDefault` / `stopImmediatePropagation` when there is no string `key` \u2014 that would treat the event as an R-key suppress.\n- Related: https://github.com/streamlit/streamlit/issues/17082\n- Related PR: https://github.com/streamlit/streamlit/pull/17105",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-24T09:17:13Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-17107)\n"
+    }
+  ]
+}

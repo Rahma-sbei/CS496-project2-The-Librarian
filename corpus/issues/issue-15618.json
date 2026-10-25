@@ -1,0 +1,40 @@
+{
+  "id": "issue-15618",
+  "type": "issue",
+  "number": 15618,
+  "url": "https://github.com/streamlit/streamlit/issues/15618",
+  "title": "selectbox always reverts to first item in the options if the options contain arbitrary classes and format_func is used",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.selectbox"
+  ],
+  "created_at": "2026-06-17T11:14:11Z",
+  "closed_at": "2026-06-24T11:18:17Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen the options given to selectbox are instances of arbitrary classes **and** a format function is used, the selected option always revert to the first option if another option is selected.\n\n### Reproducible Code Example\n\n```Python\nfrom dataclasses import dataclass\nfrom typing import NamedTuple\n\nimport streamlit as st\n\n\n[USER](frozen=True)\nclass MyDataClass:\n    id: int\n    name: str\n\n\nclass MyNamedTuple(NamedTuple):\n    id: int\n    name: str\n\n\nclass MyPlainClass:\n    def __init__(self, id_: int, name: str) -> None:\n        self.id = id_\n        self.name = name\n\nTypeToTest = MyDataClass\na = TypeToTest(1, \"one\")\nb = TypeToTest(2, \"two\")\nx = {a: \"I\", b: \"II\"}\n\n\ndef format_function(s: MyDataClass | MyNamedTuple | MyPlainClass) -> str:\n    print(x[s])\n    return s.name\n\n\ns = st.selectbox(\"selectbox\", [a, b], format_func=format_function)\nst.write(s.name)\n```\n\n### Steps To Reproduce\n\nRun the code above and try to select the second option.\n\n### Expected Behavior\n\nThe second option is selected.\n\n### Current Behavior\n\nselectbox always reverts the selection to the first option.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.58.0\n- Python version: 3.14.5\n- Operating System: Windows\n- Browser: Opera, Edge, Firefox\n\n\n### Additional Information\n\n- If you replace `TypeToTest = MyDataClass` with `TypeToTest = MyPlainClass` the problem also occurs.\n- If you replace `TypeToTest = MyDataClass` with `TypeToTest = MyNamedTuple` the problem does not occur.\n- If you remove `print(x[s])`, the problem does not occur.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-17T11:14:23Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15618)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-17T13:54:03Z",
+      "body": "### Issue Analysis\n\nThis is a bug in `st.selectbox` where the selection silently reverts to the first (default) option after the user picks any other option, but only when (a) options are instances of custom classes whose identity-based dict/set lookups don't survive a `deepcopy`, and (b) `format_func` performs such an identity-dependent operation (in the repro, `print(x[s])` against an outer dict keyed on the original instances).\n\n**Likely root cause:** In `lib/streamlit/runtime/state/session_state.py`, widget values are returned via `deepcopy(widget_value)` (so user code can't mutate session state). The selectbox then validates this value against `options` in `validate_and_sync_value_with_options` (`lib/streamlit/elements/lib/options_selector_utils.py`) by calling `format_func` on the deepcopied value and checking the resulting string against the formatted options set. If `format_func` raises (e.g., the user's `format_func` does `x[s]` and `s` is a `deepcopy` of a `MyPlainClass` instance without `__eq__`/`__hash__`), the `except Exception: pass` branch falls through and resets the widget to `default_index` (option 0). The same logic in `SelectboxSerde.serialize` falls back to `str(v)` on exception. This format-func-based identity check was introduced in PR #13648 to fix #13646; it works correctly when `format_func` is pure, but breaks when `format_func` itself relies on object identity. For `MyDataClass(frozen=True)` and `MyNamedTuple` the auto-generated value-based `__hash__`/`__eq__` should make the dict lookup survive deepcopy \u2014 worth verifying whether the repro actually fails for `MyDataClass` (it might be specific to `MyPlainClass`).\n\n### Related Issues\n\n- [#3703 \u2014 Selectbox/radio/multiselect widgets copy option values resulting in index errors and other problems](https://github.com/streamlit/streamlit/issues/3703): Same underlying root cause \u2014 widgets `deepcopy` option values, breaking identity for custom objects without `__eq__`/`__hash__`.\n- [#8008 \u2014 Selectbox returns old element not in options if format_func returns the same value for old and new options](https://github.com/streamlit/streamlit/issues/8008): Closely related \u2014 selectbox uses `format_func` output as the identity key, which conflates display and identity (the same conflation that's biting this issue).\n- [#6352 \u2014 Selectbox resets selection on visible name change](https://github.com/streamlit/streamlit/issues/6352): Related \u2014 selection identity is tracked through the formatted label rather than the underlying object, leading to spurious resets.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-17T15:44:24Z",
+      "body": "[USER] thanks for reporting this issue, I have confirmed it. A repro app can be viewed here: https://issues.streamlit.app/?issue=gh-15618"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-18T07:33:52Z",
+      "body": "About the analysis and workaround: If I change `format_function` to \n\n```python\ndef format_function(s: MyDataClass | MyNamedTuple | MyPlainClass) -> str:\n    print(x[s])\n    print(\"No exception was raised in the previous line\")\n    print(s.name)\n    print(\"The object received has a name, so it's safe to return it\")\n    return s.name\n```\n\nI see all messages in the console (that is, the function does not raise any exception). Still the selection reverts to the first option."
+    }
+  ]
+}

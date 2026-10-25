@@ -1,0 +1,33 @@
+{
+  "id": "issue-12972",
+  "type": "issue",
+  "number": 12972,
+  "url": "https://github.com/streamlit/streamlit/issues/12972",
+  "title": "Launch by module - redux!",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:cli"
+  ],
+  "created_at": "2025-11-07T21:08:50Z",
+  "closed_at": "2026-07-30T08:55:29Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nInstead of requiring an actual python file to be passed into `streamlit run`, it would be nice to use a python package location instead\n\n\n\n\n\n### Why?\n\nWe use pants, and a launch by module feature would make our lives much better.\n\nI would want to do the following in pants, where I do not have access to the final file path of the built module)\n\n```python\npex_binary(\n    name=\"streamlit_dash\",\n    entry_point=\"streamlit\",\n    dependencies=[\n        \"3rdparty/python#streamlit\",\n        \"//my/dash:module\",\n    ],\n    include_tools=True,\n    # If I knew the final resolved path here I could use that, but I don't!\n    # But I do know the module!\n    args=[\"run\", \"my.dash.module\"],\n)\n```\n\n\n### How?\n\nIf a module was passed in, it could be converted to a file with the following:\n\n```python\nimport importlib\n\nmodule_file = importlib.import_module(module_name).__file__\n```\n\nIn fact, I am currently using the following shim to make this work, but it's a little bit hacky:\n```python\n\"\"\"Shim so we can launch streamlit by module instead of by file.\n\nThis plays much better with pants pex binaries.\n\"\"\"\n\nimport importlib\nimport sys\n\nimport streamlit.web.cli\n\nif len(sys.argv) < 2:\n    raise ValueError(\"No module specified to run.\")\nmodule_name = sys.argv[1]\nmodule_file = importlib.import_module(module_name).__file__\nsys.argv = [\"streamlit\", \"run\", module_file] + sys.argv[2:]\nsys.exit(streamlit.web.cli.main())\n```\n\nIt could even be behind a flag if that was easier, e.g. `--module=<module>`\n\n### Additional Context\n\nSimilar to #662 but with a twist!\n\nAll code snippets included in this FR are released to the public domain.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-11-07T21:09:01Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12972)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-30T08:54:39Z",
+      "body": "## Update\n\nWe added `st.App(...).run()`in Streamlit 1.59. This doesn't add direct support for modules in `streamlit run`, but can be used to enable execution of modules via `python -m myapp`.\n\nThis gives Streamlit apps an officially supported Python entry point, so launcher files can be run directly with:\n\n```bash\npython app.py\nuv run app.py\n```\n\nIt also works well with PEP 723 inline script dependencies, e.g. a launcher can declare `streamlit` and app-specific dependencies directly in the file and be run with `uv run app.py` without a separate environment setup step.\n\nExample:\n\n```python\nimport streamlit as st\n\napp = st.App(\"streamlit_app.py\")\n\nif __name__ == \"__main__\":\n    app.run()\n```\n\n\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-30T08:55:29Z",
+      "body": "Closing this since I think its partly resolved + also tracked in this feature request: #662"
+    }
+  ]
+}

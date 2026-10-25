@@ -1,0 +1,46 @@
+{
+  "id": "issue-14601",
+  "type": "issue",
+  "number": 14601,
+  "url": "https://github.com/streamlit/streamlit/issues/14601",
+  "title": "Required String parameter 'redirect_uri' is not present on OIDC logout with AWS cognito",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.login",
+    "feature:authentication"
+  ],
+  "created_at": "2026-04-01T07:01:03Z",
+  "closed_at": "2026-05-02T05:37:52Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhile using st.logout() with AWS cognito configured over OIDC in the secrets.toml, the error is returned\n\n<img width=\"407\" height=\"308\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/509ab270-f1d3-423e-b0c9-496a28b7a812\" />\n\n```\nRequired String parameter 'redirect_uri' is not present\n```\n\nThe url is then\n```\nhttps://2015-40786-user-productflight.auth.eu-west-1.amazoncognito.com/error?client_id=5ceho48rc7uuvf044cl8okc6v1&post_logout_redirect_uri=https%3A%2F%2F2015-40786.cockpit.productflight.io%2Foauth2callback&id_token_hint=...\n```\nThe log out is happening though, if you press back and return to the root app, the user is logged out.\nIs post_logout_redirect_uri the culprit?\n\n### Reproducible Code Example\n\n```Python\nsecrets.toml...\n[auth]\nredirect_uri = \"http://localhost:8501/oauth2callback\"\ncookie_secret = \"123\"\nclient_id = \"xxx\"\nclient_secret = \"yyy\"\nserver_metadata_url = \"https://cognito-idp.eu-west-1.amazonaws.com/eu-west-1_B5Zn6WAh4/.well-known/openid-configuration\"\n\n\n\nstreamlit...\n        if st.user.is_logged_in:\n            if st.button(\"Logout\", key=\"logout\", type=\"tertiary\"):\n                logout()\n            return\n        st.login()\n```\n\n### Steps To Reproduce\n\n1. Login with the OIDC AWS Cognito configured\n2. Logout\n3. See error\n4. Press back button in the browser\n5. User logged out\n\n### Expected Behavior\n\nUser logged out and redirected to the login screen\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:1.55.0\n- Python version:3.12.11\n- Operating System: Ubuntu 22\n- Browser: chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-01T07:01:15Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-14601)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-01T16:12:56Z",
+      "body": "This is a bug in the OIDC logout flow when using AWS Cognito as the identity provider. The root cause is in `build_logout_url()` in [`lib/streamlit/auth_util.py`](https://github.com/streamlit/streamlit/blob/develop/lib/streamlit/auth_util.py#L223-L226), which constructs the logout URL using the standard OIDC RP-Initiated Logout parameter name `post_logout_redirect_uri`. However, AWS Cognito's logout endpoint does **not** follow the OIDC RP-Initiated Logout specification \u2014 it expects the parameter to be named `redirect_uri` (or `logout_uri`) instead. When Streamlit sends `post_logout_redirect_uri`, Cognito rejects it with \"Required String parameter 'redirect_uri' is not present\". The logout itself still succeeds server-side (cookies are cleared before the redirect), which is why pressing the browser back button shows the user as logged out.\n\nA potential fix would be to either detect Cognito-style endpoints and use the appropriate parameter name, or to allow users to configure custom logout parameters for non-standard providers.\n\n### Related Issues\n\n- **#12144** ([st.logout() doesn't redirect to correct Cognito ESE](https://github.com/streamlit/streamlit/issues/12144)) \u2014 CLOSED. Very similar Cognito logout issue from v1.48.0 where `client_id` was missing from the logout URL. Fixed via revert in 1.48.1, but the underlying Cognito parameter naming incompatibility (`post_logout_redirect_uri` vs `redirect_uri`) was not addressed.\n- **#12169** ([Breaking Change: Streamlit 1.48 breaks st.logout()](https://github.com/streamlit/streamlit/issues/12169)) \u2014 CLOSED. Related regression where `post_logout_redirect_uri` caused errors with Auth0 as well, confirming that multiple providers have non-standard logout parameter expectations.\n- **#11703** ([Allow advanced customization of OIDC/OAuth2 parameters in st.login()](https://github.com/streamlit/streamlit/issues/11703)) \u2014 OPEN. Enhancement request for customizable OIDC parameters that could serve as a workaround for provider-specific logout parameter requirements.\n\n---\n*This is an automated triage comment using `claude-4.6-opus-high-thinking`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-06T15:56:44Z",
+      "body": "## Reproduction Assessment: **CONFIRMED** (via code analysis)\n\nThis bug is confirmed real. I was unable to do a live reproduction (no Cognito user pool available), but the root cause is unambiguous from the source code.\n\n### Root Cause\n\nIn [`lib/streamlit/auth_util.py:223-226`](https://github.com/streamlit/streamlit/blob/develop/lib/streamlit/auth_util.py#L223-L226), `build_logout_url()` hardcodes the OIDC standard parameter name `post_logout_redirect_uri`:\n\n```python\nlogout_params: dict[str, str] = {\n    \"client_id\": client_id,\n    \"post_logout_redirect_uri\": post_logout_redirect_uri,\n}\n```\n\nAWS Cognito's logout endpoint does **not** follow the OIDC RP-Initiated Logout spec. It requires `redirect_uri` (or `logout_uri`), not `post_logout_redirect_uri`. It also ignores `id_token_hint`.\n\nSo Streamlit sends: `?client_id=...&post_logout_redirect_uri=...&id_token_hint=...`\nBut Cognito expects: `?client_id=...&redirect_uri=...`\n\nThis matches the exact error reported: *\"Required String parameter 'redirect_uri' is not present\"*\n\n### Why logout still works\n\nThe server-side logout (cookie clearing) happens **before** the redirect to the provider's logout endpoint. So the Streamlit session is invalidated regardless of whether the provider redirect succeeds \u2014 which is why pressing back shows the user as logged out.\n\n### Scope\n\nThis likely affects any OIDC provider whose `end_session_endpoint` doesn't follow the RP-Initiated Logout spec parameter naming. Related: #12169 showed Auth0 had the same issue.\n\nA potential fix would be to allow users to configure custom logout query parameters, or to detect non-standard providers and adjust the parameter name accordingly.\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-21T05:57:48Z",
+      "body": "Hey! The diagnosis here seems right. Cognito's logout endpoint doesn't follow the OIDC RP-Initiated Logout spec and expects `redirect_uri` instead of `post_logout_redirect_uri`.\n\nI put together a draft PR (#14868) that adds an optional `[auth.logout_params]` section to secrets.toml so you can override the default parameter names. For Cognito it'd look like:\n\n```toml\n[auth.logout_params]\nredirect_uri_name = \"redirect_uri\"\ninclude_id_token_hint = false\n```\n\nStill needs a more thorough review/approval but wanted to get it out there. Would love to know if the config shape makes sense for your use case."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-02T05:37:52Z",
+      "body": "Going to close this as a duplicate of #14290. We can continue conversation there."
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "issue-15893",
+  "type": "issue",
+  "number": 15893,
+  "url": "https://github.com/streamlit/streamlit/issues/15893",
+  "title": "st.tabs collapses into a stacked column after certain session-state interactions on 1.59.0 (works on 1.58.x)",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "area:frontend",
+    "status:needs-triage",
+    "feature:st.tabs"
+  ],
+  "created_at": "2026-07-08T07:54:19Z",
+  "closed_at": "2026-07-08T08:17:57Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nst.tabs([...]) renders correctly on the first page load, but after a chain of nested widget interactions (in our case: submit a form \u2192 click a computation button \u2192 select a CSV from the training-library st.selectbox inside a nested expander) the tab widget flattens on the next rerun: all with tab_X: block contents render as a single scrollable column with no tab bar. Downgrading to streamlit<1.59 (latest 1.58.x) restores the tab widget with no other code changes.\n\nBroken: streamlit==1.59.0 (released 2026-07-06).\nWorking: streamlit<1.59 (latest 1.58.x).\n\nSource\nhttps://github.com/Fodera-Laboratory/PEARL-app \u2014 pinned to streamlit<1.59 in requirements.txt for the moment.\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\nReproduction (against our app)\n\nOpen https://pearl-app.streamlit.app/ \u2014 10 tabs render correctly.\nIn the \ud83d\udcc2 Linescan files tab, upload a linescan .txt file.\nIn the \ud83d\udcca PLS regression unmixing tab, click \u25b6 Apply PLS Model.\nIn the \ud83d\udcd0 CLS unmixing tab, click \u25b6 Run CLS.\nIn the same tab, expand Water content \u2014 response factor method \u2192 click \u25b6 Build response curve.\nScroll to the Pure-water test section, select a spectrum from the training-library dropdown.\nOn the next rerun, the tab widget disappears \u2014 all 10 tab contents are rendered as sequential sections in a single column.\nReloading the page fully restores the tab widget.\n\n### Expected Behavior\n\nExpected behavior\n\nst.tabs() should render as a tab widget across all reruns, regardless of session-state activity elsewhere in the script.\n\n\n### Current Behavior\n\nDiagnostic signals:\nNo JavaScript errors in browser DevTools console.\nNo Python exceptions in the Streamlit Cloud runtime log.\nThe only warning present is check_session_state_rules for widgets created with both value= and key= where the key's slot is pre-seeded via st.session_state.setdefault(...). We refactored those to remove value= / index= in favour of pure setdefault seeding; the warning went away but the tab collapse persisted.\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.59.0 (broken) \u2192 downgraded to 1.58.x (fixed)\n- Python version: 3.14 (Streamlit Community Cloud current default)\n- Operating System: macOS 26.5.1 (25F80)\n- Browser: Chrome and Safari \u2014 both affected - Repro also observed in an incognito window (rules out client-side state)\n\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-08T07:54:30Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15893)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-08T08:04:05Z",
+      "body": "This is a **frontend regression introduced in 1.59.0**: `st.tabs` renders correctly on first load, but after a rerun triggered by nested widget interactions the tab bar disappears and all tab panels render stacked vertically as a single scrollable column (a full page reload temporarily restores the tab widget). In 1.59.0 the `st.tabs` frontend was rewritten from BaseWeb's `tabs-motion` to `react-aria-components` (see `frontend/lib/src/components/elements/Tabs/Tabs.tsx`). Inactive tab panels are now hidden **only** via the CSS rule in `StyledTabPanel` \u2014 `&[inert] { display: none }` \u2014 which relies on React Aria applying the `inert` attribute to the non-selected, force-mounted `<TabPanel>`s. If that `inert` attribute isn't applied after a rerun/remount (the frontend still pins React 18, which lacks first-class `inert` support), every force-mounted panel becomes visible and stacks while the tab bar/selection breaks \u2014 exactly the reported symptom. The likely trigger is the panel force-mount + selection reconciliation path interacting badly with a rerun/remount during the described session-state chain.\n\n### Related Issues\n\n- [#15892](https://github.com/streamlit/streamlit/issues/15892) \u2014 *\"st.tabs: widget rerun inside a tab renders all tabs' content stacked below the page (regression in 1.59.0)\"*. Almost certainly the **same bug**: same version, same stacked-column-with-no-tab-bar symptom, and the same trigger (a widget rerun inside a tab). It includes a minimal repro and notes the `[data-baseweb=\"tab-panel\"]` elements present in 1.58.0 are gone in 1.59.0, corroborating the RAC rewrite as the cause. This issue (#15893) is very likely a duplicate.\n- [#8239](https://github.com/streamlit/streamlit/issues/8239) \u2014 *\"st.tabs & st.expander - Improve handling of frontend state/mount\"*. Related because this regression surfaces when tabs are re-rendered/remounted during reruns, which is exactly the frontend mount/state behavior tracked there.\n- [#11344](https://github.com/streamlit/streamlit/issues/11344) \u2014 *\"Custom components rendered in non-active tabs rendered with height of 0\"*. A related (but distinct) tab-panel rendering bug involving the visibility/sizing of non-active tab panels.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-08T08:17:57Z",
+      "body": "Thanks for reporting this issue. Closing this since it's the same bug as with https://github.com/streamlit/streamlit/issues/15892 We are preparing a fix and patch today. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-08T11:48:17Z",
+      "body": "## Update\n\nThis will be fixed in the patch 1.59.1 that we will release today"
+    }
+  ]
+}

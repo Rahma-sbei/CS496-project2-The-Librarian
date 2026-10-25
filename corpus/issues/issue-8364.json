@@ -1,0 +1,55 @@
+{
+  "id": "issue-8364",
+  "type": "issue",
+  "number": 8364,
+  "url": "https://github.com/streamlit/streamlit/issues/8364",
+  "title": "Server hangs on startup when offline",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:network",
+    "status:confirmed",
+    "priority:P3"
+  ],
+  "created_at": "2024-03-22T17:37:49Z",
+  "closed_at": "2026-06-14T20:44:38Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen I run streamlit \n\n### Reproducible Code Example\n\n_No response_\n\n### Steps To Reproduce\n\n1. Disable your internet connection\r\n2. Run `streamlit hello` or `streamlit run some_script.py` (preferably with development mode on to see more logs)\r\n3. Observe that the server does not fully start (the streamlit web app page is stuck loading), and the runtime reports no connected sessions\r\n4. 2-5 minutes later, see that the server does start, along with many tornado endpoint hits processed all at once.\n\n### Expected Behavior\n\nServer starts right away even with no active internet connection\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [X] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.32.2\r\n- Python version: 3.11.1\r\n- Operating System: Fedora 36\r\n- Browser: Firefox 112.0.1\r\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-03-22T17:38:00Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-8364)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-03-22T18:01:27Z",
+      "body": "[USER] Does that happen every time? We have the check if there are newer version which might cause this, but this check is only done in 10% of server starts as far as I know. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-03-22T18:04:06Z",
+      "body": "[USER] Yes. I initially suspected it was the version check, but the hang happened even after I disabled the check."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-03-22T19:43:03Z",
+      "body": "It appears that I have this issue if I use the code from a release a few months ago, which I'm pretty sure I worked on offline without encountering this issue. So I suspect this is caused by something like a recent dependency update"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-03-22T22:21:52Z",
+      "body": "Further investigation turned up a few things:\r\n\r\nThe issue is only triggered in headless mode, because that is the only codepath that calls `net_util.get_external_ip()`. I recently enabled headless mode in my config, which is why I didn't experience it before.\r\nThe issue is in the http requests that function makes, which hang even though a connection timeout is set.\r\nIt gets stuck right after urllib3 starts a new connection, with no further information. Would have to dig into it deeper, possibly with some tracing tools, to work out what's happening.\r\n\r\nI don't know if we actually need an external ip address lookup for running headless mode, but this is also quite an edge case, so it is probably not worth removing the lookup."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-03-31T23:04:55Z",
+      "body": "Is this possibly related to the bug on Windows where a headless server hangs on closure / startup? Possibly a different root cause but might be hanging in a similar place..."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-14T20:44:38Z",
+      "body": "Closing this since I believe we have fixed this recently by adding a timeout. "
+    }
+  ]
+}

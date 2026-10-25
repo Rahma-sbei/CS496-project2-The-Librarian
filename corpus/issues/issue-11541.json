@@ -1,0 +1,40 @@
+{
+  "id": "issue-11541",
+  "type": "issue",
+  "number": 11541,
+  "url": "https://github.com/streamlit/streamlit/issues/11541",
+  "title": "ButtonGroup.select() fails when options use format_func or are not primitive strings",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P4",
+    "feature:app-testing"
+  ],
+  "created_at": "2025-06-06T09:32:13Z",
+  "closed_at": "2026-05-11T16:30:59Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nButtonGroup.select(...) in streamlit.testing.v1 crashes with a TypeError when used with option objects (not plain strings),  This makes it impossible to programmatically select a button in tests unless the value is a raw string.\n\nCode below fails with `TypeError: 'in <string>' requires string as left operand, not Option`\n\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\noptions = ['List', 'Create', 'Update']\nst.segmented_control(\n            label=\"Section\",\n            options=options,\n            selection_mode=\"single\",\n            default=options[0],\n        )\n#---- in test with pytest\nfrom streamlit.testing.v1 import AppTest\n\ndef test_button_group_selection():\n    at = AppTest.from_file(\"app.py\").run()\n    at.button_group[0].select(\"List\").run()  # or even\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\nCalling .select() with an actual entry from .options should work regardless of how options are displayed (with or without format_func). At least, passing a value that already exists in .value should not break.\n\n### Current Behavior\n\nTypeError: 'in <string>' requires string as left operand, not Option\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.45.1\n- Python version: 3.12\n- Operating System: macOS 15.5\n- Browser:  testing mode\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-06-06T09:32:30Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11541)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-06-06T17:30:15Z",
+      "body": "Hello [USER], thank you for filing this issue!\n\nWe're aware of gaps in our AppTest functionality, and unfortunately, there's no immediate timeline for a resolution. We'll leave this issue open so we can gauge interest and better prioritize when to address it. Thanks for your understanding."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-09T14:37:03Z",
+      "body": "Hi! Triaging older AppTest bugs this week \u2014 I think this one has shipped and can be closed.\n\nThe `'in <string>' requires string as left operand, not Option` error came from the AppTest `ButtonGroup` wrapper round-tripping the proto's option payload (a `ButtonGroupProto.Option` message) through string-typed code. That serialization was reworked in [#13838](https://github.com/streamlit/streamlit/pull/13838) (\"Fix `pills` and `segmented_control` `format_func` regression in AppTest\", commit `659b040b1`).\n\nOn current `develop`, options are stored as their formatted string content \u2014 see [`lib/streamlit/testing/v1/element_tree.py:733-734`](https://github.com/streamlit/streamlit/blob/develop/lib/streamlit/testing/v1/element_tree.py#L733-L734):\n```python\n# Store formatted content strings for value serialization\nself.options = [opt.content for opt in proto.options]\n```\nand `formatted_values` / `indices` consume those strings, so the `Option`-vs-string mismatch the original report describes can't occur anymore. The PR explicitly notes \"Tested both single-select and multi-select modes [...] with custom format functions.\"\n\nIf you can re-run your failing test against a Streamlit version that includes #13838 (1.51.x line and later) and still hit a `TypeError` from `.select(...)`, please share the new traceback \u2014 happy to dig further if a different code path is still broken. Otherwise this should be safe to close.\n\n(Disclosure: I drafted this comment with help from Claude Code while triaging stale issues; the references above were verified manually against the current `develop` branch.)"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-05-11T16:30:59Z",
+      "body": "Thank you for the nudge here [USER]. It does look like this has been fixed, closing this as completed."
+    }
+  ]
+}

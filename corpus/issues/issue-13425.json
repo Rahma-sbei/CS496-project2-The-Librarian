@@ -1,0 +1,33 @@
+{
+  "id": "issue-13425",
+  "type": "issue",
+  "number": 13425,
+  "url": "https://github.com/streamlit/streamlit/issues/13425",
+  "title": "not able to login to streamlit.io to cloud it showing Huh. This isn\u2019t supposed to happen. Please contact support.   Error: Your account has exceeded the fair-use limits and was blocked by the system.",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "feature:community-cloud",
+    "type:no-streamlit-issue"
+  ],
+  "created_at": "2025-12-20T10:55:14Z",
+  "closed_at": "2026-06-14T19:48:27Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nHuh.\nThis isn\u2019t supposed to happen.\nPlease [contact support](https://docs.streamlit.io/knowledge-base/deploy/how-to-submit-a-support-case-for-streamlit-community-cloud).\n\n\nError: Your account has exceeded the fair-use limits and was blocked by the system. If you believe this is a mistake, please contact customer support.\nCode: 403\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-20T10:55:23Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-13425)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-12-22T03:04:40Z",
+      "body": "Hi [USER] - thanks for reaching out!\nIf the app you are referencing is based on the code [here](https://github.com/biswa2026/Agentic/blob/main/RAG_Infobot_tool_Agentic.py) - you may be reaching usage limits because if scraping fails, `db_ready` remains `False`, and `st.rerun()` gets called repeatedly in an infinite loop. This would rapidly consume CPU cycles and memory.\nRebooting your app will help temporarily, but for a longer term solution the app will likely need some refactoring - some tips in this forum [post](https://discuss.streamlit.io/t/common-app-problems-resource-limits/16969)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-18T15:15:57Z",
+      "body": "Hello Streamlit Support Team,\n\nI am writing to request assistance regarding an issue with my Streamlit Community Cloud account.\n\nWhen I try to log in to Streamlit Cloud, I consistently receive the following error message:\n\n\u201cHuh. This isn\u2019t supposed to happen.\nError: Your account has exceeded the fair-use limits and was blocked by the system.\nCode: 403\u201d\n\nAt the moment, I am unable to log in to Streamlit Cloud or access my deployed apps at all.\n\nThis happened while I was developing and testing an app. The app itself is not resource-intensive, but it is possible that during development I unintentionally caused excessive reruns or repeated function calls (for example, due to state handling or rerun logic). If so, this was unintentional, and I am happy to refactor the app to fully comply with the fair-use policy once access is restored.\n\nI would appreciate it if you could please review my account and let me know:\n\n* Whether the block can be lifted, and\n* If there is any specific guidance I should follow to prevent this from happening again.\n\nDetails:\n\n* GitHub username: jjm1128jjm-ctrl\n* Streamlit account email: [EMAIL]\n* App URL (if applicable): jjm-tensile.streamlit.app\n\nThank you very much for your time and support.\nI appreciate any help you can provide.\n\nKind regards,\nJeon Jaemin"
+    }
+  ]
+}

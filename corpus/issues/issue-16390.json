@@ -1,0 +1,27 @@
+{
+  "id": "issue-16390",
+  "type": "issue",
+  "number": 16390,
+  "url": "https://github.com/streamlit/streamlit/issues/16390",
+  "title": "server.enableCORS=false warning incorrectly says the value is overridden to true",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:security",
+    "status:confirmed",
+    "priority:P3",
+    "feature:config",
+    "area:server"
+  ],
+  "created_at": "2026-08-06T17:41:53Z",
+  "closed_at": "2026-08-10T19:42:55Z",
+  "body": "## Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n## Summary\n\nWhen XSRF protection is enabled and `server.enableCORS=false`, Streamlit logs a warning that says `server.enableCORS` is \"being overridden to 'true'.\" The current code only logs the warning. It does not change the config value. This can make operators think that Origin checks are stricter than they are.\n\n## Reproducible Code Example\n\n```python\nimport streamlit as st\n\nst.write(\"hello\")\n```\n\n## Steps To Reproduce\n\n1. Create a config with `server.enableCORS=false`.\n2. Leave `server.enableXsrfProtection=true` enabled.\n3. Start the app.\n4. Read the startup warning in the logs.\n5. Inspect behavior or code paths and see that `server.enableCORS` is still treated as false.\n\n## Expected Behavior\n\nThe warning text should describe the real behavior. If Streamlit says it overrides the option to true, the code should do that. Otherwise the warning should say that the setting stays false and that Origin checks are still wide open.\n\n## Current Behavior\n\nThe warning says:\n\n```text\nWarning: the config option 'server.enableCORS=false' is not compatible with\n'server.enableXsrfProtection=true'.\nAs a result, 'server.enableCORS' is being overridden to 'true'.\n```\n\nBut the code only logs this message. There is no code path that changes the option to true. The Origin allow logic still short-circuits when `server.enableCORS=false`.\n\n## Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n## Debug info\n\n- Streamlit version: 1.61.1\n- Python version: 3.12\n- Operating System: Any\n- Browser: N/A\n\n## Additional Information\n\nSplit from [issue #16386](https://github.com/streamlit/streamlit/issues/16386). This is operator-facing and related to security because the warning can create a false sense of protection in reverse-proxy deployments.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-07T11:37:21Z",
+      "body": "This is a confirmed documentation/warning bug: when `server.enableXsrfProtection=true` and `server.enableCORS=false`, `_check_conflicts()` in `lib/streamlit/config.py` logs that `server.enableCORS` is being overridden to `true`, but it never updates the config value. Origin checks in `server_util.is_url_from_allowed_origins()` still short-circuit when `enableCORS` is false and allow all origins. The option docstrings for both `server.enableCORS` and `server.enableXsrfProtection` also incorrectly claim Streamlit enables both. Operators can therefore believe Origin protection is active when it is not\u2014especially risky behind reverse proxies. Fix options: either actually override the setting, or correct the warning/docs to describe the real behavior.\n\n### Related Issues\n\n- https://github.com/streamlit/streamlit/issues/16386 \u2014 Parent enterprise DAST/security report this issue was split from; includes Origin-validation concerns that motivated the misleading-warning analysis.\n- https://github.com/streamlit/streamlit/issues/6062 \u2014 Proposal to rename `server.enableCORS` to `server.enableCORSProtection`; same config area and naming confusion around what the option actually does.\n- https://github.com/streamlit/streamlit/pull/16393 \u2014 Open fix PR titled \u201c[fix] Correct the server.enableCORS=false startup warning,\u201d already linked from #16386.\n\n---\n*This is an automated triage comment using `cursor-grok-4.5-high`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

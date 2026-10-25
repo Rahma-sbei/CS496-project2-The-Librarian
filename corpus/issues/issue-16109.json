@@ -1,0 +1,39 @@
+{
+  "id": "issue-16109",
+  "type": "issue",
+  "number": 16109,
+  "url": "https://github.com/streamlit/streamlit/issues/16109",
+  "title": "pressing ESC clears the contents of multiselect",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.multiselect",
+    "status:intended-behavior"
+  ],
+  "created_at": "2026-07-21T15:16:05Z",
+  "closed_at": "2026-07-31T23:31:38Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nPressing ESC clears the contents of a multiselect.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\noptions = st.multiselect(\"What are your favorite colors?\", [\"Green\", \"Yellow\", \"Red\", \"Blue\"])\nst.write(\"You selected:\", options)\n```\n\n### Steps To Reproduce\n\n1. Click on the multiselect to open it.\n2. Select all options.\n3. Press [ESC] to close the multiselect.\n4. (Optional) Press [ESC] a few more times. \n5. Click on the multiselect to open it again.\n6. Press [ESC] twice.\n7. Click on the multiselect to open it again.\n8. Select all options.\n9. Click on the multiselect\n10. Press [ESC] once\n\n### Expected Behavior\n\nIf you press ESC (no matter how many times) when a multiselect has focus, the selected options remain the same.\n\n### Current Behavior\n\nStep 6: Pressing ESC twice clears the contents of the multiselect.\nStep 10: Pressing ESC once clears the contents of the multiselect.\n\nIf the multiselect is initalized with a non-empty set of options, however, pressing ESC doesn't affect the selection.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.60.0\n- Python version: 3.14\n\n\n### Additional Information\n\nSee #15637.\n\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-21T15:16:19Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16109)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-22T08:50:01Z",
+      "body": "Pressing `ESC` on an `st.multiselect` that has **no `default`** wipes the user's current selection instead of just dismissing the dropdown. This is a follow-up to #15637 / PR #15646, which only partially fixed the problem: the fix disables ESC-clearing when a default is provided, but leaves it enabled for multiselects without a default.\n\n**Root cause:** `st.multiselect` renders BaseWeb's `Select`, whose `escapeClearsValue` prop defaults to `true`. In `frontend/lib/src/components/widgets/Multiselect/Multiselect.tsx` this is set conditionally:\n\n```tsx\nescapeClearsValue={element.default.length > 0 ? false : !disabled}\n```\n\nBecause the condition only checks `element.default` (the initial default), a multiselect created without a default still has `escapeClearsValue = true`. So when a user manually selects options and presses `ESC` (once when the dropdown is closed, or after closing an open dropdown), BaseWeb clears the whole selection. This exactly matches the reporter's observation that ESC only preserves the selection when the widget is initialized with a non-empty default. This is a frontend-only behavior; the fix would be to make `escapeClearsValue={false}` unconditionally (as is already done for the `MultiSelectCell` in the data editor at `MultiSelectCell.tsx:534`), or otherwise decouple ESC-clearing from the presence of a default.\n\n### Related Issues\n\n- **#15637 \u2013 \"pressing ESC clear the contents of multiselect\"** (closed, same author): Direct predecessor of this report. It was closed by PR #15646, whose fix only covered the \"has a default\" case, so this issue is effectively a re-report for the \"no default\" case that remained broken.\n- **#12260 \u2013 \"Regression: Selectbox/Multiselect keyboard focus not activating on mobile\"**: Another `st.multiselect` keyboard-interaction bug; related in that both concern keyboard handling of the multiselect widget (though a distinct symptom).\n- **#12392 \u2013 \"state management issues with st.pills ... selections get reset\"**: Related theme of a selection widget unexpectedly clearing previously selected items, albeit for a different widget and trigger.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-22T19:37:24Z",
+      "body": "Thanks for the detailed repro, [USER] \u2014 we reproduced this on 1.60.0.\n\nThis is currently **intended behavior**: a widget created without a `default` is treated as \"clearable,\" and pressing `ESC` on a clearable widget clears its value. This matches `st.selectbox` (a selectbox with no default also resets to empty on `ESC`). That's why PR #15646 \u2014 which fixed the *has-a-default* case from #15637 \u2014 deliberately left the no-default case clearing.\n\nThat said, we hear that ESC wiping a selection you built up manually is surprising, and our own data-editor multiselect never clears on ESC. We'll discuss internally whether to change this so ESC only dismisses the dropdown and never clears the selection.\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-23T16:50:59Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-16109)\n"
+    }
+  ]
+}

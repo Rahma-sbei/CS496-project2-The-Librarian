@@ -1,0 +1,32 @@
+{
+  "id": "issue-15401",
+  "type": "issue",
+  "number": 15401,
+  "url": "https://github.com/streamlit/streamlit/issues/15401",
+  "title": "Gap in st.number_picker",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "area:styling",
+    "status:confirmed",
+    "priority:P2",
+    "feature:st.number_input"
+  ],
+  "created_at": "2026-06-02T15:52:07Z",
+  "closed_at": "2026-06-04T19:45:21Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nStreamlit 1.58 introduced a gap inside `st.number_input` that lets the background through.\n\nI guess this is related to the font size (of all input widgets) going from 16px in Streamlit 1.57 to 14px in Streamlit 1.58.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nst.number_input(\"Number\")\n```\n\nExpected Behavior (Streamlit 1.57) | Current Behavior (Streamlit 1.58)\n---|---\n<img width=\"430\" height=\"507\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/15b94552-c0ca-48e9-af48-d3ed1bc52bc4\" /> | <img width=\"430\" height=\"507\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/45b37972-1452-4862-bf81-2f0d5fe4a3b2\" />\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.48\n- Python version: 3.11.9\n- Operating System: macOS\n- Browser: Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-02T15:52:26Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15401)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-03T13:25:42Z",
+      "body": "This is a visual regression introduced in Streamlit 1.58. A horizontal gap (showing the page background) appears inside `st.number_input` between the input field and the step (`+`/`-`) buttons. The user correctly suspects this is tied to the input font size being reduced from 16px to 14px in 1.58.\n\nThe most likely root cause is [PR #15098 (\"Adjust widget/icon sizing - Part 2\")](https://github.com/streamlit/streamlit/pull/15098), which:\n- Changed BaseWeb's `fontStyles.fontSize` from `fontSizes.md` (16px) to `fontSizes.sm` (14px) in `frontend/lib/src/theme/createBaseUiTheme.ts`, affecting all input-related typography tokens (`font300`, `font400`, etc.).\n- Reduced the leading `DynamicIcon` size in `NumberInput.tsx` from `lg` to `base`.\n\nIn `frontend/lib/src/components/widgets/NumberInput/styled-components.ts`, `StyledInputContainer` enforces `height: theme.sizes.minElementHeight` with `overflow: \"hidden\"` and `alignItems: \"center\"`, but the inner BaseWeb `Input` no longer fills that height now that its computed content height (14px font + `theme.spacing.sm` top/bottom padding) is smaller than `minElementHeight`. The step-button `StyledInputControl` uses `height: theme.sizes.full` (`100%`) and `backgroundColor: theme.colors.secondaryBg`, so the input area's missing pixels show through as a transparent strip on the right side around the `+`/`-` buttons. The fix likely needs the input field or its `Root` override to stretch to the full container height (e.g., `height: 100%`) or for `StyledInputContainer` to give the input a background color.\n\n### Related Issues\n\n- [#11569 \u2014 Unexpected visual gap in `st.number_input`](https://github.com/streamlit/streamlit/issues/11569) (closed): A very similar prior visual-gap bug in the same widget, fixed by [PR #11576](https://github.com/streamlit/streamlit/pull/11576) (which removed border-radius on the step buttons). The new regression is a different cause (font-size driven height mismatch) but the same visual symptom \u2014 worth coordinating the fix with `mayagbarnes` who owned both that fix and PR #15098.\n- [#12311 \u2014 Make all widgets use the same font size](https://github.com/streamlit/streamlit/issues/12311): The parent enhancement that motivated the 16\u219214px reconciliation in widget inputs. The visual gap is a side-effect of that reconciliation work and should be addressed as part of completing it cleanly.\n- [#12080 \u2014 Visual gap between dataframe border and background](https://github.com/streamlit/streamlit/issues/12080) (confirmed, P3): Different widget but the same family of CSS issue \u2014 an inner element's height/radius not matching its bordered container, letting the page background bleed through.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "issue-14321",
+  "type": "issue",
+  "number": 14321,
+  "url": "https://github.com/streamlit/streamlit/issues/14321",
+  "title": "st.data_editor : FutureWarning during insert",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "feature:st.data_editor",
+    "change:feature"
+  ],
+  "created_at": "2026-03-11T10:05:14Z",
+  "closed_at": "2026-06-09T20:58:07Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nHi, I have a data_editor configured to allow inserts (with `num_rows` set to `dynamic` or `add`).\nWhen I try to insert a new row, I get the following warning in my terminal (where I launched my Streamlit app):\n\n```shell\n.venv/lib/python3.11/site-packages/streamlit/elements/widgets/data_editor.py:342: FutureWarning: The behavior of DataFrame concatenation with empty or all-NA entries is deprecated. In a future version, this will no longer exclude empty or all-NA columns when determining the result dtypes. To retain the old behavior, exclude the relevant entries before the concat operation.\n  df.loc[row_label] = dict(zip(df.columns, row_values, strict=True))```\n\n### Reproducible Code Example\n\n```Python\nst.data_editor(\n    data=source_df,\n    width=\"content\",\n    hide_index=True,\n    disabled=[],\n    num_rows=\"dynamic\",\n)\n```\n\n### Steps To Reproduce\n\n1. Try to insert a new line\n2. Warning is display\n\n### Expected Behavior\n\nDon't receive the warning\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.55.0\n- Python version: 3.11\n- Operating System: MacOS\n- Browser: Brave\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-03-11T10:05:24Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-14321)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-03-11T10:41:32Z",
+      "body": "[USER] Thanks for reporting this issue. This warning is currently expected and can be ignored for now. We will likely attempt to fix this with #13211. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-09T20:58:06Z",
+      "body": "This looks resolved by #13812 (merged 2026-03-23). The `st.data_editor` add/edit path now wraps the row assignment in a `warnings.catch_warnings()` block that suppresses this specific pandas `FutureWarning` (see `lib/streamlit/elements/widgets/data_editor.py`; the inline comment there references this issue). On pandas 3.x the underlying deprecation is gone entirely. The fix shipped under the pandas-3 PR, which is why this issue wasn't auto-closed.\n\nClosing as fixed \u2014 please reopen if you still hit it on a recent version. Thanks for the report!"
+    }
+  ]
+}

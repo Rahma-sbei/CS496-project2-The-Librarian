@@ -1,0 +1,43 @@
+{
+  "id": "issue-17011",
+  "type": "issue",
+  "number": 17011,
+  "url": "https://github.com/streamlit/streamlit/issues/17011",
+  "title": "Conditionally created dialog in a fragment stops logically existing after rerun of a fragment while still existing on the website",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "status:confirmed",
+    "priority:P2",
+    "feature:st.dialog",
+    "feature:st.fragment",
+    "area:execution-model"
+  ],
+  "created_at": "2026-09-17T14:46:10Z",
+  "closed_at": "2026-09-24T08:33:32Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen a fragment gets rerun and it has conditionally rendered child dialog (for example guarded by a button being clicked) the dialog will stop being responsive while still existing on the page\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\n\n[USER].dialog(\"Dialog\", dismissible=False)\ndef show_dialog() -> None:\n    if st.button(\"Increment\"):\n        st.session_state[\"clicks\"] = st.session_state.get(\"clicks\", 0) + 1\n    st.write(\"Clicks:\", st.session_state.get(\"clicks\", 0))\n\n\n[USER].fragment(run_every=5)\ndef parent_fragment() -> None:\n    st.session_state[\"parent_runs\"] = st.session_state.get(\"parent_runs\", 0) + 1\n    st.write(\"Parent runs:\", st.session_state[\"parent_runs\"])\n    if st.button(\"Open dialog\"):\n        show_dialog()\n\n\nst.write(\"Open the dialog, then wait for the parent fragment's next automatic rerun (every 5 seconds).\")\nparent_fragment()\n```\n\n### Steps To Reproduce\n\n1. Click Open dialog\n2. start clicking increment\n3. after parent reruns the dialog stops being responsive and streamlit will log The fragment with id <id> does not exist anymore - it might have been removed during a preceding full-app rerun.\n\n### Expected Behavior\n\nThe dialog to still be responsive\n\n### Current Behavior\n\nThe dialog stops being responsive\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.64.0\n- Python version: Python 3.13.13\n- Operating System: Linux 7.1.4-arch1-1\n- Browser: Firefox\n\n\n### Additional Information\n\nworked when ran with\n```\nuv run --no-project --with streamlit==1.57.0 streamlit run repro.py\n```\nstopped working at\n```\nuv run --no-project --with streamlit==1.58.0 streamlit run repro.py\n```",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-17T14:46:20Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-17011)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-17T16:10:50Z",
+      "body": "This is a regression from 1.57.0 to 1.58.0: a dialog opened from a button inside `[USER].fragment(run_every=...)` stays on screen after the parent fragment auto-reruns, but clicks inside it stop working and the backend logs `The fragment with id ... does not exist anymore`.\n\n`[USER].dialog` is implemented as a nested fragment of the caller (`_fragment` wrapping the dialog body). Because the repro only calls `show_dialog()` on the button-click run, the parent `run_every` rerun never re-registers that nested fragment. Since 1.58.0 (PR #15130, the #15084 stale auto-rerun fix), `ScriptRunner` evicts descendants that were not re-registered via `clear_stale_descendants`. The frontend still shows the modal because dialogs live on `event_dg` (outside the parent fragment tree) and keep `isOpen` in React state. Later widget clicks send a fragment rerun for the evicted id; `AppSession.request_rerun` then drops the request at the `fragment_storage.contains` check. A likely fix is to keep an open dialog fragment across parent fragment reruns (or not treat dialogs as evictable descendants), rather than closing leftover UI.\n\n### Related Issues\n\n- [#15084](https://github.com/streamlit/streamlit/issues/15084) \u2014 Nested `run_every` fragments crashing when an ancestor stopped rendering them. The 1.58.0 descendant-eviction fix for this is the likely source of this regression; dialogs are nested fragments that are *intentionally* not re-called on later parent runs.\n- [#16708](https://github.com/streamlit/streamlit/issues/16708) \u2014 Nested `run_every` fragment remains on screen with stale content after it is no longer rendered. Same leftover-UI class of bug (backend eviction vs. frontend still showing the subtree), though that report is about fragment containers rather than dialogs.\n- [#10283](https://github.com/streamlit/streamlit/issues/10283) \u2014 `st.dialog` opened from a fragment has inconsistent dismiss/reopen behavior compared with a top-level dialog. Same feature intersection (dialog nested in a fragment) but a different lifecycle failure.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-17T16:16:09Z",
+      "body": "I can look at this one because I have a bunch of fragment fixes and refactoring in progress. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-17T17:18:17Z",
+      "body": "I confirmed the regression in 1.58.0, 1.64.0, and current `develop`; 1.57.0 works correctly.\n\n[Open the live reproduction app](https://issues.streamlit.app/agent_wiki_explorer?file=issues/17011/repro_app.py)"
+    }
+  ]
+}

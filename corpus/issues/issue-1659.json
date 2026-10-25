@@ -1,0 +1,28 @@
+{
+  "id": "issue-1659",
+  "type": "issue",
+  "number": 1659,
+  "url": "https://github.com/streamlit/streamlit/issues/1659",
+  "title": "Improve caching of recursive calls",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:cache"
+  ],
+  "created_at": "2020-07-01T22:30:41Z",
+  "closed_at": "2026-07-22T09:31:02Z",
+  "body": "The following test case is failing because our identity hash func creates a recursive cycle, and we're not able to distinguish between the cycle caused by `foo(1)` and the one caused by `foo(2)`.\r\n\r\n```\r\n    def test_recursive_hash_func(self):\r\n        def hash_int(x):\r\n            return x\r\n\r\n        [USER].cache(hash_funcs={int: hash_int})\r\n        def foo(x):\r\n            return x\r\n\r\n        self.assertNotEqual(foo(2), foo(1))\r\n```",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-05-15T21:04:01Z",
+      "body": "Closing this issue since `st.cache` is deprecated. If this issue persists with the new caching decorators (`st.cache_data` or `st.cache_resource`), please open a new issue!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-09T23:52:12Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Visits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fstreamlit%2Fstreamlit%2Fissues%2F1659&title=visits&edge_flat=false)\n"
+    }
+  ]
+}

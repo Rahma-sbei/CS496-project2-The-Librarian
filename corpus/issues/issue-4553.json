@@ -1,0 +1,63 @@
+{
+  "id": "issue-4553",
+  "type": "issue",
+  "number": 4553,
+  "url": "https://github.com/streamlit/streamlit/issues/4553",
+  "title": "Rerun on each new keystroke in `st.text_input`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.text_input"
+  ],
+  "created_at": "2022-03-28T09:57:41Z",
+  "closed_at": "2026-09-02T19:17:57Z",
+  "body": "### Problem\n\nI wanted to create a Streamlit application which has an input text field which immediately responds to user input, e.g. like the Google search field does. Something like this:\n\n```py\ndef search_callback():\n  st.write(\"You searched for:\", st.session_state.input)\n\n\nsearch_str = st.text_input('Search', key='input', placeholder='Life of Brian', on_input=search_callback)\n```\n\n### Solution\n\nI couldn't find any way to achieve this with Streamlit. I think what would be necessary is a new type of `on_input` callback or similar.\n\nFurther, I think it would make sense to have a kwarg containing the current input. I would also have liked this for the `on_change` callback. As a workaround I have been using the session state instead:\n\n```py\ndef search_callback():\n  st.write(\"You searched for:\", st.session_state.input)\n\n\nsearch_str = st.text_input('Search', key='input', placeholder='Life of Brian', on_change=search_callback)\n```\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-4553)",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2022-04-01T03:04:38Z",
+      "body": "Hi [USER],\r\n\r\nRegarding `on_change ` callback, I think using `session_state ` for the input value is indeed how it is meant to be used according to: https://blog.streamlit.io/session-state-for-streamlit/\r\n\r\nCurrently, you can use args and kwargs to pass in other data (other than the input) to your callback.\r\n\r\n```python\r\ndef search_callback(*args, **kwargs):\r\n  st.write(\"You searched for:\", st.session_state.input)\r\n  st.write(args, kwargs)\r\n\r\nsearch_str = st.text_input('Search', key='input', placeholder='Life of Brian',\r\n    on_change=search_callback, args=[\"Hello\", \"Brian\"], kwargs={\"Bye\": \"Brian\"} )\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-04-15T15:13:42Z",
+      "body": "It appears the name `on_change` is badly chosen;` on_press_enter` would be more appropriate for the current behavior. A real `on_key_change` should indeed be responding directly to any changed input, that means while typing, not pressing enter.\r\n\r\nedit: better explanation\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-11-10T19:36:04Z",
+      "body": "If the user has to hit enter before the behavior happens, this seems to just be a callback, which already exists. Is that accurate? [USER] [USER] "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-11-10T19:53:04Z",
+      "body": "I was hoping for immediate updates, without additional key presses. So like in Google search with every typed character the result is immediately updated."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-10-17T16:41:46Z",
+      "body": "Hello, any update on this? I am also currently using session states to access the changed input value. However, this rules out wrapping the `on_change` callback with a `[USER].cache_resource` decorator because if I was passing the input value as a parameter to the actual callback function, it will still have the old value of user input and hence, returns an older cached value"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-01-09T14:26:55Z",
+      "body": "+1 for the documentation being very confusing on the meaning of `on_change` - I was expecting this indeed to change every time the user changes the input (i.e. types something), and not only when the user presses enter. Especially since this usecase is already well covered by `value := st.text(\u2026`. \r\n\r\nThankfully, [USER] developed a component that solves the problem brought up by [USER]. It can be found here: https://github.com/blackary/streamlit-keyup"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-09T23:05:52Z",
+      "body": "Changed the title to make it a bit more obvious what this is. I think there is an option we'll prioritize this if the issue gets more upvotes or the custom component linked above gets more usage!"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-14T12:24:01Z",
+      "body": "## Update \n\nWrote up a spec [here](https://github.com/streamlit/streamlit/pull/14905)."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-02T21:47:39Z",
+      "body": "## UPdate\n\nThis will be available in 1.64+ via the `live` parameter on `st.text_input` ([#16662](https://github.com/streamlit/streamlit/pull/16662)). `live=True` commits the value after a 250ms pause while typing (or pass a duration like `\"300ms\"`). Prefer wrapping the live UI in a fragment so typing doesn't rerun the rest of the app:\n\n```python\n[USER].fragment\ndef search():\n    query = st.text_input(\"Search\", type=\"search\", live=True)\n    st.write(\"You searched for:\", query)\n\nsearch()\n```"
+    }
+  ]
+}

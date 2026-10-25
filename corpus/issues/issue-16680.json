@@ -1,0 +1,31 @@
+{
+  "id": "issue-16680",
+  "type": "issue",
+  "number": 16680,
+  "url": "https://github.com/streamlit/streamlit/issues/16680",
+  "title": "Broken relative link in .github/copilot-instructions.md and stale knip ignoreDependencies entries",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:frontend",
+    "status:confirmed",
+    "priority:P4",
+    "area:contribution"
+  ],
+  "created_at": "2026-08-27T18:46:53Z",
+  "closed_at": "2026-09-02T06:19:32Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nTwo small repository-hygiene defects found while auditing the tree.\n\n**1. Broken relative link in `.github/copilot-instructions.md`**\n\nLine 88 reads:\n\n```markdown\n- See [.claude/skills/debugging-streamlit/SKILL.md](.claude/skills/debugging-streamlit/SKILL.md) for the full debugging guide.\n```\n\nThe file lives in `.github/`, so the relative link resolves to `.github/.claude/skills/debugging-streamlit/SKILL.md`, which does not exist. The real file is at the repository root: `.claude/skills/debugging-streamlit/SKILL.md`.\n\nThis text is duplicated from `AGENTS.md`, where the same relative link is correct because that file sits at the root \u2014 the copy into `.github/` did not adjust the path.\n\nFix: use `../.claude/skills/debugging-streamlit/SKILL.md` (or a root-absolute link).\n\n**2. Stale `ignoreDependencies` entries in `frontend/knip.json`**\n\n`yarn knip` reports three entries that are no longer needed:\n\n```\nConfiguration hints (3)\n[USER].gl/extensions          knip.json  Remove from ignoreDependencies\n[USER].gl/widgets             knip.json  Remove from ignoreDependencies\nreact-responsive-carousel    knip.json  Remove from ignoreDependencies\n```\n\nThese suppressions now hide nothing, so keeping them only reduces the value of the check.\n\nFix: drop the three entries.\n\n### Steps To Reproduce\n\n1. Open `.github/copilot-instructions.md` on GitHub and click the link on line 88 \u2014 it 404s.\n2. Run `yarn knip` in `frontend/` and read the \"Configuration hints\" section.\n\n### Expected Behavior\n\n- The documentation link resolves to the skill file.\n- `yarn knip` reports no configuration hints.\n\n### Current Behavior\n\n- The link 404s.\n- Three stale hints are reported on every run.\n\n### Acceptance Criteria\n\n- [ ] The link in `.github/copilot-instructions.md` resolves correctly from its own directory.\n- [ ] `yarn knip` reports no configuration hints.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.62.0 (`develop`, commit `2ac0d77d3`)\n- Python version: 3.13.6\n- Operating System: Windows 11\n- Browser: n/a\n\n### Additional Information\n\nI checked every relative Markdown link in the repository (171 files) for this class of problem; `.github/copilot-instructions.md:88` is the only genuinely broken one. The other candidates were either illustrative syntax examples in the `developing-with-streamlit` skill docs or a spec referencing a path that was never created.\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-27T20:13:07Z",
+      "body": "Two confirmed repo-hygiene bugs, not product regressions.\n\n**1. Broken Copilot link.** `.github/copilot-instructions.md` is generated from root `AGENTS.md` by `scripts/generate_agent_rules.py`, which copies the body verbatim. The debugging-skill link is valid from the repo root but resolves to the non-existent `.github/.claude/skills/debugging-streamlit/SKILL.md` on GitHub. Patching only the generated file will be overwritten on the next `generate_agent_rules.py` run; the durable fix is to rewrite relative links in the generator (or avoid a relative Markdown link in `AGENTS.md`). The same unadjusted path is also copied into `.cursor/rules/overview.mdc`.\n\n**2. Stale Knip ignores.** `frontend/knip.json` still lists `[USER].gl/extensions`, `[USER].gl/widgets`, and `react-responsive-carousel` in `ignoreDependencies`. Those pins remain in `frontend/lib/package.json` (Vite/Deck.gl peers and a Glide Data Grid peer, added in #16593). Knip now reports the ignores as unused configuration hints, so they can be dropped without changing the dependency list.\n\nNo duplicate of this report. Closely related prior work: [#16593](https://github.com/streamlit/streamlit/pull/16593) (introduced the Knip ignores).\n\n### Related Issues\n\nNo closely related open issues found. The contribution-docs issues below share the area but not the defects:\n\n- [#11740](https://github.com/streamlit/streamlit/issues/11740) \u2014 contributor-guide updates (WSL build notes), not agent-rule generation or Knip config.\n- [#14097](https://github.com/streamlit/streamlit/issues/14097) \u2014 VS Code debug launch configs; adjacent to the debugging skill the broken link points at, but a different request.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-02T06:19:32Z",
+      "body": "2 has been fixed and keeping 1 as is since this is just a generated file and agents are able to resolve this correctly."
+    }
+  ]
+}

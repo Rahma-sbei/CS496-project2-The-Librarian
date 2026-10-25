@@ -1,0 +1,41 @@
+{
+  "id": "issue-15148",
+  "type": "issue",
+  "number": 15148,
+  "url": "https://github.com/streamlit/streamlit/issues/15148",
+  "title": "ValueError: blake2b blocked on FIPS systems since 1.57.0",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:security",
+    "type:regression",
+    "status:confirmed",
+    "priority:P3"
+  ],
+  "created_at": "2026-05-12T14:25:30Z",
+  "closed_at": "2026-08-07T12:34:48Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nStreamlit 1.57.0 raises ValueError on FIPS-compliant Python environments (any system running Python against an OpenSSL in FIPS mode). The app fails to perform any hashing operation \u2014 element ID generation, cache key computation, file watching all break. Streamlit 1.56.0 is unaffected.\n\n### Reproducible Code Example\n\n```Python\nfrom streamlit.util import create_fast_hasher\n\nh = create_fast_hasher()\nh.update(b\"hello\")\nprint(h.hexdigest())\n```\n\n### Steps To Reproduce\n\nRun this on any FIPS-enforcing Python 3.x environment (e.g. a Chainguard python-fips image, RHEL 9 with FIPS mode enabled, or any OpenSSL built with enable-fips).\n\n### Expected Behavior\n\nStreamlit starts and runs normally. blake2b is used for non-security purposes (element IDs, cache keys, file change detection) and should be callable on FIPS systems with `usedforsecurity=False`.\n\n### Current Behavior\n\nAny code path that calls create_fast_hasher() or calc_hash() raises ValueError and crashes.\n\n```python\nTraceback (most recent call last):\n  File \"test_hashing.py\", line 3, in <module>\n    h = create_fast_hasher()\n        ^^^^^^^^^^^^^^^^^^^^\n  File \".../site-packages/streamlit/util.py\", line 74, in create_fast_hasher\n    return hashlib.blake2b(digest_size=16)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.12/hashlib.py\", line 86, in __usedforsecurity_check\n    raise ValueError(name + \" is blocked when usedforsecurity=True\")\nValueError: blake2b is blocked when usedforsecurity=True\n```\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\nStreamlit: 1.57.0 (regression; 1.56.0 works)\nPython: 3.12 (reproduced; also expected on 3.10, 3.11)\n\n\n### Additional Information\n\nIntroduced by: #14842 \u2014 which replaced MD5 with blake2b but omitted usedforsecurity=False",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-12T14:25:50Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15148)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-12T15:24:53Z",
+      "body": "Confirmed regression in Streamlit 1.57.0 on FIPS-enforcing Python environments (e.g. RHEL 9 with FIPS mode, Chainguard `python-fips`). PR [#14842](https://github.com/streamlit/streamlit/pull/14842) replaced the previous MD5-based fast hasher with `hashlib.blake2b(digest_size=16)` in `create_fast_hasher` (`lib/streamlit/util.py:74`) but did not pass `usedforsecurity=False`. On a FIPS-restricted OpenSSL, `blake2b` is blocked by default and raises `ValueError: blake2b is blocked when usedforsecurity=True`, breaking every code path that uses `create_fast_hasher()` / `calc_hash()` \u2014 element ID generation, cache key computation, file-watcher hashing, fragment IDs, etc. The previous MD5 implementation correctly passed `usedforsecurity=False` (added in PR [#10413](https://github.com/streamlit/streamlit/pull/10413) to fix [#10412](https://github.com/streamlit/streamlit/issues/10412)), so this is effectively a reintroduction of the same class of FIPS bug. The fix is a one-line change: `hashlib.blake2b(digest_size=16, usedforsecurity=False)` (and a regression test that exercises FIPS-style enforcement).\n\n### Related Issues\n\n- [#10412](https://github.com/streamlit/streamlit/issues/10412) \u2014 Streamlit fragment feature broke on a FIPS-compliant python image (same failure mode, fixed previously by adding `usedforsecurity=False` to MD5 calls).\n- [#7120](https://github.com/streamlit/streamlit/issues/7120) \u2014 Original FIPS compliance request that introduced the `usedforsecurity=False` pattern across `forward_msg_cache.py` and `watcher/util.py`; the same pattern needs to be re-applied to the new blake2b hasher.\n- [#7526](https://github.com/streamlit/streamlit/issues/7526) \u2014 \"Making streamlit FIPS compliant\" \u2014 broader FIPS compliance tracking issue; this regression undoes part of that effort.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-03T16:59:23Z",
+      "body": "Im still getting a `digest_size is invalid for openssl_blake2b()` on FIPS using the newest 1.60.0"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-07T12:35:29Z",
+      "body": "[USER] I added a fallback to use md5 in case `blake2b` isn't fully supported (e.g. in some FIPS enviornments)"
+    }
+  ]
+}

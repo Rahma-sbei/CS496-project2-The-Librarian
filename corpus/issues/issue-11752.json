@@ -1,0 +1,24 @@
+{
+  "id": "issue-11752",
+  "type": "issue",
+  "number": 11752,
+  "url": "https://github.com/streamlit/streamlit/issues/11752",
+  "title": "Add icon to st.header and st.subheader (and st.markdown?)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:markdown",
+    "feature:st.header"
+  ],
+  "created_at": "2025-06-24T18:51:26Z",
+  "closed_at": "2026-08-28T19:51:49Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAdd `icon=` to some Markdown primitives just like other primitives `st.button`, `st.expander`\n\n### Why?\n\nIt's rather typical to have icons or emojis in page titles. But they don't look very nice or aligned.\nMaking a dedicated argument could help us position the icon better!\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-06-24T18:51:37Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-11752)\n"
+    }
+  ]
+}

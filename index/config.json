@@ -1,0 +1,8 @@
+{
+  "chunk_size": 250,
+  "overlap": 40,
+  "model": "BAAI/bge-small-en-v1.5",
+  "n_chunks": 4007,
+  "build_seconds": 333.5,
+  "avg_words": 132.0
+}

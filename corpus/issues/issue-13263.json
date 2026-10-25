@@ -1,0 +1,51 @@
+{
+  "id": "issue-13263",
+  "type": "issue",
+  "number": 13263,
+  "url": "https://github.com/streamlit/streamlit/issues/13263",
+  "title": "Opening an `st.dialog` with a button shortcut highlights UI elements within the dialog",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.button",
+    "feature:st.dialog"
+  ],
+  "created_at": "2025-12-08T20:22:13Z",
+  "closed_at": "2026-07-19T11:32:25Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nUsing the new st.button shortcut kwarg to open a dialog will highlight elements of the dialog (e.g. the Close Dialog button, or widgets within the dialog). The elements will gain the state Focus or Focus-visible.\n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-13263)\n\n```Python\nimport streamlit as st\n\n[USER].dialog('Dialog')\ndef open_dialog():\n    st.segmented_control('Widget',options=range(5))\n\nif st.button('Open Dialog', shortcut='D'):\n    open_dialog()\n\nif st.button('Open Dialog with Shift', shortcut='Shift+D'):\n    open_dialog()\n\nif st.button('Open Dialog with Ctrl', shortcut='Ctrl+D'):\n    open_dialog()\n```\n\n### Steps To Reproduce\n\n1. Run the code example in streamlit 1.52.1\n2. Open the dialog by pressing the \"D\" key or \"Shift+D\" keys\n3. Observe that the Close Dialog button is highlighted\n4. Close the dialog\n5. Re-open the dialog by pressing the \"D\" key or \"Shift+D\" keys\n6. Observe that the first segmented control button is highlighted\n\n### Expected Behavior\n\nOpening a dialog with a button shortcut should not cause visibly different behavior compared to opening it with a button click\n\n<img width=\"770\" height=\"178\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/f55cb4ba-b14a-4dc8-8993-45bcd6eef466\" />\n\n### Current Behavior\n\nIf the dialog does not contain a widget, or if it does contain a widget but the dialog has not yet been opened in the current session, using a shortcut to open the dialog will give the Close Dialog button the state Focus, drawing a red square around the button:\n<img width=\"760\" height=\"172\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/186aba83-63ff-49c4-af4a-e4e31b25895a\" />\n\nIf the dialog contains a widget, subsequent shortcut uses will give the widget the state Focus-visible. In the case of Segmented Controls, it highlights and darkens the first button / pill of the widget:\n<img width=\"770\" height=\"178\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/c6d9a0a4-aefa-4c50-a90a-774bbf2e8056\" />\n\nOpening the dialog with a button click does not cause any of the above behavior.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.52.1\n- Python version: 3.11.7\n- Operating System: Windows 11\n- Browser: Chrome\n\n\n### Additional Information\n\nCaveat: Using a Ctrl modifier on the button shortcut (e.g. 'Ctrl+D') mostly sidesteps this error. In that case, using the shortcut button doesn't introduce the Focus-visible state, although it does not clear it if the Focus-visible state was already introduced. A regular button click does clear it.\n\nWorkaround: I'm using the below CSS with st.html() in order to negate the issue for now - it forces the focus state of Segmented Controls and the Close Dialog button to be visually identical to their idle state\n```html\n<style>\n\n    [data-testid=\"stBaseButton-segmented_control\"]:focus-visible {\n        box-shadow: none;\n        background-color: inherit;\n    }\n    [data-testid=\"stBaseButton-segmented_controlActive\"]:focus-visible {\n        box-shadow: none;\n        background-color: rgba(255, 75, 75, 0.1);\n    }\n\n    [aria-label=\"Close\"]:focus {\n        outline: none;\n    }\n\n</style>\n```",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-08T20:22:25Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-13263)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-12-08T20:52:49Z",
+      "body": "[USER] Thanks for reporting this issue, I was able to reproduce it [here](https://issues.streamlit.app/?issue=gh-13263). "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-09T21:33:46Z",
+      "body": "This bug report describes an issue where opening an `st.dialog` via a button's keyboard shortcut (new `shortcut` parameter) causes UI elements inside the dialog to display unwanted focus states (`:focus-visible` styling). When the dialog is triggered via keyboard, the browser tracks keyboard navigation mode, and when focus is automatically moved inside the dialog (for accessibility), this causes visible focus rings on the close button or the first widget. This behavior differs from clicking the button with a mouse, which does not apply focus-visible styling.\n\nThe root cause appears to be in how keyboard-initiated actions interact with the dialog's focus management. When a shortcut triggers the dialog, the browser's focus-visible heuristics persist the keyboard navigation state, causing the `:focus-visible` CSS selector to match elements inside the dialog. A potential fix would involve programmatically managing focus state or using techniques like `blur()` to reset focus-visible state when the dialog opens via keyboard shortcut.\n\n### Related Issues\n\n- **#9243** - [Popover and dialog first widget is always active](https://github.com/streamlit/streamlit/issues/9243): This is the most closely related issue, describing the same underlying behavior where the first widget inside `st.dialog` or `st.popover` appears active/focused by default. The new issue #13263 is a more specific manifestation triggered by keyboard shortcuts rather than general dialog opening.\n\n- **#12496** - [Improve focus state of tertiary button](https://github.com/streamlit/streamlit/issues/12496): Related issue about focus state styling on buttons, specifically the tertiary button's red focus border appearing too tight. Both issues involve unwanted visual focus indicators.\n\n---\n*This is an automated triage comment. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-12-10T18:12:17Z",
+      "body": "[USER] I have prepared a fix for this issue here: https://github.com/streamlit/streamlit/pull/13290; however, there are some concerns regarding accessibility. The general accessibility guidance is that the first selectable element in the dialog body should always get the focus. So, we probably won't merge this fix. \n\nBtw. for your app, would you prefer this:\n\n<img width=\"769\" height=\"178\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/02a4cb14-fffa-44da-a7b4-fb8841c198ec\" />\n\nor that:\n\n<img width=\"769\" height=\"178\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/0c00fad5-57be-4d13-82ac-5f3a8d022cf8\" />\n\nas the default state, or you don't really care and just want to have it consistent?\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-10T18:44:23Z",
+      "body": "[USER] Thanks, and understood on the accessibility concerns. \n\nHowever, Streamlit's current behavior appears to be inconsistent there: opening up the dialog with a button click doesn't visually focus the first Segmented Control button (although pressing Enter on the keyboard will activate and deactivate that button, and pressing Tab visually focuses on the second Segmented Control button). If that behavior is acceptable, I ultimately just want the same thing to occur when the dialog is opened by a keyboard shortcut rather than a button click.\n\nThat behavior also seems to be relatively common - using Ctrl+P to open the Print Dialog on Microsoft Edge doesn't visually focus on any button, but pressing Enter is equivalent to clicking Print.\n\nThe first image (copied below) is definitely preferred.\n<img width=\"769\" height=\"178\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/07a13957-770c-41b3-980a-ef8ae6fc26cd\" />"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-19T11:32:25Z",
+      "body": "Closing this issue since it was fixed via the basweb to react-aria migration"
+    }
+  ]
+}

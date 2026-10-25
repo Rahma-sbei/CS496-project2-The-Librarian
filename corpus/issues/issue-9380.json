@@ -1,0 +1,58 @@
+{
+  "id": "issue-9380",
+  "type": "issue",
+  "number": 9380,
+  "url": "https://github.com/streamlit/streamlit/issues/9380",
+  "title": "Attempting to show a table with nested lists fails with `cannot mix list and non-list, non-null values`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:arrow",
+    "feature:st.dataframe",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.data_editor",
+    "upstream"
+  ],
+  "created_at": "2024-08-31T09:04:42Z",
+  "closed_at": "2026-09-08T15:13:09Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nThe provided snippet attempts to show a `DataFrame` table, but it fails with a pyarrow serialization error `cannot mix list and non-list, non-null values`. For full traceback see below.\r\n\r\n### Reproducible Code Example\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-9380)\r\n\r\n```Python\r\nimport pandas as pd\r\nimport streamlit as st\r\n\r\nNESTED_LAT_LON_COORDS = [\r\n    [\r\n        [8.7778551, 49.3375681],\r\n        [8.7775115, 49.3371419],\r\n        [8.7772715, 49.3369171],\r\n    ],\r\n    [\r\n        [\r\n            [8.7778551, 49.3375681],\r\n            [8.7775115, 49.3371419],\r\n        ]\r\n    ],\r\n]\r\n\r\ndf = pd.DataFrame(\r\n    {\r\n        \"nested_lat_lon_coords\": NESTED_LAT_LON_COORDS,\r\n    }\r\n)\r\nst.write(df)\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n1. Just run it via `streamlit run debug_script.py`. The error is immediate.\r\n\r\n### Expected Behavior\r\n\r\nShould not crash and display the table.\r\n\r\n### Current Behavior\r\n\r\nThe full error traceback is:\r\n\r\n```\r\n2024-08-31 10:59:25.071 Serialization of dataframe to Arrow table was unsuccessful due to: ('cannot mix list and non-list, non-null values', 'Conversion failed for column nested_lat_lon_coords with type object'). Applying automatic fixes for column types to make the dataframe Arrow-compatible.\r\n2024-08-31 10:59:25.072 Uncaught app exception\r\nTraceback (most recent call last):\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/streamlit/dataframe_util.py\", line 815, in convert_pandas_df_to_arrow_bytes\r\n    table = pa.Table.from_pandas(df)\r\n  File \"pyarrow/table.pxi\", line 4623, in pyarrow.lib.Table.from_pandas\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/pyarrow/pandas_compat.py\", line 616, in dataframe_to_arrays\r\n    arrays = [convert_column(c, f)\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/pyarrow/pandas_compat.py\", line 616, in <listcomp>\r\n    arrays = [convert_column(c, f)\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/pyarrow/pandas_compat.py\", line 603, in convert_column\r\n    raise e\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/pyarrow/pandas_compat.py\", line 597, in convert_column\r\n    result = pa.array(col, type=type_, from_pandas=True, safe=safe)\r\n  File \"pyarrow/array.pxi\", line 358, in pyarrow.lib.array\r\n  File \"pyarrow/array.pxi\", line 85, in pyarrow.lib._ndarray_to_array\r\n  File \"pyarrow/error.pxi\", line 92, in pyarrow.lib.check_status\r\npyarrow.lib.ArrowInvalid: ('cannot mix list and non-list, non-null values', 'Conversion failed for column nested_lat_lon_coords with type object')\r\n\r\nDuring handling of the above exception, another exception occurred:\r\n\r\nTraceback (most recent call last):\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/streamlit/runtime/scriptrunner/exec_code.py\", line 88, in exec_func_with_error_handling\r\n    result = func()\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/streamlit/runtime/scriptrunner/script_runner.py\", line 590, in code_to_exec\r\n    exec(code, module.__dict__)\r\n  File \"/tmp/debug.py\", line 23, in <module>\r\n    st.write(df)\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py\", line 410, in wrapped_func\r\n    result = non_optional_func(*args, **kwargs)\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/streamlit/elements/write.py\", line 423, in write\r\n    self.dg.dataframe(arg)\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/streamlit/runtime/metrics_util.py\", line 410, in wrapped_func\r\n    result = non_optional_func(*args, **kwargs)\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/streamlit/elements/arrow.py\", line 554, in dataframe\r\n    proto.data = dataframe_util.convert_pandas_df_to_arrow_bytes(data_df)\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/streamlit/dataframe_util.py\", line 824, in convert_pandas_df_to_arrow_bytes\r\n    table = pa.Table.from_pandas(df)\r\n  File \"pyarrow/table.pxi\", line 4623, in pyarrow.lib.Table.from_pandas\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/pyarrow/pandas_compat.py\", line 616, in dataframe_to_arrays\r\n    arrays = [convert_column(c, f)\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/pyarrow/pandas_compat.py\", line 616, in <listcomp>\r\n    arrays = [convert_column(c, f)\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/pyarrow/pandas_compat.py\", line 603, in convert_column\r\n    raise e\r\n  File \"/[HOME]/git/immoscrape/venv/lib/python3.10/site-packages/pyarrow/pandas_compat.py\", line 597, in convert_column\r\n    result = pa.array(col, type=type_, from_pandas=True, safe=safe)\r\n  File \"pyarrow/array.pxi\", line 358, in pyarrow.lib.array\r\n  File \"pyarrow/array.pxi\", line 85, in pyarrow.lib._ndarray_to_array\r\n  File \"pyarrow/error.pxi\", line 92, in pyarrow.lib.check_status\r\npyarrow.lib.ArrowInvalid: ('cannot mix list and non-list, non-null values', 'Conversion failed for column nested_lat_lon_coords with type object')\r\n```\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.38.0\r\n- Python version: 3.10.12\r\n- Operating System: Ubuntu 24.04\r\n- Browser: Firefox, but irrelevant\r\n\r\n\r\n### Additional Information\r\n\r\nThe pyarrow version is 17.0.0, which is the [latest version as of this writing](https://pypi.org/project/pyarrow/#history).",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-08-31T09:04:53Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9380)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-08-31T10:14:24Z",
+      "body": "Hey [USER], thanks for reporting the issue. I am able to reproduce this. Though, this seems to be an issue with arrow itself, not Streamlit (see also this issue: https://github.com/apache/arrow/issues/30648). According to that issue, the provided datastructure is not supportable by arrow in general. How would you expect the rendered table to look like?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-02T07:34:55Z",
+      "body": "> How would you expect the rendered table to look like?\r\n\r\nJust how it does it for any raw JSON (displayed as raw text, and double-click allows to see and copy/paste the entire JSON string).\r\n\r\nI ran into this issue using a GeoJson `FeatureCollection` which consists of a hybrid of `Polygon` and `MultiPolygon` instances. According to the GeoJson specs, a polygon and a multi-polygon differ exactly in the \"nestedness\" illustrated in the minimal example. I wanted to display the GeoJson in a map, and at the same time offer the row-wise GeoJson in the table, giving users the possibility to access/inspect the raw GeoJson directly.\r\n\r\nFrom a user perspective the role and involvement of arrow is not clear. Basically streamlit suggests that it supports pandas DataFrames in general, so it is unexpected that it crashes on certain column contents, even if they are just plain json compatible data. The serialization could e.g. internally fall back to a JSON based serialization (or even `__str__` or `__repr__` based), if arrow doesn't support serializing something."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-02T07:54:07Z",
+      "body": "Thanks for elaborating on your use-case \ud83d\ude42 \r\n\r\n> internally fall back to a JSON based serialization (or even __str__ or __repr__ based), if arrow doesn't support serializing something.\r\n\r\nI think this is a great idea! [USER] do you think that this is easily achievable and also makes sense?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-02T08:28:46Z",
+      "body": "We have a fallback to `str` for arrow-incompatible columns. This is based on some logic that detects if the content of a column is incompatible:\r\n\r\nhttps://github.com/streamlit/streamlit/blob/fbe27d6432435ef5b957785f4d3976f81a1dae49/lib/streamlit/dataframe_util.py#L1029\r\n\r\nSince scalar-list values are supported, we need to check the actual list value to determine the compatibility. However, we are only doing that for the first row. This works fine in most cases but does not work correctly in the case above since the first value is supported but not the second value :("
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-02T08:58:12Z",
+      "body": "Perhaps this can be tackled from the \"EAFP vs LBYL\" perspective? I.e., instead of trying to check if a column is arrow compatible via a heuristic, just try to serialize it with arrow. If this was possible one could avoid (1) inconsistencies with the heuristic and actual arrow semantics, and (2) avoid iterating over the entire column twice, once for the check, and once inside arrow. I assume the main challenge would be that serialization would have to be done \"column-based\" for probing/serializing on an individual column level, instead of the whole frame/table."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-02T10:12:04Z",
+      "body": "Yeah, this could be a solution. But not sure if we can efficiently convert Pandas to Arrow column-by-column. Also note that we are only executing these checks if the first attempt to convert to arrow fails and the big majority of cases succeed at first try. I would love if pyarrow would provide a built-in fallback-to-string option. Or maybe provide us with structured information on what column failed the serialization. At the moment, the info is just part of the exception message. But maybe parsing this info from the exception text could still be an option? "
+    }
+  ]
+}

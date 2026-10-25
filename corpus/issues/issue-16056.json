@@ -1,0 +1,30 @@
+{
+  "id": "issue-16056",
+  "type": "issue",
+  "number": 16056,
+  "url": "https://github.com/streamlit/streamlit/issues/16056",
+  "title": "Parameter for `st.columns` to disable column stacking on mobiles",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "area:layout",
+    "area:mobile",
+    "feature:st.columns"
+  ],
+  "created_at": "2026-07-17T19:42:28Z",
+  "closed_at": "2026-07-19T12:45:00Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nMany people try to make websites with Streamlit that work on **mobile devices**. But when they try to use `st.columns` to build beautiful layouts, they are frustrated to find it **stacked vertically** on mobile screens.\n\nThis layout:\n\n<img width=\"1264\" height=\"579\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/e3a58d2a-3623-4ae6-acf9-9a573132e477\" />\n\nInstead of this one:\n\n<img width=\"584\" height=\"214\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/81581911-3f36-4556-a564-c4ba5b840bf6\" />\n\n### Why?\n\nTo make it convenient to use Streamlit apps from mobile devices or tablets.\n\n### How?\n\nIt would be amazing to have a parameter called `disable_colmn_stacking` in `st.columns` to force that column to be displayed vertically. Maybe detect if it will overflow the screen; in this case, make it stack vertically, or let it overflow if it will as it is the developer's choice.\n\nBefore:\n\n<img width=\"584\" height=\"214\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/eb8d1962-f218-4d92-81e4-728f951bfd54\" />\n\nAfter:\n\n<img width=\"250\" height=\"254\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/29345ce0-6aae-457c-9154-b0f88be50e15\" />\n\n### Additional Context\n\nHope to fix this problem ASAP.\nThank you for your efforts.\nBest regards.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-17T19:42:41Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-16056)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-17T23:03:01Z",
+      "body": "This is a **feature request** (`type:enhancement`) asking for a way to control the automatic responsive behavior of `st.columns`, which currently stacks columns vertically on narrow (mobile/tablet) viewports. The proposal is a parameter (e.g. `disable_column_stacking`) to force columns to stay side-by-side, optionally allowing horizontal overflow instead of stacking.\n\nThe responsive stacking is intentional behavior implemented on the frontend: in `StyledColumn` (`frontend/lib/src/components/core/Block/styled-components.ts`), a media query forces each column's `min-width` to roughly `100%` once the viewport drops below the `breakpoints.columns` threshold, so columns wrap onto their own rows. Any implementation of this request would need to expose an option to skip/override that media rule (and decide between overflow vs. horizontal scrolling). This is a highly requested, long-standing enhancement rather than a bug, so it likely needs product input on the API surface (a per-call parameter vs. a global config, and how it interacts with the existing flex/wrap layout system).\n\n### Related Issues\n\n- [#5003 \u2013 Deactivate responsiveness of `st.columns`](https://github.com/streamlit/streamlit/issues/5003): Near-duplicate and the most upvoted version of this request. Same core ask: prevent `st.columns` from collapsing/stacking vertically on mobile and allow forcing a horizontal layout.\n- [#6592 \u2013 Configurable column responsiveness width threshold](https://github.com/streamlit/streamlit/issues/6592): Closely related \u2014 instead of fully disabling stacking, it asks to configure the width threshold at which columns wrap, giving developers control over the same responsive behavior.\n- [#12582 \u2013 Control wrap behavior for horizontal `st.container`](https://github.com/streamlit/streamlit/issues/12582): Related mechanism \u2014 requests disabling flex wrapping so horizontal elements stay in a single row, which is the same underlying flex-wrap behavior that causes columns to stack.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "id": "issue-10959",
+  "type": "issue",
+  "number": 10959,
+  "url": "https://github.com/streamlit/streamlit/issues/10959",
+  "title": "time_input does not keep the entered value when tabbing out of it",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.time_input",
+    "upstream"
+  ],
+  "created_at": "2025-03-29T21:25:32Z",
+  "closed_at": "2026-07-24T19:28:34Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nTabbing out of a time_input field after entering a value using the keyboard resets the value to the previous state.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nst.time_input(\"Time\")\n```\n\n### Steps To Reproduce\n\n1. Click on the time_input field\n2. Enter a value using the keyboard (do not use the selection list)\n3. Leave the field by using <kbd>tab</kbd> (do not click out of the filed using the mouse)\n\n### Expected Behavior\n\nI would expect the same behaviour as other input fields: the newly entered value remains after tabbing out.\n\n\n### Current Behavior\n\nThe value is reset to the value the field had when you clicked on it in the first place.\n\nThis affects people that cannot use the selection list because they have \"odd\" times to enter.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.44.0\n- Python version: 3.13.2\n- Operating System: Windows 11\n- Browser: MS Edge, Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-29T21:25:44Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-10959)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-03-31T17:23:15Z",
+      "body": "Hi [USER] thank you for filing this ticket!\n\nI can reproduce the behavior you've described. With that said, a user can hit enter and the entered value will persist (as long as it's a valid time):\n\n1. Click on the time_input field\n2. Enter a value using the keyboard\n3. Hit <kbd>enter</kbd>\n4. Leave the field by using <kbd>tab</kbd>\n\nI believe given the way this component is structured right now, this behavior is expected. I am going to turn this into an enhancement request since the UX could be improved per the details in your ticket. Thank you!"
+    }
+  ]
+}

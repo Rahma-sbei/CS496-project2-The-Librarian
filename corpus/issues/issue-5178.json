@@ -1,0 +1,97 @@
+{
+  "id": "issue-5178",
+  "type": "issue",
+  "number": 5178,
+  "url": "https://github.com/streamlit/streamlit/issues/5178",
+  "title": "Streamlit not detecting changes to multipage apps in WSL2",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "papercut",
+    "area:windows",
+    "priority:P3",
+    "feature:multipage-apps",
+    "feature:file-watcher"
+  ],
+  "created_at": "2022-08-16T14:58:01Z",
+  "closed_at": "2026-06-18T08:16:39Z",
+  "body": "### Summary\r\n\r\nStreamlit isn\u2019t detecting file changes in multi-page apps when I run it in WSL2 (Ubuntu 20.04).\r\n\r\nI noticed that while it DOES detect changes to the main page, e.g. Home.py, it isn\u2019t detecting changes to nested pages (e.g. a page in the pages directory), nor is it detecting changes to python modules that exist in the same parent directory (I confirmed that my python path includes the parent directory).\r\n\r\n### Steps to reproduce\r\n\r\nI created a minimal example [here](https://github.com/jonstrutz11/streamlit-minimal-wsl2-bug). You can follow the steps in the README.\r\n\r\nI ran this example both in Windows (where changes to all pages and module were detected successfully) and in WSL2 (where changes to only Home.py were detected).\r\n\r\n### Is this a regression?\r\nnot for me, but I just started using streamlit recently\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.11.0\r\n- Python version: 3.10.4\r\n- Using Conda + pip\r\n- OS version: Windows 10 (Using WSL2 with ubuntu 20.04)\r\n- Browser version: Chrome 104.0.5112.81\r\n\r\n### Additional info\r\nCopying from [forums here](https://discuss.streamlit.io/t/streamlit-not-detecting-changes-to-multipage-apps-in-wsl2/29248)\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-08-16T17:26:28Z",
+      "body": "Hey [USER] , thanks for reporting this issue. \r\n\r\nCould I ask you to try to install `watchdog` via `pip install watchdog` in your python WSL env. \r\nIs the issue still there?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-08-16T18:17:52Z",
+      "body": "[USER] just installed watchdog as requested and ran the app again. Unfortunately, I got the same results."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-08-16T21:44:50Z",
+      "body": "Hi [USER], thanks for reporting this!\r\n\r\nI'll see if I can get around to investigating sometime this week as I have a machine running windows + WSL available to do some testing one. \r\n\r\nUnfortunately, there may be a chance that this is unsolvable on our end as I vaguely remember running into issues having to do with file watchers on directories being problematic on WSL/Windows due to OS-related restrictions. If this is the same problem that I'm remembering, then that would explain why it's an issue specifically with the `pages` directory for a multipage app but not the main script file.\r\n\r\nI'll get back to you sometime in the next few days after I'm able to spend some time investigating."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-08-19T00:38:35Z",
+      "body": "Hey [USER],\r\n\r\nI had some time to do some digging on this and believe I was able to find the WSL issues that I only vaguely remembered before: https://github.com/microsoft/WSL/issues/4581, https://github.com/microsoft/WSL/issues/4739, https://github.com/microsoft/WSL/issues/4064 (there are also a bunch of other related issues linked from those three).\r\n\r\nThe summary of what I've been able to find is that WSL2 doesn't support inotify except in certain situations (I believe it's possible to get things to work on ext4 filesystems, but as far as I can tell there isn't any way to fix things on ntfs or other common Windows filesystem formats), and without inotify we're unable to watch for changes to directories.\r\n\r\nI'm going to close this as I don't believe there's much we can do on our end to fix this, but let me know if I'm missing something here."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-08-19T01:43:01Z",
+      "body": "Update: it looks like this is going to require some more investigation, as it turns out that I actually didn't have any issues running the minimal example on my windows machine \ud83d\ude2c (Whoops, sorry for jumping to conclusions on finding a few WSL bugs that I thought explained the behavior.)\r\n\r\nOne thing to try in the meantime would be setting the `server.fileWatcherType` config option to `\"poll\"` since, if one suspected reason for file watchers not always working is that inotify is having issues, then using that file watcher type should circumvent the problem entirely."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-08-25T15:55:01Z",
+      "body": "[USER] setting `server.fileWatcherType` to `\"poll\"` is working for now - thank you!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-10-05T09:26:21Z",
+      "body": "I have a similar situation, struggling for months now. I'm importing a python script from a subfolder in app.py, which is a multi-page app. All the pages are in the root folder, so hot-reloading works fine. It does not though for the other script in a subfolder.\r\n```\r\n.\r\n\u251c\u2500\u2500app.py\r\n\u251c\u2500\u2500page1.py\r\n\u251c\u2500\u2500page2.py\r\n\u2514\u2500\u2500 subfolder\r\n        \u251c\u2500\u2500 __init__.py\r\n\u00a0\u00a0      \u2514\u2500\u2500 script.py\r\n```\r\nIn `app.py` I have `from subfolder.script import Class`.\r\n\r\nI added `server.fileWatcherType` to `\"poll\"`. When I change `script.py` the app correctly recognizes the change and notifies to reload. But upon reloading the changes in `script.py` are not reflected. Changes in any script in the root folder are correctly reloaded.\r\n\r\nI tried adding `subfolder` to PYTHONPATH [(doc)](https://docs.streamlit.io/knowledge-base/using-streamlit/streamlit-watch-changes-other-modules-importing-app) and importing without `from` (#358).\r\n\r\nI'm using WSL2 and the files are on NTFS filesystem (not on WSL2 fs). I'm using Streamlit v1.9.2.\r\n\r\nEDIT: I might have just found the source of this error. Since the `script.py` is only referenced in `app.py` it gets reloaded only if I fully reload the page in browser. Could this be it?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-05-19T14:33:09Z",
+      "body": "FWIW since this Github has been silent a while, noting same issue on Mac i7 Ventura 13.4 with Firefox 113.0.1 which mitigates with running with the `--server.fileWatcherType=poll` flag. (This has been strange to problem box, so I appreciate y'all already finding it \ud83d\ude4f\ud83c\udffc!) \r\n\r\n```\r\n$ tree\r\n.\r\n\u251c\u2500\u2500 helpers.py\r\n\u251c\u2500\u2500 home.py\r\n\u2514\u2500\u2500 ui\r\n    \u251c\u2500\u2500 __init__.py\r\n    \u2514\u2500\u2500 base.py\r\n\r\n$ pip3 --version\r\npip 23.1.2 from /usr/local/lib/python3.11/site-packages/pip (python 3.11)\r\n\r\n$ pip3 list | grep -Ei \"pip|watchdog|streamlit\"\r\npip                   23.1.2\r\nstreamlit             1.21.0\r\nstreamlit-option-menu 0.3.2\r\nwatchdog              3.0.0\r\n```\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-26T12:21:37Z",
+      "body": "I have the same issue. I am using WSL2, my project is stored in the Ubuntu FS (not Windows) and I change code in Pycharm. Streamlit only reloads the code changes after 1 change. All subsequent changes are ignored. When I start the app with `--server.fileWatcherType=poll` settings, it works. I am also using poetry in my project, not sure how relevant it is."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T12:58:34Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-5178)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-25T15:47:02Z",
+      "body": "hey guyzz in my case its not working i ran this command \n\n(venv) ritik-yaduvanshi@ritik-yaduvanshi-HP-Laptop-15s-eq2xxx:/media/ritik-yaduvanshi/RITIK/service-hive/chat-agent-dashboard$ streamlit run chat-agent-dashboard.py --server.fileWatcherType=poll\n\n  You can now view your Streamlit app in your browser.\n\n  Local URL: http://localhost:8501\n  Network URL: http://192.168.1.103:8501\n\n\n\nbut wheene i do change in my code i still have to kill my server and start it again to "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-10T10:19:12Z",
+      "body": "I tested on WSL2, Ubuntu 24.04, Python 3.12. It is working correct. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-31T14:56:10Z",
+      "body": "This is a confirmed bug related to Streamlit's file watcher not detecting changes to nested pages and imported modules when running in WSL2 (Windows Subsystem for Linux). The root cause is a known limitation of WSL2's inotify support, particularly when files are stored on NTFS filesystems. Streamlit's default file watcher (`auto` mode) uses the watchdog library which relies on inotify events on Linux. When inotify doesn't work properly in WSL2, the event-based watcher fails to detect changes in subdirectories. The recommended workaround is to set `server.fileWatcherType = \"poll\"` in the config, which uses a polling-based approach that doesn't depend on inotify. A potential long-term fix would be to auto-detect WSL2 environments and default to polling mode.\n\n### Related Issues\n\n- **#11037** - [Watch changes in uv workspaces](https://github.com/streamlit/streamlit/issues/11037): Similar file watcher issue where changes in local dependencies managed by `uv` workspaces are not detected, breaking hot reload. Both issues relate to the file watcher not detecting changes in certain directory structures.\n\n- **#8275** - [Keep symbolic links / re-resolve symlinks if target changes](https://github.com/streamlit/streamlit/issues/8275): Related file watcher issue where symlink target changes are not properly handled. This shares the underlying theme of file system event detection limitations.\n\n- **#11559** - [`make frontend-dev` fails during build under WSL2](https://github.com/streamlit/streamlit/issues/11559): Another WSL2 compatibility issue, demonstrating that WSL2 environment has multiple friction points with the current codebase.\n\n---\n*This is an automated triage comment. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-09T05:18:19Z",
+      "body": "Hi [USER] is this issue still open ? keen to contribue."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-18T09:24:37Z",
+      "body": "## Update\n\nWe will default to polling file watcher on WSL if it's configured with `auto`. If you want to use watchdog on WSL, you need to configure it with `server.fileWatcherType=\"watchdog\"`."
+    }
+  ]
+}

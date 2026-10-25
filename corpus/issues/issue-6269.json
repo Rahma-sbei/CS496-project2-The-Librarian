@@ -1,0 +1,35 @@
+{
+  "id": "issue-6269",
+  "type": "issue",
+  "number": 6269,
+  "url": "https://github.com/streamlit/streamlit/issues/6269",
+  "title": "st.altair_chart unable to display alt.Chart that is deserialized from json",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.altair_chart"
+  ],
+  "created_at": "2023-03-08T16:48:39Z",
+  "closed_at": "2026-08-03T15:11:23Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nst.altair_chart unable to display alt.Chart that was deserialized from json format. It shows a blank chart with labels but without data.\r\n\r\n![visualization](https://user-images.githubusercontent.com/16421143/223775716-b63f192f-bc01-41a0-b1b3-1bf2b677c83d.png)\r\n(see code that produced this in the example below)\r\n\r\n- [ ]\r\n\r\n### Reproducible Code Example\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-6269)\r\n\r\n```Python\r\nimport streamlit as st\r\nimport altair as alt\r\n\r\nchart = alt.Chart(pd.DataFrame(dict(x=list(range(10)),y=list(range(10))))).mark_line().encode(\r\n    x=alt.X('x'),\r\n    y=alt.Y('y'),\r\n)\r\nst.altair_chart(alt.Chart.from_json(chart.to_json()))\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n_No response_\r\n\r\n### Expected Behavior\r\n\r\nDisplay the original chart. And should work for layered charts as well.\r\n\r\n### Current Behavior\r\n\r\nShows blank chart, with labels but without data.\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.19.0\r\n- Python version: 3.7\r\n- Operating System: MacOS 11.7\r\n- Browser: Chrome\r\n\r\n### Additional Information\r\n\r\n_No response_\r\n\r\n### Are you willing to submit a PR?\r\n\r\n- [ ] Yes, I am willing to submit a PR!",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-03-17T10:43:01Z",
+      "body": "[USER] I was able to reproduce the issue [here](https://issues.streamlitapp.com/?issue=gh-6269). There seems to be some issue with how we extract/process the data in our `altair_chart` command. Everything works fine if you load this JSON spec with `vega_lite_chart` (can be used as a workaround):\r\n\r\n```python \r\nimport json\r\nst.vega_lite_chart(json.loads(chart.to_json()))\r\n```\r\n\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T13:05:33Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-6269)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-20T09:00:30Z",
+      "body": "I am making use of [USER] workaround because this issue has not been resolved."
+    }
+  ]
+}

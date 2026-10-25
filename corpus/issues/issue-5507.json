@@ -1,0 +1,34 @@
+{
+  "id": "issue-5507",
+  "type": "issue",
+  "number": 5507,
+  "url": "https://github.com/streamlit/streamlit/issues/5507",
+  "title": "time_input widget Android style. ",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.time_input",
+    "type:possible-component"
+  ],
+  "created_at": "2022-10-10T13:28:35Z",
+  "closed_at": "2026-07-24T19:28:33Z",
+  "body": "### Problem\r\n\r\nThe current dropdown-list time_input widget is impractical if you need to scroll the list to  search for a specific time.\r\nIt is also not self evident, after clicking on the input box, that you can also write a time into it (backspace does not delete the previous text).\r\n\r\n### Solution\r\nI would adopt the widely used Android widget instead, as in [Material Design](https://material.io/components/time-pickers/android#using-time-pickers). \r\n\r\nIt is a lot more intuitive and practical:\r\n\r\n![unnamed](https://user-images.githubusercontent.com/25978536/194877161-85cb1269-002d-412b-be38-bc24643801de.png)\r\n\r\n### Voting for feature requests\r\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\r\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2022-10-10T19:35:48Z",
+      "body": "That's a cool idea and I think we should definitely do this at some point! Thanks for the suggestion. I don't think it will be high priority though because a) the [BaseWeb library](https://baseweb.design/components/time-picker/#time-picker) that we use under the hood doesn't offer such a component, so we'd need to build something oursevles and b) `st.time_input` isn't used that often compared to other widgets. \r\n\r\nI think this could also be a great candidate to [build a custom component](https://docs.streamlit.io/library/components/create) if you're interested in that [USER]!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-10-11T06:46:45Z",
+      "body": "As an alternative solution I could suggest usage of HTML native, time input field: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/time. \r\n\r\nIt has great support (96.87% as of https://caniuse.com/input-datetime) and widget rendering is delegated to the browser. It is also supported by BaseWeb library via `Input` component: https://baseweb.design/components/input/."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-10-12T10:47:07Z",
+      "body": "[USER], if `time_input`is based on BaseWeb, is there any possibility to change further settings in BaseWeb's `TimePickerDefaultProps`? \r\nI mean, how to change the standard 15min interval to i.e. 10min, as requested in #4693? \r\n\r\n```\r\nexport type TimePickerDefaultProps = {\r\n  format: '12';\r\n  step: 900;\r\n  creatable: false;\r\n  adapter: DateIOAdapter<Date>;\r\n  ignoreMinMaxDateComponent: false;\r\n};\r\n```"
+    }
+  ]
+}

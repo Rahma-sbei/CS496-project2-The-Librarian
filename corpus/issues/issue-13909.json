@@ -1,0 +1,41 @@
+{
+  "id": "issue-13909",
+  "type": "issue",
+  "number": 13909,
+  "url": "https://github.com/streamlit/streamlit/issues/13909",
+  "title": "`AppTest` fails to resolve imports when using a src layout",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "papercut",
+    "status:confirmed",
+    "priority:P3",
+    "feature:app-testing"
+  ],
+  "created_at": "2026-02-11T11:32:43Z",
+  "closed_at": "2026-07-22T12:19:31Z",
+  "body": "When using the [src layout](https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/), `AppTest.from_file()` fails to resolve internal module imports, even when the tests are run from the project root. Is this a bug or is there a specific syntax/configuration I should use to let AppTest know it should look into the src directory?",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-02-11T11:32:53Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-13909)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-02-11T17:46:38Z",
+      "body": "This is a bug in how `AppTest` (and the underlying `ScriptRunner`) sets up `sys.path` when executing scripts. The root cause is in `modified_sys_path` (`lib/streamlit/runtime/scriptrunner/exec_code.py`), which is intended to prepend the script's **directory** to `sys.path` during execution. However, it receives and inserts the full **file path** (e.g., `/project/src/myapp/app.py`) instead of the parent directory (`/project/src/myapp/`). Since Python expects directories in `sys.path`, this has no effect on import resolution. In a flat layout, this bug is masked because the CWD (already in `sys.path`) typically matches the script's directory. In a src layout, the script lives in a subdirectory (e.g., `src/myapp/`) that is not the CWD, so sibling module imports fail with `ModuleNotFoundError`.\n\nThe fix would involve changing `modified_sys_path` to use `os.path.dirname(main_script_path)` instead of the raw file path, or having `AppTest` explicitly add the script's parent directory to `sys.path`.\n\n### Related Issues\n\n- https://github.com/streamlit/streamlit/issues/8154 \u2014 `AppTest` doesn't work with relative filenames in `st.sidebar.page_link()`. Related because it also involves path resolution issues within the `AppTest` framework.\n- https://github.com/streamlit/streamlit/issues/8429 \u2014 Unable to test a multipage app with custom sidebar using `AppTest`. Related because the test runner cannot resolve page paths correctly, which is another manifestation of path handling issues in `AppTest`.\n\n---\n*This is an automated triage comment using `opus-4.6-thinking`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-02-11T18:15:41Z",
+      "body": "Thank you for filing this issue [USER]! \n\nWe understand there is a gap with our AppTest capabilities right now, but also want to be transparent and mention that it is unlikely we'll be resolving them at this moment. We'll keep this issue open so that others can \ud83d\udc4d - we use that information to help surface widely impactful issues. Thank you again for filing this!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-02-13T19:20:20Z",
+      "body": "Opened a PR for this: #13944"
+    }
+  ]
+}

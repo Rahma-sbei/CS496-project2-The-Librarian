@@ -1,0 +1,29 @@
+{
+  "id": "issue-15216",
+  "type": "issue",
+  "number": 15216,
+  "url": "https://github.com/streamlit/streamlit/issues/15216",
+  "title": "st.button shortcut doesn't work with Ctrl+PageDown",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:docs",
+    "feature:st.button",
+    "status:intended-behavior"
+  ],
+  "created_at": "2026-05-18T15:57:43Z",
+  "closed_at": "2026-05-19T17:36:33Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen using a shortcut for st.button :\n\nThe doc mentions that C + R are reserved.\nIt seems to be more than that :\n\nCtrl+PageDown is used by the browser to switch between pages opened in the browser then this shortcut doesn't work with the 'Ctrl' modifiers.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\n# Doesn't work :\nif st.button(\n    \"Does't work\",\n    key=\"foo\",\n    icon=\":material/skip_next:\",\n    shortcut=\"Ctrl+PageDown\",\n):\n    st.toast(\"Never displayed\", icon=\"\ud83d\ude22\")\n\n# Works\nif st.button(\n    \"Works\",\n    key=\"bar\",\n    icon=\":material/skip_next:\",\n    shortcut=\"PageDown\",\n):\n    st.toast(\"See ?\", icon=\"\ud83d\ude0d\")\n```\n\n### Steps To Reproduce\n\nLaunch the code provided, hit PageDow and Ctrl+PageDown\n\n### Expected Behavior\n\nPageDow and Ctrl+PageDown should each show a st.toast\n\n### Current Behavior\n\nOnly PageDow shows a st.toast\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.56.0\n- Python version: >=3.11\n- Operating System: Linux\n- Browser: Chrome / Edge\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-18T15:58:03Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15216)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-18T16:02:59Z",
+      "body": "### Analysis\n\nThis issue reports that the `st.button` `shortcut` keyword does not fire when the user presses `Ctrl+PageDown` (or `Ctrl+PageUp`), even though plain `PageDown` works as expected. The reporter notes that the docs only call out `C` and `R` as reserved.\n\n**Likely root cause: browser-level keybinding, not a Streamlit bug.** `Ctrl+PageDown`/`Ctrl+PageUp` are reserved by Chrome, Edge, Firefox, etc. for \"switch to next/previous tab\" and are intercepted by the browser before any web page can see the event. Streamlit's shortcut handling in [`frontend/lib/src/hooks/useRegisterShortcut.ts`](frontend/lib/src/hooks/useRegisterShortcut.ts) (using `hotkeys-js`) and the Python validator in [`lib/streamlit/elements/lib/shortcut_utils.py`](lib/streamlit/elements/lib/shortcut_utils.py) both happily accept and register `Ctrl+PageDown`, but the registered handler simply never receives a `keydown` for it because the browser consumes the event at the OS/chrome level (this is non-overridable from a web page for security/UX reasons).\n\nSo this is effectively an **intended-but-undocumented limitation**. The likely fixes here are:\n1. Update the docstring for `shortcut` (`st.button`, `st.download_button`, `st.link_button`, `st.form_submit_button`) to mention that browser-reserved combinations (e.g. `Ctrl+T`, `Ctrl+W`, `Ctrl+Tab`, `Ctrl+PageUp`, `Ctrl+PageDown`, `Ctrl+N`, etc.) cannot be captured by the page, and/or\n2. Validate against (or at least warn about) commonly browser-reserved combinations in `normalize_shortcut(...)`.\n\n### Related Issues\n\n- [#13263](https://github.com/streamlit/streamlit/issues/13263) \u2013 `Opening an st.dialog with a button shortcut highlights UI elements within the dialog`. Another `feature:st.button` `shortcut` bug, useful sibling for triage grouping.\n- [#13112](https://github.com/streamlit/streamlit/issues/13112) \u2013 `Page- and app-level keyboard shortcuts`. Same shortcut machinery; any documentation/validation around reserved/blocked combos should apply to a future app-level API too.\n- [#1291](https://github.com/streamlit/streamlit/issues/1291) \u2013 Original `[Coming soon] Keyboard shortcuts` request; useful as background context for the overall shortcut feature.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

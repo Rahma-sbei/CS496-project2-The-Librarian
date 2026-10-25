@@ -1,0 +1,43 @@
+{
+  "id": "issue-10519",
+  "type": "issue",
+  "number": 10519,
+  "url": "https://github.com/streamlit/streamlit/issues/10519",
+  "title": "Programmatically update multiselect selected values",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.multiselect"
+  ],
+  "created_at": "2025-02-26T00:51:30Z",
+  "closed_at": "2026-06-14T20:00:40Z",
+  "body": "I would like to be able to programmatically update the selected values for the multiselect widget. For example, I have an app where it is common to select upwards of 30 values and have the app's UI update accordingly. It would be handy if I could allow the user to, say, upload a csv file and use its contents to programmatically select values.\nHere is another user looking for similar functionality: [https://discuss.streamlit.io/t/dynamically-updating-the-displayed-selections-in-a-multiselect/66239?u=maxmargolis](url). As you can see that topic got closed without an answer, so I assume it is not currently possible.",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-02-26T15:14:18Z",
+      "body": "[USER] Curious question: How did you create this issue without using our issue templates? I think we are enforcing templates, is there a bug in Github that allows to create blank issues?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-26T16:47:14Z",
+      "body": "Hahaha. I hit this link:\n\n<img width=\"538\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/01c868e2-a0b9-4db5-a3ad-f6d24d2011c7\" />\n\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-06-11T19:32:46Z",
+      "body": "Can't you just do this with session state, e.g. with something like this:\n\n```python\nimport streamlit as st\n\ndef select_b_c():\n    st.session_state.multi = [\"B\", \"C\"]\n    \nst.multiselect(\"Multiselect\", [\"A\", \"B\", \"C\"], key=\"multi\")\nst.button(\"Select B and C\", on_click=select_b_c)\n```\n\nOr do you want something different?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-06-15T13:03:20Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-10519)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-14T20:00:40Z",
+      "body": "Closing this since I believe this is already possible via st.session state as suggested by [USER] \n"
+    }
+  ]
+}

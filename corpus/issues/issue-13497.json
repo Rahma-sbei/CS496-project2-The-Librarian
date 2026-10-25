@@ -1,0 +1,38 @@
+{
+  "id": "issue-13497",
+  "type": "issue",
+  "number": 13497,
+  "url": "https://github.com/streamlit/streamlit/issues/13497",
+  "title": "Add required* parameter in st.text_input",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.text_input"
+  ],
+  "created_at": "2026-01-02T19:38:46Z",
+  "closed_at": "2026-09-16T21:47:12Z",
+  "body": "### **Checklist**\n\n- I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n\n- I added a descriptive title and summary to this issue.\n\n### **Summary**\nAdding a required=True parameter would allow for built-in browser-level validation and clearer UI signaling that a field must be filled before a form can be submitted.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Attributes/required\n\n\n### **Why?**\nAdding a required prop would benefit the development in several ways:\n\n- It allows browsers to trigger native \"Please fill out this field\" tooltips and visually mark fields without the developer needing to manually inject CSS or markdown.\n- Save the manual logic to prevent the form from submitting or showing additional messages causing re-renders.\n- Allow screen readers to communicate form requirements.\n\n\n### **How?**\nInclude an optional argument for required=True into the st.text_input() function\n\n\n### **Additional Context**\nNo response",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-01-04T15:38:03Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-13497)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-13T03:59:08Z",
+      "body": "[USER] [USER] nice to meet you.\nI'd like to contribute on this project.\nMay I take up this issue as the first contribution?\nThank you"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-01-19T19:09:12Z",
+      "body": "Related to https://github.com/streamlit/streamlit/issues/7165"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-23T00:29:00Z",
+      "body": "Follow up on this, thank you"
+    }
+  ]
+}

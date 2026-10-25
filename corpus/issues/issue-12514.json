@@ -1,0 +1,31 @@
+{
+  "id": "issue-12514",
+  "type": "issue",
+  "number": 12514,
+  "url": "https://github.com/streamlit/streamlit/issues/12514",
+  "title": "Fragments within container disappearing on rerender",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.container",
+    "feature:st.fragment"
+  ],
+  "created_at": "2025-09-12T13:28:14Z",
+  "closed_at": "2026-07-29T03:51:23Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nI have an issue with `st.fragment`s within a container disappearing on rerender. The initial render works as expected, but after the first user interaction within the fragment, the container seems to act somewhat like an `st.empty()`.\n\nIt only happens under very particular conditions. I isolated the issue by simplifying my example as much as possible. Of course, that example now looks silly, but in my app, these \"particular conditions\" have reasons to be.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\n\n[USER].fragment  # Has to be a fragment.\ndef a():\n    st.button(\"Rerender `a()`\")\n    container = st.container()\n    with container:\n        b(1)\n    with container:  # Has to be a separate `with`.\n        b(2)\n\n\n[USER].fragment  # Has to be a fragment.\ndef b(i: int):\n    st.markdown(i)\n\n\na()\n```\n\n### Steps To Reproduce\n\n1. Try the above code example.\n2. On the initial render, you should see \"1\" and \"2\".\n3. Click the \"Rerender `a()`\" button.\n4. Notice the \"1\" is now gone.\n5. Variations:\n   - If you add anything after `with container: b(2)`, say `container.markdown(3)`, the \"2\" will also disappear, leaving only the \"3\".\n   - If you replace `st.container()` with `st.columns(1)[0]`, `st.expander(\"\")`, `st.popover(\"\")`, or `st.tabs((\"Tab\",))[0]`, the same issue happens.\n7. If you remove any one of the three lines with a comment, it avoids the issue. These three conditions are necessary to reproduce the issue.\n\n### Expected Behavior\n\nAlways seeing \"1\" and \"2\", even after a rerender.\n\n### Current Behavior\n\nInitial render:\n<img width=\"150\" height=\"151\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/613ad0ab-dad8-4336-876d-a54c643e01f0\" />\nAfter clicking the \"Rerender `a()`\" button:\n<img width=\"150\" height=\"151\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/2e224389-5048-4ea2-abef-7c61826f0b49\" />\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.49.1\n- Python version: 3.11.9\n- Operating System: MacOS\n- Browser: Chrome\n\n\n### Additional Information\n\nSee `Steps To Reproduce` #7 for workarounds. Personally, I am not blocked; I am fine with the second workaround. I just thought I'd share my findings since it took me a whiiile to identify the issue, and it's clearly unexpected.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-09-12T13:28:24Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-12514)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-31T14:34:17Z",
+      "body": "This is a confirmed bug involving the interaction between `st.fragment` and `st.container` during fragment reruns. The issue occurs when a fragment contains nested fragments that are rendered inside a container using separate `with container:` context managers. During rerender, the frontend's stale node clearing logic (`ClearStaleNodeVisitor`) appears to incorrectly identify nested fragment elements as stale, causing them to disappear.\n\nThe root cause likely lies in how cursor positions and delta paths are restored during fragment reruns combined with how the `fragmentId` and `scriptRunId` are tracked when multiple nested fragments exist within containers. When the outer fragment (`a()`) reruns, its cursor state is restored, but elements from the nested fragment (`b()`) created in separate `with container:` blocks may not be properly associated with the correct script run, leading to incorrect clearing.\n\n### Related Issues\n\n- https://github.com/streamlit/streamlit/issues/12762 - **Key is ignored when using fragments and containers**: Very similar pattern involving fragments and containers where state management fails across fragment boundaries. Though closed as intended-behavior, the underlying issue may be related.\n\n- https://github.com/streamlit/streamlit/issues/10719 - **Nested periodic st.fragments can cause StreamlitDuplicateElementId**: Another bug involving nested fragments, demonstrating that the fragment nesting logic has edge cases that need attention.\n\n- https://github.com/streamlit/streamlit/issues/6063 - **Clean-slate rendering**: A request for explicit control over element clearing during re-renders, which relates to the unexpected clearing behavior observed in this bug.\n\n---\n*This is an automated triage comment. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

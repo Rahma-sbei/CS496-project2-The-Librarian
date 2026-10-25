@@ -1,0 +1,65 @@
+{
+  "id": "issue-11299",
+  "type": "issue",
+  "number": 11299,
+  "url": "https://github.com/streamlit/streamlit/issues/11299",
+  "title": "Failed to process a Websocket message - while using Slider + st.dataframe height",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:cache",
+    "status:confirmed",
+    "priority:P1"
+  ],
+  "created_at": "2025-05-07T23:56:06Z",
+  "closed_at": "2025-05-09T19:33:26Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-11299)\n\nThis is a very easy to reproduce bug.  If it matters we have a almost 100k row dataframe.\n\nThere is a slider:\nrows_to_show = st.slider(\"Rows to show\", min_value=10, max_value=100, value=20, step=10)\n\nWhich adjusts the height of the df:\nst.dataframe(df, height=40 + (rows_to_show * 30)) # <- yes a little math voodoo\n\nHowever, if you adjust the height and then re-adjust the height (or slider) prior to the dataframe finish loading, this error is thrown. \n\nFor now, I will hard code a frame height. \n\nIssue raised in webpage:\nFailed to process a Websocket message. Error: Cached ForwardMsg MISS [hash=918983c443e8f49e31d63646dea52973]. This is not expected to happen.\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-07T23:56:17Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11299)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-05-08T04:19:08Z",
+      "body": "Hi [USER], really appreciate your issue submission!\nWe are finding this issue more elusive to reproduce on our end - using the slider + dataframe height, as well as simulated data load delay & rapid changes to the slider. \nDo you perhaps have any additional info on triggering the error or is there any way you could provide the app code?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-08T04:51:49Z",
+      "body": "Is there something specific I can add for debugging to help?\r\n\r\nOne thing I noticed, running this locally - I could not reproduce. Running\r\nthis on a remote server - which introduces network lag is where moving the\r\nslider before a reload is both possible but also triggers the error message.\r\n\r\nOn Wed, May 7, 2025 at 9:19\u202fPM Maya Barnes ***@***.***> wrote:\r\n\r\n> *mayagbarnes* left a comment (streamlit/streamlit#11299)\r\n> <https://github.com/streamlit/streamlit/issues/11299#issuecomment-2861701902>\r\n>\r\n> Hi [USER] <https://github.com/travesty77>, really appreciate your\r\n> issue submission!\r\n> We are finding this issue more elusive to reproduce on our end - using the\r\n> slider + dataframe height, as well as simulated data load delay & rapid\r\n> changes to the slider.\r\n> Do you perhaps have any additional info on triggering the error or is\r\n> there any way you could provide the app code?\r\n>\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub\r\n> <https://github.com/streamlit/streamlit/issues/11299#issuecomment-2861701902>,\r\n> or unsubscribe\r\n> <https://github.com/notifications/unsubscribe-auth/AUP65H5BGPHYDHQLPFR4TOT25LLNHAVCNFSM6AAAAAB4VEKZ6GVHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHMZDQNRRG4YDCOJQGI>\r\n> .\r\n> You are receiving this because you were mentioned.Message ID:\r\n> ***@***.***>\r\n>\r\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-05-08T11:18:08Z",
+      "body": "Unfortunately, I'm not able to reproduce this :( But I have prepared a potential fix:\n\n```bash\npip install -U https://core-previews.s3-us-west-2.amazonaws.com/pr-11302/streamlit-1.45.0-py3-none-any.whl\n```\n\nIt would be awesome if you could check if the issue still appears with this fix."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-08T20:28:15Z",
+      "body": "[USER] Any luck with the wheel file?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-09T04:18:47Z",
+      "body": "Thanks so much! I will aim to test this tomorrow.\r\n\r\nOn Thu, May 8, 2025 at 1:28\u202fPM Ken McGrady ***@***.***> wrote:\r\n\r\n> *kmcgrady* left a comment (streamlit/streamlit#11299)\r\n> <https://github.com/streamlit/streamlit/issues/11299#issuecomment-2864233864>\r\n>\r\n> [USER] <https://github.com/travesty77> Any luck with the wheel file?\r\n>\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub\r\n> <https://github.com/streamlit/streamlit/issues/11299#issuecomment-2864233864>,\r\n> or unsubscribe\r\n> <https://github.com/notifications/unsubscribe-auth/AUP65H2QWCWBPLE357ZSFRD25O47LAVCNFSM6AAAAAB4VEKZ6GVHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHMZDQNRUGIZTGOBWGQ>\r\n> .\r\n> You are receiving this because you were mentioned.Message ID:\r\n> ***@***.***>\r\n>\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-09T04:56:33Z",
+      "body": "Hey, actually - found a few minutes to run this through the paces.  This works! I'm surprised this was such a quick fix on your end.  I've left this in the prod environment for now, let me know if you need me to do anything in the morning.\n\nThanks so much!"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-05-09T06:25:32Z",
+      "body": "Linking related issue: https://github.com/streamlit/streamlit/issues/11300"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-05T18:29:25Z",
+      "body": "This scenario still reproduces on 1.64.0: nudging the slider back and forth about twice a second on a 100k-row dataframe raised the same `Cached ForwardMsg MISS` in 2 of 3 rounds of 90 s. #11302 fixed part of it. The remaining race is tracked in #17265, with a minimal repro and a workaround: https://github.com/streamlit/streamlit/issues/17265#issuecomment-6000613061\n"
+    }
+  ]
+}

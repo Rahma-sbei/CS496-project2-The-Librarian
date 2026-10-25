@@ -1,0 +1,73 @@
+{
+  "id": "issue-11050",
+  "type": "issue",
+  "number": 11050,
+  "url": "https://github.com/streamlit/streamlit/issues/11050",
+  "title": "Add the ability to initialize the cache (and orchestrate its refreshment)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:cache"
+  ],
+  "created_at": "2025-04-08T08:18:43Z",
+  "closed_at": "2026-07-24T09:44:59Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nHello,\n\nThis is a suggestion for adding feature to initialize the cache (and orchestrate its refreshment).\n\nHere's one of my current needs: I have an application with lots of pages. For each page, there are several cached functions that take a few minutes to execute but have a relatively long ttl (several days). The problem is that the user experience is degraded for the first user to access a page.\n\nWhat would be nice, I think, is to be able to run all pages in the background (without rendering) to initialize the cache, or to be able to run a function or a page in the background (with different query params), and to be able to empty and refill the cache from time to time.\n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-04-08T08:18:58Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-11050)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-04-08T17:48:52Z",
+      "body": "That does sound like a useful feature, thanks for suggesting it [USER]!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-15T10:15:00Z",
+      "body": "I was in a similar situation, here is my workaround for now. Its a background thread that refreshes the cache of registered functions periodically - please excuse the somewhat messy code:\n\n```\n# General imports\nimport time\nimport threading\nimport streamlit as st\nfrom streamlit.runtime.scriptrunner import add_script_run_ctx\n\n# Import functions that should be refreshed periodically. These functions should have the decorator \"[USER].cache_data\" without any ttl time specified.\nfrom some_model import expensive_function_1, expensive_function_2\n\n# Create a global list to track the functions, how often they should be refreshed and when they were last refreshed.\nregistered_cache_functions = [\n    (expensive_function_1, 120, 0),\n    (expensive_function_2, 120, 0),\n]\n\ndef run_threaded():\n    while True:\n        current_time = time.time()\n        for i, (func, interval, last_run) in enumerate(registered_cache_functions):\n            if current_time - last_run >= interval:\n                try:\n                    func.clear()\n                    func()\n                    registered_cache_functions[i] = (func, interval, current_time)\n                except:\n                    pass\n        time.sleep(1)\n\n[USER].cache_resource\ndef run():\n    worker_thread = threading.Thread(target=run_threaded, name=\"Cache Refresher\")\n    add_script_run_ctx(worker_thread)\n    worker_thread.start()\n\n```\n\nHope this gives you a starting point to work with."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-22T22:21:39Z",
+      "body": "I think this could be rephrased as \"Implement an app startup hook\".\n\nI would imagine something like this, where a startup hook would be passed in at boot:\n```\nstreamlit run --startup_hook my_module.startup.init_app app.py\n```\nHere, you might have a `my_module/startup.py` file with a `def init_app():` in it to call on boot.\n\nThis could then start background threads to do things like populate caches - and the contract could be that the Streamlit wasn't started until the hook exited, allowing the author to block on code execution."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-24T09:44:59Z",
+      "body": "## Update\n\nStreamlit 1.61 will support a `refresh_mode=\"background\"` for `cache_data` and `cache_resource` which allows expired values (based on `ttl`) to be updated in the background without blocking the user session.\n\nIt is also already possible to pre-warm caches at startup before the first user connects via `st.App` lifespan:\n\n```python\nfrom contextlib import asynccontextmanager\nfrom streamlit.starlette import App\n\n[USER]\nasync def lifespan(app):\n    print(\"\ud83d\ude80 Pre-caching data...\")\n\n    # Call cached functions to populate cache\n    from myapp import load_data, compute_stats\n    load_data(\"users\")      # [USER].cache_data\n    load_data(\"products\")   # [USER].cache_data\n    compute_stats()         # [USER].cache_resource\n\n    print(\"\u2705 Cache warmed!\")\n    yield\n    \n    # Run any close operations here\n\napp = App(\"main.py\", lifespan=lifespan)\n```\n\nThe lifespan runs before the server accepts connections, so the first user gets instant cached results."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-24T09:46:32Z",
+      "body": "We are also planning to add a background job utility (+ cron scheduling) that would allow additional advanced ways to refresh caches in the background. This is tracked here: https://github.com/streamlit/streamlit/issues/6687"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-21T07:44:46Z",
+      "body": "Thank you so much for this [USER] :) Is there any way that we can influence the \"2 * ttl\" background cache timeout? In my use case I want a short ttl so the values are updated often, but I never want my users to have to wait for a response. I would like to set the ttl to something like 2 minutes, but the oldest background cache thats allowed to be served can be much older than four minutes. The main goal being that I would prefer old cache over users having to wait."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-21T07:50:04Z",
+      "body": "[USER] i think we can add a config option to make the multiplier configurable. Would this work for you? "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-21T08:58:42Z",
+      "body": "Absolutely, that would be perfect :)"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-21T12:00:45Z",
+      "body": "[USER] started a PR [here](https://github.com/streamlit/streamlit/pull/16599)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-21T16:31:08Z",
+      "body": "incredible!! Thanks so much!"
+    }
+  ]
+}

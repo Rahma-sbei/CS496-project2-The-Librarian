@@ -1,0 +1,97 @@
+{
+  "id": "issue-2090",
+  "type": "issue",
+  "number": 2090,
+  "url": "https://github.com/streamlit/streamlit/issues/2090",
+  "title": "`st.bar_chart` should not be zoomable",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement"
+  ],
+  "created_at": "2020-10-06T01:34:05Z",
+  "closed_at": "2022-11-10T18:46:38Z",
+  "body": "# Summary\r\n\r\nThe bar chart zooms, which I can't think of a scenario for. \r\n\r\n# Steps to reproduce\r\n\r\n```py\r\nimport streamlit as st\r\nimport pandas as pd\r\nimport numpy as np\r\n\r\nst.title('Uber pickups in NYC')\r\n\r\nDATE_COLUMN = 'date/time'\r\nDATA_URL = ('https://s3-us-west-2.amazonaws.com/'\r\n            'streamlit-demo-data/uber-raw-data-sep14.csv.gz')\r\n\r\n[USER].cache\r\ndef load_data(nrows):\r\n    data = pd.read_csv(DATA_URL, nrows=nrows)\r\n    lowercase = lambda x: str(x).lower()\r\n    data.rename(lowercase, axis='columns', inplace=True)\r\n    data[DATE_COLUMN] = pd.to_datetime(data[DATE_COLUMN])\r\n    return data\r\n\r\ndata_load_state = st.text('Loading data...')\r\ndata = load_data(10000)\r\ndata_load_state.text(\"Done! (using st.cache)\")\r\n\r\nif st.checkbox('Show raw data'):\r\n    st.subheader('Raw data')\r\n    st.write(data)\r\n\r\nst.subheader('Number of pickups by hour')\r\nhist_values = np.histogram(data[DATE_COLUMN].dt.hour, bins=24, range=(0,24))[0]\r\nst.bar_chart(hist_values)\r\n```\r\n\r\n## Expected behavior:\r\n\r\nNot sure. Maybe no zoom. \r\n\r\n## Actual behavior:\r\n\r\n<img width=\"789\" alt=\"Screen Shot 2020-10-05 at 18 31 38\" src=\"https://user-images.githubusercontent.com/589034/95148773-04cce800-0739-11eb-86a9-0a935ae7b367.png\">\r\n\r\n# Debug info\r\n\r\n- Streamlit version: 0.65.2\r\n\r\n---\r\n\r\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\r\n\r\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-10-06T06:04:23Z",
+      "body": "~Hm, I can't seem to reproduce this (at least, not on the latest version of Streamlit, Windows, Chrome). Using your exact code snippet gives me:~\r\n\r\n![](https://i.imgur.com/P0EbuM1.png)\r\n\r\nThough, it is kind of weird that the lines on the bar chart are so thin -- not sure if that's a bug with barchart or working as intended."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-10-06T06:07:05Z",
+      "body": "Oh, silly me, I thought you were saying that it was zoomed out by default, but you meant that \"Barcharts should not zoom at all\"; and my gut instinct is that you're absolutely right, there's no reason for that to exist."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-10-06T16:08:52Z",
+      "body": "It might make sense to zoom horizontally only. The vertical zoom for a bar chart is odd. \r\n\r\nYou can constrain the interactions to horizontal like this:\r\n\r\n```\r\nscales = alt.selection_interval(bind=\"scales\", encodings=[\"x\"])\r\nst.write(alt.Chart(df).mark_bar().encode(\r\n    alt.Y(\"count()\"),\r\n    alt.X(\"Body Mass (g)\", bin=True)\r\n).add_selection(scales))\r\n```\r\n\r\n<img width=\"559\" alt=\"Screen Shot 2020-10-06 at 09 09 08\" src=\"https://user-images.githubusercontent.com/589034/95227975-9b3def80-07b3-11eb-89cc-42ec30ec3d6c.png\">\r\n<img width=\"557\" alt=\"Screen Shot 2020-10-06 at 09 08 59\" src=\"https://user-images.githubusercontent.com/589034/95227988-9e38e000-07b3-11eb-8a8a-07c280efadd7.png\">\r\n\r\nI think this interaction can be useful if there are a lot of bars. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-10-22T22:35:02Z",
+      "body": "[USER] -- just saw your comment, and agree that horizontal zooming seems like a better fit than vertical zooming for bar charts. But the code snippet you provided doesn't seem to interact well with the ordinal scale on x-axis... \r\n\r\nAm I invoking the altair library incorrectly somehow? (And/or: any chance of setting this default behavior in the upstream altair library, rather than hacking it in st.bar_chart =3)\r\n\r\n```\r\nimport streamlit as st\r\nimport altair as alt\r\nimport pandas as pd\r\n\r\n\r\ndf = pd.DataFrame(\r\n    {\r\n        \"index\": [3, 4, 5, 6],\r\n        \"numbers\": [10, 50, 30, 40],\r\n    }\r\n)\r\nst.write(df)\r\n\r\nst.write(\"Zooms horizontally\")\r\nscales = alt.selection_interval(bind=\"scales\", encodings=[\"x\"])\r\nst.write(\r\n    alt.Chart(df)\r\n    .mark_bar()\r\n    .encode(alt.Y(\"numbers\"), alt.X(\"index\"))\r\n    .add_selection(scales)\r\n)\r\n\r\nst.write(\"Zooms vertically\")\r\nst.write(\r\n    alt.Chart(df)\r\n    .mark_bar()\r\n    .encode(\r\n        alt.Y(\"numbers\"),\r\n        alt.X(\"index\", type=\"ordinal\"),\r\n    )\r\n    .add_selection(scales)\r\n    .interactive()\r\n)\r\n```"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-10-22T22:39:41Z",
+      "body": "> But the code snippet you provided doesn't seem to interact well with the ordinal scale on x-axis...\r\n\r\nCan you send a gif of what you are seeing?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-10-22T22:46:51Z",
+      "body": "> Can you send a gif of what you are seeing?\r\n\r\nHow about an S4A app :wink:? https://share.streamlit.io/akrolsmir/guac-bottle/barchart-zoom\r\n\r\n![streamlit-streamlit_app-2020-10-22-12-10-66](https://user-images.githubusercontent.com/856034/96937913-11ae4300-147e-11eb-8e72-af1eacbcae28.gif)"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-10-22T22:51:47Z",
+      "body": "Perfect. \r\n\r\n```\r\nst.write(\"Zooms vertically\")\r\nst.write(\r\n    alt.Chart(df)\r\n    .mark_bar()\r\n    .encode(\r\n        alt.Y(\"numbers\"),\r\n        alt.X(\"index\", type=\"ordinal\"),\r\n    )\r\n    .add_selection(scales)\r\n    .interactive()\r\n)\r\n```\r\n\r\nI would only do one: set the selection or call `.interactive`.\r\n\r\nAnd yes, I think the defaults in Altair could be better. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-10-23T01:01:44Z",
+      "body": "> I would only do one: set the selection or call `.interactive`.\r\n\r\nHm, the problem I'm seeing is: For X type=ordinal with only the selection set, the graph doesn't scroll at all; with only `.interactive` set, the graph zooms vertically. I couldn't figure out how to get it to scroll horizontally with type=ordinal.\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-10-23T01:56:53Z",
+      "body": "It zooms horizontally in your gif. I'm missing something. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-10-23T17:24:01Z",
+      "body": "> It zooms horizontally in your gif. I'm missing something.\r\n\r\nAh, sorry if that wasn't clear. In the gif, the first graph does NOT have \"type=ordinal\" set; that is, the only way I could get horizontal scrolling to work was by removing \"type=ordinal\". \r\n\r\nBut this is not super desirable for the graph otherwise; you'll notice that the bars in the first chart are thin, and the number line extends in both direction (whereas a bar chart should only have the ordinal buckets for that the data fits into?)"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-10-23T21:35:18Z",
+      "body": "I see. Zooming in a categorical chart probably isn't all that useful anyway so you could probably disable interactions completely. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-03-01T22:07:50Z",
+      "body": "I've found functionality in horizontal zooming. I have a dataset with very large and very small values, it's important that I can display both the high values and zoom in on areas with the smaller values. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-03-01T22:19:13Z",
+      "body": "I see. In that case you would want only horizontal zooming, though. I see why that could be useful. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-11-10T18:46:38Z",
+      "body": "Given that there aren't any upvotes on this request, I'm going to close the issue. Happy to reopen if something changes."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-11-10T19:33:24Z",
+      "body": "Hmm, I think it's problematic to support zooming on bar charts and the discussion shows that it's a problem people agree with. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-03T04:52:29Z",
+      "body": "This was closed as completed, and yet my bar charts still zoom, breaking scrolling behavior. Please either disable zooming entirely or provide a way to disable it from the st.bar_chart function."
+    }
+  ]
+}

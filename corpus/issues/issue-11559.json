@@ -1,0 +1,39 @@
+{
+  "id": "issue-11559",
+  "type": "issue",
+  "number": 11559,
+  "url": "https://github.com/streamlit/streamlit/issues/11559",
+  "title": "`make frontend-dev`  fails during build under WSL2",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "area:contribution"
+  ],
+  "created_at": "2025-06-08T02:33:09Z",
+  "closed_at": "2026-08-30T13:49:42Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n- Following the [Contributing guide](https://github.com/streamlit/streamlit/wiki/Contributing), I set up a development environment under WSL2 (Ubuntu), installing nvm, Node.js, and Yarn(by `corepack enable`).\n\n- After creating a Python venv in the lib directory, I ran `make all-devel` at the project root, which completed successfully.\n\n- However, ran `make frontend-dev` resulted in the following error:\n```\ncd frontend/ ; yarn workspaces foreach --all --exclude [USER]/app --exclude [USER]/lib --topological run build\nUsage Error: Couldn't find the node_modules state file - running an install might help (findPackageLocation)\n\n$ yarn workspaces foreach [--from #0] [-A,--all] [-R,--recursive] [-W,--worktree] [-v,--verbose] [-p,--parallel] [-i,--interlaced] [-j,--jobs #0] [-t,--topological] [--topological-dev] [--include #0] [--exclude #0] [--no-private] [--since] [-n,--dry-run] <commandName> ...\nmake: *** [Makefile:282: frontend-dependencies] Error 1\n```\n\n### Reproducible Code Example\n\n```Python\n(.venv) user@host:/work/streamlit$ make frontend-dev\n```\n\n### Debug info\n\n- Streamlit version: 1.45.1\n- Python version: 3.10.12\n- Operating System: Ubuntu 22.04.5 (WSL2)\n- Node.js: 24.1.0\n- nvm: 0.40.3\n- yarn: 4.5.3\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-06-08T02:33:25Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11559)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-06-09T10:53:01Z",
+      "body": "[USER] Thanks for reporting this issue. We do not officially support WSL2 for Streamlit development since all core Streamlit developers are using MacOS. Our recommendation for external contributors is to use devcontainer/codespaces. However, we would be open for tweaks to our setup to support development on WSL2. I'm marking this is an enhancement and would be great if someone external with a Windows machine could make a contribution to get our setup running on WSL2 "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-06-21T10:47:28Z",
+      "body": "I'm using WSL2, Ubuntu 24.04.2 LTS, on Windows 10 using the latest versions of everything (I installed them today), and I didn't have any trouble building. It does seem to refuse the connection after everything is successfully built, with\n\n```\n3:35:26 AM [vite] http proxy error: /static/media/SourceSansVF-Upright.ttf.BsWL4Kly.woff2\nError: connect ECONNREFUSED 127.0.0.1:8501\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)\n```\n\nbut building itself was not a problem.\n\nI wish I could help more. Earlier, when trying an earlier version of Ubuntu, I made this note to myself (as a proposal for the documentation):\n\n> If you are on Ubuntu 22.04.5 LTS or earlier, then you will only have access to libprotoc 3.12.4, which is lower than the minimum required version 3.20. Therefore, you will have to do-release-upgrade.\n\nThis doesn't **look** like the same error, but maybe that failed previously in the process, resulting in the node_modules state file not getting built?\n\n----\n\nEdit 2025-06-24 (I've edited this in here instead of leaving a new comment because I don't want to fatigue the other participants with notifications):\n\nIncidentally, from examining the output, `cd frontend/ ; yarn workspaces foreach --all --exclude [USER]/app --exclude [USER]/lib --topological run build` and the makefile from 1.45.1 https://github.com/wyattscarpenter/streamlit/blob/bcfab16697d1f5980393b5cd6c0b22451123d2e3/Makefile and the tip of `develop` https://github.com/streamlit/streamlit/blob/develop/Makefile I notice that `frontend-dev` now no longer uses `frontend-dependencies`. So perhaps it would work for you now, [USER]? Run all the commands again, since the dependency graph of the make commands have changed. (Or don't; maybe it's hopeless.)\n\nBoth `frontend-dev` and `frontend-dependencies` from the tip of `develop` work fine for me, for the record."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-30T13:49:41Z",
+      "body": "Thanks for the report. The original `make frontend-dev` failure (Yarn missing the `node_modules` state file while prebuilding workspace packages) should no longer apply on current `develop` \u2014 that target now just runs `yarn start`, and frontend deps are installed via `make all-dev` / `frontend-init`.\n\nDeveloping Streamlit on Windows/WSL2 is not officially supported. We recommend using the [devcontainer](https://github.com/streamlit/streamlit/tree/develop/.devcontainer) via GitHub Codespaces or VS Code."
+    }
+  ]
+}

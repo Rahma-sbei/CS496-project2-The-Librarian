@@ -1,0 +1,70 @@
+{
+  "id": "issue-10906",
+  "type": "issue",
+  "number": 10906,
+  "url": "https://github.com/streamlit/streamlit/issues/10906",
+  "title": "Revamp HTML validation error popup",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "area:widgets",
+    "feature:st.number_input"
+  ],
+  "created_at": "2025-03-25T18:13:03Z",
+  "closed_at": "2026-07-15T08:16:15Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nFor some input fields (e.g. `st.number_input`), we show the normal HTML form error when validation fails (e.g. if the number is outside the min/max boundaries):\n\n![Image](https://github.com/user-attachments/assets/92b709e7-4e87-48b4-a83b-f64ab45d6305)\n\nThis error doesn't follow our styling though and also doesn't get formatted by theming. We should change it to our own error popup, e.g. similar to the one we made for validation in `st.date_input`:\n\n![Image](https://github.com/user-attachments/assets/822db4aa-d5b8-4a6d-aa38-fe9c836d24d4)\n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-25T18:13:13Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-10906)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-31T11:40:09Z",
+      "body": "Hello, I want to try to fix this issue!"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-03-31T16:57:50Z",
+      "body": "Hey [USER], go for it! As outlined above, this should ideally use the same error popup as we use for validation on `st.date_input` now. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-04-17T12:40:27Z",
+      "body": "Should I pick this up? Looking to get started with my first issue and it seems this has had no activity in a few weeks?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-17T19:35:51Z",
+      "body": "> Should I pick this up? Looking to get started with my first issue and it seems this has had no activity in a few weeks?\n\nhey im starting it today or tomorrow, thanks"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-28T10:54:53Z",
+      "body": "Hi, im working on tests now, will open a PR soon. Is there anything specific i need to do before opening that?\n\n> Hey [[USER]](https://github.com/katerinatsikoura), go for it! As outlined above, this should ideally use the same error popup as we use for validation on `st.date_input` now.\n\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-05-05T13:04:03Z",
+      "body": "Nothing else than what's mentioned in our [Contributing guide](https://github.com/streamlit/streamlit/wiki/Contributing) :)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-24T15:11:49Z",
+      "body": "Hi! I\u2019m interested in working on this issue and can start investigating right away"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-02-15T00:45:27Z",
+      "body": "  Hi, the previous PR #11533 was closed and this has been inactive for several months, so I took a shot at it in PR #13747. [USER] apologies if you were already\n  working on this.\n\n  If anyone has a better approach, happy to close mine."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-03T13:00:10Z",
+      "body": "Hey, I would like to work on this issue. This would be a first for me. I am certain on how to move forward but would appreciate any advice. Can I work on this? "
+    }
+  ]
+}

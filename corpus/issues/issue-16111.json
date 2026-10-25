@@ -1,0 +1,30 @@
+{
+  "id": "issue-16111",
+  "type": "issue",
+  "number": 16111,
+  "url": "https://github.com/streamlit/streamlit/issues/16111",
+  "title": "st.table() / st.dataframe() / st.data_editor() causes fatal SIGSEGV (exit code 139) in PyArrow convert_column - process killed silently, no Python exception raised",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:arrow",
+    "status:confirmed",
+    "priority:P1"
+  ],
+  "created_at": "2026-07-22T08:57:39Z",
+  "closed_at": "2026-07-22T09:06:03Z",
+  "body": "### Summary\n\nCalling st.table(), st.dataframe(), or st.data_editor() with a pandas DataFrame causes a fatal segmentation fault (SIGSEGV, exit code 139) that kills the entire Streamlit process. The crash originates inside PyArrow's convert_column C extension, called during Streamlit's internal DataFrame-to-Arrow serialization. No Python exception is raised. The process dies silently with no user-visible error. In containerized environments (Kubernetes/OpenShift) this triggers a pod restart.\n\n\n### Steps To Reproduce\n\nWe were unable to produce a minimal example that reliably crashes in all environments. The crash is non-deterministic and appears to depend on the process memory state at the time of rendering. It reproduces consistently in our containerized Linux environment (OpenShift, Python 3.11) but not on a local Windows developer machine.\n\nThe code that triggers it in the enviroments:\n\n```\nimport streamlit as st\nimport pandas as pd\n\n# This DataFrame is rendered on every page rerun\ndf = pd.DataFrame({\"Group\": st.session_state.get(\"usergroup\", [])})\nst.table(df)  \n```\n\nor\n\n```\nimport streamlit as st\nimport pandas as pd\n\n# DataFrame built from backend JSON response\nrows = [{\"col_a\": \"value\", \"col_b\": None}, {\"col_a\": \"other\", \"col_b\": 3}]\ndf = pd.DataFrame(rows)  # object-dtype columns with None values\nst.dataframe(df)  #\n```\n\n\nSteps To Reproduce\n\n1. Deploy a Streamlit 1.55.0 app to a Linux container (e.g. OpenShift/Kubernetes)\n2. Navigate to a page that renders st.table() or st.dataframe() with a DataFrame that has object-dtype columns (e.g. built from pd.DataFrame(list_of_dicts) where some cells are None)\n3. Trigger a Streamlit script rerun via a button click that loads new data into session state before the render\n4. Observed: process dies with exit code 139, container restarts\n5. Repeat the exact same steps - it works on the second attempt\n\n### Expected Behavior\n\nThe DataFrame renders normally. If an internal serialization error occurs, Streamlit catches it and displays an error in the UI without killing the process.\n\n### Current Behavior\n\nThe Python process is killed with SIGSEGV (exit code 139). Nothing appears in logs unless faulthandler is explicitly enabled at startup. With import faulthandler; faulthandler.enable() added, the crash trace is:\n\n```\nFatal Python error: Segmentation fault\n\nCurrent thread (most recent call first):\n  File \".../pyarrow/pandas_compat.py\", line 638 in convert_column\n  File \".../pyarrow/pandas_compat.py\", line 656 in dataframe_to_arrays\n  File \".../streamlit/dataframe_util.py\", line 839 in convert_pandas_df_to_arrow_bytes\n  File \".../streamlit/dataframe_util.py\", line 919 in convert_anything_to_arrow_bytes\n  File \".../streamlit/elements/table.py\", line 78 in marshall_table\n  File \".../streamlit/elements/table.py\", line 234 in table\n```\n\nThe crash is non-deterministic: it only occurs on some reruns, always the first one after the pod/process starts, and does not occur on subsequent reruns with identical data and code. We have no confirmed explanation for the non-determinism beyond it appearing to depend on process memory state.\n\n**Workaround**: converting object-dtype columns to pd.StringDtype() before rendering prevents the crash:\n\n- For st.table(): replace with st.write() / st.markdown() to avoid PyArrow entirely\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- **Streamlit version:** 1.55.0\n- **Python version:** 3.11\n- **OS:** Linux (OpenShift container, py311ora base image)\n- **PyArrow version:** (bundled with Streamlit 1.55.0)\n- **pandas version:** (default installed with Streamlit 1.55.0)\n- **Browser**: Microsoft Edge\n\n### Additional Information\n\n- The crash is in PyArrow's C extension code, not in Streamlit's Python layer - Streamlit could potentially guard against it by catching signals or pre-validating column types before passing to PyArrow\n- After the SIGSEGV the container restarts automatically (Kubernetes/OpenShift restart policy). On the very next attempt, with the process freshly started and identical code, data, and user actions, the crash does not occur and the app works normally. This \"works after restart\" behavior is what made the bug difficult to diagnose initially, as it appeared to be a transient infrastructure issue rather than a code defect.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-22T08:57:51Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16111)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T09:06:03Z",
+      "body": "[USER] Thanks for reporting this issue. This is a known upstream issue with pyarrow 25.0.0: https://github.com/apache/arrow/issues/50471 Its already fixed, but the pyarrow patch is not yet rolled out. \n\nTo fix this, you can use the latest version of Streamlit which excludes the broken pyarrow version or pin pyarrow to `pyarrow!=25.0.0` or `pyarrow<25.0.0` in your requirements."
+    }
+  ]
+}

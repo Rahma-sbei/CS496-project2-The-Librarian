@@ -1,0 +1,35 @@
+{
+  "id": "issue-7847",
+  "type": "issue",
+  "number": 7847,
+  "url": "https://github.com/streamlit/streamlit/issues/7847",
+  "title": "Add configurable footer element",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:layout",
+    "type:possible-component",
+    "area:elements"
+  ],
+  "created_at": "2023-12-18T09:23:15Z",
+  "closed_at": "2026-07-06T01:30:05Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAs discussed in this #7583 pull request, I propose to add a configurable footer element.\r\nSince we used to patch the \"hard-coded\" Streamlit footer to add some imprint information, the footer is gone now and there is no real way to deal with such requirements.\n\n### Why?\n\nFooter has been removed. Furthermore, it was not designed for easy configuration. Inline css patching was required to change the content which does not follow Streamlit's easy-to-use interfaces.\n\n### How?\n\nSet the \"Made with Streamlit\" footer by default. Make the footer configurable, e.g.\r\n```\r\nst.footer(text=\"Imprint: My Company\", activate=True)\r\n```\r\nor via a global configuration:\r\n```\r\nst.set_page_config(footer=\"Imprint: My Company\")\r\n```\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-12-18T09:23:27Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-7847)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-29T07:12:46Z",
+      "body": "this would be super convenient to have! any plans on developing this feature?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-06T01:30:05Z",
+      "body": "We recently released `st.bottom` in Streamlit, which can be used for footers, see [here](https://docs.streamlit.io/develop/api-reference/layout/st.bottom)."
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "id": "issue-15696",
+  "type": "issue",
+  "number": 15696,
+  "url": "https://github.com/streamlit/streamlit/issues/15696",
+  "title": "Exception type too broad in error handling",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [],
+  "created_at": "2026-06-25T06:42:42Z",
+  "closed_at": "2026-06-25T08:46:11Z",
+  "body": "## Bug Report\n\n### Description\nSome `except` clauses catch overly broad exception types (e.g., bare `except:` or `except Exception:`), which can accidentally swallow important errors like `KeyboardInterrupt` or `SystemExit`.\n\n### Example\n```python\n# Problematic:\ntry:\n    do_something()\nexcept:  # catches EVERYTHING including KeyboardInterrupt\n    pass\n\n# Better:\ntry:\n    do_something()\nexcept ValueError as e:\n    logger.warning(f\"Value error: {e}\")\n```\n\n### Expected Behavior\nException handlers should catch only the specific exceptions they know how to handle.\n\n### Impact\n- Makes it impossible to interrupt the program with Ctrl+C in some cases\n- Hides unexpected errors that should be investigated\n- Makes debugging significantly harder\n\n### Suggested Fix\nReplace broad `except` clauses with specific exception types wherever possible.\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-25T08:46:11Z",
+      "body": "[USER] if there is a specific issue you are encountering or a certain area of the code you think should be updated, can you make an issue/PR with details of that? This is too broad and non-specific to be actionable. "
+    }
+  ]
+}

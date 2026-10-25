@@ -1,0 +1,34 @@
+{
+  "id": "issue-7348",
+  "type": "issue",
+  "number": 7348,
+  "url": "https://github.com/streamlit/streamlit/issues/7348",
+  "title": "It would be great to add error texts into the text_input",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:widgets",
+    "feature:st.text_input"
+  ],
+  "created_at": "2023-09-16T05:36:12Z",
+  "closed_at": "2026-08-03T06:43:35Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nHi Team,\r\n\r\nIt would be great if we would have a error text field into the text_input, like I am creating a big application with streamlit in which i have a form, I want to validate input of my users and the set a error message accordingly in the text_input.\r\n\r\nWe can just add a field error_message in the text_input which will show a small beautiful message below the input.\r\n\r\nThanks\r\n\r\nRegards,\r\nDilip Thakkar\n\n### Why?\n\nBecause It would be very helpful to create a large form with input validations.\n\n### How?\n\nWe can just add a field error_message in the text_input which will show a small beautiful message below the input.\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-09-16T05:36:23Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-7348)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-09-17T10:50:09Z",
+      "body": "There are multiple issues opened for similar things. It would be more benefitial to add your input to one of already opened issues.\r\nLike, #7165, #6704"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-03T06:45:57Z",
+      "body": "## Update\n\n`st.text_input` now supports client-side regex validation with a custom error message through the new `validate` parameter. This will be available in Streamlit `1.62+`.\n\n```python\nemail = st.text_input(\n    \"Email\",\n    validate=(r\"^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$\", \"Enter a valid email address.\"),\n)\n```\n\nInvalid non-empty values are not submitted, and the custom message is shown when validation fails."
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "id": "issue-10719",
+  "type": "issue",
+  "number": 10719,
+  "url": "https://github.com/streamlit/streamlit/issues/10719",
+  "title": "Nested periodic st.fragments can cause StreamlitDuplicateElementId",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.fragment"
+  ],
+  "created_at": "2025-03-11T14:56:57Z",
+  "closed_at": "2026-08-05T20:32:40Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen you create 2 fragments that rerun both automatically and call one from the other, sometimes one rerun can cause both fragments to rerun at the same time and generate the same widget at the inner fragment which causes an error\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\n[USER].fragment(run_every=0.2)\ndef func2():\n    st.button(\"OK2\")\n\n[USER].fragment(run_every=0.5)\ndef func():\n    st.button(\"OK\")\n    func2()\n\nfunc()\n```\n\n### Steps To Reproduce\n\n- start streamlit run <script.py>\n- see streamlit console logs and wait (~4-5 sec for me, or make smaller run_every times)\n\n### Expected Behavior\n\nOne of: \n- The streamlit rendering smoothly without any error, without any console-log\n- The streamlit wrote an error at the first run, stating that a fragment cannot contain another fragment (or another fragment with an automatic rerun setting).\n\n### Current Behavior\n\nA warning message appears every `func` fragment rerun time\n---\n\n```\n<timestamp> The fragment with id <fragment-id> does not exist anymore - it might have been removed during a preceding full-app rerun.\n```\n\nError message appears after a short time (for me ~4-5 sec)\n---\n\n```\n<timestamp> Uncaught app execution\nTraceback (most recent call last):\n  File \"<streamlit_path>/streamlit/runtime/fragment.py\", line 244, in wrapped_fragment\n    result = non_optional_func(*args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<script_path>/main.py\", line 5, in func2\n    st.button(\"OK2\")\n  File \"<streamlit_path>/streamlit/runtime/metrics_util.py\", line 410, in wrapped_func\n    result = non_optional_func(*args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<streamlit_path>/streamlit/elements/widgets/button.py\", line 243, in button\n    return self.dg._button(\n           ^^^^^^^^^^^^^^^^\n  File \"<streamlit_path>/streamlit/elements/widgets/button.py\", line 1010, in _button\n    element_id = compute_and_register_element_id(\n                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<streamlit_path>/streamlit/elements/lib/utils.py\", line 241, in compute_and_register_element_id\n    _register_element_id(ctx, element_type, element_id)\n  File \"<streamlit_path>/streamlit/elements/lib/utils.py\", line 147, in _register_element_id\n    raise StreamlitDuplicateElementId(element_type)\nstreamlit.errors.StreamlitDuplicateElementId: There are multiple `button` elements with the same auto-generated ID. When this element is created, it is assigned an internal ID based on the element type and provided parameters. Multiple elements with the same type and parameters will cause this error.\n```\n\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.43.1\n- Python version: 3.12.3\n- Operating System: Linux Mint 22.1\n- Browser: Firefox Browser 135.0.1 (64-bit)\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-11T14:57:11Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-10719)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-12T14:27:17Z",
+      "body": "Hello, [USER]; thank you for opening this issue!\n\nI was able to reproduce it [here](https://issues.streamlit.app/?issue=gh-10719)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-09-11T10:56:22Z",
+      "body": "I found a similar issue I believe is related [here](https://discuss.streamlit.io/t/duplicate-key-error-with-st-radio-in-nested-fragments/119429). If the child fragment is triggered multiple times before the parent finishes executing this error seems to occur. see the forum post for details."
+    }
+  ]
+}

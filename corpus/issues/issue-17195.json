@@ -1,0 +1,46 @@
+{
+  "id": "issue-17195",
+  "type": "issue",
+  "number": 17195,
+  "url": "https://github.com/streamlit/streamlit/issues/17195",
+  "title": "Programmatically set selections fail for empty selection",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:frontend",
+    "feature:st.dataframe",
+    "status:confirmed",
+    "priority:P3"
+  ],
+  "created_at": "2026-09-29T18:16:24Z",
+  "closed_at": "2026-10-01T17:28:13Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nThe example in https://docs.streamlit.io/develop/api-reference/data/st.dataframe titled: \"Example 2: Programmatically set selections\" does not work if we try with empty selections.\n\n### Reproducible Code Example\n\n```Python\nimport pandas as pd\nimport streamlit as st\nfrom numpy.random import default_rng as rng\n\ndf = pd.DataFrame(rng(0).standard_normal((12, 5)), columns=[\"a\", \"b\", \"c\", \"d\", \"e\"])\n\nif st.button(\"Select the first row\"):\n    st.session_state[\"data\"] = {\"selection\": {\"rows\": [0], \"columns\": [], \"cells\": []}}\nif st.button(\"Select no row\"):\n    st.session_state[\"data\"] = {\"selection\": {\"rows\": [], \"columns\": [], \"cells\": []}}\n\nevent = st.dataframe(\n    df,\n    key=\"data\",\n    on_select=\"rerun\",\n    selection_mode=[\"single-row\"],\n)\n\nst.code(event.selection)\n```\n\n### Steps To Reproduce\n\n1. Run the code\n2. Select a row\n3. Click on the button \"Select the first row\", it works as expected\n4. Select a row again\n5. Click on the button \"Select no row\", the dataframe selection state is empty but the table keeps the previous selection.\n\n### Expected Behavior\n\nThe row selection should match the dataframe selection state and be empty.\n\n### Current Behavior\n\nThe dataframe selection state is empty but the table keeps the previous selection and is not empty.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.63.0\n- Python version: 3.12\n- Operating System: WSL Docker\n- Browser: Edge\n\n\n### Additional Information\n\nI remember it worked in Streamlit version 1.57.0 but I am not sure, I may be mistaken.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-29T18:16:36Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-17195)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-30T13:43:38Z",
+      "body": "Assigning an empty dataframe selection via `st.session_state` (for example `{\"selection\": {\"rows\": [], \"columns\": [], \"cells\": []}}`) updates the Python return value, but the Glide Data Grid UI keeps the previous row selection. Non-empty programmatic selections in the same docs example work. Backend validation already accepts empty selections and, on `value_changed`, writes them to the one-shot `selection_state` proto field. The frontend parser is also written to return an empty `GridSelection` (not `undefined`) so clearing can work, but `DataFrame` never asserts that applying that empty state actually unchecks rows. The existing e2e clear test only checks the Python markdown output, not the canvas, which matches this backend/UI split.\n\n### Related Issues\n\n- [#14454](https://github.com/streamlit/streamlit/issues/14454) \u2014 Previous bug in the same programmatic-selection path (`selection` key / `AttributeError`). Same session-state API; that issue was about applying selections, this one is about clearing them.\n- [#10128](https://github.com/streamlit/streamlit/issues/10128) \u2014 Original request to pre-set dataframe selections via session state (shipped in #13594). This report is a gap in that feature: empty selections are a documented way to clear.\n- [#16388](https://github.com/streamlit/streamlit/issues/16388) \u2014 Similar backend/frontend split: Python reflects the cleared widget value while the UI keeps the stale one. Different widget (`st.text_input`) and trigger (`del` vs assigning an empty selection).\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-01T11:11:01Z",
+      "body": "Assigning an empty dataframe selection via `st.session_state` (for example `{\"selection\": {\"rows\": [], \"columns\": [], \"cells\": []}}`) updates the Python return value, but the Glide Data Grid UI keeps the previous row highlight. Non-empty programmatic selections in the same docs example work. Backend validation already accepts empty selections and, on `value_changed`, writes them to the one-shot `selection_state` proto field. The frontend parser is also written to return an empty `GridSelection` (not `undefined`) so clearing can work, but `DataFrame` never asserts that applying that empty state actually unchecks rows. The existing e2e clear test only checks the Python markdown output, not the canvas, which matches this backend/UI split. A likely apply-path gap is that empty selection JSON is always the same string, so `processedSelectionStateRef` can skip a later clear, and/or Glide does not visually honor a controlled empty selection after a rerun in `single-row` mode.\n\n### Related Issues\n\n- [#14454](https://github.com/streamlit/streamlit/issues/14454) \u2014 Previous bug in the same programmatic-selection path (`selection` key / `AttributeError`). Same session-state API; that issue was about applying selections, this one is about clearing them.\n- [#10128](https://github.com/streamlit/streamlit/issues/10128) \u2014 Original request to pre-set dataframe selections via session state (shipped in #13594). This report is a gap in that feature: empty selections are a documented way to clear.\n- [#16388](https://github.com/streamlit/streamlit/issues/16388) \u2014 Similar backend/frontend split: Python reflects the cleared widget value while the UI keeps the stale one. Different widget (`st.text_input`) and trigger (`del` vs assigning an empty selection).\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-10-01T12:26:45Z",
+      "body": "Hello, I'd like to work on this issue. \n\nI've reproduced the bug where programmatically passing an empty selection (`{\"rows\": [], \"columns\": [], \"cells\": []}`) updates the backend session state but fails to clear the active selection in the frontend UI. \n\nI'm planning to investigate the state reconciliation in the dataframe frontend component (`frontend/lib/src/components/widgets/DataFrame/`) to see if empty arrays are being evaluated as falsy or skipped during state updates.\n\nCould you please assign this issue to me?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-10-01T12:50:01Z",
+      "body": "This also affects repeated **non-empty** assignments, which may help narrow the investigation.\n\nWith the unmodified Streamlit 1.64.0 wheel in Chrome on macOS, using the example above and keeping `key=\"data\"` unchanged:\n\n| Sequence | Python `event.selection.rows` | Visible selected row |\n| --- | --- | --- |\n| Select a row, then click \u201cSelect no row\u201d for the first time | `[]` | None |\n| Select another row, then click \u201cSelect no row\u201d again | `[]` | Previous row remains checked |\n| Click \u201cSelect the first row\u201d | `[0]` | First row |\n| Select the second row in the grid, then click \u201cSelect the first row\u201d again | `[0]` | Second row remains checked |\n\nThe first clear does remove the checkbox/highlight, so this is not simply empty arrays being ignored by the grid.\n\nIn [DataFrame.tsx at 1.64.0](https://github.com/streamlit/streamlit/blob/1.64.0/frontend/lib/src/components/widgets/DataFrame/DataFrame.tsx#L661-L692), `processedSelectionStateRef` retains the last programmatic JSON string. The early return for an absent one-shot `selectionState` does not clear that ref. This appears consistent with both repeated-value failures: the same later command is skipped before parsing/applying it.\n\nA regression check should include both `clear \u2192 user selects \u2192 clear` and `[0] \u2192 user selects [1] \u2192 [0]`, asserting the grid's selected row as well as the Python output. I haven't validated a source fix.\n"
+    }
+  ]
+}

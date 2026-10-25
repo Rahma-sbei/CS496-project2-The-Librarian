@@ -1,0 +1,32 @@
+{
+  "id": "issue-15493",
+  "type": "issue",
+  "number": 15493,
+  "url": "https://github.com/streamlit/streamlit/issues/15493",
+  "title": "streamlit.pills invokes callback with the value returned by format_func",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P2",
+    "feature:callbacks",
+    "feature:st.segmented_control",
+    "feature:st.pills"
+  ],
+  "created_at": "2026-06-10T02:06:09Z",
+  "closed_at": "2026-06-16T19:29:57Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nIf I have `streamlit.pills(label, options, on_change=callback, format_func=formatter)`, `callback` is sometimes invoked not with one of the values of `options`, but with the value returned by `formatter`.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nprint(\"RUN!\")\n\nif \"L\" not in st.session_state:\n    st.session_state[\"L\"] = \"EN\"\nif \"F\" not in st.session_state:\n    st.session_state[\"F\"] = \"A\"\n\n\ndef set_lang() -> None:\n    print(f\"Set language to {st.session_state['_L']}\")\n    st.session_state[\"L\"] = st.session_state[\"_L\"]\n\n\ndef set_fruit() -> None:\n    new_fruit = st.session_state[\"_F\"]\n    if new_fruit in [\"A\", \"O\"]:\n        st.session_state[\"F\"] = st.session_state[\"_F\"]\n    else:\n        print(f\"UNEXPECTED: Set fruit to {new_fruit}\")\n\n\nfruits_en = {\"A\": \"apples\", \"O\": \"oranges\"}\nfruits_es = {\"A\": \"manzanas\", \"O\": \"naranjas\"}\n\nfruits = fruits_en if st.session_state[\"L\"] == \"EN\" else fruits_es\n\nst.pills(\"\ud83c\udf10\", [\"EN\", \"ES\"], required=True, default=st.session_state[\"L\"], key=\"_L\", on_change=set_lang)\nst.write(f\"Default value: {st.session_state['F']}\")\nst.pills(\n    \"\ud83d\ude0b\", [\"A\", \"O\"], required=True, default=st.session_state[\"F\"], key=\"_F\", on_change=set_fruit, format_func=lambda f: fruits[f]\n)\n```\n\n### Steps To Reproduce\n\n1. Run the application as usual\n    Console: \n    ```\n    RUN!\n    ```\n1. Click on \"ES\" \n    Console: \n    ```\n    Set language to ES\n    RUN!\n    ```\n    (By the way: Now, no fruit pill is selected, which is also unexpected.)\n1. Click on \"EN\"\n    Console: \n    ```\n    Set language to EN\n    UNEXPECTED: Set fruit to apples\n    RUN!\n    ```\n\n\n### Expected Behavior\n\nThe callback should always be invoked with one of the options given to `streamlit.pills`, without formatting.\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.58.0\n- Python version: 3.14.5rc1\n- Operating System: Windows 11 Enterprise 24H2\n- Browser: Opera, Firefox, Edge\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-10T02:06:18Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15493)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-10T16:44:19Z",
+      "body": "### Analysis\n\nWhen `st.pills` (and `st.segmented_control`, which shares the same backend) is used with `format_func`, the widget value is stored and transported as the **formatted string** rather than the raw option. On each script run, `_SingleSelectButtonGroupSerde.deserialize` (in `lib/streamlit/elements/widgets/button_group.py`) looks the incoming formatted string up in `formatted_option_to_option_index` to convert it back to the original option. If the lookup fails \u2014 which happens here because the `format_func` output changes between runs (English \u2194 Spanish via the `fruits` dict) \u2014 the serde falls through to `return string_value`, i.e. it returns the formatted string verbatim. This unresolved value is what ends up in `st.session_state[\"_F\"]` and is what the `on_change` callback receives, which is why `set_fruit` is invoked with `\"apples\"` instead of `\"A\"`. The follow-up reset by `validate_and_sync_value_with_options` fixes serialization back to the frontend, but it runs *after* the callback has already fired with the formatted string. Closely related to the long-standing serde fragility documented in #8008 and #11541.\n\n### Related Issues\n\n- [#8008 - Selectbox returns old element not in options if format_func returns the same value for old and new options](https://github.com/streamlit/streamlit/issues/8008) \u2014 Same root cause family: the selection serde uses `format_func` output as the round-trip key, which breaks when the function isn't stable or one-to-one across reruns.\n- [#11541 - ButtonGroup.select() fails when options use format_func or are not primitive strings](https://github.com/streamlit/streamlit/issues/11541) (closed) \u2014 Directly about the ButtonGroup (pills/segmented_control) serde mishandling `format_func`; useful prior context and a likely starting point for the fix.\n- [#12392 - state management issues with `st.pills` when options change dynamically](https://github.com/streamlit/streamlit/issues/12392) \u2014 Another manifestation of the pills/segmented_control state-resync logic misbehaving when the option set/labels change between runs.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

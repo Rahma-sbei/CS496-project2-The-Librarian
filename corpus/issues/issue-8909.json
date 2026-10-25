@@ -1,0 +1,33 @@
+{
+  "id": "issue-8909",
+  "type": "issue",
+  "number": 8909,
+  "url": "https://github.com/streamlit/streamlit/issues/8909",
+  "title": "Can not install milvus SDK",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:community-cloud"
+  ],
+  "created_at": "2024-06-15T17:14:45Z",
+  "closed_at": "2026-07-22T09:52:10Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nI am trying to use milvus SDK in streamlit and deloy it but the building app got stuck in \r\nBuilding wheel for grpcio-tools (setup.py): still running...\r\n![image](https://github.com/streamlit/streamlit/assets/107928828/b0ba3b64-e9e4-4eeb-9df7-dae6e8c1f1fd)\r\n\n\n### Reproducible Code Example\n\n```Python\nstreamlit==1.32.2\r\npymilvus==2.4.1\r\ngoogle-generativeai==0.5.0\r\n\r\nthis is my requirement.txt file\r\n\r\nhttps://stackoverflow.com/questions/56357794/unable-to-install-grpcio-using-pip-install-grpcio i also found this fix on stackoverflow\n```\n\n\n### Steps To Reproduce\n\n1. create a streamlit app which use milvus sdk: pip install milvus\r\n2. deploy it \n\n### Expected Behavior\n\nIt should be able to download milvus and run\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:  1.32.2\r\n- Python version: 3.12\r\n- Operating System: Windows 100\r\n- Browser: Google\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-06-24T17:38:27Z",
+      "body": "Hi [USER], thanks for your submission! \r\nI have opened a ticket with our Community Cloud team to look into the issue when possible - could you just confirm that you are deploying through Streamlit - https://share.streamlit.io/ ?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-28T06:38:22Z",
+      "body": "> Hi [USER], thanks for your submission! I have opened a ticket with our Community Cloud team to look into the issue when possible - could you just confirm that you are deploying through Streamlit - https://share.streamlit.io/ ?\r\n\r\nyes I was deloping a streamlit app using Community Cloud"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-30T13:30:33Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8909)\n"
+    }
+  ]
+}

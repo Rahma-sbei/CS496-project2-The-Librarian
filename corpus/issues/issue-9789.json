@@ -1,0 +1,71 @@
+{
+  "id": "issue-9789",
+  "type": "issue",
+  "number": 9789,
+  "url": "https://github.com/streamlit/streamlit/issues/9789",
+  "title": "InvalidStateError: CanvasRenderingContext2D.scale: Canvas is already in error state.",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:st.dataframe",
+    "status:cannot-reproduce",
+    "feature:st.data_editor",
+    "upstream"
+  ],
+  "created_at": "2024-11-06T06:32:13Z",
+  "closed_at": "2026-06-13T14:01:10Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nI'm getting the error in Firefox but not in Chrome.\r\n\r\nHere's how it appears with a `streamlit run .\\app.py --server.port 8080` :\r\n\r\n![image](https://github.com/user-attachments/assets/a5793e5c-6c3b-4337-91c0-5c84ff3ea6e6)\r\n\r\nAnd here is the Traceback (*as text*):\r\n```\r\nInvalidStateError: CanvasRenderingContext2D.scale: Canvas is already in error state.\r\n\r\n78170/pe</Et<[USER]://localhost:8080/static/js/9589.fa50c837.chunk.js:2:189843\r\n78170/pe</<[USER]://localhost:8080/static/js/9589.fa50c837.chunk.js:2:190125\r\nol@http://localhost:8080/static/js/main.33cac65c.js:10:2346148\r\nyl@http://localhost:8080/static/js/main.33cac65c.js:10:2353444\r\nzl@http://localhost:8080/static/js/main.33cac65c.js:10:2353288\r\ngl@http://localhost:8080/static/js/main.33cac65c.js:10:2352824\r\n73207/Ac/<[USER]://localhost:8080/static/js/main.33cac65c.js:10:2364661\r\nAc@http://localhost:8080/static/js/main.33cac65c.js:10:2365176\r\ncc@http://localhost:8080/static/js/main.33cac65c.js:10:2358895\r\nUo@http://localhost:8080/static/js/main.33cac65c.js:10:2299288\r\nrc@http://localhost:8080/static/js/main.33cac65c.js:10:2355780\r\nns@http://localhost:8080/static/js/main.33cac65c.js:10:2320925\r\n78170/lt</po<[USER]://localhost:8080/static/js/9589.fa50c837.chunk.js:2:264155\r\n78170/xe/L<[USER]://localhost:8080/static/js/9589.fa50c837.chunk.js:2:213609\r\n78170/xe/F<[USER]://localhost:8080/static/js/9589.fa50c837.chunk.js:2:213802\r\n78170/ye/P<[USER]://localhost:8080/static/js/9589.fa50c837.chunk.js:2:210332\r\n78170/ye/<[USER]://localhost:8080/static/js/9589.fa50c837.chunk.js:2:211357\r\n```\r\n\r\n### Reproducible Code Example\r\nNot a MRE but at least the configuration that triggers the error on my machine.\r\n\r\n```Python\r\nimport streamlit as st\r\n\r\n[USER].cache_data\r\ndef _get_df():\r\n    # df is made from an sql query\r\n    # len(df.columns) is 94\r\n    return df\r\n\r\ntab_1, tab_2, tab_3 = st.tabs(3)\r\nwith tab_1:\r\n    st.dataframe(_get_df(), hide_index=True, use_container_width=True)\r\n    # + a pagination using `st.input_number` and `st.selectbox`\r\n    # + an `st.toggle` (that uses a fragment of `st.download_button`) to export the dataframe\r\n\r\n# rest of the code\r\n```\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.38.0\r\n- Python version: 3.10.13\r\n- Operating System: Windows 10\r\n- Browser: Firefox 132.0.1\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-06T06:32:30Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9789)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-11-06T17:59:54Z",
+      "body": "[USER] Thanks for reporting this issue. Unfortunately, I wasn't able to reproduce this issue with Firefox 132.0.1. And as far as I know, this is the first time this error has been reported. \r\n\r\nDoes the error directly appear when opening the app? Does the error appear always?\r\n\r\nCan you check if it also runs into the error with Streamlit 1.39? We fixed a similar issue in 1.39 with dataframe [here](https://github.com/streamlit/streamlit/pull/9490). "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-07T09:06:43Z",
+      "body": "> [USER] Thanks for reporting this issue. Unfortunately, I wasn't able to reproduce this issue with Firefox 132.0.1. And as far as I know, this is the first time this error has been reported.\r\n\r\n[USER], you're welcome.\r\n\r\n> Does the error directly appear when opening the app? Does the error appear always?\r\n\r\nThe error appears always in Firefox and 1.38.0.\r\n\r\n> Can you check if it also runs into the error with Streamlit 1.39? We fixed a similar issue in 1.39 with dataframe [here](https://github.com/streamlit/streamlit/pull/9490).\r\n\r\nUpgrading to 1.39.0 fixed the issue for me, thank you ;)\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-10T14:48:44Z",
+      "body": "Facing the same issue while on Streamlit v1.40.0 and Firefox. Downgrading to V1.39 solved the issue. Should I start a different thread for it?\r\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-11-11T09:17:35Z",
+      "body": "[USER] is it the exact same error? And do you have a minimal snippet that allows reproducing it?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-11T23:56:55Z",
+      "body": "[USER] Yes, it was the same error. I tried to reproduce it today again after updating to v1.40.1 and it works just fine.\r\n\r\nI will post the code if this turns up again. Thank you."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-12T00:02:55Z",
+      "body": "[USER] Downgraded to v 1.40.0 and the error pops up again. Below is the screenshot\r\n\r\n![image](https://github.com/user-attachments/assets/bd0d96c1-43fd-4294-99d5-fb0a0d6bf2ec)\r\n\r\n\r\nThe code used is as follows\r\n\r\n```\r\nimport pandas as pd\r\nimport streamlit as st\r\n\r\ndf = pd.read_csv('instruments.csv')\r\nst.dataframe(df)\r\n```\r\n\r\nThe instruments.csv is \r\n[instruments.csv](https://github.com/user-attachments/files/17709262/instruments.csv)\r\n\r\n**Firefox: 131.0.2(64-bit)**\r\n**Streamlit: 1.40.0**\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-30T20:21:44Z",
+      "body": "In my case, it was an issue with using the `height` argument. Removing it resolved the issue."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-11-08T01:19:46Z",
+      "body": "Is anyone still impacted by this issue with the latest Streamlit version?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-13T14:01:10Z",
+      "body": "Closing this since I believe this is fixed. If this issue still impacts anyone, please respond here"
+    }
+  ]
+}

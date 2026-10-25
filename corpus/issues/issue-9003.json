@@ -1,0 +1,43 @@
+{
+  "id": "issue-9003",
+  "type": "issue",
+  "number": 9003,
+  "url": "https://github.com/streamlit/streamlit/issues/9003",
+  "title": "AppTest - add support for st.image and st.download_button",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:app-testing"
+  ],
+  "created_at": "2024-07-01T10:58:24Z",
+  "closed_at": "2026-06-12T09:27:57Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nRequesting st.image and st.download_button to be added to AppTest\n\n### Why?\n\nImages and download buttons are key features of our streamlit app, and we'd like to use AppTest to write automated tests for these widgets.\n\n### How?\n\nNew properties within AppTest class for getting sequences of all st.image and st.download_button widgets.\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-07-01T10:58:36Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-9003)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-07-08T02:08:05Z",
+      "body": "As a workaround, I think you should be able to do something like `at.get(\"imgs\")` or `at.get(\"download_button\")`"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-12T10:51:38Z",
+      "body": "> As a workaround, I think you should be able to do something like `at.get(\"imgs\")` or `at.get(\"download_button\")`\r\n\r\nThanks for the suggestion. This works and helps us set up some basic checks.\r\n\r\nWould still be good to eventually be able to use AppTest's more advanced interaction-simulation at some point."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-24T14:25:58Z",
+      "body": "> As a workaround, I think you should be able to do something like `at.get(\"imgs\")` or `at.get(\"download_button\")`\r\n\r\nIs it possible to click the download button and receive the file from `at.get(\"download_button\")` ? "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-20T18:25:13Z",
+      "body": "The following workaround works for me for a case where there is only one download_button.\n\n```python\nimport streamlit as st\n\nclass DownloadButton(object): # Singleton (only be created once) class to hold inputs to download button\n    def __new__(cls, label=None, data=None, file_name=None, mime=None):\n        # Note: I only set this up to handle inputs that I'm using but it can obviously be extended\n        if not hasattr(cls, 'instance'):\n            cls.instance = super(DownloadButton, cls).__new__(cls) # Create singleton if it does not exist\n            cls.instance.value = False\n\n        cls.instance.label = label\n        cls.instance.data = data\n        cls.instance.file_name = file_name\n        cls.instance.mime = mime\n\n        return cls.instance\n    \n    def click(self):\n        self.value = True\n  \n\ndef download_button(label, data, file_name, mime):\n    btn = DownloadButton(label, data, file_name, mime)\n\n    out = btn.value\n    if out and callable(btn.data):\n        btn.data = data()\n    btn.value = False  # Set to False to revert value after a button click\n    return out\n\ndef columns(ncols, *args, **kwargs):  # Extend st.columns to include download button function\n    all_cols = st._main.columns(ncols, *args, **kwargs)\n    for c in all_cols:\n        c.download_button = download_button\n\n    return all_cols\n\n# Replace streamlit functions\nst.download_button = download_button\nst.columns = columns\n\ndef test_download(app):    \n    btn = DownloadButton()\n    btn.click()\n    app.run()\n\n    assert isinstance(btn.data, bytes)\n```"
+    }
+  ]
+}

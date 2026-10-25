@@ -1,0 +1,60 @@
+{
+  "id": "issue-7501",
+  "type": "issue",
+  "number": 7501,
+  "url": "https://github.com/streamlit/streamlit/issues/7501",
+  "title": "Choose if anchor button will be showed or not in st.markdown in a title tag outside a anchor tag",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:markdown",
+    "status:unlikely"
+  ],
+  "created_at": "2023-10-04T19:32:51Z",
+  "closed_at": "2026-06-29T14:57:34Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\r\n- [X] I added a descriptive title and summary to this issue.\r\n\r\n### Summary\r\n\r\nMake parametrizable if a title in HTML inside st.markdown will show a anchor when hover or not.\r\n\r\n### Why?\r\n\r\nSometimes the default streamlit text elements are not enough (e.g.: style and postion) and its common to use HTML inside `st.markdown` element, like that:\r\n```python\r\nst.markdown(\r\n  \"\"\"\r\n          <h1>Example Text</h1>\r\n          <h2>Example Text</h2>\r\n  \"\"\"\r\n,unsafe_allow_html=True\r\n)\r\n```\r\n\r\nIt works very well, like that:\r\n![image](https://github.com/streamlit/streamlit/assets/57851959/eefcc0e4-34c9-4e47-8ce1-50cf1d8d5d97)\r\n\r\nBut when i hover that titles, it show a link button, that works like a anchor link.\r\n![image](https://github.com/streamlit/streamlit/assets/57851959/8cad47df-25eb-46a3-a297-efbfa78e81db)\r\n\r\n### How?\r\n\r\nA parameter inside st.markdown like:\r\n```python\r\nst.markdown(\"<h1>Streamlit</h1>\", anchor_in_texts=False)\r\n```\r\nTo be honest, that link button must be disabled by default (or not exist at all).\r\n\r\n### Additional Context\r\n\r\nI really don't know if it is a bug, but in my opinion its very undesired to have a anchor link displayed in that way when I'm not specifying if I want or not that link button in a element that is not inside a anchor tag.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-10-04T19:33:02Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-7501)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-10-05T00:32:47Z",
+      "body": "You can do that by using e.g. `st.title(\"foo\", anchor=None)`, see docs [here](https://docs.streamlit.io/library/api-reference/text/st.title). The same works for `st.header` and `st.subheader`. Is that enough for you? I don't think we'll add a parameter to `st.markdown` just for this. Btw we're also revamping the design of the anchor button to make it look less annoying. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-10-05T13:46:28Z",
+      "body": "> You can do that by using e.g. `st.title(\"foo\", anchor=None)`, see docs [here](https://docs.streamlit.io/library/api-reference/text/st.title). The same works for `st.header` and `st.subheader`. Is that enough for you?\r\n\r\nNo, isn't enought as my objective is to inject HTML and CSS in streamlit because the default text elements in streamlit are not customizable enough to many use cases.\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-11-15T06:06:11Z",
+      "body": "[USER] I agree with [USER] in that anchors should be disabled by default on markdown, at least when you use `unsafe_allow_html=True`. I use st.markdown a lot for adding custom HTML, and most of the time I don't need an anchor."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-01-29T11:48:21Z",
+      "body": "Completely agree...I've been trying to find a way to do this for a while now as it makes multi column containers untidy at best..."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-23T08:57:10Z",
+      "body": "Any updates about this issue? Seems no one wants this anchor, why include it then?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-11T19:52:38Z",
+      "body": "[Remove or hide the anchor (link icon)](https://discuss.streamlit.io/t/remove-or-hide-the-anchor-link-icon-particularly-when-using-st-markdown-to-inject-css/75516)\r\n\r\nMaybe this will help"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-29T14:57:31Z",
+      "body": "## Update \n\nClosing this since Streamlit 1.60+ will allow us to deactivate the anchor buttons via `st.markdown(anchors: bool)`"
+    }
+  ]
+}

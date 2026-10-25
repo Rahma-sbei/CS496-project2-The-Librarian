@@ -1,0 +1,29 @@
+{
+  "id": "issue-13148",
+  "type": "issue",
+  "number": 13148,
+  "url": "https://github.com/streamlit/streamlit/issues/13148",
+  "title": "Show column statistics in `st.dataframe`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe",
+    "feature:st.data_editor"
+  ],
+  "created_at": "2025-11-27T14:20:04Z",
+  "closed_at": "2026-06-12T19:34:50Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nShow per-column summary statistics (e.g. count, mean, min/max, unique values, missing values) directly in the table UI of `st.dataframe` so users can quickly understand their data\u2019s distribution without writing extra code or exporting to other tools.\n\n<img width=\"400\"  alt=\"Image\" src=\"https://github.com/user-attachments/assets/ddcf6839-40c1-474d-a5c7-cd2977d9157b\" />\n\n### How?\n\nJust show the statistics/visualisation inside the column menu.\n\n### Additional Context\n\n- Prototype: https://github.com/streamlit/streamlit/pull/11323\n- Related issue: https://github.com/streamlit/streamlit/issues/6863",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-11-27T14:20:15Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-13148)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-13T13:20:58Z",
+      "body": "## Update \n\n`st.dataframe` in Streamlit 1.59+ will have a column statistics menu showing a variety of statistics based on the column type:\n\n<img width=\"415\" height=\"377\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/f407cf69-4ec0-4bd7-8d4d-07923621c6bd\" />"
+    }
+  ]
+}

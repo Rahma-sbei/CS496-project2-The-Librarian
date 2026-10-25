@@ -1,0 +1,42 @@
+{
+  "id": "issue-17082",
+  "type": "issue",
+  "number": 17082,
+  "url": "https://github.com/streamlit/streamlit/issues/17082",
+  "title": "GlobalHotkeys crashes on keydown/keyup events without a key",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:frontend",
+    "status:confirmed",
+    "priority:P3",
+    "feature:app-menu",
+    "area:events"
+  ],
+  "created_at": "2026-09-22T21:50:07Z",
+  "closed_at": "2026-09-25T08:06:40Z",
+  "body": "### Checklist\n\n    - [x] I searched the existing issues and pull requests for this bug.\n    - [x] I reproduced this on Streamlit 1.63.0 and confirmed the same unguarded code is present on the current develop branch.\n\n    ### Summary\n\n    The global shortcut handler assumes every dispatched keydown/keyup event has a string key. Browser integrations, test harnesses, embedded hosts, or extensions can dispatch an Event without the KeyboardEvent key field. In that case, GlobalHotkeys calls toLowerCase on undefined and throws an uncaught TypeError.\n\n    ### Minimal reproduction\n\n    Run any Streamlit app, open the browser console after the app loads, and execute:\n\n    ~~~js\n    document.dispatchEvent(new Event(\"keydown\"))\n    document.dispatchEvent(new Event(\"keyup\"))\n    ~~~\n\n    The first event reaches GlobalHotkeys.handleKeyDown and calls normalizeKey(event.key). The second reaches handleKeyUp and does the same. Because Event has no key property, normalizeKey receives undefined and key.toLowerCase() throws.\n\n    A plain DOM Event is intentional here: event listeners can receive synthetic events from browser hosts and integrations despite the TypeScript annotation. The handler should be defensive at this external boundary.\n\n    ### Current implementation\n\n    In frontend/app/src/components/GlobalHotkeys/GlobalHotkeys.tsx:\n\n    ~~~ts\n    function normalizeKey(key: string): string {\n    return key === \"Escape\" || key === \"Esc\" ? \"esc\" : key.toLowerCase()\n    }\n\n    const handleKeyDown = (event: KeyboardEvent): void => {\n    const normalizedKey = normalizeKey(event.key)\n    // ...\n    }\n\n    const handleKeyUp = (event: KeyboardEvent): void => {\n    const normalizedKey = normalizeKey(event.key)\n    // ...\n    }\n    ~~~\n\n    ### Expected behavior\n\n    Malformed or non-keyboard keydown/keyup events without a string key should be ignored without throwing. Normal keyboard shortcuts should continue to work.\n\n    ### Suggested fix\n\n    Guard both handlers before normalization, for example:\n\n    ~~~ts\n    if (typeof event.key !== \"string\") {\n    return\n    }\n    ~~~\n\n    Alternatively, make normalizeKey accept unknown and return undefined for invalid values, with callers returning early.\n\n    ### Regression test\n\n    Add cases in GlobalHotkeys.test.tsx that dispatch keydown and keyup events without key and assert that no exception is thrown and no shortcut callback runs.\n\n    ### Environment\n\n    - Streamlit: 1.63.0\n    - Also present on the current develop branch as of 2026-09-22\n    - Browser: Chromium\n    ",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2026-09-22T21:54:01Z",
+      "body": "Additional version check: this is also reproducible in the latest official release, Streamlit 1.64.0. The 1.64.0 tag and the current `develop` branch both still call `normalizeKey(event.key)` in the `keydown` and `keyup` handlers without validating that `event.key` is a string."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-09-22T21:57:48Z",
+      "body": "I investigated this further and prepared the minimal fix plus regression coverage in a fork branch:\n\nhttps://github.com/streamlit/streamlit/compare/develop...acsarthur3333:streamlit:fix-global-hotkeys-missing-key\n\nThe patch adds a string guard for event.key in both keydown and keyup handlers and a Vitest case that dispatches keyless events, verifies no exception is thrown, and verifies neither shortcut callback runs.\n\nThe branch is based on the current develop head. A PR could not be created through the connected OAuth application because the streamlit organization restricts third-party OAuth app write access, but the comparison is ready for review or cherry-picking."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-23T06:20:04Z",
+      "body": "`GlobalHotkeys` listens on `document` for `keydown`/`keyup` and immediately calls `normalizeKey(event.key)`, which does `key.toLowerCase()`. Real `KeyboardEvent`s always have a string `key` (empty string if unspecified), so normal typing is fine. A plain `Event(\"keydown\")`/`Event(\"keyup\")` has no `key`, so the handler throws `TypeError: Cannot read properties of undefined (reading 'toLowerCase')`. That can happen with synthetic events from hosts, extensions, or test harnesses. The component was introduced in #16655 as a `react-hot-keys` replacement and has no guard; widget shortcut code already uses `event.key ?? \"\"`. Guarding `typeof event.key !== \"string\"` in both handlers (and covering keyless events in `GlobalHotkeys.test.tsx`) is the right fix. Note: `Dialog.tsx` also calls `e.key.toLowerCase()` unguarded on capture-phase `keydown`.\n\n### Related Issues\n\n- [#16608](https://github.com/streamlit/streamlit/issues/16608) \u2014 Same `GlobalHotkeys` document listeners for the `r`/`c` app shortcuts; different bug (shortcuts firing inside custom components) but the same event path.\n- [#16954](https://github.com/streamlit/streamlit/issues/16954) \u2014 Request to change the clear-cache `c` shortcut, which is dispatched through this same `GlobalHotkeys` handler.\n- [#13112](https://github.com/streamlit/streamlit/issues/13112) \u2014 Broader request for app-level keyboard shortcuts; not a duplicate, but it would share this document-level key handling.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-23T13:47:45Z",
+      "body": "I was able to reproduce this issue here: https://issues.streamlit.app/?issue=gh-17082"
+    }
+  ]
+}

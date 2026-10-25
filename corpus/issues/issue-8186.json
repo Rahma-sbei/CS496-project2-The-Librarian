@@ -1,0 +1,43 @@
+{
+  "id": "issue-8186",
+  "type": "issue",
+  "number": 8186,
+  "url": "https://github.com/streamlit/streamlit/issues/8186",
+  "title": "New component: `st.drawer` as a dismissable container",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:layout"
+  ],
+  "created_at": "2024-02-21T16:32:29Z",
+  "closed_at": "2026-09-28T20:34:27Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nStreamlit has expanded its layout options, which compound on each others to create complex application user flows beyond the single page, top to bottom interaction. \r\n\r\nAs `st.dialog` is coming along, and `st.popover` merged, most types of surfaces are being covered by streamlit, except the drawer concept, which is a dismissable container sliding from the right of the screen on demand, which blocks the screen from the side without masking the context, can be used as an information surface, for continuous interactions (like LLM Chat), or for form input. \n\n### Why?\n\n`st.sidebar`, which is the current closest equivalent has been very useful to have a permanent set of widget independent of the main window context but fall short when\r\n\r\n- The interface has to be conditional, it requires more `session_state `trickery to redraw the sidebar\r\n- The navigation gets rich, and the sidebar should have only a few other static elements but not a full form entry / sub interface\r\n\r\nThus, the sidebar and drawer concepts may overlap for simple usage, but are very different in practice and we would beneficiate from a better separation of duty \r\n\r\nGitlab makes a good example of using a rich navigation sidebar to the left hand side, and drawers for Gitlab Duo AI Chat, or to input CI Variables\r\n\r\n![image](https://github.com/streamlit/streamlit/assets/97103608/3c830664-12c6-4b8a-8e91-8192c326a05d)\r\n\r\n![image](https://github.com/streamlit/streamlit/assets/97103608/5bd212a0-f31a-4f73-b4f4-3fca85374585)\r\n\n\n### How?\n\nThe [Base Web](https://baseweb.design/components/drawer/) component is a starting point.\r\n\r\nThe main behaviours between the background and drawer I can refine in a first round are : \r\n\r\n- _Focused_ : The background is frozen, the user must exit using a default exit button. Clicking on the background does not exit the drawer (as it leads to different input errors). A drawer is always exitable. The background gets slightly greyed out, to ensure the drawer is in focus but remains readable\r\n- _Scrollable_ : The background can be scrolled. This ensures that the user can retain a mental image of where they are in the UX Flow of the app.\r\n- _Form Like (Optional)_ : The developer should be able to set a condition which closes the drawer, similar to how `st.form_submit_button` allows to exit the form. Perhaps we could reuse behaviours, and a form could be nested within a drawer, upon submission it closes the drawer.\r\n\r\nWith only those basic behaviour we can address most use cases:\r\n\r\n1. A one-shot configuration (i.e. use a drawer to make a request, drawer closes and request shows up in main app area)\r\n2. A continuous data entry, where the drawer remains open whilst the user makes several input (i.e. add multiple records)\r\n3. An information/documentation panel with little interactions, but potentially rich display elements\r\n4. A chat like interface on demand, a la copilot or gitlab duo chat.\r\n\r\nOn the python end, `st.drawer` should be similar syntaxically to st.dialog and st.popover to ease on the cognitive load, meaning\r\n\r\n```python\r\nwith st.drawer(\"Open Drawer\"):\r\n   ...\r\n\r\n```\r\n\r\nShould call the drawer to expand, clicking away or on a well visible close/exit button should close the drawer.\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-02-21T16:32:41Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8186)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-02-21T19:47:16Z",
+      "body": "That's a pretty interesting suggestion! Reminds me of the side-peek feature in Notion. I was very much against a \"right-hand sidebar\" in the past because I think it would just make the app look super cluttered if you have 3 different sections (left sidebar, main area, right sidebar). But in this fashion (where it isn't a proper sidebar but just shows up temporarily and overlaps the main page), I could actually see this be a thing!\r\n\r\nThat being said, I definitely want to focus on getting out dialog right now and then we'll have a few major non-layout-related features coming up. So I don't think we'll realistically get to this very soon. But I'll keep it in mind for when we plan out the next few quarters in April. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-02-22T16:21:05Z",
+      "body": "Just noting for my future self, maybe we could also name this `st.side_peek` or something like that to make it a bit more similar to `st.sidebar`. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-12-03T15:11:35Z",
+      "body": "This would be a nice addition to Streamlit!\r\n\r\nIt could help declutter the left sidebar, which could be more focused on listing the pages in a multi-app page. The drawer would focus more on settings and other features.\r\n\r\nSome thoughts:\r\nI think `st.drawer` should work nicely with multi-app pages. That is, we should be able to set a generic setup. For instance, if we want a button (e.g., chatbot) to be displayed in all app pages, we shouldn't define it in all app pages but just in the entry point where `st.navigation` is called. In addition, custom setups per page should be possible."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-28T20:03:31Z",
+      "body": "## Update\n\nThis will be available in Streamlit **1.66+** via `[USER].dialog` with `position=\"right\"` or `position=\"left\"`. That shows the dialog as a user-resizable, full-height side drawer (it stays modal, so the rest of the app is inert while the drawer is open):\n\n```python\nimport streamlit as st\n\n\n[USER].dialog(\"Details\", position=\"right\")\ndef show_details(item):\n    st.write(f\"Details for {item}\")\n\n\nif st.button(\"Open details\"):\n    show_details(\"Order #1234\")\n```\n\nThe other side-drawer use case \u2014 a panel that stays open while you interact with the main content \u2014 is tracked in https://github.com/streamlit/streamlit/issues/1980."
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "id": "issue-15421",
+  "type": "issue",
+  "number": 15421,
+  "url": "https://github.com/streamlit/streamlit/issues/15421",
+  "title": "Update `Starlette` dependency >= 1.01",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement"
+  ],
+  "created_at": "2026-06-03T20:06:50Z",
+  "closed_at": "2026-06-04T16:16:32Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nUpgrade Starlette dependency to >= 1.01.\n\n\n\n### Why?\n\nThe Starlette version locked by pyproject.toml has not been remediated from a critical vuln (CVE-2026-48710 'BadHost'). \n\n### How?\n\nUpgrade version and correct any issues this may cause.\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-03T20:07:07Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-15421)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-04T15:48:23Z",
+      "body": "Hi [USER], I'd like to work on this. I'll update the Starlette dependency constraint in pyproject.toml to >= 1.01 and check for any compatibility issues the version bump may introduce."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-04T16:16:32Z",
+      "body": "Starlette `1.01` is allowed by Streamlit and will be installed if no other dependency requires an older version; we only pin a minor version to allow a broad set of technical compatibility. It is up to the app developer to ensure that the latest versions of the dependencies are installed. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-04T19:42:25Z",
+      "body": "[USER] i had a report from a user that 1.01 wasn't compatible currently, but I do get version 1.2.1 in the devcontainer :-)"
+    }
+  ]
+}

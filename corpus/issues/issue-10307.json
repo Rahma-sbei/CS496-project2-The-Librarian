@@ -1,0 +1,54 @@
+{
+  "id": "issue-10307",
+  "type": "issue",
+  "number": 10307,
+  "url": "https://github.com/streamlit/streamlit/issues/10307",
+  "title": "Support copy/pasting files into `st.chat_input`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:st.chat_input"
+  ],
+  "created_at": "2025-01-31T16:52:43Z",
+  "closed_at": "2026-06-17T12:07:55Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nWe'll soon launch file upload support for `st.chat_input`. This lets you manually upload a file from your machine to the chat. It would be great to also support copy/pasting a file into the chat input. \n\n### Why?\n\nMore convenient in some situations. \n\n### How?\n\nWhen you copied a file, focus on the chat input, and paste, upload the file to the chat just as if you would have selected it from your disk. \n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-01-31T16:52:53Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-10307)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-01T04:18:13Z",
+      "body": "It will be a great addition. Similarly, if st.audio_input (audio input) can be added in st.chat_input that will be useful for multimodal chat."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-20T22:58:55Z",
+      "body": "Could someone link me to relevant material for file upload support as mentioned in the above summary? Trying to implement this in an app and hoping someone has already built it."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-02-20T23:06:23Z",
+      "body": "It's not released yet but will be in the next release (1.43) in two weeks! We'll publish documentation then. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-20T23:16:17Z",
+      "body": "That's amazing, thank you [USER] ! I was about to build a custom component but this will save me a lot of time. ~~Is there a testing branch I can use in the meantime?~~ Looks like it's live in the `develop` branch as of #9491 "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-02-21T00:59:13Z",
+      "body": "Yup, you can use `pip install streamlit-nightly` to use it!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-18T07:29:43Z",
+      "body": "Hello, this will be a great feature, is it still planned to roll it our soon? Thanks!"
+    }
+  ]
+}

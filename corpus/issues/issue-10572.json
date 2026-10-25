@@ -1,0 +1,32 @@
+{
+  "id": "issue-10572",
+  "type": "issue",
+  "number": 10572,
+  "url": "https://github.com/streamlit/streamlit/issues/10572",
+  "title": "`st.page_link` and `st.switch_page` don't raise errors when pointing to non-existent pages with the same pathname as a real page",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P4",
+    "feature:st.switch_page",
+    "feature:st.page_link",
+    "feature:st.navigation"
+  ],
+  "created_at": "2025-03-01T00:56:17Z",
+  "closed_at": "2026-06-26T06:27:26Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nIn filing a feature request (#10570), I got a pathological bright idea that I just confirmed: `st.page_link` and `st.switch_page` will silently switch to a different page than they are given (if the app developer passes a nonexistent page that happens to have the same pathname as a page that does exist).\n\n### Reproducible Code Example\n\nAll files in a flat directory:\n```Python\n#app.py\nimport streamlit as st\n\ndef home():\n    \"home\"\n\ndef page1():\n    \"Callable page1\"\n\npg = st.navigation([home,st.Page(\"page1.py\", url_path=\"foo\")])\npg.run()\n\nif st.button(\"not_page1.py\"):\n    st.switch_page(st.Page(\"not_page1.py\", url_path=\"foo\"))\nif st.button(\"callable page1\"):\n    st.switch_page(st.Page(page1, url_path=\"foo\"))\n\nst.page_link(st.Page(lambda x: None, url_path=\"foo\"))\nst.page_link(st.Page(\"not_page1.py\", url_path=\"foo\"))\nst.page_link(st.Page(page1, url_path=\"foo\"))\nst.page_link(st.Page(\"foo.py\"))\n# st.page_link(\"foo.py\") # Only this one throws an error\n```\n\n```Python\n#foo.py\nimport streamlit as st\n\n\"foo.py\"\n```\n\n```Python\n#not_page1.py\nimport streamlit as st\n\n\"not_page1.py\"\n```\n\n```Python\n#page1.py\nimport streamlit as st\n\n\"page1.py\"\n```\n\n### Steps To Reproduce\n\nAll links/buttons redirect you to the page `/foo` defined by `\"page1.py\"` in `st.navigation`, even though other pages were technically used in the commands.\n\n1. From home, click any of the buttons on the page.\n2. Click home in the left navigation.\n3. Repeat\n\n### Expected Behavior\n\nTrying to switch or link to a nonexistent page should throw an error.\n\n### Current Behavior\n\nSo long as _some_ page in `st.navigation` has a matching url_path, the officially registered page in `st.navigation` is used and the passed page is silently ignored.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-01T00:56:28Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-10572)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-03T13:15:26Z",
+      "body": "Thank you [USER] !"
+    }
+  ]
+}

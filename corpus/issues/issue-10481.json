@@ -1,0 +1,34 @@
+{
+  "id": "issue-10481",
+  "type": "issue",
+  "number": 10481,
+  "url": "https://github.com/streamlit/streamlit/issues/10481",
+  "title": "Make sidebar allowable in fragment?",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.sidebar",
+    "feature:st.fragment"
+  ],
+  "created_at": "2025-02-21T17:28:32Z",
+  "closed_at": "2026-06-23T16:50:33Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAny chance we can allow sidebar to be usable in a fragment?\n\n### Why?\n\nIt would be nice to have a viz control in the sidebar but the viz itself in the main page and it would be nice to not have to necessarily re-run the whole page when the control is changed\n\nIn my case I have some options in the sidebar and then a button below them. Once the user clicks the button, it creates some data based on the options and creates a plotly chart in the main page. It's convenient to have the button and options in the sidebar so they don't clutter the main page, but the entire main page isn't affected - just the chart - so it would be faster to only have that re-run\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-02-21T17:28:42Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-10481)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-26T21:08:34Z",
+      "body": "agreed! I'm not sure if that's because we're doing something wrong but that feels limitating for me too. I have some buttons like \"restart LLM engine\" that only affect a variable and wouldn't need to refresh any of my tabs "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-09T16:04:37Z",
+      "body": "I too want this feature"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "issue-12606",
+  "type": "issue",
+  "number": 12606,
+  "url": "https://github.com/streamlit/streamlit/issues/12606",
+  "title": "minify index.hash.js for loading time improvement",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:performance"
+  ],
+  "created_at": "2025-09-23T11:44:50Z",
+  "closed_at": "2026-06-14T19:56:40Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nJust discovered StreamLit and love it already! \n\nI built a minimal chatbot and started to examine the way it works and noticed the size of _index._hash_.js_ is around 1.8Mb. Looking at it I see it's uncompressed JS that might be optimised.\n\nI was wondering if this file can be **minified** in the local compilation pipeline in order to improve loading time: useful for production deployments or set via a config option.\n\nSorry if I totally misunderstand the way it works; I also didn't find any issue or question related to minification. \n\n### Why?\n\nI expect the production build to be minified when I look in DevTools/Network, it will improve loading time.\n\n### How?\n\nInclude a last step in the generation of the index.js file that will minify the newly generated index.js file\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-09-23T11:45:03Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12606)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-06T23:28:59Z",
+      "body": "Hi! Could you assign this to me and [USER] ? We would like to work on this issue."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-17T23:20:53Z",
+      "body": "[USER] Hi! Just wanted to double check that this is a relevant issue and that there is support for it from the Streamlit team. I don't want to get started on it and not have it merged, as per the [contribution documentation](https://github.com/streamlit/streamlit/wiki/Contributing#before-contributing) "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-11-20T17:19:59Z",
+      "body": "Thanks so much for raising this issue [USER] and for the thoughtful interest in helping out, [USER] and [USER]. We really appreciate the enthusiasm and willingness to contribute here.\n\nFor this particular item, we're planning to tackle it in-house as part of a broader set of performance improvements we'll be working. Because of that, we're not looking for external contributions on this specific issue right now.\n\nWe'll keep this issue updated as we make progress or have concrete changes to share. Thanks again for your understanding and for helping make Streamlit better!"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-14T19:56:40Z",
+      "body": "Closing this since we have done a couple of improvements recently related to our bundle size and initial loading size."
+    }
+  ]
+}

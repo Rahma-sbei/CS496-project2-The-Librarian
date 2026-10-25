@@ -1,0 +1,55 @@
+{
+  "id": "issue-11430",
+  "type": "issue",
+  "number": 11430,
+  "url": "https://github.com/streamlit/streamlit/issues/11430",
+  "title": "`st.help` shows `page.run()` header but correct docstring when called in a multipage app",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P4",
+    "feature:st.help"
+  ],
+  "created_at": "2025-05-22T00:33:23Z",
+  "closed_at": "2026-08-01T12:43:34Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen calling `st.help` on a page of an app (not the entrypoint file), the displayed information has an incorrect header (`page.run()`) even though it displays the correct information for whatever was passed to it.\n\nWhen calling `st.help` from within a function from the entrypoint file, the function name is displayed in the help header.\n\n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-11430)\n\n```Python\nimport streamlit as st\n\ndef page_function():\n    st.help(st.write)\n\npage = st.navigation([st.Page(page_function)])\n\nst.header(\"Run the page returned from navigation\")\npage.run()\nst.header(\"Execute the page function directly\")\npage_function()\nst.header(\"Directly execute the commands within the page function\")\nst.help(st.write)\n```\n\n### Steps To Reproduce\n\n1. Run the app\n\n### Expected Behavior\n\nAll instances of `st.help` should show `st.write` and its docstring.\n\n### Current Behavior\n\nAll instances show the `st.write` docstring, but the header changes to reflect the parent call from within the entrypoint file.\n\nThis behavior is also exhibited in version 1.36.0 when `st.navigation` was introduced.\n\n<img width=\"820\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/8fea52eb-7452-42b1-bdf7-972537e63c4a\" />\n\n<img width=\"788\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/80a87bc0-bae4-4c56-b88e-affb7665b945\" />\n\n<img width=\"797\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/66669387-f9b9-4782-b608-5d66157b70d3\" />\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-22T00:33:36Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11430)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-22T14:41:33Z",
+      "body": "Nice find, [USER]!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-26T02:23:22Z",
+      "body": "Hello! Can I try to fix it?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-27T17:18:58Z",
+      "body": "[USER] that would be great. Thanks for volunteering!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-27T17:30:35Z",
+      "body": "That's great! Could you assign me this task? [USER] "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-28T17:05:32Z",
+      "body": "Certainly!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-06-08T00:19:38Z",
+      "body": "Hi [USER] !\n\nWhile working on this issue, I found the root cause of the problem.\n\nIt was located in the `_get_scriptrunner_frame()` method in `lib/streamlit/elements/doc_string.py`.\nThe way the variable name was being retrieved wasn't compatible with the multipage feature, as it relied on `SCRIPTRUNNER_FILENAME` to identify the variable passed to st.help(). This approach incorrectly selected the previous frame, which led to inaccurate results in multipage apps.\n\nWith the fix introduced in [PR #11558](https://github.com/streamlit/streamlit/pull/11558), everything is now working correctly.\n\nI'm also attaching some screenshots of the tests after the changes.\n\n![Image](https://github.com/user-attachments/assets/0a942da2-d595-4a0e-9b00-459d31fe90d9)\n\n![Image](https://github.com/user-attachments/assets/c83dc4b4-8e82-453a-9b4b-3171ac28a7dd)\n\n![Image](https://github.com/user-attachments/assets/99fe86f4-e967-455b-9a0f-7e3237dbebe1)"
+    }
+  ]
+}

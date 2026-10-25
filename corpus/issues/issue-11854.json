@@ -1,0 +1,33 @@
+{
+  "id": "issue-11854",
+  "type": "issue",
+  "number": 11854,
+  "url": "https://github.com/streamlit/streamlit/issues/11854",
+  "title": "Turn submit button in `st.chat_input` into stop button",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.chat_input"
+  ],
+  "created_at": "2025-07-02T22:34:47Z",
+  "closed_at": "2026-07-01T23:17:22Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nIn ChatGPT and many other apps, the submit button in the chat input turns into a stop button after submitting. Clicking it interrupts the current LLM generation/streaming. We should have the same thing!\n\n### Why?\n\nToday, there's no way to interrupt an LLM generation in a Streamlit app. That can be annoying for long LLM messages. \n\n### How?\n\nAfter submitting a message, the submit button should turn into a stop button. Clicking it should interrupt the current run, maybe simply by calling `st.stop` under the hood? If the run is interrupted or finished, the stop button should turn back into a submit button. \n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-02T22:35:00Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-11854)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-13T07:59:51Z",
+      "body": "actually I used a button with st.stop() for stopping the llm\nand it turned to a disaster !\nI need the stop button within the chat input "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-01T23:22:32Z",
+      "body": "## Update\n\nStreamlit 1.59+ will have a `submit_mode` parameter for `st.chat_input` that controls widget behavior after submission while the script is running:\n\n- \"submit\" (default): The widget remains fully enabled after submission. Users can submit new messages while the script is running (existing behavior).\n- \"disable\": The widget is automatically disabled after submission and re-enabled when the run completes. This prevents users from interrupting ongoing operations like LLM streaming.\n- \"stop\": The submit button transforms into a stop button while the script runs, allowing users to halt execution (like the app's \"Stop\" button). The text area is disabled during the run. "
+    }
+  ]
+}

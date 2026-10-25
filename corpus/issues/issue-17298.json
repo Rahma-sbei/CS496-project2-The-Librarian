@@ -1,0 +1,36 @@
+{
+  "id": "issue-17298",
+  "type": "issue",
+  "number": 17298,
+  "url": "https://github.com/streamlit/streamlit/issues/17298",
+  "title": "Unknown-attribute lookup on streamlit imports modules since 1.65 (breaks iteration over sys.modules)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "status:confirmed",
+    "priority:P3",
+    "area:backend"
+  ],
+  "created_at": "2026-10-07T05:34:28Z",
+  "closed_at": "2026-10-07T20:27:01Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n### Summary\n\nSince 1.65.0, looking up any unknown attribute on the `streamlit` module (even `hasattr(st, \"x\")` or `getattr(st, \"x\", None)`) imports `streamlit.command_suggestions` and `difflib`. Code that iterates over `sys.modules` while probing module attributes then fails with `RuntimeError: dictionary changed size during iteration`. This broke our whole test suite at setup after upgrading from 1.64.0.\n\n### Reproducible Code Example\n\n```python\nimport sys\nimport streamlit\n\n[m for m in sys.modules.values() if getattr(m, \"date\", None) is not None]\n```\n\n### Steps To Reproduce\n\nRun the script above in a fresh interpreter with streamlit 1.65.0.\n\n### Expected Behavior\n\nAs in 1.64.0: the lookup returns the default, and no module is imported.\n\n### Current Behavior\n\n```\nRuntimeError: dictionary changed size during iteration\n```\n\nThe module `__getattr__` added in #16912 imports `streamlit.command_suggestions` on every miss, including lookups that only probe with a default:\n\n```python\nimport sys, streamlit\nbefore = set(sys.modules)\nhasattr(streamlit, \"date\")                 # False, as expected\nprint(sorted(set(sys.modules) - before))   # ['difflib', 'streamlit.command_suggestions']\n```\n\n### Is this a regression?\n\nYes, this used to work in a previous version (1.64.0).\n\n### Debug info\n\n- Streamlit version: 1.65.0\n- Python version: 3.14.3\n- Operating System: macOS\n- Browser: n/a\n\n### Additional Information\n\nThe pattern is common in test suites: a pytest fixture scans the loaded modules to patch a name (here, freezing `date.today()`). We have fixed our side by iterating over `list(sys.modules.values())`, since iterating over the live dict is fragile in general. But a plain `hasattr` or `getattr(..., default)` now has an import side effect. Some possible ways to avoid it:\n\n- import `streamlit.command_suggestions` eagerly (or once, at first use outside `__getattr__`);\n- only build suggestions when the `AttributeError` is actually raised to user code, not on probes;\n- or document that unknown-attribute lookups import modules.\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-07T05:34:37Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-17298)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-07T09:00:27Z",
+      "body": "This is a regression in 1.65.0 (working in 1.64.0), introduced by #16912. `lib/streamlit/__init__.py` defines a module `__getattr__` that lazy-imports `streamlit.command_suggestions` so a missing `st.*` name can raise `AttributeError` with a removal note or typo suggestion. `hasattr` and `getattr(obj, name, default)` both call `__getattr__` and then swallow `AttributeError`, so a probe that should only return false or the default still runs that import. `command_suggestions.py` imports `difflib` at module scope, which inserts `streamlit.command_suggestions` and `difflib` into `sys.modules`. Code that iterates the live `sys.modules` mapping while probing attributes then raises `RuntimeError: dictionary changed size during iteration`. `command_suggestions` does not import Streamlit at module level, so loading it while `streamlit` itself is imported, instead of inside `__getattr__`, would stop those probes from mutating `sys.modules`.\n\n### Related Issues\n\nNo duplicate or closely related issues were found. Searches for `sys.modules` iteration failures, `hasattr` side effects, and the command-suggestion error path only match this report. The behavior comes from #16912, which is not linked to another issue.\n\n---\n*This is an automated triage comment using `grok-4.7-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-07T13:41:34Z",
+      "body": "This is a regression in 1.65.0 (working in 1.64.0), introduced by #16912. `lib/streamlit/__init__.py` defines a module `__getattr__` that lazy-imports `streamlit.command_suggestions` so a missing `st.*` name can raise `AttributeError` with a removal note or typo suggestion. `hasattr` and `getattr(obj, name, default)` both call `__getattr__` and then swallow `AttributeError`, so a probe that should only return false or the default still runs that import. `command_suggestions.py` imports `difflib` at module scope, which inserts `streamlit.command_suggestions` and `difflib` into `sys.modules`. Code that iterates the live `sys.modules` mapping while probing attributes then raises `RuntimeError: dictionary changed size during iteration`. `command_suggestions` does not import Streamlit at module level, so loading it while `streamlit` itself is imported, instead of inside `__getattr__`, would stop those probes from mutating `sys.modules`.\n\n### Related Issues\n\nNo duplicate or closely related issues were found. Searches for `sys.modules` iteration failures, `hasattr` side effects, and the command-suggestion error path only match this report. The behavior comes from #16912, which is not linked to another issue.\n\n---\n*This is an automated triage comment using `grok-4.7-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

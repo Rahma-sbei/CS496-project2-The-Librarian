@@ -1,0 +1,104 @@
+{
+  "id": "issue-6074",
+  "type": "issue",
+  "number": 6074,
+  "url": "https://github.com/streamlit/streamlit/issues/6074",
+  "title": "Persist widget state if `key` is set, even if the widget is not rendered",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:widgets",
+    "feature:st.session_state"
+  ],
+  "created_at": "2023-02-07T16:24:43Z",
+  "closed_at": "2026-07-08T07:32:38Z",
+  "body": "\ud83d\udc4b I work on developer experience for Streamlit and wanted to get some feedback on this recurring issue.\n\n**TL;DR: Take a look at the [example app](https://keyed-widget-state-issue.streamlit.app/) and let us know how it impacts you, and what you think about how to fix this issue!**\n\n**Discussion on the forums [here](https://discuss.streamlit.io/t/keyed-widget-state-persistence-discussion-possible-fixes/37359)**\n\nOne of the current Streamlit behaviors that causes confusion for many of us is how widgets with `key='foo'` lose their session_state value when they are not rendered in a given run. It seems to come up most often with multipage apps that have some state dependency between pages, but also possible in a single page app with conditional rendering. A minimal example:\n\n```\nview = st.radio(\"View\", [\"view1\", \"view2\"])\n\nif view == \"view1\":\n    st.text_input(\"Text1\", key=\"text1\")\n    \"\u261d\ufe0f Enter some text, then click on view2 above\"\nelif view == \"view2\":\n    \"\u261d\ufe0f Now go back to view1 and see if your text is still there\"\n```\n\nI'm working with [USER] on whether / how to update this behavior so it's more intuitive, or at least possible to get the intuitive behavior easily.\n\nI put together a simple example app showing the behavior and linking some of the prior issues about it:\n[https://keyed-widget-state-issue.streamlit.app/](https://keyed-widget-state-issue.streamlit.app/)\n\n### Questions\n\n- Do you have a full working public app where you had to hack around this (such as duplicating or using \"shadow keys\")? Please share with us!\n- Do you have an app or use case where you rely on the current behavior (widget has `key` set but needs value to reset after not rendering), that will break if we change this? We **really** want to hear about these! Please share!\n\n### Possible fixes\n\nIt seems like most developers we hear from find the current behavior very unintuitive, and we see a lot more use cases that have to work around this rather than benefit from it.\n- Given that, should we just do a breaking change to the default behavior to persist, like most of us seem to expect?\n- If so: We should still provide a path to clear keyed widget state when needed. Need to figure out how to best do this.\n\nIf not a breaking change: most proposals seem to prefer something like a `persist=` key. For example, both [USER] and [USER] propose something like this in [#4458](https://github.com/streamlit/streamlit/issues/4458). Thoughts on this approach, or other ideas?\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-6074)",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2023-02-08T18:14:41Z",
+      "body": "Thanks for throwing shade at this issue!\r\n\r\nI've built a really complex app with streamlit, and have been stung time and again due to this behaviour. See for e.g. - https://gooey.ai/video-bots/\r\n\r\n---\r\n\r\nCurrently using the following workaround for this - \r\n\r\n1. Don't use keys. Instead, store the initial value inside the session state, and update the state manually.\r\n\r\n2. If the widget goes out of view, make sure the initial values are up to date  \r\n\r\n```python\r\nfrom time import sleep\r\nfrom streamlit.runtime.state import get_session_state\r\nimport streamlit as st\r\n\r\ninit_key = \"__init_values__\"\r\n\r\n\r\ndef main():\r\n    view = st.radio(\"View\", [\"view1\", \"view2\"])\r\n\r\n    if view == \"view1\":\r\n        text_input(\"Text1\", key=\"text1\")\r\n        \"\u261d\ufe0f Enter some text, then click on view2 above\"\r\n    elif view == \"view2\":\r\n        \"\u261d\ufe0f Now go back to view1 and see if your text is still there\"\r\n\r\n    st.write(st.session_state)\r\n\r\n\r\ndef text_input(label, key):\r\n    if init_key not in st.session_state:\r\n        st.session_state[init_key] = {}\r\n    initial_values = st.session_state[init_key]\r\n    try:\r\n        value = initial_values[key]\r\n    except KeyError:\r\n        value = st.session_state.get(key, \"\")\r\n        initial_values[key] = value\r\n\r\n    value = st.text_input(label, value=value)\r\n\r\n    st.session_state[key] = value\r\n    return value\r\n\r\n\r\ndef ensure_hidden_widgets_loaded():\r\n    new_session_state = get_session_state()._state._new_session_state\r\n    for key, value in st.session_state.items():\r\n        if key in new_session_state or key == init_key:\r\n            continue\r\n        st.session_state[init_key][key] = value\r\n\r\n\r\ntry:\r\n    main()\r\nfinally:\r\n    ensure_hidden_widgets_loaded()\r\n```\r\n\r\n---\r\n\r\nIMO the idea of keys, in general, needs to be rethought. They cause really hard-to-debug issues.\r\n\r\nE.g. see how the `slider` widget behaves when provided with a key. And also how text editing  is jumpy when a piece of blocking code is executed.\r\n\r\nBut permanently changing this behaviour would be an excellent start. For cases where developers need to clear widget state, there should be a clear path to do it explicitly, e.g. `st.session_state.pop(key, None)` or `st.session_state.clear()`\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-02-09T16:32:01Z",
+      "body": "Hi I am the author of #4458.\r\nLet me just provide supplement information, while it's not any additional examples or suggestions.\r\n\r\nEven though I introduced a multi page-like example in the issue above, it does not imply the `persist` API (or some alternatives) should work across the pages on the native MPA. My interest at that point was only the state of unrendered components in a single page.\r\nWhen I wrote the issue was before the release of native multi-page apps support (or at least before I started using it), so it accidentally looked like MPA.\r\n\r\nAnd the MPA-like example was just a simplified example to explain the problem; Originally I encountered some difficulty derived from this problem when I was developing [a custom component `streamlit-webrtc`](https://github.com/whitphx/streamlit-webrtc), and did workaround somehow."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-02-14T04:26:07Z",
+      "body": "Thanks, all!\r\n\r\n> E.g. see how the slider widget behaves when provided with a key. And also how text editing is jumpy when a piece of blocking code is executed.\r\n\r\nWas talking with [USER] about some of these funky behaviors today, definitely want to fix those!\r\n\r\n> it does not imply the persist API (or some alternatives) should work across the pages on the native MPA.\r\n\r\nYeah I think I am coming around to this perspective too. Was discussing an alternative idea of clearer scopes between pages for MPA [here](https://discuss.streamlit.io/t/keyed-widget-state-persistence-discussion-possible-fixes/37359/10?u=jcarroll). Wonder if that resonates or if you have any thoughts."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-02-15T10:48:18Z",
+      "body": "> One of the current Streamlit behaviors that causes confusion for many of us is how widgets with `key='foo'` lose their session_state value when they are not rendered in a given run\r\n\r\nWell in fact their widget state [gets deleted](https://github.com/streamlit/streamlit/blob/ef8bb02b27ab26780c07814ee77d4c5e91de62c7/lib/streamlit/runtime/state/session_state.py#L599-L608) while session state is persisted across re-runs.\r\nGiven how this distinction is already [exposed](https://docs.streamlit.io/library/advanced-features/session-state#session-state-and-widget-state-association), it could make be left to users to decide whether or not to preserve widget state across reruns.\r\nGiven that this tends to affect more complicated apps, I would presume we mostly wouldn't even mind a component-level`persist_state=True` flag. An app-wide setting would be an improvement without polluting the API.\r\n\r\nAs a catch with app-wide behavior, conditionally rendered widgets can have different valid options/number ranges when being rendered again, possibly making the persisted state now invalid."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-02-15T17:41:56Z",
+      "body": "> As a catch with app-wide behavior, conditionally rendered widgets can have different valid options/number ranges when being rendered again, possibly making the persisted state now invalid.\r\n\r\nYes, if the widget arguments change, we will always re-create the widget and clear any prior values/state. I don't think there's any consideration to change that behavior, since as you said it can lead to invalid states pretty easily."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-03-29T06:49:37Z",
+      "body": "\ud83d\udc4d\r\n\r\nGreat to read this thread. Although I really like Streamlit this behaviour makes it pretty much impossible to use it when working with a lot of filter settings. A \u2018persist=\u2018 flag would work, but I prefer it with True as default. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-05-04T09:27:32Z",
+      "body": "Hi there! I'm excited to be contributing to this project and I hope my contribution is helpful. I wanted to report an issue that I came across and I hope I'm reporting it in the right place. Please let me know if there's anything else I can do to help. Thanks! \r\n\r\nI was able to perform a complete serialization of my application (for the components I needed), by means of the following method, based on what [USER]  reported, which I thank.\r\n\r\n```python\r\nfrom __future__ import annotations\r\nimport streamlit as st\r\n\r\n\r\ndef __get_actual_page_ui_state():\r\n    return st.session_state[\"session_manager\"].ui_state[st.session_state['ActualPage']]\r\n\r\n\r\ndef gus():\r\n    return __get_actual_page_ui_state()\r\n\r\n\r\n__shadow_key_character = \"_\"\r\n\r\n\r\ndef __get_component(component, label: str, key: str, value, **kwargs):\r\n    shadow_key = __shadow_key_character + key\r\n    ui_state = gus()\r\n    if shadow_key not in st.session_state:\r\n        if component == st.selectbox:\r\n            options = kwargs[\"options\"]\r\n            if key in ui_state:\r\n                if ui_state[key] < len(options):\r\n                    st.session_state[shadow_key] = options[ui_state[key]]\r\n            else:\r\n                if value < len(options):\r\n                    st.session_state[shadow_key] = options[value]\r\n        else:\r\n            st.session_state[shadow_key] = ui_state.get(key, value)\r\n    if component == st.multiselect:\r\n        actual_value = component(label,\r\n                                 key=shadow_key,\r\n                                 default=value,\r\n                                 **kwargs)\r\n        ui_state[key] = actual_value\r\n    elif component == st.selectbox:\r\n        options = kwargs[\"options\"]\r\n        if value > len(options):\r\n            value = 0\r\n        actual_value = component(label=label,\r\n                                 key=shadow_key,\r\n                                 index=int(value),\r\n                                 **kwargs)\r\n        if actual_value is not None:\r\n            ui_state[key] = options.index(actual_value)\r\n    else:\r\n        actual_value = component(label,\r\n                                 key=shadow_key,\r\n                                 value=value,\r\n                                 **kwargs)\r\n        ui_state[key] = actual_value\r\n    return actual_value\r\n\r\n\r\ndef text_input(label: str, key: str, value, **kwargs):\r\n    return __get_component(st.text_input, label, key, value, **kwargs)\r\n\r\n\r\ndef number_input(label: str, key: str, value, **kwargs):\r\n    return __get_component(st.number_input, label, key, value, **kwargs)\r\n\r\n\r\ndef checkbox(label: str, key: str, value, **kwargs):\r\n    return __get_component(st.checkbox, label, key, value, **kwargs)\r\n\r\n\r\ndef slider(label: str, key: str, value, **kwargs):\r\n    return __get_component(st.slider, label, key, value, **kwargs)\r\n\r\n\r\ndef multiselect(label: str, key: str, default, **kwargs):\r\n    return __get_component(component=st.multiselect, label=label,\r\n                           key=key,\r\n                           value=default,\r\n                           **kwargs)\r\n\r\n\r\ndef selectbox(label: str, key: str, index, **kwargs):\r\n    return __get_component(component=st.selectbox,\r\n                           label=label,\r\n                           key=key,\r\n                           value=index,\r\n                           **kwargs)\r\n```\r\n\r\nIn order to make the code work within my multi-page application, I had to add the following code, which is executed every time the current page is changed, to handle the fact that for some components (multiselectbox) the key is not deleted.\r\n\r\n```python\r\n# Clearing residuals shadow keys not removed by streamlit\r\n# This is necessary because of the actual implementation of shadow keys\r\n# for UI serialization\r\nfor key in st.session_state:\r\n    if key[0] == cr.__shadow_key_character:\r\n        del st.session_state[key]\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-06-28T15:39:14Z",
+      "body": "Hi,\r\nany news on this? I'm not yet using streamlit, and hence I can't give any feedback.\r\nWhat surprise me is that this issue does not appear in streamlit's [roadmap](https://roadmap.streamlit.app/)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-12T08:01:54Z",
+      "body": "Is there any update with this issue? I am stuck with a problem that is almost similar.\r\n\r\nI can print the session state variables and see their values preserved. Yet, the widgets that refer to those session state variables as keys do not reflect the values of those variables.\r\n\r\nThis seems to be rather different from [this comment above](https://github.com/streamlit/streamlit/issues/6074#issuecomment-1431135774)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-12T11:54:58Z",
+      "body": "[USER]: Actually, I may have found work around. My scenario was with modularising the functions that load or initialise the session state variables. See the code at https://github.com/anirbanbasu/st_sessions and the deployment at https://st-sessions.streamlit.app/ -- it seems to work as I would like it to."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-08T15:17:55Z",
+      "body": "Are there any updates on this issue? "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-12-14T01:26:45Z",
+      "body": "Hi all, I'm seeing what seems to be session_state variables disappearing when switching between pages even when the variables aren't associated with a widget. I can assign a variable manually on the main page and it will be undefined when I try to access session_state from a different page. Not sure if this is related but it seems likely .... any tips?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-02-26T11:22:58Z",
+      "body": "My organization has over 20 multipage Streamlit apps, and none of them find the current default useful, so I'm definitely in favour of a breaking change here.\n\nI'm currently going through an exercise where I'm building a Streamlit proxy object which does the following:\n* Intercept all calls to streamlit, and if the attribute is a callable, set the item in session_state using the same default logic that the widget would normally apply. For example, set multiselect box default to `[]` rather than `None`\n* Pop value/default/index from args\n* Wrap the callable with a function that sets the state item in our own state dictionary, only if the widget has a key defined and allows writing\n\nHere's the bulk of the code:\n```\ndef __getattr__(self, name):\n        attr = getattr(self._original_st, name)\n\n        if callable(attr):  # If the attribute is a function/method, wrap it\n\n            def persist_widget_values(*args, **kwargs):\n                logging.info(\n                    f\"Intercepted call to {name} with args={args}, kwargs={kwargs}\"\n                )\n\n                # If a key exists, persist it!\n                key = kwargs.get(\"key\", None)\n                if key:\n                    # This lets us handle cases where widgets are called with only\n                    # positional arguments, eg: st.radio(\"radio1\", [\"option1\", \"option2\"])\n                    # so we can correctly infer defaults\n                    all_args_as_kwargs = inspect.getcallargs(attr, *args, **kwargs)\n                    logging.debug(f\"Re-wrote arguments to {all_args_as_kwargs}\")\n                    self._set_default_value(name, key, all_args_as_kwargs)\n\n                    # We have to always pop the default/value setting kwargs to avoid WidgetStateDuplicationWarning\n                    for k in [\"value\", \"default\", \"index\"]:\n                        kwargs.pop(k, None)\n\n                    if name not in UNCONTROLLABLE_WIDGETS: # List of widgets with writes_allowed = False\n                        value = self._original_st.session_state[key]\n                        self.items_to_persist[key] = value\n                        logging.info(f\"Interrupting cleanup for {key}\")\n                        self._original_st.session_state[key] = value\n                return attr(\n                    *args, **kwargs\n                )  # Call the function with our updated kwargs\n\n            return persist_widget_values\n```\n\n\n\n* Each time a page is initialized, restore state items which have been cleaned up:\n```\ndef restore_persisted_items(self):\n        \"\"\"Restores state items which were linked to Streamlit widgets\n        that are no longer displayed on the page. This allows us to keep\n        tracking state items even if the current page doesn't use widgets\n        with those keys\n        \"\"\"\n        for key, value in self.items_to_persist.items():\n            if key not in self._original_st.session_state:\n                self._original_st.session_state[key] = value\n```"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-11-14T06:50:42Z",
+      "body": "When we spec this out, we should definitely look at #4458, which has a lot of great thoughts on this topic as well. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-29T19:30:54Z",
+      "body": "See this repo: https://github.com/rr1964/stateful_streamlit\n\nI have basically taken the work of [USER] and [USER] and wrapped it up in a more streamlined package. I have tried to give a minimal working example that should at least get a user close to building an app with statefulness. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-07T21:18:15Z",
+      "body": "[USER] This was implemented by https://github.com/streamlit/streamlit/pull/15645, right? "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-08T07:32:38Z",
+      "body": "We added a new `persist_state` param which can be set to \"page\" or \"session\" to ensure the widget state is persisted even when the widget is not rendered (e.g. due to conditional logic or page switches). This was included in the 1.59.0 release this week. "
+    }
+  ]
+}

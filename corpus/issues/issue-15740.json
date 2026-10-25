@@ -1,0 +1,37 @@
+{
+  "id": "issue-15740",
+  "type": "issue",
+  "number": 15740,
+  "url": "https://github.com/streamlit/streamlit/issues/15740",
+  "title": "RuntimeError: reentrant call inside _io.BufferedWriter when stopping server via Ctrl+C on Windows",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:windows",
+    "status:confirmed",
+    "priority:P3",
+    "feature:cli",
+    "area:server"
+  ],
+  "created_at": "2026-06-27T09:18:55Z",
+  "closed_at": "2026-07-13T11:31:09Z",
+  "body": "## Bug: `RuntimeError: reentrant call inside <_io.BufferedWriter>` when stopping the server via Ctrl+C on Windows\n\n### Summary\n\nOn Windows, when the Streamlit server is stopped via Ctrl+C (SIGINT), the signal handler calls `server.stop()` which tries to write a \"Stopping...\" message to the console via `click.secho` \u2192 colorama's `AnsiToWin32`. This can race with the asyncio event loop's `select.select()` \u2192 buffered write to the same console handle, causing a `RuntimeError: reentrant call inside <_io.BufferedWriter>`.\n\n### Error\n\n```\nRuntimeError: reentrant call inside <_io.BufferedWriter>\n```\n\n### Full traceback\n\n```\nTraceback (most recent call last):\n  File \"bootstrap.py\", line 43, in signal_handler\n    server.stop()\n  File \"server.py\", line 529, in stop\n    cli_util.print_to_cli(\"  Stopping...\", fg=\"blue\")\n  File \"cli_util.py\", line 34, in print_to_cli\n    click.secho(message, **kwargs)\n  File \"termui.py\", line 690, in secho\n    return echo(message, file=file, nl=nl, err=err, color=color)\n  File \"utils.py\", line 321, in echo\n    file.write(out)  # type: ignore\n  File \"_compat.py\", line 543, in _safe_write\n    return _write(s)\n  File \"ansitowin32.py\", line 47, in write\n    self.__convertor.write(text)\n  File \"ansitowin32.py\", line 177, in write\n    self.write_and_convert(text)\n  File \"ansitowin32.py\", line 202, in write_and_convert\n    self.write_plain_text(text, cursor, start)\n  File \"ansitowin32.py\", line 211, in write_plain_text\n    self.wrapped.flush()\n  File \"_winconsole.py\", line 176, in write\n    buf = get_buffer(b)\n  File \"_winconsole.py\", line 112, in get_buffer\n    out: Array[c_char] = buffer_type.from_address(buf.buf)\nRuntimeError: reentrant call inside <_io.BufferedWriter>\n```\n\nNote: the signal handler at `bootstrap.py:43` is invoked *inside* the asyncio event loop's `_run_once` \u2192 `select.select()` call, so the reentrant write happens while the loop is already inside a buffered I/O operation.\n\n### Environment\n\n- OS: Windows 10/11 (10.0.26200)\n- Python: 3.11.3\n- Streamlit: latest (reproduced via `aider --gui` which launches Streamlit)\n- Virtual environment: No\n\n### Root cause\n\nThe signal handler (`signal_handler` in `bootstrap.py`) runs synchronously inside the asyncio event loop's `select.select()` call. It calls `server.stop()` \u2192 `cli_util.print_to_cli(\"  Stopping...\", fg=\"blue\")` \u2192 `click.secho` \u2192 colorama `AnsiToWin32.write` \u2192 `wrapped.flush()` \u2192 `_winconsole.py` `get_buffer`. This writes to the same `_io.BufferedWriter` that the event loop may already be writing to, triggering CPython's reentrancy guard: `RuntimeError: reentrant call inside <_io.BufferedWriter>`.\n\nThis is a race condition \u2014 it doesn't happen every time, only when the signal arrives while the event loop is mid-write to the console buffer.\n\n### Suggested fix\n\nAvoid writing to the console from inside the signal handler. Options:\n\n1. **Set a flag in the signal handler and do the actual stop + console output from the event loop.** E.g.:\n   ```python\n   def signal_handler(signum, frame):\n       # Don't do I/O inside the signal handler; schedule the stop\n       loop.call_soon_threadsafe(server.stop)\n   ```\n\n2. **Wrap the `cli_util.print_to_cli` call in a try/except** to swallow `RuntimeError` during shutdown (less clean, but minimal change).\n\n3. **Use `signal.signal()` with a coroutine-aware handler** that doesn't write to the console synchronously.\n\nOption 1 is the cleanest \u2014 signal handlers should never do I/O.\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-29T09:31:09Z",
+      "body": "### Triage analysis\n\nThis is a **bug** (Windows-specific) in the server-shutdown path. On Windows, pressing `Ctrl+C` delivers `SIGINT`, which Python runs synchronously on the main thread inside the asyncio `SelectorEventLoop`'s `_run_once` \u2192 `select.select()` call. The registered handler does console I/O, which can race with a buffered write already in progress and trip CPython's reentrancy guard:\n\n- `signal_handler` (`lib/streamlit/web/bootstrap.py:41-43`) calls `server.stop()` directly inside the signal handler.\n- `Server.stop()` (`lib/streamlit/web/server/server.py:119-120`) starts with `cli_util.print_to_cli(\"  Stopping...\", fg=\"blue\")`.\n- `cli_util.print_to_cli` (`lib/streamlit/cli_util.py:25-34`) calls `click.secho`, which on Windows routes through colorama's `AnsiToWin32` \u2192 `wrapped.flush()` on the underlying `_io.BufferedWriter`.\n\nBecause the handler runs while the loop may already be mid-write to that same `BufferedWriter`, this raises `RuntimeError: reentrant call inside <_io.BufferedWriter>`. It's a race, so it only happens when the signal lands during an in-flight console write.\n\n**Likely fix:** avoid I/O inside the signal handler. Schedule the stop on the loop (e.g. `loop.call_soon_threadsafe(server.stop)`) so the `\"Stopping...\"` print and shutdown run from the event loop rather than the interrupting signal context. The reporter's suggested Option 1 matches this and looks correct.\n\n### Related Issues\n\n- [#2975 - Server shutdown fails to exit while processing infinite loop](https://github.com/streamlit/streamlit/issues/2975): Another confirmed bug in the server shutdown path (`Ctrl+C` not exiting cleanly), same general area of signal-driven shutdown.\n- [#6611 - Graceful Shutdown of Server](https://github.com/streamlit/streamlit/issues/6611): Discusses graceful/clean server stop behavior; relevant to making `server.stop()` robust during shutdown.\n- [#7825 - Enhance Streamlit's Compatibility with Playwright on Windows by Updating Event Loop Configuration](https://github.com/streamlit/streamlit/issues/7825): Touches the Windows asyncio event-loop selection (Selector vs Proactor) that is at the heart of this race condition.\n\nNo exact duplicate was found in the open issues.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-29T17:01:02Z",
+      "body": "[USER] thanks for filing this, can you let us know whether the shut down succeeds but throws this error, or whether it fails to shut down?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-29T17:05:26Z",
+      "body": "Hey\n\nThanks for the reply. I cant remember if it worked or not sadly. The AI filled out the issue but I cant remember where it happened. Sorry for it."
+    }
+  ]
+}

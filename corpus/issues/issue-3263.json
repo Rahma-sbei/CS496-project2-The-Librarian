@@ -1,0 +1,43 @@
+{
+  "id": "issue-3263",
+  "type": "issue",
+  "number": 3263,
+  "url": "https://github.com/streamlit/streamlit/issues/3263",
+  "title": "Caching improvements",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:cache"
+  ],
+  "created_at": "2021-05-13T13:28:56Z",
+  "closed_at": "2026-07-22T10:18:56Z",
+  "body": "### Problem\r\n\r\nI'm using Streamlit to build a complicated report which takes about an hour to generate an output. It processes a hundred megabytes of Pandas dataframes. The performance of this report is important to keep UX better. Data processing has also it's own cost. \r\n\r\nTo show report results during a reasonable amount of time and minimize processing costs I utilize caching approach. Using Streamlit's caching mechanism I've faced multiple difficulties:\r\n1. I would like to use persistence on the disk instead of keeping the cache inside in RAM. It helps to avoid wasting RAM when you have multiple nodes where the report is hosted. I understand that it needs time to load the cache into memory but it is excepted. When there are multiple cache values which take 100MB it is reasonable to keep this on disk instead of in RAM to avoid OOM. Unfortunately, Streamlit keeps a copy of cache value in memory when `persist=True`.\r\n2. There are only two strategies of caching: memory and disk. In my particular case, it is reasonable to have the possibility to keep cache directly in S3/Minio.\r\n3. Streamlit has only one strategy of data serialization: Pickle. In the case of large Pandas data frames, it is reasonable to have other formats support like Arrow (it more efficient in term of memory usage and loading time). In general, it would be great to have different strategies which depend on the data type.\r\n4. I'm not able to configure caching folder. Currently, Streamlit keep all cache in `~/.streamlit`\r\n\r\nI'm still exploring Streamlit features and code, so probably it is not a complete list of missing cache features.\r\n\r\n### Solution\r\n\r\n**MVP:**\r\n1. Add `skip_memory_cache=True`\r\n2. As a workaround we can mount S3 into `~/.streamlit` folder using the FUSE driver ([s3 FUSE driver](https://github.com/s3fs-fuse/s3fs-fuse), [Minio FUSE driver](https://github.com/minio/minfs))\r\n3. Pickle is good enough but it does not support unserialization streaming which leads to RAM usage spike.\r\n4. Add cache folder into config (see #3269)\r\n5. Do not remove `cache` directory, because it might be mounted using `s3fs`\r\n\r\n**Preferred solution:**\r\n1-2. Add different caching strategies and possibility to chain different strategies (like `cache_strategies=['memory', 'disk', 's3']`). Initially, we can fetch from the fast cache and if it is miss then from the slower cache.\r\n3. Implement data serialization for Pandas. Parquet is a preferable format (see formats [comparison](https://towardsdatascience.com/the-best-format-to-save-pandas-data-414dca023e0d))\r\n4. Cache folder should be a part of `disk` strategy configuration.\r\n5. Decouple cache component as a separate library to avoid coupling on the whole streamlit project. I found this useful when I want to use the same caching approach in my libraries.\r\n\r\n### Additional context\r\n\r\nProbably integration of an already existing cache library that already supports all these features might be a faster and more robust solution.\r\n\r\nHere is a library that can be easily replace FS Python operations with S3:\r\nhttps://s3fs.readthedocs.io/en/latest/\r\n\r\n---\r\n\r\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\r\n\r\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-05-14T22:35:44Z",
+      "body": "Thanks for the detailed write-up [USER]!\r\n\r\nIt turns out that we're actively thinking about a lot of these things -- we have plans to begin on prototypes of a v2 of `st.cache` in the near future. I'll bring this ticket to the attention of the team members that are working on this so that we can keep these suggestions/use cases in mind."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-05-15T12:22:19Z",
+      "body": "Is it possible to see a work branch or the document which describes changes\nin the architecture?\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-05-16T02:34:50Z",
+      "body": "For persisting primarely to disk you can try if the python diskache works in Streamlit. It is really great."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-06-08T11:29:08Z",
+      "body": "[USER] I've found another problem. If press `Clear cache` in streamlit menu, the entire `~/.streamlit/cache` directory will be removed, which breaks mount of `s3fs`"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T10:18:56Z",
+      "body": "Closing this since the issue is very old and about our old `st.cache` decorator. We have implemented various improvements for our caching in our new `st.cache_data` and `st.cache_resource` decorators. "
+    }
+  ]
+}

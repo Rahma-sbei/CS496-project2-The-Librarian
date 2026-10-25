@@ -1,0 +1,33 @@
+{
+  "id": "issue-15342",
+  "type": "issue",
+  "number": 15342,
+  "url": "https://github.com/streamlit/streamlit/issues/15342",
+  "title": "oauth_authlib_routes not working anymore",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:needs-triage"
+  ],
+  "created_at": "2026-05-27T08:36:33Z",
+  "closed_at": "2026-06-01T15:48:35Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nHello,\n\nSince the removal of `oauth_authlib_routes` in Streamlit 1.57.0, it looks like `AuthCallbackHandler` is no longer usable.\n\nI was previously relying on it for handling OAuth callbacks, but with the recent changes (Starlette migration), I can\u2019t find any way to restore this functionality.\n\nIs there a recommended alternative to achieve the same behavior in newer versions of Streamlit?  \nOr is there any supported way to plug into the OAuth callback flow now?\n\nThanks in advance for your help!\n\n\n### Reproducible Code Example\n\n```Python\nfrom streamlit.web.server.oauth_authlib_routes import AuthCallbackHandler\nAuthCallbackHandler.get\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-27T08:36:44Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15342)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-05-27T16:19:06Z",
+      "body": "[USER] Thanks for reporting this issue. It's expected that the old `AuthCallbackHandler` won't be available anymore after the migration.\n\n> I was previously relying on it for handling OAuth callbacks, but with the recent changes (Starlette migration), I can\u2019t find any way to restore this functionality.\n\nDo you have more context on what you have been doing with the old `AuthCallbackHandler`? Maybe we can somehow enable the same use case with the new Starlette implementation."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-01T15:48:35Z",
+      "body": "Closing this since we won't bring back the old `AuthCallbackHandler`. Please create a feature request if you are missing some functionality with the new Starlette implementation. "
+    }
+  ]
+}

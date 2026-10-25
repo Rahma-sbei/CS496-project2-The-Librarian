@@ -1,0 +1,55 @@
+{
+  "id": "issue-10503",
+  "type": "issue",
+  "number": 10503,
+  "url": "https://github.com/streamlit/streamlit/issues/10503",
+  "title": "unicode error",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:windows",
+    "status:confirmed",
+    "priority:P4"
+  ],
+  "created_at": "2025-02-25T07:19:20Z",
+  "closed_at": "2026-07-19T12:27:53Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nwindows10 pro, python13.2, streamlit 1.40, error while importing heyoo module like...\n\n.\n.\n.\nthere is no error if run with windows10 pro, python9/11, streamlit1.39/1.38\n\n### Reproducible Code Example\n\n```Python\nfrom heyoo import WhatsApp\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\nUnicodeEncodeError: 'utf-8' codec can't encode characters in position 155-156: surrogates not allowed\nTraceback:\nFile \"C:\\Users\\[HOME]\\PycharmProjects\\clinic\\.venv\\Lib\\site-packages\\streamlit\\runtime\\scriptrunner\\exec_code.py\", line 121, in exec_func_with_error_handling\n    result = func()\nFile \"C:\\Users\\[HOME]\\PycharmProjects\\clinic\\.venv\\Lib\\site-packages\\streamlit\\runtime\\scriptrunner\\script_runner.py\", line 591, in code_to_exec\n    exec(code, module.__dict__)\n    ~~~~^^^^^^^^^^^^^^^^^^^^^^^\nFile \"C:\\Users\\[HOME]\\PycharmProjects\\clinic\\pages\\zPrescription.py\", line 23, in <module>\n    import util\nFile \"C:\\Users\\[HOME]\\PycharmProjects\\clinic\\util.py\", line 39, in <module>\n    from heyoo import WhatsApp\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:1.40\n- Python version:13.2\n- Operating System:windows10pro\n- Browser:chrome latest\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-02-25T07:19:31Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-10503)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-02-25T17:57:07Z",
+      "body": "Hi [USER], \n\nI've reproduced this issue and narrowed it down to python 3.13 with any version of Streamlit. \n\nAre you able to use python 3.12.9 as a mitigation?\n\nLaura"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-25T19:32:15Z",
+      "body": "Yes, thank u for help!\r\n\r\nOn Tue, 25 Feb 2025, 23:27 Laura Wilby, ***@***.***> wrote:\r\n\r\n> Hi [USER] <https://github.com/madhukarjadhav736>,\r\n>\r\n> I've reproduced this issue and narrowed it down to python 3.13 with any\r\n> version of Streamlit.\r\n>\r\n> Are you able to use python 3.12.9 as a mitigation?\r\n>\r\n> Laura\r\n>\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub\r\n> <https://github.com/streamlit/streamlit/issues/10503#issuecomment-2682862433>,\r\n> or unsubscribe\r\n> <https://github.com/notifications/unsubscribe-auth/A2C2ZYJPUZQDEQLQSZIJS532RSVITAVCNFSM6AAAAABXZ37VKOVHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHMZDMOBSHA3DENBTGM>\r\n> .\r\n> You are receiving this because you were mentioned.Message ID:\r\n> ***@***.***>\r\n> [image: sfc-gh-lwilby]*sfc-gh-lwilby* left a comment\r\n> (streamlit/streamlit#10503)\r\n> <https://github.com/streamlit/streamlit/issues/10503#issuecomment-2682862433>\r\n>\r\n> Hi [USER] <https://github.com/madhukarjadhav736>,\r\n>\r\n> I've reproduced this issue and narrowed it down to python 3.13 with any\r\n> version of Streamlit.\r\n>\r\n> Are you able to use python 3.12.9 as a mitigation?\r\n>\r\n> Laura\r\n>\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub\r\n> <https://github.com/streamlit/streamlit/issues/10503#issuecomment-2682862433>,\r\n> or unsubscribe\r\n> <https://github.com/notifications/unsubscribe-auth/A2C2ZYJPUZQDEQLQSZIJS532RSVITAVCNFSM6AAAAABXZ37VKOVHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHMZDMOBSHA3DENBTGM>\r\n> .\r\n> You are receiving this because you were mentioned.Message ID:\r\n> ***@***.***>\r\n>\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-30T04:02:31Z",
+      "body": "Anu update on this?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-08-30T05:21:32Z",
+      "body": "[USER] when I looked into this in February, I found the error is because of [this line](https://github.com/Neurotech-HQ/heyoo/blob/main/heyoo/__init__.py#L86) in the docstring of the package you are using that has an emoji. If I remember correctly, there was a change in Python that makes this no longer work with the Streamlit script runner when we need to call exec on your script. \n\nDo you know the maintainer of this library? We thought the simplest solution would be to remove that emoji. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-30T05:28:23Z",
+      "body": "Good, thanks , will try doing that.\r\n\r\nOn Sat, 30 Aug 2025, 10:51 am Laura Wilby, ***@***.***> wrote:\r\n\r\n> *sfc-gh-lwilby* left a comment (streamlit/streamlit#10503)\r\n> <https://github.com/streamlit/streamlit/issues/10503#issuecomment-3238961941>\r\n>\r\n> [USER] <https://github.com/madhukarjadhav736> when I looked\r\n> into this in February, I found the error is because of this line\r\n> <https://github.com/Neurotech-HQ/heyoo/blob/main/heyoo/__init__.py#L86>\r\n> in the docstring of the package you are using that has an emoji. If I\r\n> remember correctly, there was a change in Python that makes this no longer\r\n> work with the Streamlit script runner when we need to call exec on your\r\n> script.\r\n>\r\n> Do you know the maintainer of this library? We thought the simplest\r\n> solution would be to remove that emoji.\r\n>\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub\r\n> <https://github.com/streamlit/streamlit/issues/10503#issuecomment-3238961941>,\r\n> or unsubscribe\r\n> <https://github.com/notifications/unsubscribe-auth/A2C2ZYI2ZYZQ6AFJ6DRX6CT3QEYHFAVCNFSM6AAAAABXZ37VKOVHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHMZTEMZYHE3DCOJUGE>\r\n> .\r\n> You are receiving this because you were mentioned.Message ID:\r\n> ***@***.***>\r\n>\r\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-19T12:27:53Z",
+      "body": "Closing this since it doesnt seem like an issue with Streamlit itself. "
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "issue-15495",
+  "type": "issue",
+  "number": 15495,
+  "url": "https://github.com/streamlit/streamlit/issues/15495",
+  "title": "Running Streamlit with Starlette in Corporate Network",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:needs-triage"
+  ],
+  "created_at": "2026-06-10T09:01:37Z",
+  "closed_at": "2026-06-10T20:49:12Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nI am not sure if my comment in #15400 is considered, but as stated there, I tested the wheel file in the fix as well as streamlit-nightly and i am still facing the same issue as reported in #15378, I cannot use Streamlit with the update to Starlette anymore. If possible I would like to open this topic again.\n\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-10T09:01:53Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15495)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-10T20:49:12Z",
+      "body": "Reopening https://github.com/streamlit/streamlit/issues/15378 & closing this one to maintain context"
+    }
+  ]
+}

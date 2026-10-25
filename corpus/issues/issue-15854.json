@@ -1,0 +1,23 @@
+{
+  "id": "issue-15854",
+  "type": "issue",
+  "number": 15854,
+  "url": "https://github.com/streamlit/streamlit/issues/15854",
+  "title": "expose_tokens ignored with st.App(secrets=...)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:needs-triage"
+  ],
+  "created_at": "2026-07-06T21:59:44Z",
+  "closed_at": "2026-07-06T22:05:30Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n### `expose_tokens` ignored when using `st.App(secrets=...)`\n\nI\u2019m using Streamlit `1.59.0` with `st.App(..., secrets=...)` and built-in auth.\n\nLogin works, and `st.secrets[\"auth\"][\"expose_tokens\"]` is available inside the app, but `st.user.tokens.to_dict()` remains empty.\n\nMinimal shape:\n\n```python\napp = st.App(\n    script_path=\"main.py\",\n    secrets={\n        \"auth\": {\n            \"redirect_uri\": \".../oauth2callback\",\n            \"cookie_secret\": \"...\",\n            \"expose_tokens\": [\"access\"],\n            \"okta\": {\n                \"client_id\": \"...\",\n                \"client_secret\": \"...\",\n                \"server_metadata_url\": \"...\",\n            },\n        }\n    },\n)\n```\n**Expected**:\n`st.user.tokens.to_dict()` should return `{\"access\": \"...\"}`\n\n**Actual**:\n`st.user.tokens.to_dict()`returns `{}`\n\n**Environment**:\n\n- Streamlit 1.59.0\n- Python 3.11\n- Auth provider: Okta\n\n**Codex analyse** : \nissue is in streamlit/web/server/starlette/starlette_websocket.py.\nexpose_tokens is read once when the WebSocket handler is created:\n```python\ndef create_websocket_handler(runtime):\n    expose_tokens = get_expose_tokens_config()\n```\nBut with st.App(secrets=...), programmatic secrets seem to be merged later during app startup/lifespan. So the handler may capture expose_tokens=[] before the injected secrets are available.\n\n\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-06T21:59:56Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15854)\n"
+    }
+  ]
+}

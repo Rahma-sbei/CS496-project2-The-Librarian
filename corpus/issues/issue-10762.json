@@ -1,0 +1,34 @@
+{
+  "id": "issue-10762",
+  "type": "issue",
+  "number": 10762,
+  "url": "https://github.com/streamlit/streamlit/issues/10762",
+  "title": "Horizontal scroll for st.popover",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe",
+    "feature:st.popover"
+  ],
+  "created_at": "2025-03-13T05:46:39Z",
+  "closed_at": "2026-07-28T13:04:28Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nSt.popover with suppose large dataframe is not horizontally scrollable.\n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-13T05:46:52Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-10762)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-03-13T15:38:07Z",
+      "body": "Can you add a few more details? The dataframe itself should be scrollable if it's too large for the popover container. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-13T20:10:06Z",
+      "body": "Whole popover\r\n\r\nOn Thu, 13 Mar 2025, 21:08 Johannes Rieke, ***@***.***> wrote:\r\n\r\n> Can you add a few more details? The dataframe itself should be scrollable\r\n> if it's too large for the popover container.\r\n>\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub\r\n> <https://github.com/streamlit/streamlit/issues/10762#issuecomment-2721695031>,\r\n> or unsubscribe\r\n> <https://github.com/notifications/unsubscribe-auth/AHH34WIQVX6KQQLNS6C3PHD2UGQ7NAVCNFSM6AAAAABY5J66FSVHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHMZDOMRRGY4TKMBTGE>\r\n> .\r\n> You are receiving this because you authored the thread.Message ID:\r\n> ***@***.***>\r\n> [image: jrieke]*jrieke* left a comment (streamlit/streamlit#10762)\r\n> <https://github.com/streamlit/streamlit/issues/10762#issuecomment-2721695031>\r\n>\r\n> Can you add a few more details? The dataframe itself should be scrollable\r\n> if it's too large for the popover container.\r\n>\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub\r\n> <https://github.com/streamlit/streamlit/issues/10762#issuecomment-2721695031>,\r\n> or unsubscribe\r\n> <https://github.com/notifications/unsubscribe-auth/AHH34WIQVX6KQQLNS6C3PHD2UGQ7NAVCNFSM6AAAAABY5J66FSVHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHMZDOMRRGY4TKMBTGE>\r\n> .\r\n> You are receiving this because you authored the thread.Message ID:\r\n> ***@***.***>\r\n>\r\n"
+    }
+  ]
+}

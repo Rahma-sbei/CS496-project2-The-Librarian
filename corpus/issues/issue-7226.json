@@ -1,0 +1,36 @@
+{
+  "id": "issue-7226",
+  "type": "issue",
+  "number": 7226,
+  "url": "https://github.com/streamlit/streamlit/issues/7226",
+  "title": "Altair plots can't be exported to vega editors",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P4",
+    "feature:st.altair_chart",
+    "upstream"
+  ],
+  "created_at": "2023-08-23T20:00:28Z",
+  "closed_at": "2026-07-19T12:11:53Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nAltair charts normally are exportable to vega lite (by clicking in the context menu). \r\nThis allows adjusting plots (e.g. by removing some point or adjusting colors / sizes / names in legend) for presentation purposes.\r\n\r\nBelow I give an example how it works in altair documentation, and how it doesn't work in streamlit.\n\n### Reproducible Code Example\n\n_No response_\n\n### Steps To Reproduce\n\n1. open streamlit documentation https://docs.streamlit.io/library/api-reference/charts/st.altair_chart\r\n2. scroll to first altair plot, in the context menu select \"Open in vega editor\"\r\n3. try to RUN - you'll see empty plot because exported json does not contain any data\n\n### Expected Behavior\n\n1. open altair's documentation https://altair-viz.github.io/gallery/simple_bar_chart.html\r\n2. in the context menu select \"Open in vega editor\"\r\n3. click RUN - and you see the plot. Note that source json on the left contains the dataset.\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.25.0 (latest)\r\n- Python version: 3.10\r\n- Operating System: mac\r\n- Browser: chrome and firefox - both affected\r\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-08-23T20:00:40Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-7226)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-09-06T23:04:35Z",
+      "body": "Linking the relevant issue: https://github.com/vega/vega-embed/issues/719\r\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-19T12:11:53Z",
+      "body": "Closing this since we removed the context menu. "
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "id": "issue-4941",
+  "type": "issue",
+  "number": 4941,
+  "url": "https://github.com/streamlit/streamlit/issues/4941",
+  "title": "st.date_input: Error handling with invalid date entry",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.date_input"
+  ],
+  "created_at": "2022-07-07T18:07:56Z",
+  "closed_at": "2026-08-12T19:26:41Z",
+  "body": "### Summary\r\n\r\nThe [example for date_input](https://docs.streamlit.io/library/api-reference/widgets/st.date_input) fails with \"This app has encountered an error. \"\r\n\r\n### Steps to reproduce\r\n\r\n1. Open the example for date_input\r\n2. Type 0900/01/01 as date\r\n3. Move the cursor between 0 and 9\r\n4. Type anything (like 5 or . or -)\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-07-07T18:28:46Z",
+      "body": "Seems to be working for me:\r\n\r\n![Screen Shot 2022-07-07 at 2 26 41 PM](https://user-images.githubusercontent.com/2762787/177843607-15a6feb5-1a19-4b7b-b199-a705507af3fb.png)\r\n\r\nIs there a practical issue you are running into here? Pre-1500 or so (when the calendar was standardized to the Gregorian calendar), I'm not sure you can programmatically be doing a lot of data analysis in Python as the calendars were location-specific.\r\n\r\nBest,\r\nRandy\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-07-07T20:16:26Z",
+      "body": "![image](https://user-images.githubusercontent.com/25638902/177863868-410edd02-1030-4291-b349-3beef1bd891c.png)\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-07-07T20:17:40Z",
+      "body": "The \"practical issue\" is \"the application crashes with bad input\"\r\n\r\n```\r\nFile \"/[HOME]/venv/lib/python3.7/site-packages/streamlit/scriptrunner/script_runner.py\", line 551, in _run_script\r\n    self._session_state.on_script_will_rerun(rerun_data.widget_states)\r\nFile \"/[HOME]/venv/lib/python3.7/site-packages/streamlit/state/safe_session_state.py\", line 67, in on_script_will_rerun\r\n    self._state.on_script_will_rerun(latest_widget_states)\r\nFile \"/[HOME]/venv/lib/python3.7/site-packages/streamlit/state/session_state.py\", line 500, in on_script_will_rerun\r\n    self._compact_state()\r\nFile \"/[HOME]/venv/lib/python3.7/site-packages/streamlit/state/session_state.py\", line 319, in _compact_state\r\n    self._old_state[key_or_wid] = self[key_or_wid]\r\nFile \"/[HOME]/venv/lib/python3.7/site-packages/streamlit/state/session_state.py\", line 397, in __getitem__\r\n    return self._getitem(widget_id, key)\r\nFile \"/[HOME]/venv/lib/python3.7/site-packages/streamlit/state/session_state.py\", line 417, in _getitem\r\n    return self._new_widget_state[widget_id]\r\nFile \"/[HOME]/venv/lib/python3.7/site-packages/streamlit/state/session_state.py\", line 146, in __getitem__\r\n    deserialized = metadata.deserializer(value, metadata.id)\r\nFile \"/[HOME]/venv/lib/python3.7/site-packages/streamlit/elements/time_widgets.py\", line 432, in deserialize_date_input\r\n    datetime.strptime(v, \"%Y/%m/%d\").date() for v in ui_value\r\nFile \"/[HOME]/venv/lib/python3.7/site-packages/streamlit/elements/time_widgets.py\", line 432, in <genexpr>\r\n    datetime.strptime(v, \"%Y/%m/%d\").date() for v in ui_value\r\nFile \"/usr/local/lib/python3.7/_strptime.py\", line 577, in _strptime_datetime\r\n    tt, fraction, gmtoff_fraction = _strptime(data_string, format)\r\nFile \"/usr/local/lib/python3.7/_strptime.py\", line 359, in _strptime\r\n    (data_string, format))\r\n```"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-07-07T20:24:38Z",
+      "body": "Ah, it's not about trying to use a really early date, but rather \r\n- having a year < 1000\r\n- keeping the zero and typing another number\r\n\r\nThat's pretty weird \ud83e\udd23 "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-07-07T20:29:20Z",
+      "body": "This is *one* of the possibilities. If (for example) you type 0022/07/07 then try to fix the error by deleting the first 0 and typing 2, the application crashes too."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-09-13T16:04:01Z",
+      "body": "[USER] `date_input` wiget works correctly for all scenarious presented above, could you please confirm that this is an issue for the latest streamlit version?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-09-14T05:51:31Z",
+      "body": "The [example page for date_input](https://docs.streamlit.io/library/api-reference/widgets/st.date_input) uses the latest streamlit version (1.12.0), so it is still an issue, see [screencast](https://user-images.githubusercontent.com/25638902/190069960-eb1aca7d-35b5-4fed-a4e0-665760f709d1.webm).\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-09-22T09:59:40Z",
+      "body": "Once  [PR-#5281](https://github.com/streamlit/streamlit/pull/5281) which upgrades `baseui` to `[EMAIL]` is merged, none of the issue presented in the issue will occur."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-11-16T08:08:51Z",
+      "body": "Still an issue, see [screencast](https://user-images.githubusercontent.com/25638902/202122946-9fde50ac-8856-471f-b4bb-db5e7ae7c942.webm).\r\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-07-22T17:21:22Z",
+      "body": "Just confirming that the original issue still exists."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-08-21T19:51:30Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-4941)"
+    }
+  ]
+}

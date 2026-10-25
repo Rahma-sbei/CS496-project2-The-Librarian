@@ -1,0 +1,109 @@
+{
+  "id": "issue-9450",
+  "type": "issue",
+  "number": 9450,
+  "url": "https://github.com/streamlit/streamlit/issues/9450",
+  "title": "Allow streamlit app to be run as a normal python script with `python app.py`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:cli"
+  ],
+  "created_at": "2024-09-12T13:31:56Z",
+  "closed_at": "2026-06-16T19:57:41Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nIt would be convenient to allow users to simply run `python streamlit_app.py`, without having to necessarily run `streamlit run streamlit_app.py`\r\n\r\n\n\n### Why?\n\nThis would make it easier to launch streamlit apps in a more flexible way. My particular interest is being able to do `uv run streamlit_app.py` and use [inline script dependencies](https://peps.python.org/pep-0723/) to share completely standalone single-file streamlit apps that don't require any setup other than installing uv.\r\n\r\nThis can be accomplished today by adding some code that grabs the streamlit internal method that gets run with `streamlit run` and calling that directly, but it would be much nicer if this was the default behavior:\r\n\r\nThe dependencies above were inserted to the script automatically with:\r\n```sh\r\nuv add --script app.py yfinance\r\nuv add --script app.py streamlit\r\n```\r\n\r\n```python\r\n# /// script\r\n# requires-python = \">=3.10\"\r\n# dependencies = [\r\n#     \"streamlit\",\r\n#     \"yfinance\",\r\n# ]\r\n# ///\r\n\r\nimport streamlit as st\r\nimport yfinance as yf\r\n\r\nmsft = yf.Ticker(\"MSFT\")\r\n\r\n# get all stock info\r\nst.write(msft.info)\r\n\r\n# Hacky stuff required to be added to make it work without `streamlit run`:\r\nif __name__ == \"__main__\":\r\n    from streamlit.runtime.scriptrunner import get_script_run_ctx\r\n    if get_script_run_ctx() is None:\r\n        from streamlit.web.cli import main\r\n        import sys\r\n        sys.argv = ['streamlit', 'run', __file__]\r\n        main()\r\n```\r\n\r\nAs-is, this works simply by:\r\n1. Installing uv\r\n2. Running `uv run app.py`\r\n\r\nNo other setup is needed at all.\n\n### How?\n\n`python streamlit_app.py` or `python -m streamlit_app` just work, automatically calling the `main` function if streamlit is imported in them.\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-12T13:32:07Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-9450)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-25T14:48:01Z",
+      "body": "One alternative to this would be that we actually recognize inline script dependencies with `streamlit run` and use `uv` under the hood to install them. I think this would actually be pretty neat because you could do one-liner Streamlit apps!"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-25T16:04:00Z",
+      "body": "> One alternative to this would be that we actually recognize inline script dependencies with `streamlit run` and use `uv` under the hood to install them. I think this would actually be pretty neat because you could do one-liner Streamlit apps!\r\n\r\nI do think that would be nice, but that still means the process is:\r\n* Install streamlit (either globally, or in some virtual environment)\r\n* streamlit run app.py\r\n\r\nIf you have streamlit installed globally, would you install the dependencies into a new venv, and then also install and run streamlit from that venv? Or would you install them for global python?\r\n\r\nInstead of\r\n* uv run app.py"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-30T08:16:31Z",
+      "body": "Until this is solved in an \"official way\" - there's a workaround that allows this: https://bartbroere.eu/2023/06/17/adding-a-main-to-streamlit/"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-30T13:07:25Z",
+      "body": "[USER] that is a nice an elegant solution, but it looks like that might not work for newer versions of streamlit -- I tried it, and got this error:\r\n\r\n```python\r\n.../python3.12/site-packages/streamlit/runtime/app_session.py\", line 720, in _create_new_session_message\r\n    imsg.is_hello = self._script_data.is_hello\r\n    ^^^^^^^^^^^^^\r\nTypeError: 'NoneType' object cannot be interpreted as an integer\r\n```"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-30T13:14:58Z",
+      "body": "[USER] That's actually an easy to solve bug in the workaround itself. Try this:\r\n```python\r\ndef main():\r\n    ...\r\n\r\nif __name__ == \"__main__\":\r\n    # See: https://bartbroere.eu/2023/06/17/adding-a-main-to-streamlit/\r\n\r\n    if \"__streamlitmagic__\" not in locals():\r\n        import streamlit.web.bootstrap\r\n\r\n        streamlit.web.bootstrap.run(__file__, False, [], {})\r\n#                                             ^^^^^ Difference here\r\n    main()\r\n```"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-10-01T15:35:59Z",
+      "body": "Nice! So this is now the full version of a script that is runnable via `uv run app.py`\r\n\r\n```python\r\n# /// script\r\n# requires-python = \">=3.10\"\r\n# dependencies = [\r\n#     \"streamlit\",\r\n#     \"yfinance\",\r\n# ]\r\n# ///\r\n\r\nimport streamlit as st\r\nimport yfinance as yf\r\n\r\nmsft = yf.Ticker(\"MSFT\")\r\n\r\n# get all stock info\r\nst.write(msft.info)\r\n\r\nif __name__ == \"__main__\":\r\n    if \"__streamlitmagic__\" not in locals():\r\n        import streamlit.web.bootstrap\r\n\r\n        streamlit.web.bootstrap.run(__file__, False, [], {})\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-25T13:32:40Z",
+      "body": "Will this work with a multi-page application? I get:\r\n```python\r\n  File \".../streamlit/commands/navigation.py\", line 190, in navigation\r\n    if page._default:\r\n       ^^^^^^^^^^^^^\r\nAttributeError: 'StreamlitPage' object has no attribute '_default'\r\n```"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-10-25T13:36:13Z",
+      "body": "That's a good question. I only ever tried it with a single-page app with multiple tabs. I imagine adapting the workaround wouldn't be too hard. You might want to try reaching out to the author of the original workaround to ask about that."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-01-01T10:39:41Z",
+      "body": "[USER] I just tested it with [this multi-page app example](https://github.com/Sven-Bo/streamlit-multipage-app-example) and it worked fine. I'll be happy to take another look if you can provide a reproducible example."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-01-27T09:13:03Z",
+      "body": "> [[USER]](https://github.com/sgrimee) I just tested it with [this multi-page app example](https://github.com/Sven-Bo/streamlit-multipage-app-example) and it worked fine. I'll be happy to take another look if you can provide a reproducible example.\n\nyes, it works. thanks!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-05T10:33:30Z",
+      "body": "A caveat related to using 3rd party components: ensure you import any 3rd party components **after** doing `streamlit.web.bootstrap.run`. This is because when a component is declared, which typically happens when they're imported, it requires a `ScriptRunContext` (at least on 1.45.0), which is populated by the bootstrap code. A failure to do so will result in the component being replaced by a warning along the lines of:\n\n>Your app is having trouble loading the **st_custom_component.some_comp** component.\n>\n>If this is an installed component that works locally, the app may be having trouble accessing the component frontend assets due to network latency or proxy settings in your app deployment.\n>\n>For more troubleshooting help, please see the [Streamlit Component docs](https://docs.streamlit.io/develop/concepts/custom-components) or visit our [forums](https://discuss.streamlit.io/).\n\nTo summarize:\n\n```python\nfrom st_custom_component import some_comp  # <<<<<<< BAD\n\ndef main():\n    some_comp()\n\n\nif __name__ == \"__main__\":\n    if \"__streamlitmagic__\" not in locals():\n        from streamlit.web.bootstrap import run\n\n        run(__file__, False, [], {})\n\n    main()\n```\n```python\ndef main():\n    from st_custom_component import some_comp  # <<<<<<< GOOD\n\n    some_comp()\n\n\nif __name__ == \"__main__\":\n    if \"__streamlitmagic__\" not in locals():\n        from streamlit.web.bootstrap import run\n\n        run(__file__, False, [], {})\n\n    main()\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-12T11:05:45Z",
+      "body": "It runs properly with uv, but I see this warning message\n\n```\nThread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-09-24T02:33:05Z",
+      "body": "This is how I end up with.\n\nInstead of merging main python script file and streamlit entrypoint file, I separated those into two dedicated files.\n\n```python\n# app/main.py\nfrom streamlit.web import bootstrap\n\nfrom app import entrypoint\n\ndef streamlit_run(flag_options):\n    \"\"\"simplified version of `streamlit.web.cli._main_run()`\"\"\"\n\n    bootstrap.load_config_options(flag_options=flag_options)\n    bootstrap.run(entrypoint.__file__, False, [], flag_options)\n    # you can of course just hard-code the streamlit entrypoint file path instead:\n    # bootstrap.run(\"app/entrypoint.py\", False, [], flag_options)\n\ndef main():\n\n    # setup global states like shared loggers here\n\n    streamlit_run({\n        # NOTE: hard-coded streamlit options\n        #       we can't use streamlit environment variables because we are bypassing\n        #       `streamlit run` command and directly calling `bootstrap.run()` to set global loggers.\n        \"browser.serverAddress\": \"localhost\",\n        \"server.address\": \"0.0.0.0\",\n        \"server.headless\": True,\n    })\n\nif __name__ == \"__main__\":\n    main()\n```\n\n```python\n# entrypoint.py\n\n# streamlit entrypoint file.\n# can be executed with `streamlit run entrypoint.py`\n# though you might loose some global states then\n\ndef main():\n    import streamlit as st # put this under `main()` so that it won't be executed on `import app.entrypoint`\n\n    pg = st.navigation([\n        st.Page(\"../pages/1_first_page.py\"),\n        st.Page(\"../pages/2_second_page.py\"),\n    ])\n    pg.run()\n\nif __name__ == \"__main__\":\n    main()\n```\n\nStill compatible with `uv`."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-11-04T15:15:52Z",
+      "body": "If anyone's trying to register project entry point to use with `uv`, i.e. \n```toml\n[project.scripts]\nmy_dashboard = \"my_package.my_dashboard.main:main\"\n```\nyou'll need to put the workaround in a function and replace `locals` with `globals`:\n```python\ndef main() -> None:\n    if \"__streamlitmagic__\" not in globals():   # <<<<< changed here\n        from streamlit.web.bootstrap import run\n\n        run(__file__, False, [], {})\n\n    # Rest of your init code\n```\nThen it's possible to do `uv run my_dashboard`. HOWEVER, I am yet to find a way to get it to automatically switch to the `my_package/my_dashboard` subfolder (I don't want to specify this in the run command), so if you have a `.streamlit` folder with configs/secrets, it **won't be picked up** unless you `cd` to the app's directory manually beforehand.\n\nI'll reach out to Astral and update."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-16T19:56:08Z",
+      "body": "## Update\n\nThis use case is addressed by the new `st.App(...).run()` API shipping in Streamlit 1.59.\n\nThis gives Streamlit apps an officially supported Python entry point, so launcher files can be run directly with:\n\n```bash\npython app.py\nuv run app.py\n```\n\nIt also works well with PEP 723 inline script dependencies, e.g. a launcher can declare `streamlit` and app-specific dependencies directly in the file and be run with `uv run app.py` without a separate environment setup step.\n\nExample:\n\n```python\n# /// script\n# dependencies = [\n#   \"streamlit\",\n#   \"yfinance\",\n# ]\n# ///\n\nimport streamlit as st\n\napp = st.App(\"streamlit_app.py\")\n\nif __name__ == \"__main__\":\n    app.run()\n```\n\nThis avoids relying on internal `streamlit.web.bootstrap` calls. The supported pattern is a small Python launcher that points at the Streamlit app script, rather than making arbitrary Streamlit scripts auto-run themselves.\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-17T13:31:03Z",
+      "body": "I checked this with the latest streamlit-nightly and it works great -- thanks [USER]!\n\n```python\n# /// script\n# dependencies = [\n#   \"streamlit-nightly>=1.58.1.dev20260616\",\n#   \"yfinance\",\n# ]\n# ///\n\nimport streamlit as st\n\napp = st.App(\"streamlit_app.py\")\n\nif __name__ == \"__main__\":\n    app.run()\n```"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-18T17:52:54Z",
+      "body": "[USER] one minor thing -- this doesn't open the browser automatically -- is there a workaround for that?"
+    }
+  ]
+}

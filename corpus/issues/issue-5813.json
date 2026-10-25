@@ -1,0 +1,70 @@
+{
+  "id": "issue-5813",
+  "type": "issue",
+  "number": 5813,
+  "url": "https://github.com/streamlit/streamlit/issues/5813",
+  "title": "Preserve widget state when a widget disappears from the page (demoed via Multipage Apps)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:widgets",
+    "feature:st.session_state",
+    "feature:multipage-apps"
+  ],
+  "created_at": "2022-12-05T01:06:19Z",
+  "closed_at": "2026-07-22T07:33:36Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen you set a session state variable via the\n\n```py\nst.some_input_widget(..., key=\"foo\")\n```\n\nThe value of session_state.foo is overridden when you leave that page and go back to that page.\n\nI created an example of this which you can see here\n* [Live app](https://treuille-streamlit-1-15-2-multipage-state--streamlit-app-kpr2ai.streamlit.app/)\n* [Source Code](https://github.com/treuille/streamlit-1.15.2-multipage-state-issue/blob/main/streamlit_app.py)\n\n### Reproducible Code Example\n\n```Python\n# See the live example on Streamlit Community Cloud\n```\n\n\n### Steps To Reproduce\n\n1. Go to the [live app](https://treuille-streamlit-1-15-2-multipage-state--streamlit-app-kpr2ai.streamlit.app/). \n2. Type in \"ABC\" in the text box which should bind it to the state variable \"foo\"\n3. Optionally, click the button to set the \"bar\" state (this is included only to show that other forms of state are properly preserved across state views).\n4. Click on the second page.\n5. Click *back* to the main page.\n\n### Expected Behavior\n\nWhen you complete step (5) the text you entered (\"ABC\") should still be be bound to \"foo\" and appear on that page.\n\n### Current Behavior\n\n\"foo\" has been overridden when you go back to the main page.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: `1.15.2`\n- Python version: `3.10.6`\n- Operating System: `MacOS 12.6.1 (21G217)`\n- Browser: `Chrome Version 107.0.5304.121 (Official Build) (arm64)`\n- Virtual environment: Python venv\n\n\n### Additional Information\n\n_No response_\n\n### Are you willing to submit a PR?\n\n- [ ] Yes, I am willing to submit a PR!\n\n![Views](https://api.views-badge.org/badge/st-issue-5813)",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-12-05T21:00:53Z",
+      "body": "Hey [USER] \r\n\r\nAs of today, this is _expected behavior_, but I understand why this is confusing. We have adopted the mechanism that widgets that disappear from the page are removed from session state. There was a lot of confusion on what this means. The counter-bug we received is saying \"Why does the widget continue to have a value after it disappeared?\"\r\n\r\nMPA demonstrates this problem by switching pages effectively removes widgets from session_state. There are two ways to think about the UX.\r\n\r\n1.  MPA are \"separate\" apps. In this case, values set by session state are preserved, but values set by widget state (in session state) will disappear in the next run after the widget is removed. The idea is that each page is it's own self-functioning app, and therefore we expect the widget state to reset when going back to it.\r\n2. MPA session state is all shared including widget state. This is what you are advocating as the expected behavior.\r\n\r\nIn the end, we identified (1) as the model to use and agreed on. I think the main reasoning is that to achieve (2) behavior, you simply save your widget state into session state as a separate variable. It's a little clunky though. I will leave this issue open to get feedback and ideas from the community."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-12-07T17:22:06Z",
+      "body": "Hi [USER],\r\n\r\nPersonally I've been aware of this for a long time and while I understand that this is a design decision, I have never understood the rationale for this particular choice.\r\n\r\nOne reason why I do not like it is that passing `key` to the widget is an explicit attempt to save the widget state in the session state. It is a very convenient syntactic sugar for associating widgets with explicit updates to `st.session_state` - or it would be, except it does not actually do that and it's not very upfront about that fact.\r\n\r\nPersonally, if the widget has been declared with the `key`, it usually means that I want to keep the state independently of whether the widget is currently displayed or not. Sometimes I do not care. And although I can certainly imagine valid reasons why someone would want the state to go away with the widget, I have never wanted it to, and if I did, I would prefer to explicitly clear the state anyway.\r\n\r\nThe fact that the saving is conditional on the widget being there and that fact is not very explicitly sign-posted in the description of the `key` parameter is very confusing to newcomers. I do not think it is much of an overstatement to say that on https://discuss.streamlit.io/ there is a thread about \"why am I losing my widget state?\" every other day.\r\n\r\nFor those of us who do know about it it results in code littered with callback functions which serve only the purpose of running the 'fake' widget session state into the 'real' persistent widget state.\r\n\r\nI think the bottom line with this is that the way Streamlit state works now, there are three modes:\r\n\r\n1. transient (normal widgets)\r\n2. persistent (`st.session_state`)\r\n3. persistent, but only sometimes (widget session state)\r\n\r\nThe existence of the third one is, in my opinion, not very useful.\r\n\r\nObjectively, it is poorly documented. The [Session State API reference](https://docs.streamlit.io/library/api-reference/session-state) treats the two like as if they were the same thing:\r\n\r\n>Every widget with a key is automatically added to Session State:\r\n\r\nThe [Multipage Apps](https://docs.streamlit.io/library/get-started/multipage-apps) site explicitly says:\r\n\r\n>Pages share the same [st.session_state](https://docs.streamlit.io/library/advanced-features/session-state):\r\n\r\nThe linked page says:\r\n\r\n>Session State provides the functionality to store variables across reruns. Widget state (i.e. the value of a widget) is also stored in a session.\r\n\r\n>For simplicity, we have unified this information in one place. i.e. the Session State. This convenience feature makes it super easy to read or write to the widget's state anywhere in the app's code. Session State variables mirror the widget value using the key argument.\r\n\r\nThis hints at the fact that the two are different, but never properly explains the caveats of using the widget state. The only place that does is the [Advanced notes on widget behaviour](https://docs.streamlit.io/library/advanced-features/widget-semantics):\r\n\r\n>If you don't call a widget function in a script run, we neither store the widget state nor render the widget. If you call a widget function with the same arguments later, Streamlit treats it as a new widget.\r\n\r\nWhile updating the documentation to really drive home the real behavior could be one solution, I would argue that whoever wrote the documentation described how this process would work in an intuitive manner: *if you put the `key` on a widget, the state will be saved in `st.session.state`, which persists between pages*, and it's the real behavior that is counter-intuitive. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-12-07T21:44:00Z",
+      "body": "Hey [USER] I really appreciate your thoughts here.\r\n\r\n1. I've sent your feedback to documentation on making it clear. At the minimum, we should make sure understanding of this is clear.\r\n2. I've added feedback on this to our thoughts on Session state as we look into how to best update Session State. I think whatever next step we take will require some deep thought on what's the best experience for all use cases. I can't guarantee when these updates will happen, but we will definitely take on all the learnings from the feedback we have received!\r\n\r\nThanks again for writing up your feedback!"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2022-12-07T22:23:51Z",
+      "body": "Also made a note for myself to dig deeper into this once I have some free time. Lots going on right now!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-12-08T13:27:17Z",
+      "body": "I believe using shadow keys https://github.com/streamlit/streamlit/issues/5620#issuecomment-1342663537 should workaround this bug too\r\n\r\n```py\r\nkey = \"foo\"\r\nshadow_key = \"_foo\"\r\n\r\nif key in st.session_state and shadow_key not in st.session_state:\r\n    st.session_state[shadow_key] = st.session_state[key]\r\n\r\nvalue = st.text_input(\"Set the state variable foo\", key=shadow_key)\r\nst.session_state[key] = value\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-12-09T14:47:12Z",
+      "body": "Hi [USER], thanks a lot for taking this into consideration.\r\n\r\nI think that for common use cases, the persistent state as default makes more sense. For example in a multi-step form entry for a CRUD app, or in a complex computation with multiple parameters grouped in tabs/pages, you normally would not want the application state to be reset just because the entry widget is hidden."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-02-07T16:27:27Z",
+      "body": "Streamlit team is looking at how to improve / change this behavior. If you have other thoughts or examples beyond what's already discussed here, please let us know over in #6074 "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-09-16T23:51:12Z",
+      "body": "There is an interesting interaction too with how long you let the other page run for that I have documented on https://github.com/streamlit/streamlit/issues/7338"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-06-26T17:08:36Z",
+      "body": "Drive-by comment: One idea here could also be to do something like `st.navigation(..., preserve_state=True)` to keep all values in session state preserved across page changes. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T07:33:36Z",
+      "body": "Closing this since it was implemented in https://github.com/streamlit/streamlit/pull/15645\n\nAdds a keyword-only `persist_state=None | \"page\" | \"session\"` parameter to most widgets that preserves a keyed widget's value when it stops being rendered. Persistence is purely a server-side state decision.\n\n- `None` (default): current behavior \u2014 value is lost when the widget isn't rendered or on a page switch.\n- `\"page\"`: keep the value while the widget isn't rendered on the **same page**; drop it on a page switch (not restored on return, and never leaks to another page that reuses the key).\n- `\"session\"`: keep the value for the whole session, including across page switches."
+    }
+  ]
+}

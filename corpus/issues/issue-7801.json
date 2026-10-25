@@ -1,0 +1,68 @@
+{
+  "id": "issue-7801",
+  "type": "issue",
+  "number": 7801,
+  "url": "https://github.com/streamlit/streamlit/issues/7801",
+  "title": "Expose all Streamlit Types, I.E UploadedFile from file_uploader input",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.file_uploader"
+  ],
+  "created_at": "2023-12-04T21:15:51Z",
+  "closed_at": "2026-08-05T13:25:45Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nTitle is straight forward, in terms of trying to make a very type safe python application, having access to the types used from a library is paramount, so wondering why these types are not accessible as an import from the lib.\n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-12-04T21:16:05Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-7801)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-12-05T17:13:54Z",
+      "body": "Yeah good point, we should do that. We probably need to find a good place where we expose classes like this. I think we thought about having an `st.typing` namespace at some point. Anyway, will prioritize this when it gets more upvotes!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-02-19T04:12:08Z",
+      "body": "[USER]  I've also had to import this UploadedFile type from deeper in the streamlit API than I care to for my own application. An `import streamlit.typing as stt` (where typing.pyi is just a stubs module, if you don't want to provide user access to the actual classes themselves) would be super useful; it could contain things like `StreamlitAPIException`, `UploadedFile`, `DeltaGenerator`, etc..."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-06T02:43:55Z",
+      "body": "[USER] [USER] I also had to import the UploadedFile type in an inconvenient manner. Providing library types for end users is quickly becoming standard practice.\r\n<img width=\"485\" alt=\"lol\" src=\"https://github.com/streamlit/streamlit/assets/83451189/f18e26d0-9e87-4ed9-8779-01f2208b67cf\">\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-07-06T19:44:49Z",
+      "body": "[USER] Let me know if you disagree with any of the initial additions here; I think it's a reasonable place to start (small)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-12T14:56:14Z",
+      "body": "Great job [USER], when do we think the types module be ship to production?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-13T07:52:40Z",
+      "body": "I think that depends on the maintainers ([USER], for example). I am currently working on GH-8112 though."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-11-20T20:24:59Z",
+      "body": "We don't have a concrete plan to work on this right now unfortunately. Would one of you be interested in working on a PR at some point? I'll bring it up with the team for discussion but I think at least exposing the basic types like `UploadedFile` in a separate namespace shouldn't be a controversial topic."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-11-06T01:05:29Z",
+      "body": "# Proposed solution\n\n- Add a new module `streamlit.typing` (this is similar to what e.g. NumPy does, they have `numpy.typing`).\n- This module should definitely contain `UploadedFile`. I couldn\u2019t find anything else that should obviously be in there but might make sense to have another look through the library.\n- What this should **not** contain:\n    - `DeltaGenerator` \u2192 not clear if we want to keep this long-term, and there are no requests for it at the moment\n    - Exceptions \u2192 these are already in `streamlit.errors`\n- I think the `streamlit.typing` module should also be mentioned in the docs. We can start very small though and just use the existing docstrings for types (e.g. see [[here](https://github.com/streamlit/streamlit/blob/c16232e330f084a9575ad54ab2dc78d6368df60c/lib/streamlit/runtime/uploaded_file_manager.py#L58)](https://github.com/streamlit/streamlit/blob/c16232e330f084a9575ad54ab2dc78d6368df60c/lib/streamlit/runtime/uploaded_file_manager.py#L58) for UploadedFile)."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-05T20:32:11Z",
+      "body": "## Update \n\nStreamlit 1.62+ will expose various types/classes as part of the `streamlit.typing` namespace (also available as `st.typing`)."
+    }
+  ]
+}

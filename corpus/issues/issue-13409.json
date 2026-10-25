@@ -1,0 +1,33 @@
+{
+  "id": "issue-13409",
+  "type": "issue",
+  "number": 13409,
+  "url": "https://github.com/streamlit/streamlit/issues/13409",
+  "title": "download_button with data=callable runs without ScriptRunContext",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:needs-triage"
+  ],
+  "created_at": "2025-12-18T14:54:29Z",
+  "closed_at": "2025-12-18T14:58:36Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen using the newly introduced option to provide a callable as data argument, the callable runs without ScriptRunContext.\n\n### Reproducible Code Example\n\n```Python\n# app.py\nimport csv\nimport io\n\nimport streamlit as st\n\n\ndef to_csv() -> str:\n    foo = st.session_state.get(\"foo\", \"nope\")\n    print(foo)\n    buffer = io.StringIO()\n    writer = csv.writer(buffer)\n    writer.writerow([foo])\n    buffer.seek(0)\n    return buffer.getvalue()\n\n\nst.download_button(\n    label=\"Download\",\n    data=to_csv,\n    file_name=\"foo.csv\",\n    mime=\"text/csv\",\n)\n\nst.session_state[\"foo\"] = \"bar\"\n```\n\n### Steps To Reproduce\n\n1. `streamlit run app.py`\n2. Click the button\n\nRaises Thread 'asyncio_0': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n\n### Expected Behavior\n\nWhen called from the download_button, the function `to_csv` should have context, and see the currenct `session_state`.\n\n### Current Behavior\n\nWarning\n```\nThread 'asyncio_0': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n```\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.52.2\n- Python version: 3.13\n- Operating System: Win\n- Browser: Chrome\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-18T14:54:40Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-13409)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-18T14:58:36Z",
+      "body": "Somehow I missed this issue https://github.com/streamlit/streamlit/issues/13337\nClosing as duplicate"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-09-01T18:51:38Z",
+      "body": "Confirming this from a production incident \u2014 and it's a bit worse than \"missing ScriptRunContext produces a warning\": inside that thread, `st.session_state` reads return stale values and `[USER].cache_data`-wrapped calls silently return whatever was already cached, **with no error and no warning**. Both just look like they worked.\n\nOur incident: a `data=callable` on `st.download_button` called into functions that (transitively) read `[USER].cache_data`-cached helpers. Because those calls run outside `ScriptRunContext`, they picked up cached results from a *different* request context \u2014 users occasionally downloaded a file that didn't match what they'd just generated on screen, with nothing in the logs to explain why. We only found the mechanism by tracing the full call graph of the callable, not just inspecting it \u2014 a lambda that looks pure can still be unsafe if anything it calls touches cached/session state indirectly.\n\nWe ended up moving off lazy `data=` entirely (eager bytes, pre-warmed at save time) because we couldn't make the callable's dependency tree provably free of session/cache reads. For anyone hitting this: if your callable calls anything that isn't a pure function of its arguments, the missing context isn't just a perf/warning issue, it's a correctness one.\n"
+    }
+  ]
+}

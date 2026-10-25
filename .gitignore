@@ -1,0 +1,11 @@
+# secrets: never commit
+.env
+
+# local environment and temp files
+
+venv/
+_docs_clone/
+__pycache__/
+
+# corpus/ and index/ are intentionally NOT ignored: commit them as a frozen snapshot
+# (check sizes first; if they grow past ~50 MB, move them to Git LFS or a GitHub release)

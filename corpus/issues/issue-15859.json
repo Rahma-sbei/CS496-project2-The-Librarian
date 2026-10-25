@@ -1,0 +1,37 @@
+{
+  "id": "issue-15859",
+  "type": "issue",
+  "number": 15859,
+  "url": "https://github.com/streamlit/streamlit/issues/15859",
+  "title": "st.date_input calendar renders behind st.dialog overlay (regression in 1.59.0)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "status:confirmed",
+    "priority:P1",
+    "feature:st.date_input",
+    "feature:st.dialog"
+  ],
+  "created_at": "2026-07-07T04:35:11Z",
+  "closed_at": "2026-07-07T19:07:28Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nThe st.date_input calendar popover renders behind the modal surface of st.dialog in 1.59.0, so the calendar is visible but not clickable. This is a regression \u2014 the same code worked correctly in 1.57.0 (calendar floated above the dialog).\n\n\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\n[USER].dialog(\"Add Payment\")\ndef add_payment():\n    c_amount, c_due = st.columns(2)\n    c_amount.number_input(\"Amount\")\n    c_due.date_input(\"Due Date\")   # calendar opens *behind* the dialog\n\nif st.button(\"Open dialog\"):\n    add_payment()\n```\n\n### Steps To Reproduce\n\n1. Run the app above with Streamlit 1.59.0.\n2. Click Open dialog.\n3. Inside the dialog, click the Due Date field to open the calendar.\n4. The calendar popover appears partly/entirely behind the dialog's modal surface and cannot be clicked.\n\n### Expected Behavior\n\nThe calendar popover renders above the dialog (as it did in 1.57.0) and dates are selectable.\n\n### Current Behavior\n\nThe calendar popover is stacked below the dialog overlay, so it's non-interactive.\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.59.0\n- Python version: 3.13.5\n- OS: Linux (Debian 13, kernel 6.12)\n- Browser: Chromium Version 149.0.7827.114 (Official Build) built on Debian GNU/Linux 13 (trixie) (64-bit)\n- Prior working version: 1.57.0\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-07T04:35:19Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15859)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-07T08:58:14Z",
+      "body": "### Triage summary\n\nThis is a **frontend stacking/z-index regression**: an `st.date_input` calendar opened inside an `st.dialog` renders *behind* the dialog surface, so it's visible but not clickable.\n\n**Likely root cause:** `st.date_input` (like `st.time_input` / `st.datetime_input`) still renders its calendar via **BaseWeb** (`baseui/datepicker` + `baseui/popover`). BaseWeb popovers portal through the BaseWeb `LayersManager`, whose z-index is set to `zIndices.popup` in [`RootStyleProvider.tsx`](https://github.com/streamlit/streamlit/blob/develop/frontend/lib/src/RootStyleProvider.tsx). In **1.58.0**, `st.dialog` was migrated off BaseWeb to `react-aria-components` (PR #15327, *\"Remove `BaseWeb` for `Dialog`\"*), and the new overlay `StyledDialogOverlay` also uses `zIndex: theme.zIndices.popup` ([`Modal/styled-components.ts`](https://github.com/streamlit/streamlit/blob/develop/frontend/lib/src/components/shared/Modal/styled-components.ts)). Because both share the **same numeric z-index**, stacking falls back to DOM order \u2014 and the react-aria dialog portal mounts later in the DOM than the BaseWeb layers root, so the dialog paints over the calendar. The date_input `Popover` override does not apply the `getOverlayZIndex()` (`popup !important`) helper that migrated widgets now use, so it stays behind.\n\nNote: the Dialog BaseWeb removal landed for **1.58.0** (commit `a7200715c3`, 2026-05-26); the reporter likely upgraded 1.57.0 \u2192 1.59.0 and didn't test 1.58.0. A fix would mirror #15599 \u2014 give the BaseWeb date/time popover bodies an above-dialog z-index (or migrate them off BaseWeb / lower the dialog overlay z-index). This same bug very likely also affects `st.time_input` and `st.datetime_input`.\n\n### Related Issues\n\n- **#15599 \u2014 Selectbox dropdown renders behind st.dialog** *(closed/completed)*: Essentially the identical bug for `st.selectbox`, with the same root cause (BaseWeb dropdown portal vs. the high-z-index react-aria dialog). It was fixed for migrated widgets via `getOverlayZIndex()`; the same fix pattern should apply to `st.date_input`.\n- **#12390 \u2014 Regression when showing layered altair chart in dialog (tooltips not showing)** *(open)*: Another regression where element content doesn't layer/behave correctly inside `st.dialog`, i.e. the same family of \"rendering inside a dialog\" stacking problems.\n- **#13633 \u2014 `st.popover` with `st.date_input` opens the date input dropdown** *(open)*: Related `st.date_input` popover/layering interaction when nested inside another overlay container, though the mechanism (click/open passthrough) differs from this z-index issue.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-08T11:48:42Z",
+      "body": "## Update\n\nThis will be fixed in the patch 1.59.1 that will be released today."
+    }
+  ]
+}

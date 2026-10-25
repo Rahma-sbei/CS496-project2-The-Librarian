@@ -1,0 +1,9 @@
+{
+  "id": "release-1.42.1",
+  "type": "release",
+  "url": "https://github.com/streamlit/streamlit/releases/tag/1.42.1",
+  "title": "1.42.1",
+  "version": "1.42.1",
+  "date": "2025-02-17T21:21:02Z",
+  "body": "<!-- Release notes generated using configuration in .github/release.yml at 1.42.1 -->\n\n\n\n**Full Changelog**: https://github.com/streamlit/streamlit/compare/1.42.0...1.42.1"
+}

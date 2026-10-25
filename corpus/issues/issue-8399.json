@@ -1,0 +1,78 @@
+{
+  "id": "issue-8399",
+  "type": "issue",
+  "number": 8399,
+  "url": "https://github.com/streamlit/streamlit/issues/8399",
+  "title": "Basic accessibility web features",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:accessibility"
+  ],
+  "created_at": "2024-03-30T17:41:53Z",
+  "closed_at": "2026-10-11T01:20:44Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nTo begin with, it is a great product. In its current state, it seems advisable to generate a final web page with considerations for web accessibility. This includes aspects such as the page name, language, structure, and named links. Currently, these tags cannot be controlled and may result in errors or warnings in accessible web page verification tools.\n\n### Why?\n\nThe product is described as excellent. However, it lacks certain features related to web accessibility. Enhancing web accessibility can improve user experience and ensure compliance with accessibility standards. This proactive approach can also prevent errors and warnings in verification tools.\n\n### How?\n\nTo address this, efforts should be made to generate a final web page that incorporates aspects of web accessibility. This may involve adjusting tags related to page name, language, structure, and links to comply with accessibility guidelines. By implementing these changes, errors and warnings in verification tools can be minimized, thereby improving the overall accessibility and usability of the web page.\n\n### Additional Context\n\nI know there are some questions in forums about compatibility e.g. with 508 standards (https://discuss.streamlit.io/t/508-compliance-for-streamlit/13579) which of course would be great but my recommendation would be to start with simple compatibilities that do not incorporate too much development overhead, or diminish Stremlit's capabilities.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-03-30T17:42:02Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8399)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-01T05:56:57Z",
+      "body": "Hi,\r\n\r\nWe are currently working on an accessibility project and encountered an issue with two unlabeled buttons in the Streamlit UI. Specifically, these are the \"close sidebar\" button and the \"three-dotted\" menu button.\r\n\r\n<img width=\"2056\" alt=\"image\" src=\"https://github.com/user-attachments/assets/940f363c-ccc0-4eb0-ba34-49dc14891f79\">\r\n\r\nWe hope the Streamlit team addresses these accessibility concerns. The product is excellent, but it could greatly benefit from improved accessibility features. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-16T07:57:47Z",
+      "body": "Hi,\r\n\r\nI'd like to volunteer to address these 2 unlabelled buttons (plus the 3rd \"expand sidebar\" button). I am a frontend developer with experience in accessibility.\r\n\r\nAs per the contributing guidelines I'll wait for confirmation here from the Streamlit team before submitting a PR. Thanks."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-09T16:29:36Z",
+      "body": "I can't emphasize enough how important it is to have Section 508 compliance for the platform for government use. The platform is missing out on a huge business opportunity with Gov sector if it relies on clicks by users to gauge the importance of this request."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-11T10:49:57Z",
+      "body": "I would suggest this issue/ticket should be labelled as a \"bug fix\" rather than an \"enhancement\". Just to add, for the Streamlit team, that my offer to fix these stands, with the hope that I can then look at other accessibility issues following this work. Please do let me know if it's okay to submit a PR."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-07T16:46:37Z",
+      "body": "Adding to this to agree with the previous posts that this is incredibly important for government work and Streamlit would greatly benefit from addressing this (thank you to [USER] for the offer for development, I hope they take you up on it!)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-04T17:48:34Z",
+      "body": "As a Senior Solutions Architect with a large Government consulting firm.  I want to add in on the agreement. Streamlit will ultimately be sidelined, even by the data scientists, if the end results cant be presented with 508 compliance.  RFPs from government agencies have largely begun boilerplate 508 compliance into all of their requests. Which will immediately disqualify this fantastic product from government use."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-09-19T13:42:57Z",
+      "body": "At least update the top-right menu? axe checker says:\n- Elements must only use supported ARIA attributes. The span isn\u2019t the toggle \u2014 the button is; move aria-expanded and aria-haspopup onto the button itself.\n- Buttons must have discernable text. Give the button an informative aria-label.\n\nThe suggestions are from ChatGPT, but it's a bug, please fix."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-11-06T07:16:54Z",
+      "body": "[USER] sorry, hadn't seen your post! Please feel free to make PRs \u2013 especially for things like this that just fix existing features and don't add new features or APIs, we're very likely to merge them."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-08T12:10:27Z",
+      "body": "I'm eager if these concerns have been prioritized by streamlit. I would like to avail Accessibility features given I'm blind tech founder and now into leveraging AI technologies."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-10T08:30:43Z",
+      "body": "Thanks [USER]. Our team aren't using Streamlit right now, so if [USER] is keen to work on these then that's great."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-10-11T01:20:44Z",
+      "body": "Thanks so much to everyone who reported and pushed on accessibility initiatives here \ud83c\udf89 \nThis issue collected several distinct concerns over time, so we're triaging them against recent work and more focused trackers:\n\n| Concern | Status | Tracking / notes |\n| --- | --- | --- |\n| Controllable page name / title | Done | Supported via `st.set_page_config(page_title=...)` |\n| Unlabeled sidebar collapse / expand buttons | Done | #17170 |\n| Unlabeled main menu (\u22ef) button + ARIA on wrong element | Done | #13878 \u2014 `aria-label`, `aria-haspopup`, and `aria-expanded` are on the menu button |\n| Named links | Partial | Empty-label `st.page_link` / icon-only chrome naming in #17170. Heading anchors: #13329 (fixed in #13378). Meaningful link text for app content remains author-owned (WCAG 2.4.4). |\n| Page structure (landmarks, headings, skip links) | Partial | Shell landmarks / skip link still need focused work \u2014 tracked in #17416. Wiki inventories leave WCAG 2.4.1 unscored. |\n| Controllable HTML language (`lang`) | Open | Tracked in #15726 |\n| Broader Section 508 / WCAG compliance | N/A (framework) | Streamlit is a framework, not a finished app, so it can't be blanket \"508 compliant\" \u2014 conformance depends on each deployed app (author content, charts, custom components, etc.). We'll keep improving shell/widget accessibility and the APIs authors need so apps *can* meet WCAG / 508 criteria. Track concrete gaps via `area:accessibility` issues and the wiki inventories (`accessibility-wcag.md`, `accessibility-theme.md`). |\n\nWe're closing this issue so new accessibility reports land in focused tickets instead of piling up here. The specific UI bugs from this thread (sidebar controls, main menu) are fixed; anything still open is linked in the table above. If you hit a new gap, please open a dedicated issue with the `area:accessibility` label."
+    }
+  ]
+}

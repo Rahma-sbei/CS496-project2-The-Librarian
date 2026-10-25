@@ -1,0 +1,65 @@
+{
+  "id": "issue-2302",
+  "type": "issue",
+  "number": 2302,
+  "url": "https://github.com/streamlit/streamlit/issues/2302",
+  "title": "pydeck_chart not showing different pydeck Views types",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.pydeck_chart"
+  ],
+  "created_at": "2020-10-31T21:51:54Z",
+  "closed_at": "2026-09-04T14:47:30Z",
+  "body": "# Summary\r\nWhen I try to show Pydeck map with view other than \"MapView\", nothing happens, it does not change the view of the map.\r\n\r\n# Steps to reproduce\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-2302)\r\n\r\n1. Use code:\r\n```\r\nimport streamlit as st\r\nimport pydeck as pdk\r\n\r\nview_state = pdk.ViewState(latitude=0, longitude=0, zoom=2, min_zoom=2)\r\nview = pdk.View(type=\"MapView\", controller=True)\r\n\r\ndeck = pdk.Deck(views=[view],initial_view_state=view_state)\r\nst.pydeck_chart(deck)\r\n```\r\n\r\n2. Try to change view:\r\n`view = pdk.View(type=\"OrbitView\", controller=True)` or `view = pdk.View(type=\"OrthographicView\", controller=True)`, or any other\r\n\r\n\r\n## Expected behavior:\r\n\r\nIt should change the view of the map.\r\n\r\n## Actual behavior:\r\n\r\nIt still shows the same \"MapView\" view of the map.\r\n\r\n## Is this a regression?\r\nno\r\n\r\n# Debug info\r\n\r\n- Streamlit version: (0.70.0)\r\n- Python version: (3.7.7)\r\n- Using Conda? PipEnv? PyEnv? Pex? No\r\n- OS version: Linux Ubuntu 18.04\r\n- Browser version: Google Chrome, Version 86.0.4240.111\r\n\r\n# Additional information\r\n\r\n",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2020-11-09T09:25:55Z",
+      "body": "Hi, I just wanted to check if there is any progress on this subject? We are preparing some app with map feature, so I would grateful for any feedback. Thank you very much for the help!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-11-09T19:53:26Z",
+      "body": "Hi Eveyone,  this is a very good question I would like to know too.  I'm plotting point clouds below the map (underground) and full rotations of the OrbitView type would be tremendously helpful to check distribution and patterns.  For instance, concentration of hypocentres (points to origin of earthquake) could show the rupture plane or fault.  Thanks in advance for any help or hint on how to achieve this!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2020-11-24T16:57:07Z",
+      "body": "Hello, I come from https://discuss.streamlit.io/t/pydeck-chart-not-showing-different-pydeck-views-types/7396 :) \r\n\r\nNOTES:\r\n\r\nThe `views` part of pydeck is [dropped from the proto](https://github.com/streamlit/streamlit/blob/368585077a337003f48f61f7446d2e4eccedca44/frontend/src/components/elements/DeckGlJsonChart/DeckGlJsonChart.tsx#L154), then Streamlit defines a [default `StaticMap`](https://github.com/streamlit/streamlit/blob/368585077a337003f48f61f7446d2e4eccedca44/frontend/src/components/elements/DeckGlJsonChart/DeckGlJsonChart.tsx#L215) to be used. \r\n\r\nI don't know if building [one View](https://deck.gl/docs/developer-guide/views#using-a-view-class) or an [array of views](https://deck.gl/docs/developer-guide/views#using-multiple-views) from the `views` in the proto breaks something else, but since there's no more `deck_gl_chart` now this may be easier to do?\r\n\r\n_____ \r\n\r\nAnyway [USER] sorry for the trouble you're encountering, it doesn't seem like a pseudo-immediate fix there may be a little bit of thought to give here, but the code example you provided is super helpful. :confused: \r\n\r\n[USER] looks great! do you have a little code sample of what you're trying to achieve so the API can be refined on the Streamlit side?\r\n\r\n_If you really are in a hurry, you could try to embed `deck.to_html()` in [`components.html()`](https://docs.streamlit.io/en/stable/develop_streamlit_components.html#render-an-html-string) or [build a quick Component](https://docs.streamlit.io/en/stable/develop_streamlit_components.html#development-environment-setup) with the Views rebuilt. I know that may sound overkill but that could be done quickly with the right guidance. If you're interested in that, you can ask for help on the [Streamlit forum](https://discuss.streamlit.io/)._\r\n\r\nBest,\r\nFanilo\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2020-11-25T11:27:04Z",
+      "body": "Hi Fanilo,\r\n\r\nThank you very much for the explanation. Excellent, I will try the solution with embedding _deck.to_html()_ to _components.html()_ and I  will send feedback here if we manage to deal with it. \r\n\r\nThanks again! Best,\r\nJovan"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-03-13T23:15:25Z",
+      "body": "[USER] Did you get this workaround to work by chance?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-03-19T09:49:51Z",
+      "body": "[USER] Hi, sorry, I didn't, I switched to Dash for that application.\r\n\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-03-19T20:03:50Z",
+      "body": "[USER] I'm sorry to hear that. I hope it's working for your needs! I will keep this in mind as we make improvements to Streamlit. Thanks again for posting the issue!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T12:56:26Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-2302)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-04T14:06:38Z",
+      "body": "## Update\n\nThis will be available in Streamlit **1.64+** ([#16819](https://github.com/streamlit/streamlit/pull/16819)). `st.pydeck_chart` now honors pydeck `views` such as `OrbitView` and `OrthographicView`.\n\n```python\nimport streamlit as st\nimport pydeck as pdk\n\nst.pydeck_chart(\n    pdk.Deck(\n        views=[pdk.View(type=\"OrbitView\", controller=True)],\n        initial_view_state=pdk.ViewState(\n            target=[0, 0, 0], zoom=5, rotation_x=15, rotation_orbit=30\n        ),\n        map_provider=None,\n    )\n)\n```"
+    }
+  ]
+}

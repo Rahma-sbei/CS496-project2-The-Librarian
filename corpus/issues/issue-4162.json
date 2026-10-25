@@ -1,0 +1,63 @@
+{
+  "id": "issue-4162",
+  "type": "issue",
+  "number": 4162,
+  "url": "https://github.com/streamlit/streamlit/issues/4162",
+  "title": "Allow console_scripts as streamlit run scripts",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:cli"
+  ],
+  "created_at": "2021-12-11T10:32:20Z",
+  "closed_at": "2026-07-22T11:03:22Z",
+  "body": "### Problem\n\nRight now streamlit requires a raw Python script (e.g. `your_script.py`) that is invoked, e.g.\n```\nstreamlit run your_script.py [-- script args]\n```\n\nThis is really frustrating if you want to package your streamlit application in a wheel file and distribute it to your friends & colleagues.  Streamlit's requirement of a raw Python script makes this impossible.\n\nAssume I have created a proper Python package/distribution `my-streamlit-dashboard` and uploaded it to PyPI or some company-internal artefact store. If my colleagues now runs `pip install my-streamlit-dashboard`, my package will be installed but how would my colleague now run my dashboard? There is no `script.py` entry point for him or her to run. \n\n\n### Solution\n\nFor use-cases like this, Python packaging allows the definition of `console_scripts` which allow you to define command-line scripts that are installed e.g. within your virtual environment, and behave like normal shell scripts (but are actual Python scripts). All details can be found [here](https://python-packaging.readthedocs.io/en/latest/command-line-scripts.html#the-console-scripts-entry-point). Quite many Python tools & frameworks use this capability like for instance [PyScaffold's `putup` command](https://github.com/pyscaffold/pyscaffold), [Django's `django-admin` command](https://docs.djangoproject.com/en/3.2/ref/django-admin/), [poetry's `poetry` command](https://python-poetry.org/docs/) and streamlit's own `streamlit` command.\n\nContinuing the example from above, I could define a console-script `my-cool-dashboard` within the package `my-streamlit-dashboard` that would act as the initial script to run for streamlit, i.e.\n```\nstreamlit run my-streamlit-dashboard\n```\nFor this to work, streamlit would need to allow console scripts defined by `console_scripts` as start points for dashboard. Technically this should be possible as they are just Python scripts. Doing this right now leads to the error:\n```\nError: Streamlit requires raw Python (.py) files, but the provided file has no extension.\nFor more information, please see https://docs.streamlit.io\n```\nif the console script doesn't end with `.py`, which is common. Adding `.py` leads to:\n```\nError: Invalid value: File does not exist: my-cool-dashboard.py\n```\nA crude and unsatisfying workaround is:\n```\nstreamlit run `which my-cool-dashboard.py`\n```\nThis seems to mostly work but also emits nasty errors during execution:\n```\nFile \"/[HOME]/.mambaforge/envs/streamlit-demo/lib/python3.9/site-packages/streamlit/script_runner.py\", line 354, in _run_script\n    exec(code, module.__dict__)\nFile \"/[HOME]/.mambaforge/envs/streamlit-demo/bin/my-streamlit-dashboard.py\", line 33, in <module>\n    sys.exit(load_entry_point('my-streamlit-dashboard', 'console_scripts', 'my-cool-dashboard.py')())\n```\n\n\n### Additional context\n\nWhat are the benefits of making packaging for streamlit apps possible? I'm glad you asked! \n* Another way of distribution. For production, a streamlit app would right now be deployed as docker container most likely. Allowing proper packaging would also make it possible for users to just install and run it locally via pip. Thus more **flexibility**.\n* Proper **versioning**. Since Python packages/distributions are versioned, one could apply proper versioning to these packages and enforce certain processes within an organisation, like semantic versioning etc. which is hard if everyone is just cloning a git repo. \n* Enabling [**ML-Ops** principles](https://ml-ops.org/content/mlops-principles). Most organisation provide templates for Python projects that support developers in applying techniques like testing (CI/CD), reproducibility, documentation, deployment, etc. With the suggested solution it would be much easier to incorporate streamlit in such templates as e.g. provided by [PyScaffold](https://pyscaffold.org/).\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-4162)",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2021-12-11T10:56:18Z",
+      "body": "instead of using a normal console script entrypoint, which is practically just a cli,\r\nit seems like it would be far more versatile of streamlit had a own entrypoint that would allowe to compose the streamlit experience directly\r\n\r\nafter all this thing is NOT a cli - its a ux, imho a console_script entrypoint is the completely wrong starting point"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-12-11T11:02:11Z",
+      "body": "[USER], agreed, that would be even better. My suggested solution was born from the idea of having minimal changes in streamlit to get an 80% solution. \r\n\r\nCan you elaborate more on your suggestion to give the streamlit developers a hint on how you would approach this?\r\n\r\nWhat I understood is that `my-streamlit-dashboard` would register a streamlit `entry_point` which `streamlit` would then find and just provide. It could then be just listed when running `streamlit ls` (for showing all found dashboards) and run with `streamlit show my-streamlit-dashboard`, for instance to have a differentiation to `streamlit run your_script.py`."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-12-11T11:50:39Z",
+      "body": "A key difference between a script, and a entrypoint is, that the module / file containing it typically is expected to be importable without triggering the action\n\nAka importing myapp.cli is not expected to run myapp.cli.main\n\nScripts are expected to actually act\n\nWhich its why a common pattern for __main__ modules in packages is to just import and run the cli main "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-12-11T13:38:31Z",
+      "body": "Sure [USER], what I meant was that according to your suggestion, app developers would just need to set in `setup.cfg` something like:\r\n```init\r\n[options.entry_points]\r\nstreamlit.dashboards =\r\n    my-cool-dashboard = my_streamlit_dashboard.dashboad:main\r\n```\r\nfollowing the example from above. `my_streamlit_dashboard` would be the package and `dashboard` the module wherein a function `main()` is defined. This function acts like the main entrance point for the dashboard in a similar way currently a pure Python script is used by streamlit.\r\n\r\nTo make this work, the developers of streamlit would then need to register those `entry_points` using the entry-point group `streamlit.dashboards` from above, i.e.\r\n```python\r\nfrom importlib.metadata import entry_points\r\n\r\n# find all dashboards provided by customer packages and load them.\r\ndashboards = {entry_point.name: entry_point.load() \r\n              for entry_point in entry_points().select(group=\"streamlit.dashboards\")\r\n# assume user has selected `my-cool-dashboard`, e.g. with `streamlit run my-cool-dashboard`,\r\n# then streamlit would execute the dashboard internally with\r\ndashboards[\"my-cool-dashboard\"](*args, **kwargs)\r\n```\r\n\r\nThis is what you meant with your first comment, right?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-12-11T14:23:14Z",
+      "body": "Roughly"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2022-10-16T01:27:23Z",
+      "body": "I think that's a valid idea! It's not high on our priority list right now (simply because we don't heard a ton of requests like this) but if it gets more upvotes (\ud83d\udc4d), I'm happy to bump it up further!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2022-10-17T12:05:09Z",
+      "body": "Python has an API for running modules, so you can create a entrypoint script that provides similar functionality. See this thread: https://github.com/streamlit/streamlit/issues/5471"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-12-07T14:32:43Z",
+      "body": "> Python has an API for running modules, so you can create a entrypoint script that provides similar functionality. See this thread: #5471\r\n\r\nI can confirm [USER] suggestion works. I added some more details [below the original answer](https://github.com/streamlit/streamlit/issues/5471#issuecomment-1341051365)."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T11:02:10Z",
+      "body": "## Update \n\nThe packaging use case is now supported via `st.App.run()` (added in #15563 and available since Streamlit 1.59.0), although `streamlit run <console-script>` itself still requires a Python-file target.\n\nA package can expose a console script whose entry point does:\n\n```python\nfrom pathlib import Path\nimport streamlit as st\n\ndef main() -> None:\n    st.App(Path(__file__).with_name(\"dashboard.py\")).run()\n```\n\nUsing an absolute package path is important because the generated console-script executable lives in the virtual environment's `bin` directory.\n"
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "id": "issue-8765",
+  "type": "issue",
+  "number": 8765,
+  "url": "https://github.com/streamlit/streamlit/issues/8765",
+  "title": "New Selection mode on st.altair_chart doesn't work with binding_radio and binding_select",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.altair_chart"
+  ],
+  "created_at": "2024-05-24T13:54:40Z",
+  "closed_at": "2026-09-04T07:00:35Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\n\r\n\r\n\r\nTesting out the new functionality introduced in 1.35. Selections work great in general with altair charts, however I found a few examples where it doesn't work, namely when using certain [Widget bindings](https://altair-viz.github.io/user_guide/interactions.html#widget-binding). \r\n\r\nWith selection enables the altair binding widgets render multiple times and chart data is not visible for some reason. \r\n\r\n\r\nWithout new selection API enabled.\r\n![image](https://github.com/streamlit/streamlit/assets/61916473/6008785a-5b74-4043-a3cd-c3e3dd428fff)\r\n\r\nWith the new selection api enabled\r\n![image](https://github.com/streamlit/streamlit/assets/61916473/4700918f-2480-48d7-a8cc-4248353688c5)\r\n\r\n\r\n### Reproducible Code Example\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-8765)\r\n\r\n```Python\r\nimport altair as alt\r\nfrom vega_datasets import data\r\n\r\nimport streamlit as st\r\nimport pandas as pd\r\n\r\n\r\ndf = pd.read_json(data.cars.url)\r\n\r\ninput_dropdown = alt.binding_radio(\r\n    options=df.Origin.unique().tolist(),\r\n    labels=df.Origin.unique().tolist(),\r\n    name='Region: '\r\n)\r\n\r\nsingle_selection = alt.selection_point(name=\"single\", toggle=False)\r\nselection = alt.selection_point(\r\n    name = 'og_select',\r\n    fields=['Origin'], bind=input_dropdown, value = df.Origin.unique().tolist()[0], toggle = False\r\n)\r\nchart = (\r\n    alt.Chart(data.cars.url)\r\n    .mark_point(\r\n        tooltip=True,\r\n    )\r\n    .encode(\r\n        x=\"Miles_per_Gallon:Q\",\r\n        y=\"Horsepower:Q\",\r\n        color=alt.condition(single_selection, \"Origin:N\", alt.value(\"lightgray\")),\r\n    ).transform_filter(\r\n       selection\r\n    ).add_params(\r\n        single_selection,\r\n        selection\r\n    )\r\n        \r\n    \r\n)\r\n\r\nreturn_event = st.checkbox('Use selection')\r\nif return_event:\r\n    event_data = st.altair_chart(\r\n        chart, on_select=\"rerun\", selection_mode = 'single', \r\n        use_container_width=True)\r\n    st.write(event_data)\r\nelse:\r\n    st.altair_chart(\r\n        chart, \r\n        use_container_width=True\r\n    )\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n_No response_\r\n\r\n### Expected Behavior\r\n\r\n_No response_\r\n\r\n### Current Behavior\r\n\r\n_No response_\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.35\r\n- Python version: Python 3.11\r\n- Operating System: Ubuntu 22.04\r\n- Browser: Chrome\r\n\r\n\r\n### Additional Information\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-05-24T13:54:50Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-8765)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-05-24T16:46:45Z",
+      "body": "[USER] Thanks for reporting this issue. I reproduced it [here](https://issues.streamlit.app/?issue=gh-8765)."
+    }
+  ]
+}

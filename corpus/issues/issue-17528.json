@@ -1,0 +1,31 @@
+{
+  "id": "issue-17528",
+  "type": "issue",
+  "number": 17528,
+  "url": "https://github.com/streamlit/streamlit/issues/17528",
+  "title": "`st.chat_input(accept_audio=True)`: recording waveform disappears once the text area has expanded to multiple lines",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:frontend",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.chat_input"
+  ],
+  "created_at": "2026-10-18T19:52:12Z",
+  "closed_at": "2026-10-20T19:01:46Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n### Summary\nWith `accept_audio=True`, the live waveform shows while recording only until the chat input's text area has once expanded to more than one line. After that, every later recording shows an empty waveform area until the page is reloaded. Recording itself still works: the audio is captured and returned correctly. Only the visualization is missing, so users can't tell whether the microphone is picking anything up.\n\nThis is easy to hit when an app pre-fills the input via session state, e.g. putting a speech transcript into the field so the user can edit it before sending. But it also reproduces with nothing but typed text.\n\n### Reproducible Code Example\n```python\nimport streamlit as st\n\nvalue = st.chat_input(\"Say something\", accept_audio=True)\nif value:\n    st.write(value)\n```\n\n### Steps To Reproduce\n1. Run the app and open it in the browser.\n2. Click the mic: the waveform animates while recording. Cancel or send.\n3. Type a message with at least two lines (Shift+Enter) so the text area expands.\n   Don't send it.\n4. Click the mic again and speak.\n\nVariant with programmatic text: set `st.session_state[\"<key>\"] = \"line 1\\n\\nline 2\"` before rendering a keyed `st.chat_input(key=\"<key>\", accept_audio=True)`, then record.\n\n### Expected Behavior\nThe waveform animates during every recording, whatever was in the text area before.\n\n### Current Behavior\nIn step 4 the recording UI appears (cancel and stop buttons, timer), but the waveform area stays empty. It stays empty for all later recordings, even after the text is cleared, until the page is reloaded.\n\n### Possible cause (from reading the 1.66.0 frontend bundle)\n- `ChatInput` renders two layouts:\n  `isExtended && !isRecording ? <expanded layout> : <compact layout>`. The waveform container (`<div ref={waveformContainerRef}>` inside the `isRecording` wrapper) exists only in the compact layout.\n- When the text area extends, the compact layout unmounts, so the container `<div>` is removed. When recording starts, the compact layout mounts again with a **new** container element.\n- `useWaveformController` creates the WaveSurfer instance and the record plugin only once. `start()` does `if (initializedRef.current || await initialize()) ...`, and the init effect depends only on stable callbacks, not on the container element. WaveSurfer therefore stays bound to the first, now detached container and draws into a node that is no longer in the DOM.\n\nPossible fixes:\n- (a) Keep the waveform container mounted in both layouts and hide it with CSS instead of unmounting it.\n- (b) Use a callback ref, or compare `containerRef.current` with the element WaveSurfer was created with, and tear down and reinitialize when it changes.\n\n### Is this a regression?\n- [ ] Yes, this used to work in a previous version.\n\n(Not checked against versions before 1.60.)\n\n### Debug info\n- Streamlit version: 1.66.0 (also seen with 1.60.0)\n- Python version: 3.14\n- Operating System: macOS 26 (Darwin 25.5)\n- Browser: Firefox version 157.0.1 (64-Bit)\n\n### Additional Information\nRelated but different: #12446 (`st.audio_input` waveform keeps playback colors after a new recording).",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-18T19:52:24Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-17528)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-19T07:02:24Z",
+      "body": "This is a frontend bug in `st.chat_input(accept_audio=True)`: once the text area has expanded past one line, later recordings still capture audio and show the recording controls, but the live waveform stays empty until the page reloads.\n\nThe waveform node (`StyledChatAudioWave`, `waveformContainerRef` in `ChatInput.tsx`) is rendered only in the compact row. The expanded toolbar branch (`hasExpandedHeight && !isRecording`) unmounts it, and starting a recording mounts a new empty div. `useWaveformController` builds WaveSurfer once: `initializeWaveSurfer` skips work when `isInitializedRef` is already set, and its effect depends on the stable ref object, theme, and sample rate, so it never notices the DOM node was replaced. `start()` keeps painting into the detached node.\n\nAn input that is already expanded on first paint (a multiline value, or `height` other than `\"content\"`) can fail earlier. The init effect sees a null container and returns, and the first `start()` throws `Record backend not initialized`. `st.audio_input` keeps its waveform node mounted, so it does not have this layout bug. Keeping one container mounted across both layouts, or recreating WaveSurfer when the element changes, would fix it.\n\n### Related Issues\n\nNo open duplicate was found.\n\n- [#12446](https://github.com/streamlit/streamlit/issues/12446) (closed): `st.audio_input` kept playback waveform colors after seeking and recording again. It shares `useWaveformController` / WaveSurfer, with a different symptom (stale colors, not a missing waveform). The reporter already separated it from this bug.\n\n---\n*This is an automated triage comment using `grok-4.7-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

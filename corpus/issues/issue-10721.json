@@ -1,0 +1,34 @@
+{
+  "id": "issue-10721",
+  "type": "issue",
+  "number": 10721,
+  "url": "https://github.com/streamlit/streamlit/issues/10721",
+  "title": "Add support for mermaid charts",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:charts",
+    "type:possible-component"
+  ],
+  "created_at": "2025-03-11T16:55:16Z",
+  "closed_at": "2026-06-22T16:52:51Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAdd support for rendering [mermaid charts](https://github.com/mermaid-js/mermaid) in Streamlit.\n\n### Why?\n\nMermaid is a popular, text-based diagramming tool integrated into tools like Github & Notion. It provides a variety of diagrams that could also be useful for Streamlit apps. \n\n### How?\n\nThere are a couple of options for how this could be implemented:\n1. Add support for mermaid charts as part of the markdown rendering (e.g. via code blocks)\n2. Provide a `st.mermaid_chart` command that allows rendering a mermaid string.\n3. Do 1 + 2.\n\n### Additional Context\n\n- Remark plugin for renderin mermaid charts:\n    - https://github.com/remcohaszing/remark-mermaidjs\n    - https://github.com/temando/remark-mermaid\n    - https://github.com/remcohaszing/rehype-mermaid\n- [Mermaid Playground](https://mermaid-js.github.io/mermaid-live-editor/edit)\n- [mkdocs support via markdown code blocks](https://squidfunk.github.io/mkdocs-material/reference/diagrams/#using-state-diagrams)\n- [Github support via markdown code blocks](https://github.blog/developer-skills/github/include-diagrams-markdown-files-mermaid/)\n- Related Streamlit forum posts: [1](https://discuss.streamlit.io/t/st-markdown-does-not-render-mermaid-graphs/25576) & [2](https://discuss.streamlit.io/t/streamlit-markdown-a-streaming-markdown-component-with-latex-mermaid-table-code-support/72187)",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-11T16:55:27Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-10721)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-03-27T08:38:20Z",
+      "body": "[USER] made a beautiful component for that! https://github.com/blackary/streamlit-mermaid-interactive"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-22T16:53:31Z",
+      "body": "## Update\n\nMermaid support will be released in 1.59+ via markdown code-blocks and a dedicated `st.mermaid_chart` command. "
+    }
+  ]
+}

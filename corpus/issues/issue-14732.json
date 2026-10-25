@@ -1,0 +1,36 @@
+{
+  "id": "issue-14732",
+  "type": "issue",
+  "number": 14732,
+  "url": "https://github.com/streamlit/streamlit/issues/14732",
+  "title": "`st.switch_page` switching to a blank page",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:needs-triage",
+    "feature:multipage-apps",
+    "feature:st.switch_page",
+    "feature:st.navigation"
+  ],
+  "created_at": "2026-04-11T13:03:54Z",
+  "closed_at": "2026-04-12T09:20:29Z",
+  "body": "",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-11T13:04:02Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-14732)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-11T13:12:15Z",
+      "body": "This issue reports `st.switch_page` navigating to a blank page instead of the target page, with the URL not updating. The same author previously reported this in #14709, which was closed as cannot-reproduce. This new issue includes full reproducible code.\n\n**Root cause analysis:** The user's entrypoint (`project.py`) uses third-party components (`EncryptedCookieManager` from `streamlit_cookies_manager_ext` and `streamlit_js_eval`) that can call `st.stop()` or trigger `st.rerun()` **before** `st.navigation()` runs. Critically, the code checks `if \"cookie_manager\" not in st.session_state` but only ever sets `st.session_state[\"cookies\"]` \u2014 so the key `\"cookie_manager\"` is never stored. This means a new `EncryptedCookieManager` is created on every rerun, and `cookies.ready()` likely returns `False` on the first render (since the component requires a browser round-trip), triggering `st.stop()` before `st.navigation()` executes. When `st.switch_page` triggers a rerun, `st.navigation()` never runs, so no navigation message is sent to the frontend, resulting in a blank page.\n\nThis appears to be a **user code issue** (session state key mismatch) rather than a Streamlit framework bug. However, it does highlight a usability concern: when `st.stop()` is called before `st.navigation()` during a page-switch rerun, the result is a silent blank page with no error feedback.\n\n### Related Issues\n\n- [#14709](https://github.com/streamlit/streamlit/issues/14709) \u2014 Same author, same problem (`st.switch_page` not working), closed as cannot-reproduce. This issue (#14732) is a re-filing with more detailed code.\n- [#9009](https://github.com/streamlit/streamlit/issues/9009) \u2014 `st.switch_page` does not function within a `try/except` block. Related pattern where execution flow control (`st.switch_page` uses a `RerunException` internally) conflicts with user code patterns.\n- [#10756](https://github.com/streamlit/streamlit/issues/10756) \u2014 Custom components unmount and reload on `switch_page`. Related issue where third-party custom components interact poorly with page navigation.\n\n---\n*This is an automated triage comment using `claude-4.6-opus-high-thinking`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-04-11T18:56:20Z",
+      "body": "The suggested probable reasons are not True.\n\nThe provided code reproduces the exact same problem.\n\nNote: The navigation works perfectly when selecting the page from st.navigation but it doesn't work with st.switch_page."
+    }
+  ]
+}

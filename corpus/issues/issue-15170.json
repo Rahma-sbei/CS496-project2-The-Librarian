@@ -1,0 +1,38 @@
+{
+  "id": "issue-15170",
+  "type": "issue",
+  "number": 15170,
+  "url": "https://github.com/streamlit/streamlit/issues/15170",
+  "title": "Auth flow uses deprecated `authlib.jose` APIs and should migrate to `joserfc` before Authlib 2.0",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:dependencies",
+    "status:confirmed",
+    "priority:P3",
+    "upstream",
+    "feature:st.login",
+    "feature:authentication"
+  ],
+  "created_at": "2026-05-13T13:49:41Z",
+  "closed_at": "2026-05-19T18:27:54Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nAuthlibDeprecationWarning: authlib.jose module is deprecated, please use joserfc instead.\nIt will be compatible before version 2.0.0.\n  from authlib.jose import jwt\n\nHello,\n\nStreamlit will not be compatible with the next Authlib. Joserfc have to be used instead of jose.\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-13T13:50:11Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15170)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-13T17:11:18Z",
+      "body": "### Analysis\n\nThis is a forward-looking compatibility bug: Authlib has emitted an `AuthlibDeprecationWarning` indicating that the `authlib.jose` module will be removed in Authlib **2.0.0** in favor of the [`joserfc`](https://pypi.org/project/joserfc/) package. Streamlit's authentication layer currently imports `from authlib.jose import jwt` (and `JoseError`, `JWTClaims`) in [`lib/streamlit/auth_util.py`](https://github.com/streamlit/streamlit/blob/develop/lib/streamlit/auth_util.py) to sign/decode the short-lived provider JWT used by `st.login`. When Authlib 2.0.0 is released, these imports will break and `st.login` / `st.user` will fail.\n\nCurrently `lib/pyproject.toml` declares `auth = [\"Authlib>=1.3.2\"]` with no upper bound, so a fresh install once Authlib 2.0.0 ships could pull in an incompatible version. Mitigation options include: (1) pin the dependency to `Authlib>=1.3.2,<2`, (2) migrate the JWT encoding/decoding to `joserfc`, or (3) support both paths via a version check (the existing `is_authlib_installed()` helper already inspects `authlib.__version__`). This is an upstream-driven change rather than a regression in Streamlit itself.\n\n### Related Issues\n\n- [#11364](https://github.com/streamlit/streamlit/issues/11364) \u2014 \"You should install Authlib for me\": Discusses making Authlib a managed dependency for `st.login`; relevant because the fix here will likely involve adjusting the Authlib version constraint or replacing the dependency.\n- [#11391](https://github.com/streamlit/streamlit/issues/11391) \u2014 \"Cannot use common tenant with microsoft login: authlib.jose.errors.InvalidClaimError\": Another `authlib.jose`-related issue tagged `upstream`, directly affecting the same module that is being deprecated.\n- [#12995](https://github.com/streamlit/streamlit/issues/12995) \u2014 \"st.login against MSAL returns authlib OAuthError\": Same area (`authlib`-backed OAuth flow in `st.login`), useful context for the broader Authlib integration.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-05-13T17:12:03Z",
+      "body": "Thanks [USER] for reporting this. I dug into it locally.\n\nI can reproduce the `AuthlibDeprecationWarning` with Authlib `1.7.2`, and the warning is coming from Streamlit\u2019s optional auth code path still importing `authlib.jose` for provider-token encode/decode. So there is a real future-compatibility issue here.\n\nWith that said, I don\u2019t see Authlib `2.0` released yet, and the current auth flow still works with latest `1.7.2`. It emits a warning but does not currently fail. I am going to update this ticket to reflect this."
+    }
+  ]
+}

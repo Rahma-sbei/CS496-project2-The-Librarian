@@ -1,0 +1,28 @@
+{
+  "id": "issue-6677",
+  "type": "issue",
+  "number": 6677,
+  "url": "https://github.com/streamlit/streamlit/issues/6677",
+  "title": "Text alignment in buttons",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:st.button"
+  ],
+  "created_at": "2023-05-12T05:34:52Z",
+  "closed_at": "2026-07-22T09:54:51Z",
+  "body": "### Problem\r\n\r\nIf I use Container Width = True with...say.. an st.button, the button label gets center-aligned by default.\r\n\r\n### Solution\r\n\r\nSuggest that a text align parameter be introduced in all widgets that have the Container Width parameter. The options of this text align parameter can be either 'left', 'right' or 'center'\r\n\r\nThe options are because:\r\na. left: I'd like my button text to be left aligned\r\nb. center: Some users may want this\r\nc. right: Can be used to simulate a sub menu (main button text left aligned, sub button text right aligned.\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-05-12T18:23:35Z",
+      "body": "Can you show a concrete use case where you'd want this? E.g. a mock/sketch or a real app. I can't really imagine any situation where this would look good. If your main use case here is the sub menu, can you describe a bit more in detail what you want? I don't think we'll want to solve that via buttons but if there's a valid use case, we could see if we should support another element for it. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-05-13T10:12:24Z",
+      "body": "Hi,\r\n\r\nAs requested, I have provided 2 pix:\r\nOne for the menu (with a comparison between the current and the proposed change in the widget - p1.png and\r\nAnother, for how it would look, if it was to substitute as a menu (as streamlit does not have that widget)\r\n\r\n![p1](https://github.com/streamlit/streamlit/assets/88389632/1a65dc21-6656-4282-8cbf-a22da108b7da)\r\n![p2](https://github.com/streamlit/streamlit/assets/88389632/b9cf8e2d-48a2-4649-b22e-539da4e5a11f)\r\n\r\nAdditionally, I have been tinkering around with other similar frameworks: specifically, nicegui (https://nicegui.io/). Why can't we get a streamlit equivalent of ... say..\r\na. ui.label('Login:').classes('text-2xl font-bold text-purple pl-10')\r\nb. with ui.header().style('background-color: #7B2869').props('elevated'):\r\n\r\nYou get the gist...\r\n"
+    }
+  ]
+}

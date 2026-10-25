@@ -1,0 +1,84 @@
+{
+  "id": "issue-9243",
+  "type": "issue",
+  "number": 9243,
+  "url": "https://github.com/streamlit/streamlit/issues/9243",
+  "title": "Don't autofocus first element in `st.popover` and `st.dialog`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.popover",
+    "feature:st.dialog"
+  ],
+  "created_at": "2024-08-08T21:13:15Z",
+  "closed_at": "2026-07-19T12:55:44Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nWhenever a popover contains widgets, the very first one will look \"active\". It should remain neutral.\r\n\r\nSee recordings:\r\n- https://share.cleanshot.com/Kr9svw0F\r\n- https://share.cleanshot.com/NW4ll8hK\r\n\r\n### Reproducible Code Example\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-9243)\r\n\r\n```Python\r\nimport streamlit as st\r\n\r\nwith st.popover(\"Foobar\"):\r\n    st.text_input(\"Always active\")\r\n    st.button(\"Active on hover\")\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n_No response_\r\n\r\n### Expected Behavior\r\n\r\nNo widget is activated\r\n\r\n### Current Behavior\r\n\r\nThe first widget is activated\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.35.0\r\n- Python version: \r\n- Operating System: OSX\r\n- Browser: Chrome",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-08-08T22:22:49Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9243)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-08-09T19:18:09Z",
+      "body": "[USER], thanks for reporting this issue. I reproduced it [here](https://issues.streamlit.app/?issue=gh-9243). This looks quite easy to fix. But not 100% sure if it's a better or worse behavior to auto-focus. Are there any other opinions against or for auto-focus (cc [USER] [USER]) "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-08-12T21:26:29Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-08-12T21:27:21Z",
+      "body": "We moved this to an enhancement because the current intention to autofocus is working as expected. The question remains whether autofocus should _not_ be a feature of popover."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-16T09:47:50Z",
+      "body": "Noticed this does really look buggy/undesirable when the popover starts with a `st.date_input`. \r\n\r\nhttps://share.cleanshot.com/wGC18Qml"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-16T15:17:34Z",
+      "body": "Also: this affects st.dialog"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-02-07T16:00:23Z",
+      "body": "In my opinion, the example with a single text box or selectbox being automatically active is nice, but with things like st.date_input it's *very* annoying. I would love a `focus_on_first=False` argument added (and also it would be nice to see this default behavior mentioned in the docs)."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-02-10T15:04:59Z",
+      "body": "I prepared a PR to deactivate autofocus for dialog and popover. I think not using autofocus is a slightly better default than using autofocus: https://github.com/streamlit/streamlit/pull/10370 And I will add a new feature request to make this behavior configurable (e.g. via `focus_on_first`). "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-02-10T15:32:22Z",
+      "body": "New feature request: https://github.com/streamlit/streamlit/issues/10371"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-02-11T20:25:20Z",
+      "body": "After some discussion, we decided not to deactivate auto-focus as default and instead accelerate the migration of date_input away from baseweb (to fix the annoying issue with the popover) https://github.com/streamlit/streamlit/issues/9243 I think adding a parameter - e.g., `focus_on_first` - is also quite valid... but will require a small product discussion (cc [USER])"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-02-12T16:44:15Z",
+      "body": "What was the reasoning not to remove the auto-focus? I've been actually thinking for a long time that we should remove it, I always found it a bit annoying... Sure, there are certain situations (like a single text input) where it might be useful but in most situations, it felt pretty awkward to me. I'm not totally opposed to a parameter but even then I'd probably set the default to `False`. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-02-12T16:57:22Z",
+      "body": "[USER] it was related to concerns about breaking web standards and accessibility: https://github.com/streamlit/streamlit/pull/10370#discussion_r1949575070"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-19T12:55:44Z",
+      "body": "Closing this since it was fixed by the basweb to react-aria migration in the latest Streamlit version."
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "issue-6423",
+  "type": "issue",
+  "number": 6423,
+  "url": "https://github.com/streamlit/streamlit/issues/6423",
+  "title": "1 second resolution for st.time_input",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.time_input"
+  ],
+  "created_at": "2023-04-03T23:58:47Z",
+  "closed_at": "2026-07-28T17:26:16Z",
+  "body": "### Problem\n\nI would like to allow user input for time to the precision of seconds. Currently, the `st.time_input` widget only allows selection of hour and minutes, which is a limitation if we want higher level time precision.\n\n### Solution\n\nI would love to see seconds- and possibly milliseconds-level precision in the `st.time_input` widget. In many cases, we might need different levels of precision, so perhaps it would make sense for users to select the level of precision, whether that is 'minutes', 'seconds' or 'milliseconds'.\n\nI hope you will consider implementing this feature as it would greatly expand the capability for web apps that require high precision time input. Thanks!\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-6423)",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-04-05T11:52:50Z",
+      "body": "See also #4693. We'll actually launch this on Thursday with the next release! `st.time_input` will get a step parameter that will let you specify the step between consecutive times. It's limited to min. 60 seconds at the moment since going lower would have been a lot more effort to implement. So I'll leave this open and we'll use it as a request for a lower bound ;)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-05-02T02:36:11Z",
+      "body": "Keen to see this added, particularly useful when working with time series IOT data"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-01-09T09:25:52Z",
+      "body": "Same here, working with time-series IoT data and really need proper second support (at least). :)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-08T17:21:40Z",
+      "body": "[USER] What was the blocker from being able to specify a value for `step` of less than 60?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-01-10T12:08:01Z",
+      "body": "> What was the blocker from being able to specify a value for step of less than 60?\n\nThe [time picker component from BaseWeb](https://baseweb.design/components/time-picker/) that we use only allows showing hours/minutes, not seconds. "
+    }
+  ]
+}

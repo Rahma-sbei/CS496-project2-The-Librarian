@@ -1,0 +1,94 @@
+{
+  "id": "issue-7740",
+  "type": "issue",
+  "number": 7740,
+  "url": "https://github.com/streamlit/streamlit/issues/7740",
+  "title": "Toasts are not preserved when page is rerun",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:st.toast"
+  ],
+  "created_at": "2023-11-20T21:58:33Z",
+  "closed_at": "2026-08-17T20:22:06Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nMy main use-case for toasts is providing some information about result when flushing the page.\r\nE.g. data entered and stored in the database. \r\nTo prevent further interaction with page (to avoid duplicates or incorrect behavior), I call rerun. That's where toasts could be helpful, but unfortunately they do not appear if page is reloaded afterwards\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\r\n\r\nif st.button(\"just make some toasts\"):\r\n    st.toast(\"Hi there, here is my toast-1\")\r\n\r\nif st.button(\"make some toasts and rerun\"):\r\n    st.toast(\"Hi there, here is my toast-2\")\r\n    st.experimental_rerun()\n```\n\n\n### Steps To Reproduce\n\nsee expected code above. When hitting the second button, toast does not appear for user.\n\n### Expected Behavior\n\nIn both cases toast should be visible for 4 seconds.\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.26.0\r\n- Python version: 3.10\r\n- Operating System: both Mac OS and Linux\r\n- Browser: Chrome-based (Brave)\r\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-11-29T17:42:43Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-7740)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-23T16:44:09Z",
+      "body": "You could try a workaround and save the toast message & icon in st.session_state and display any saved data as toast. I use this to show a toast after st.switch_page (page 1 generates the toast data --> switch to page 2 --> page 2 displays toast data)\r\n\r\n```\r\nimport streamlit as st\r\nfrom streamlit import session_state as sst\r\n\r\n# init sst variable\r\nif 'infoToast' not in sst:\r\n    sst['infoToast'] = {}\r\n\r\n# show info toast if in sst & clear\r\ndef showInfoToast():\r\n    if sst.infoToast != {}:\r\n        toastTxt = sst.infoToast['txt']\r\n        toastIco = sst.infoToast['ico']\r\n        sst.infoToast = {}\r\n        st.toast(toastTxt, icon=toastIco)\r\n\r\nshowInfoToast()    \r\n    \r\nif st.button('make a toast and rerun'):\r\n    sst.infoToast['txt'] = 'Hi there, here is my toast after rerun'\r\n    sst.infoToast['ico'] = ':material/info:'\r\n    st.rerun()\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-23T16:55:22Z",
+      "body": "[USER] this code wouldn't show things properly in case of two reloads, and can show it on new page even after timeout.\r\n\r\nthis should be a part of core functionality of widget (and that's very simple to implement on browser side), not some workarounds in python"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-23T18:09:38Z",
+      "body": "[USER] Sure, this is a workaround since it is not implemented in streamlit. And, to achieve your desired functionality with this, you would have to do some extra modifications to the sst variable, e.g. save multiple toast infos in the dict (by time of creation) and loop through, save the timing, save the reference site or whatever\u2026"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-04T15:49:55Z",
+      "body": "This issue has become even more pertinent with the new dialogs, since st.rerun() is a core part of the dialog functionality.\r\n\r\nI think one of the core features of the dialog is to let a user create/update/delete some data, and it would be perfect to use a st.toast() when closing the dialog to let the user know that the thing has been properly created/updated/deleted.\r\n\r\nCould someone from the Streamlit team weigh in and tell if fixing this is feasible or if its core drawback of the way Streamlit works. If it would be feasible I am willing to look into it in the near future to figure out how to solve this."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-06T15:29:23Z",
+      "body": "any news?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-01-30T03:15:44Z",
+      "body": "I have a similar use case. I use a dialogue to create new users and I wanted to show a toast indicating success or failure.  "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-13T16:48:31Z",
+      "body": "up"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-06-02T09:46:34Z",
+      "body": "up"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-25T16:58:04Z",
+      "body": "up"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-21T11:45:03Z",
+      "body": "up"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-08T10:43:12Z",
+      "body": "up"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-12T20:34:51Z",
+      "body": "up"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-07T09:39:51Z",
+      "body": "up"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-17T20:22:30Z",
+      "body": "## Update\n\nThis will be fixed in Streamlit 1.63+"
+    }
+  ]
+}

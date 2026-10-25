@@ -1,0 +1,60 @@
+{
+  "id": "issue-3533",
+  "type": "issue",
+  "number": 3533,
+  "url": "https://github.com/streamlit/streamlit/issues/3533",
+  "title": "Element values are not restored properly after `st.rerun`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.rerun"
+  ],
+  "created_at": "2021-07-10T02:31:11Z",
+  "closed_at": "2026-09-02T07:04:48Z",
+  "body": "### Summary\r\n\r\nValues of components which appear after `st.experimental_rerun()` are not restored but initialized after executing `st.experimental_rerun()`\r\n\r\n### Steps to reproduce\r\n\r\nCode snippet:\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-3533)\r\n\r\n```python\r\nimport streamlit as st\r\n\r\nradio_value = st.radio(\"Select1\", [\"Egg\", \"Spam\", \"Bacon\", \"Sausage\"])\r\nst.write(radio_value)\r\n\r\nif st.button(\"Rerun\"):\r\n    st.experimental_rerun()\r\n\r\nradio_value = st.radio(\"Select2\", [\"Egg\", \"Spam\", \"Bacon\", \"Sausage\"])\r\nst.write(radio_value)\r\n\r\nradio_value = st.radio(\"Select3\", [\"Egg\", \"Spam\", \"Bacon\", \"Sausage\"])\r\nst.write(radio_value)\r\n```\r\n\r\n1. At first, all radio values are \"Egg\"\r\n2. Change the selections; for example, \"Spam\", \"Bacon\", and \"Sausage\" for 3 radios respectively. Now, each radio button and its successive `st.write()` shows the selected item name.\r\n3. Click the \"Rerun\" button. This triggers `st.experimental_rerun()`\r\n4. After `st.experimental_rerun()`, **the second and third `st.write()`'s outputs are reset to \"Egg\"** (radio buttons selections are visually not changed though).\r\n\r\n* Rerunning without `st.experimental_rerun()` fixes this wrong state. For example, after changing the selection of some radio button which causes the script to rerun, all the component values are restored properly again.\r\n\r\n**Expected behavior:**\r\n\r\nAt step 4 above, all component values are restored properly so that the second `st.write()` shows \"Bacon\" and the third \"Sausage\".\r\n\r\n**Actual behavior:**\r\n\r\nAs explained above, at step 4, the second and third `st.write()` show wrong restored component values.\r\n<img width=\"383\" alt=\"bug_rerun_\u00b7_Streamlit\" src=\"https://user-images.githubusercontent.com/3135397/125149061-9ad2ea80-e171-11eb-8ddf-68c271df4cff.png\">\r\n\r\n### Is this a regression?\r\n\r\nThat is, did this use to work the way you expected in the past?\r\nno\r\n\r\n### Debug info\r\n\r\n- Streamlit version: `Streamlit, version 0.83.0`\r\n- Python version: `Python 3.8.7`\r\n- Using Conda? PipEnv? PyEnv? Pex?: `pyenv` + `python -m venv`\r\n- OS version: macOS Big Sur, 11.4\r\n- Browser version: Brave 1.26.74 Chromium: 91.0.4472.124\uff08Official Build\uff09 \uff08arm64\uff09\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-07-13T03:25:31Z",
+      "body": "This forum topic looks same https://discuss.streamlit.io/t/widget-checkbox-state-doesnt-persist-on-rerun/14914"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-07-13T04:30:12Z",
+      "body": "Thanks for reporting this issue, [USER]! I was able to reproduce the behavior with `Streamlit, version 0.83.0`. The issue is no longer reproducible after the fix in the latest [`0.84.1` patch](https://github.com/streamlit/streamlit/releases/tag/0.84.1). Closing this issue for now."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-09-24T14:25:26Z",
+      "body": "[USER] I found this bug has been introduced again from v0.86.0."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-10-19T23:09:55Z",
+      "body": "Hi [USER],\r\n\r\nI noticed your last reply on this issue while looking into #3854. Sorry about this getting dropped! I'll see if I can get a fix out for this in the next 2-3 weeks."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-03-28T04:49:50Z",
+      "body": "Really annoying bug. Still exists in 2024. Here's another example.\r\n\r\nSwitch the toggle, then press the st.rerun button. Toggle will now return False despite being shown as enabled.\r\nAfter clicking the \"do nothing\" button everything becomes normal.\r\n\r\n```python\r\nif st.button('st.rerun'):\r\n    st.rerun()\r\n\r\nst.button('do nothing button')\r\n\r\nst.write(st.session_state)\r\n\r\nvalue = st.toggle('Toggle', key='toggle_value')\r\nst.write(value)\r\n\r\nst.write(st.session_state)\r\n```"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-10T12:07:05Z",
+      "body": "I did a quick investigation on this issue today. It is related to us not treating a rerun triggered by `st.rerun` as a premature_stop:\r\n\r\nhttps://github.com/streamlit/streamlit/blob/10028f83114f71e8d826370d34abcc92aa847224/lib/streamlit/runtime/scriptrunner/exec_code.py#L105\r\n\r\n -> This causes us to clear out all the stale widget states in the backend, which is the root cause for this issue. But just switching `premature_stop` to `False`  most likely brings in other issues and will require more investigation. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-11-20T22:07:55Z",
+      "body": "bumping this issue -- it makes st.checkbox unusable for a number of use-cases where st.rerun is required. I've not yet found a chack to make st.checkbox + button that calls st.rerun work in the meantime... but if someone else has that would be cool\r\n\r\nThe best I've got is to make a button that acts like checkbox as follows\r\n\r\n```python\r\nif 'toggle' not in st.session_state:\r\n    st.session_state['toggle'] = False\r\n\r\ndef change_toggle():\r\n    st.session_state.toggle = not st.session_state.toggle\r\n\r\nst.button(label=\"Toggle\",\r\n          key='toggle-button',\r\n          type='primary' if st.session_state.toggle else 'secondary',\r\n          on_click=change_toggle)\r\n```\r\nChanging the `type` between primary/secondary does change the color of the button.\r\n\r\nOr even more simply you can just replace st.checkbox with the `toggle_button` function below\r\n\r\n```python\r\ndef toggle_button(label, key=None, help=None, on_click=None, args=None, kwargs=None, *, icon=None, disabled=False, use_container_width=False) -> bool:\r\n\r\n    def toggle():\r\n        st.session_state[key] = not st.session_state.get(key, False)\r\n\r\n        if on_click is not None:\r\n            on_click()\r\n\r\n    return st.button(label=label,\r\n                     key=key + '-button',\r\n                     help=help,\r\n                     type='primary' if st.session_state.get(key, False) else 'secondary',\r\n                     on_click=toggle,\r\n                     args=args,\r\n                     kwargs=kwargs,\r\n                     icon=icon,\r\n                     disabled=disabled,\r\n                     use_container_width=use_container_width)\r\n\r\n\r\n```"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T12:57:18Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-3533)\n"
+    }
+  ]
+}

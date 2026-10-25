@@ -1,0 +1,29 @@
+{
+  "id": "issue-15005",
+  "type": "issue",
+  "number": 15005,
+  "url": "https://github.com/streamlit/streamlit/issues/15005",
+  "title": "`st.metric` treatment of delta=0",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:st.metric"
+  ],
+  "created_at": "2026-05-02T20:59:23Z",
+  "closed_at": "2026-07-15T13:18:34Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nHi,\n\nI would welcome an additional treatment of delta = 0.\n\n\n### Why?\n\nTo avoid showing green \"up arrow\" zero values, or red \"down arrow\" zero values which are awkward.\n\n\n### How?\n\nst.metric\n* `.delta_color()`: \"normal\" (default) - The color is red when the delta is negative, green when positive and grey when zero.\n* `.delta_arrow()`: \"auto\" (default) - The arrow direction follows the sign of delta, and \"-\" (or right arrow?) if delta is zero\n\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-02T20:59:32Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-15005)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-06T09:49:40Z",
+      "body": "Opened PR #15057 to address this issue.\n "
+    }
+  ]
+}

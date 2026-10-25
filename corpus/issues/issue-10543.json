@@ -1,0 +1,149 @@
+{
+  "id": "issue-10543",
+  "type": "issue",
+  "number": 10543,
+  "url": "https://github.com/streamlit/streamlit/issues/10543",
+  "title": "Set `[auth]` secrets config from environment variables or through `st.login`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.secrets",
+    "feature:authentication"
+  ],
+  "created_at": "2025-02-27T15:47:19Z",
+  "closed_at": "2026-04-24T18:39:32Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nThe docs page for secrets management says:\n\n> Existing secrets management tools, such as .... will work fine in Streamlit. We just add native secrets management for times when it's useful.\n\nBut the docs page for authentication says:\n\n> st.login() uses your app's secrets.toml file to configure your connection\n\nI would like to use existing secrets management tools to configure st.login secrets. As far as I can tell this is currently only possible through `.streamlit/secrets.toml`.\n\nWould it be possible to also allow setting these secrets using environment variables?\n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-02-27T15:47:29Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-10543)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-03T06:21:59Z",
+      "body": "[USER] you can set the secrets config using the secrets singleton. Such as: \n\n```\nfrom streamlit.runtime.secrets import secrets_singleton\n\nsecrets_singleton._secrets = {\"auth\": {\"redirect_uri\" : \"\"}}\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-05T15:54:51Z",
+      "body": "Thanks! I found that workaround as well but I was hoping for a solution where I don't need to overwrite private variables of streamlit. It would be nice if env vars or cli arguments can be used as well, similar to other configuration options: https://docs.streamlit.io/develop/concepts/configuration/options\n\nIf that is not something streamlit wishes to support this issue can be closed :)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-12T07:18:37Z",
+      "body": "yes, this will be very useful for apps that is deployed not on the streamlit cloud."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-25T08:59:43Z",
+      "body": "Any updates on this yet? for deployments such as Heroku you can't add a secrets file, we pass all variables through env"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-04T08:43:44Z",
+      "body": "Also for azure app service , I am currently struggling to use the st.login feature when it is not passing the secrets file on deployment. Any workaround / solution?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-04T11:48:32Z",
+      "body": "[USER] this comment has a workaround: https://github.com/streamlit/streamlit/issues/10543#issuecomment-2693388331\n\nYou can fetch the settings from environment variables in your code and then set them in the secrets_singleton"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-09T07:21:36Z",
+      "body": "my current workaround is to populate the secrets file manually from environment variable in the startup script before calling streamlit run command\n\n> Also for azure app service , I am currently struggling to use the st.login feature when it is not passing the secrets file on deployment. Any workaround / solution?\n\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-11T17:55:35Z",
+      "body": "If you are building a docker container, you can create a `secrets.tmpl.toml` that uses environment variables for the secret portions e.g.\n```toml\n[auth]\nredirect_uri = \"http://localhost:8501/oauth2callback\"\ncookie_secret = \"${COOKIE_SECRET}\"\nclient_id = \"myclient\"\nclient_secret = \"${CLIENT_SECRET}\"\nserver_metadata_url = \"https://accounts.google.com/.well-known/openid-configuration\"\n```\n\nThen use `envsubst` (from `gettext-base`) to generate `secrets.toml` at runtime using env vars secrets exposed to the docker container:\n\n```dockerfile\nRUN apt-get update && apt-get install -y gettext-base && rm -rf /var/lib/apt/lists/*\n\n# Configure with runtime env var secrets\nCOPY --chmod=755 <<EOF /app/entrypoint.sh\n#!/bin/sh\nenvsubst < /app/.streamlit/secrets.tmpl.toml > /app/.streamlit/secrets.toml\nexec streamlit run main.py\nEOF\nCMD [\"/app/entrypoint.sh\"]\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-10T21:58:31Z",
+      "body": "[USER] +1 for providing this work around.\n\nHowever, this issue is also linked to #10361 - Having the lock-in to the `secrets.toml` makes deployment / provisioning on other plattforms except community cloud needlessly hard...\n\nI use the following workaround to extend the secrets singleton\n\n```python\nsecrets_singleton._secrets = {\n    \"auth\":  {\n        \"redirect_uri\": os.getenv(\"OIDC_REDIRECT_URL\", False),\n        \"cookie_secret\": os.getenv(\"OIDC_COOKIE_SECRET\", False),\n        \"microsoft\": {\n            \"client_id\": os.getenv(\"OIDC_CLIENT_ID\", False),\n            \"client_secret\": os.getenv(\"OIDC_CLIENT_SECRET\", False),\n            \"server_metadata_url\": os.getenv(\"OIDC_SERVER_METADATA_URL\", False),\n        },\n    }\n} | st.secrets.to_dict()\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-30T02:15:40Z",
+      "body": "On this note, while it's generically titled \"from env vars\", for those of us who use \"real secrets management services\", I found it a bit misleading that the https://docs.streamlit.io/develop/concepts/connections/secrets-management page says \"you don't have to use our secrets.toml for stuff, BYO.\" I can access (most all) my key/secrets management tools from python, so while I really appreciate discovering the secrets_singleton hack, it'd be nice to keep an official python interface to st.login/logout for configuration, beyond env vars."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-06-19T17:47:10Z",
+      "body": "Yeah this makes a lot of sense. We should probably allow specifying these parameters directly in `st.login`, maybe through `**kwargs` similar to how we do it for `st.connection` (see [here](https://docs.streamlit.io/develop/api-reference/connections/st.connection)). I'll add this to our plan for next quarter but can't guarantee if/when we'll get to it yet. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-06-30T07:57:59Z",
+      "body": "Yes, please! It would make it much simpler if we are able to pull in secrets from .env file or a secrets manager. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-15T16:55:22Z",
+      "body": "This is a much needed feature"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-01-27T15:02:42Z",
+      "body": "I started [writing a spec on how we could support environment variables in `st.secrets`](https://github.com/streamlit/streamlit/pull/13717). I would love to get some feedback! Would [Option A](https://issues.streamlit.app/spec_renderer?pr=13717#option-a-placeholder-substitution-in-secrets-toml) work for your usecases? E.g:\n```toml\n# .streamlit/secrets.toml\n[auth]\nclient_id = \"${{OAUTH_CLIENT_ID}}\"\nclient_secret = \"${{OAUTH_CLIENT_SECRET}}\"\nredirect_uri = \"${{OAUTH_REDIRECT_URI:-http://localhost:8501}}\"\n\n[database]\nconnection_string = \"postgres://${{DB_USER}}:${{DB_PASS}}@${{DB_HOST}}/mydb\"\n```\n\n> We should probably allow specifying these parameters directly in st.login, maybe through **kwargs similar to how we do it for st.connection (see [here](https://docs.streamlit.io/develop/api-reference/connections/st.connection)).\n\nUnfortunately, providing them with the `st.login` call isn't a feasible option since some of these secrets need to be available at server startup. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-27T19:49:25Z",
+      "body": "> Would [Option A](https://issues.streamlit.app/spec_renderer?pr=13717#option-a-placeholder-substitution-in-secrets-toml) work for your usecases?\n\nYes! I personally prefer the `${env:VAR}` syntax. Like you said in the Streamlit issue, it's less ambiguous, and it opens the door for other reference types in the future (ex: `${file:path/to/file}`) \ud83d\ude80 \n\nGreat work on the [Spec Renderer](https://issues.streamlit.app/spec_renderer?pr=13717#spec-renderer)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-27T22:36:09Z",
+      "body": "I agree Option A is the cleanest of the 3 presented, but to quote myself above, there's usually (and in my case) python support from \"real secrets management services\", to get the values in python itself.\n\nFor \"real deployments\", we usually have a container just to run streamlit in. \nPerhaps for development I'll have a separate program that evokes streamlit with the proper env vars for the secrets...\nOr perhaps I could CI-inject my secrets from my management service into that container.\nOr store them in plaintext in the container.\nI actually use a combination of all of these (and the above workarounds) today, in different projects.\n\nBut, for scoped security and safety, I still prefer to minimize scope. Env vars can get picked up by any running program, and trivially accidentally printed into logs. I'd rather have them only be either 1) acquired or 2) decrypted in-process in python, and then immediately fed into their consuming function.\n`st.login(..., kwarg1=get_decrypt_secret('kwarg1'), ...)`\n\nI suppose it's too much to ask that streamlit stores the in-memory values of secrets as encrypted, when not in use, for this to establish pretty strong trust; but not having them leakily exposed as env vars is a start. Who knows what loggers do & deep python dependencies do, this isn't an offline app.\n\nLastly, secrets.toml, much less doing env var resolution in the secrets.toml file, which is just a nicely printed dictionary, is a code smell.\nI can make that exact same dictionary, in python, with getenv. Dicts and getenv are as simple as it gets.\nIf I only use secrets.toml for hardcoded values, I could hardcode them in python.\nIf I only use secrets.toml for env vars, I can fetch them in python.\nThere's no reason to create yet another spec, yet another syntax, yet another special set of parsing, formatting, importing, runtime evaluating rules. We have python: lets use it.\n(toml isn't even supported by sops; why have secrets on disk anywhere but sops?)"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-01-27T23:22:03Z",
+      "body": "[USER] thanks, good feedback! Reading out these secrets in the user script and passing them to the login is too late and hacky for some aspects. The script is session-based (per user), but some of these secrets need to be exposed to the server globally and shouldn't change per session. However, with the new [experimental `st.App` interface](https://github.com/streamlit/streamlit/issues/13600), it would be possible to pass in these secrets programmatically before the runtime/server starts. I added this to the options in the spec (see Option D): https://issues.streamlit.app/spec_renderer?pr=13717 How do you like that approach? "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-28T00:04:02Z",
+      "body": "Ah, I might not be fully aware of any necessary secrets required before launching the streamlit page; I either haven't hit them, or out hacked them (ex see the singleton above, or streamlit killing/restarting itself, or a bash entrypoint wrapping streamlit doing some pre-proc, loop-when-exit, handle changes logic). Otherwise all our pages load a page setup function that imports consts, env vars, remote calls, caches stuff, checks login, before the rest of the page loads.\n\nI did see the news about the migration, it looks really exciting. I hadn't connected that there was a currently difficult problem pre-startup, but that new st.App design seems like it could handle many priorly difficult use cases.\n\nIf we're chiming in about the handling of that, I'd still recommend `class Secrets(dict)`, that has an ephemeral encryption key, stores the values encrypted, and en/de-crypts on standard indexing/get/set, allowing either values or dicts in its init() for simplicity, and converting into that internally if the user supplied raw dict: \n`st.App( secrets: Secrets[str, Any] | dict[str, Any] | None ); app = App(secrets = {...}); assert isinstance(app.secrets, Secrets);`\n\nIn terms of having multiple options of setting values, I'd recommend to keep it simple, and easy to inspect the process; less to debug when things go wrong. I can currently log the adding and key names of things added to our app (env vars or fetches), and it'd be nice to have the logs of what streamlit is doing in the background. \n(Ex: uh oh, someone committed their test credentials in .streamlit/secrets.toml, since we don't use that file, and being a dot file, isn't visible, and easily forgotten. Why aren't my secrets what I expect?)\n\nAt the bottom of your spec, in the checklist, it mentions under security implications: \"No new security risks; env vars are standard practice\".\nJust because they're standard does not preclude them from being a security risk; this is definitely an additional risk. They're _easy_, really easy, very visible, and should only be used last-minute, smallest scope, for passing secrets to applications that are parameterized by env vars. Even so, the common (our) sprawling python dependency tree allows many 3rd party packages access to arbitrary python code, including reading & sending env vars.\nOn the flip side, pulling from the env to run the app means vulnerability to the environment, vs deterministic behavior based on the files. Files are easily inspectable for changes / malignant code, the env less so, and more overlooked.\n(I'm all for env vars! But they are a feature for normal stuff, and a risk for secrets).\n\n(Did you ai gen the spec? The volume suggests that, but it having read it all, it's very clean. Thanks for your hard work)"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-01-28T00:46:07Z",
+      "body": "> Did you ai gen the spec?\n\nI worked on this together with Claude :) But need to do a bit more tweaking and cleanups before moving this out of draft. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-31T14:40:36Z",
+      "body": "This feature would be useful to my team as well."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-04-15T08:25:52Z",
+      "body": "## Update\n\nI wrote up a new spec just focused on programmatically passing `secrets` to `st.App`, which I believe should resolve most needs: https://github.com/streamlit/streamlit/pull/14789 "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-04-24T18:40:50Z",
+      "body": "## Update \n\nStreamlit 1.58 will allow providing `secrets` via `st.App`."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-09T14:14:25Z",
+      "body": "Hi, this feature is working well, and it allows me to set streamlit settings via .env or environment variables.\nOne issue (or maybe I'm missing something?)\nWhen you want to expose id or access tokens, you must enter it in the secrets.toml as a list:\n\"expose_tokens\" : [\"id\", \"access\"]\n\nThis does not work with the secrets paramter however, as it explicitly states \n\"Unsupported type 'list' at 'auth.expose_tokens' in secrets. Allowed types are: str, int, float, bool, and nested dicts.\"\n\nIs there a workaround?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-09T15:20:42Z",
+      "body": "\n\n\n> \"Unsupported type 'list' at 'auth.expose_tokens' in secrets. Allowed types are: str, int, float, bool, and nested dicts.\"\n\nSame issue here : I can't set the expected list type like `[\"access\"]` and if I set a string instead of a list, e.g. `\"access\"`, I get this other error:\n `streamlit.errors.StreamlitMissingAuthlibError: Authentication requires Authlib>=1.3.2. Install it via 'pip install streamlit[auth]'.` \n\n...even though the auth module is well installed in my project.\n\nI should also point out that I am able to retrieve my secrets and verify them via st.secrets"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-09T15:55:23Z",
+      "body": "[USER] [USER] thanks for reporting this, I'm working on a fix to support lists here as well. Will be out in the next release."
+    }
+  ]
+}

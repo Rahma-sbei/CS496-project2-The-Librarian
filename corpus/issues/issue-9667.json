@@ -1,0 +1,34 @@
+{
+  "id": "issue-9667",
+  "type": "issue",
+  "number": 9667,
+  "url": "https://github.com/streamlit/streamlit/issues/9667",
+  "title": "date_input grey out the year which is within the min_date and max_date range incorrectly",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.date_input",
+    "upstream"
+  ],
+  "created_at": "2024-10-15T17:00:01Z",
+  "closed_at": "2026-08-12T19:26:42Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nYear 2016 is greyed out while setting the range between datetime.date(2016, 6, 28) and datetime.date(2018, 4, 13) in date_input.\r\nHowever, if you first select 1st Jan 2017 and click left arrow at the top left comer, it will show dates in 2016 correctly (un-greyed out) and it can be selected as well. \r\n\r\n![image](https://github.com/user-attachments/assets/b47a71b3-dbb1-4dc5-8644-64523aa8b49f)\r\n\r\n\r\n### Reproducible Code Example\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-9667)\r\n\r\n```Python\r\nimport streamlit as st\r\nimport datetime\r\n\r\ntest_date = st.sidebar.date_input('Test date', None, datetime.date(2016, 6, 28), datetime.date(2018, 4, 13))\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n1. go to sidebar\r\n2. click on date_input box\r\n3. click on year drop-down \r\n\r\n### Expected Behavior\r\n\r\nyear 2016 should be un-greyed and selectable.\r\n\r\n### Current Behavior\r\n\r\nyear 2016 is greyed out and cannot be selected.\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.38.0\r\n- Python version: 3.12.4\r\n- Operating System: windows\r\n- Browser: edge\r\n\r\n\r\n### Additional Information\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-10-15T17:00:12Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9667)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-10-16T21:18:40Z",
+      "body": "Thanks for reporting this issue. I was able to reproduce it [here](https://issues.streamlit.app/?issue=gh-9667). I think the reason why it is disabled is that you cannot go back to the same month/date of the currently selected month/date. If you select a date that is also allowed in 2016, it seems to work fine. I think this is more of an upstream improvement needed to be implemented in the basweb UI component.  "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-15T14:50:45Z",
+      "body": "FYI \u2014 #14799 was just filed reporting the same issue on Streamlit 1.56.0 (macOS, Safari/Edge), confirming this upstream BaseWeb bug is still present. That issue has a nice side-by-side comparison repro showing the inconsistency clearly."
+    }
+  ]
+}

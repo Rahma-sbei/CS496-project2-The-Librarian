@@ -1,0 +1,79 @@
+{
+  "id": "issue-16341",
+  "type": "issue",
+  "number": 16341,
+  "url": "https://github.com/streamlit/streamlit/issues/16341",
+  "title": "Community Cloud installs incompatible Streamlit/Starlette versions causing GZipResponder TypeError on startup",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "area:dependencies",
+    "feature:community-cloud",
+    "status:confirmed",
+    "priority:P0",
+    "upstream",
+    "area:server"
+  ],
+  "created_at": "2026-08-05T10:54:32Z",
+  "closed_at": "2026-08-05T15:32:48Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nI'm unable to deploy any Streamlit application on Streamlit Community Cloud.\n\nThe issue is reproducible with a minimal application.\n\nRepository contents:\n\napp.py\n\nimport streamlit as st\n\nst.title(\"Hello\")\n\nrequirements.txt\n\nstreamlit\n\nThe application never starts. The error occurs before my code is executed.\n\nDeployment log shows:\n\nUsing Python 3.14.6 environment\n\nInstalled packages include:\n\n- streamlit==1.61.0\n- starlette==1.4.0\n- uvicorn==0.52.1\n\nThe server then fails health checks with:\n\nTypeError: GZipResponder.__init__() missing 1 required keyword-only argument: 'thread_minimum_size'\n\nStack trace points to:\n\nstreamlit/web/server/starlette/starlette_gzip_middleware.py\n\nThe same error happens:\n\n- with a completely minimal app\n- with a requirements.txt containing only \"streamlit\"\n- after changing the configured Python version\n- with multiple different applications\n\nSince the application code is never executed, this appears to be an incompatibility in the deployment environment rather than in the app itself.\n\nCould you please investigate why Community Cloud is installing this package combination?\n\n### Reproducible Code Example\n\n```Python\nUsing Python 3.14.6 environment\n\nstreamlit==1.61.0\nstarlette==1.4.0\nuvicorn==0.52.1\n\nTypeError: GZipResponder.__init__() missing 1 required keyword-only argument: 'thread_minimum_size'\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-05T10:54:45Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16341)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-05T11:38:02Z",
+      "body": "Our team is also experiencing this issue! Thank you [USER] for raising this issue!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-05T12:10:58Z",
+      "body": "I run into the same issue. It can be fixed by constraining starlette with :\n\n```\n\"starlette<1.4.0\",\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-05T12:17:27Z",
+      "body": "plus 1 on the above, using \"starlette<1.4.0\" (or starlette==1.3.1 ) resolved the issue immediately "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-05T12:27:16Z",
+      "body": "### Triage summary\n\nThis is a **dependency-compatibility bug** in Streamlit's web server, not a Community Cloud\u2013specific problem \u2014 it affects any environment where a fresh install resolves Starlette to a newer release (Community Cloud just happens to auto-resolve the latest compatible versions).\n\n**Root cause:** Streamlit's custom gzip middleware (`lib/streamlit/web/server/starlette/starlette_gzip_middleware.py`) subclasses and directly instantiates Starlette's *internal* `GZipResponder`/`IdentityResponder` classes, which are private implementation details rather than public API:\n\n```python\nresponder = _MediaAwareGZipResponder(\n    self.app, self.minimum_size, compresslevel=self.compresslevel\n)\n```\n\n`_MediaAwareGZipResponder` does not override `__init__`, so it inherits Starlette's constructor. A newer Starlette release changed `GZipResponder.__init__` to add a required keyword-only argument `thread_minimum_size`. Because the responder is instantiated without it, startup fails before any app code runs:\n\n```\nTypeError: GZipResponder.__init__() missing 1 required keyword-only argument: 'thread_minimum_size'\n```\n\nStreamlit's runtime dependency range in `lib/pyproject.toml` is `starlette>=0.46.0,<2`, so the incompatible Starlette version satisfies the upper bound (`<2`) and gets installed. This coupling to Starlette internals was introduced with the Starlette/Uvicorn server migration ([#14553](https://github.com/streamlit/streamlit/pull/14553)).\n\n**Workaround confirmed by multiple reporters:** pin `starlette<1.4.0` (e.g. `starlette==1.3.1`) in `requirements.txt`.\n\n**Suggested fix:** cap the Starlette upper bound below the breaking release (and/or make the middleware resilient to the changed responder signature, e.g. forward `thread_minimum_size` or stop relying on the private responder classes).\n\n### Related Issues\n\n- [#15378 \u2013 Running Streamlit with Starlette in Corporate Network](https://github.com/streamlit/streamlit/issues/15378): Another `area:server` bug stemming from the Starlette/Uvicorn migration; related to server behavior introduced by the same migration, though a different symptom (WebSocket connectivity).\n- [#15022 \u2013 Intermittent `OSError: [WinError 121]` since upgrading to `v1.57.0`](https://github.com/streamlit/streamlit/issues/15022): Also traces back to the 1.57 Starlette/Uvicorn migration and touches the same server layer, indicating shared risk in the new Starlette stack.\n\nNo existing issue appears to be a duplicate of this specific `GZipResponder`/Starlette-version incompatibility.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-05T12:31:29Z",
+      "body": "> plus 1 on the above, using \"starlette<1.4.0\" (or starlette==1.3.1 ) resolved the issue immediately\n\nThanks! That fixed it immediately. Adding starlette<1.4.0 to requirements.txt solved the deployment issue. Really appreciate the help!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-05T12:55:30Z",
+      "body": "I encountered the same issue, and pinning Streamlit to version 1.56.0 (streamlit==1.56.0) resolved it for me. Hopefully, an upstream fix will be released in a future update."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-05T12:56:46Z",
+      "body": "## Update\n\nThe Starlette 1.4.0 update breaks Streamlit :( I have reported this [here](https://github.com/Kludex/starlette/issues/3414), and we are working on a fix + patch for Streamlit. This will likely be released today. The current suggested workaround is to pin `starlette<1.4.0` in your requirements. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-05T12:57:58Z",
+      "body": "Thanks for the report! We are also working on pinning the dependency automatically on CC to <1.4 until a patch is out."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-05T15:05:59Z",
+      "body": "## Update\n\nWe released a patch (1.61.1) that should resolve the issue. Please make sure to update to the latest Streamlit version"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-05T15:32:48Z",
+      "body": "## Update\n\nStarlette also released a patch (1.4.1) that resolves the issue for older Streamlit versions. Closing this since I believe we did everything that can be done here to mitigate this issue. "
+    }
+  ]
+}

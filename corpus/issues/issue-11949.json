@@ -1,0 +1,40 @@
+{
+  "id": "issue-11949",
+  "type": "issue",
+  "number": 11949,
+  "url": "https://github.com/streamlit/streamlit/issues/11949",
+  "title": "select box does not support multiple not unique labels anymore. v.1.46.1",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.selectbox"
+  ],
+  "created_at": "2025-07-16T03:01:23Z",
+  "closed_at": "2026-07-16T11:40:22Z",
+  "body": "### Summary\n\nI am trying to create a selectbox from a list of dictionaries that includes and name and an id. I want the user to see the (possibly duplicated_ names but to have the unique id returned. I find that this does not work. When I pick each duplicated name I get the same id (the last one in the list). Here is a failing example.\n\n\n\nhttps://discuss.streamlit.io/t/selectbox-returns-wrong-id-when-duplicate-labels/117153\n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-11949)\n\n```python\nimport streamlit as st\ndata = [{\"name\":'Ron', \"id\": 1}, {\"name\":'Fred', \"id\": 2}, {\"name\":'George', \"id\": 3}, {\"name\":'Fred', \"id\": 4}, {\"name\":'George', \"id\": 5}]\n\nlabels = [x[\"name\"] for x in data]\noptions = [x[\"id\"] for x in data]\ndic = dict(zip(options, labels))\n\na = st.selectbox('Choose name', options=options, format_func=lambda x: dic[x])\n\nst.write(a)\n```\n\n### Expected Behavior\n\nreturns {\"name\":'Fred', \"id\": 2} or {\"name\":'Fred', \"id\": 4}\n\n### Current Behavior\n\nalways returns {\"name\":'Fred', \"id\": 4}\n\n### Is this a regression?\n\n-  Yes, this used to work in a previous version. worked in v 1.44.\n\n### Debug info\n\n- Streamlit version: 1.46.1\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-16T03:01:34Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11949)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-16T05:28:13Z",
+      "body": "This is the same issue as #11219 and is a regression introduced in 1.45.0 with the addition of `accept_new_options`."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-07-16T08:24:37Z",
+      "body": "Since these are showing up differently, even though they have the same root cause, I will keep them both open. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-02T16:23:14Z",
+      "body": "was it fixed? \n\nEdit: seems like not. "
+    }
+  ]
+}

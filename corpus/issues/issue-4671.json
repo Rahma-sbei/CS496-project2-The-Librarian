@@ -1,0 +1,39 @@
+{
+  "id": "issue-4671",
+  "type": "issue",
+  "number": 4671,
+  "url": "https://github.com/streamlit/streamlit/issues/4671",
+  "title": "Make `st.selectbox` dropdown scroll along with option in focus, when navigating with arrow keys (\u2191\u2193)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:st.selectbox"
+  ],
+  "created_at": "2022-05-01T20:11:31Z",
+  "closed_at": "2026-06-14T13:06:53Z",
+  "body": "### Problem\n\nWhen navigating the options of a `st.selectbox` widget using the arrow keys (\u2191\u2193), the dropdown does not scroll up/down along with the option in focus.\n\nThis is only noticeable when there are 9 or more options to select from.\n\n### Solution\n\n**Preferred solution:** Dropdown scrolls up/down along with option in focus, when navigating with arrow keys (\u2191\u2193)\n\n### Additional context\n\nFrom the user's perspective, if you don't see what option is in focus, you don't know when to stop scrolling (in this scenario, hitting up/down arrow keys).\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-4671)",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2022-06-25T13:34:03Z",
+      "body": "Thanks [USER] for tagging this one properly.\r\n\r\nAnother comment: When I select one option from a selectbox with many options, if I click on the selectbox again the drop-down opens but at the top. I think it should reopen wherever the previously selected option is. Should I create an additional issue for this, or is it ok here as a comment?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2022-06-27T23:38:14Z",
+      "body": "Hey [USER], I think it might be better to open an additional enhancement request for this :) "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-06-28T07:49:17Z",
+      "body": "Thanks a lot [USER]! Just added the request as a separate one here: [#4901](https://github.com/streamlit/streamlit/issues/4901)"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-14T13:06:53Z",
+      "body": "## Update\n\nClosing this since the recent migration from baseweb to react-aria seems to have fixed this"
+    }
+  ]
+}

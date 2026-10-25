@@ -1,0 +1,35 @@
+{
+  "id": "issue-12644",
+  "type": "issue",
+  "number": 12644,
+  "url": "https://github.com/streamlit/streamlit/issues/12644",
+  "title": "Make `st.multiselect` not wrap the selected options / keep its height",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "area:layout",
+    "feature:st.multiselect"
+  ],
+  "created_at": "2025-09-26T18:58:18Z",
+  "closed_at": "2026-08-18T21:51:55Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nIf you select many options in `st.multiselect`, they wrap to multiple lines. This makes the widget grow in height and can make layouts look bad:\n\n<img width=\"479\" height=\"390\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/6d764080-9d35-4739-bd8d-e5cc971de700\" />\n\nIn some situations, it would be nice to make the options not wrap but e.g. require the user to scroll to see them:\n\n<img width=\"479\" height=\"171\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/0187abd0-ba09-4063-884d-46171ddab542\" />\n\n### Why?\n\nThe current style is annoying in some situations:\n\n1. In compact layouts, this can use up a lot of space. \n2. When placing the multiselect side by side with another widget like `st.selectbox` or `st.button`, it can look awkward if they have different height. \n\n### How?\n\nI think there are situation where you want the options to wrap but others where you don't want that. So probably needs a parameter, e.g. `wrap=False|True`. \n\nAnd/or we could show the selected options in the dropdown, even though that would probably require us to move to a different component. \n\n### Additional Context\n\nRelated: \n\n- #12583 \n- #12582\n- #5003 \n- #6592\n- #13516",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-09-26T18:58:27Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12644)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-23T08:10:05Z",
+      "body": "This is a **feature request / enhancement** for `st.multiselect`. When many options are selected, the chips wrap onto multiple lines, causing the widget to grow vertically and break compact layouts or misalign with adjacent widgets (e.g. `st.selectbox`, `st.button`). The request is to add a way to keep the widget's height fixed, e.g. a `wrap=False` parameter that keeps selected chips on a single (scrollable) line, and/or to summarize selections in the dropdown. Since this is a widget-styling/layout behavior with a small, well-scoped surface, the existing `type:enhancement`, `feature:st.multiselect`, `area:layout`, and `papercut` labels fit well. This is part of a broader family of \"control wrap behavior\" requests the author has filed across widgets and containers.\n\n### Related Issues\n\n- [#13516 \u2014 Option to not wrap `st.segmented_control` while displaying on a page](https://github.com/streamlit/streamlit/issues/13516): The closest analog \u2014 another chip/tag-based widget where the request is an option to prevent items from wrapping. A shared solution/API (`wrap=False`) would likely apply to both.\n- [#12582 \u2014 Control wrap behavior for horizontal `st.container`](https://github.com/streamlit/streamlit/issues/12582): Same `wrap=False` concept applied to horizontal containers; part of the same wrap-control theme and directly cross-referenced in this issue.\n- [#12583 \u2014 Control wrap behavior for text (`st.markdown`, `st.text`, ...)](https://github.com/streamlit/streamlit/issues/12583): Requests a `wrap=False` parameter to avoid text wrapping (truncating instead); same underlying layout-control motivation and also cross-referenced here.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-18T21:52:50Z",
+      "body": "## Update\n\nStreamlit 1.62+ will provide a `wrap` parameter that allows to keep the mutliselect at a single row height via wrap=False."
+    }
+  ]
+}

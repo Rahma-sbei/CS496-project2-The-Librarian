@@ -1,0 +1,34 @@
+{
+  "id": "issue-16538",
+  "type": "issue",
+  "number": 16538,
+  "url": "https://github.com/streamlit/streamlit/issues/16538",
+  "title": "st.color_picker cannot be fully interacted with when it's directly inside st.dialog",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "area:frontend",
+    "area:widgets",
+    "status:confirmed",
+    "priority:P2",
+    "feature:st.dialog",
+    "feature:st.color_picker"
+  ],
+  "created_at": "2026-08-17T12:13:16Z",
+  "closed_at": "2026-08-18T08:05:06Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen using `st.color_picker` the component does not work when it's inside `st.dialog`.  Clicking on the coloured square opens the color pallete, but any interaction with that pallete is imposible.\n\nPutting the element inside a popover fixes the issue. I have tested `st.column`, `st.expander` and neither of them fix the issue like `st.dialog`.\n\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\n[USER].dialog(\"Example dialog\")\ndef example_dialog():\n    color = st.color_picker(\"Color picker inside dialog\")\n    st.text(color)\n\n    with st.popover(\"Example popover\"):\n        color = st.color_picker(\"Color picker inside dialog inside popover\")\n        st.text(color)\n\n\ncolor = st.color_picker(\"Color picker inside dialog inside popover\")\nst.text(color)\n\nst.button(\"Click me\", on_click=example_dialog)\n```\n\n### Steps To Reproduce\n\n1. Create `st.dialog`\n2. Create `st.color_picker` inside that dialog\n3. Try to interact with the `st.color_picker`\n\n### Expected Behavior\n\nThe color pallete would be interactable with inside st.dialog.\n\n### Current Behavior\n\nUpon clicking on `st.color_picker` that is inside `st.dialog` the color pallete dropdown opens, but user cannot interact with it with mouse nor keyboard.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.61.1\n- Python version: Python 3.12.4\n- Operating System: Windows 11 (OS build 26100.9106)\n- I have tested this behaviour on following browsers and the unexpected behaviour was same for all\n    - Microsoft Edge (Version 151.0.4129.78) (Official build) (64-bit)\n    - Firefox Version 153.0.4 (64-bit)\n    - Google Chrome (Version 151.0.7922.138) (Official Build) (64-bit)\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-17T12:13:26Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16538)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-17T17:48:23Z",
+      "body": "This is a frontend bug: `st.color_picker` opens its palette inside `st.dialog`, but mouse and keyboard interaction with the palette fail. Likely root cause: `BaseColorPicker` mounts via `<FloatingPortal>` without `id={FLOATING_OVERLAY_PORTAL_ID}`, so the popover is not under the shared host tagged with `data-react-aria-top-layer` / `data-st-overlay-root`. React Aria\u2019s dialog then treats that portal as outside the modal (often marking it `inert`), which matches \u201copens but cannot interact.\u201d Nesting under `st.popover` can appear to work because popover already uses that portal host. The same fix pattern used for date_input / selectbox / popover-in-dialog overlays should apply here.\n\n### Related Issues\n\n- [#16005](https://github.com/streamlit/streamlit/issues/16005) \u2014 Popover content inside a dialog was unusable for the same React Aria overlay/`inert` reason; fixed by routing Floating UI portals through `FLOATING_OVERLAY_PORTAL_ID`. Closest prior art for this bug.\n- [#15859](https://github.com/streamlit/streamlit/issues/15859) \u2014 `st.date_input` calendar rendered behind / unusable inside `st.dialog` (overlay stacking after the React Aria dialog migration). Same dialog + portaled overlay family.\n- [#15599](https://github.com/streamlit/streamlit/issues/15599) \u2014 Selectbox dropdown behind `st.dialog` so clicks did not register. Same class of dialog overlay interaction issues.\n\nNo exact open duplicate found for `st.color_picker` specifically.\n\n---\n*This is an automated triage comment using `cursor-grok-4.5-high`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

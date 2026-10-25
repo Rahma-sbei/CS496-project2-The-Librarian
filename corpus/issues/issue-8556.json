@@ -1,0 +1,40 @@
+{
+  "id": "issue-8556",
+  "type": "issue",
+  "number": 8556,
+  "url": "https://github.com/streamlit/streamlit/issues/8556",
+  "title": "st.date_input not working in the sidebar on mobile devices or very narrow windows",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.date_input"
+  ],
+  "created_at": "2024-04-23T14:21:08Z",
+  "closed_at": "2026-08-12T19:26:42Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nSince some recent time, [st. date_input](https://docs.streamlit.io/develop/api-reference/widgets/st.date_input) is not working anymore when it is put in the sidebar (e.g., `st.sidebar.date_input()`) *and* the streamlit app is either run on a mobile device or with a very narrow browser window (the important point is that the app width is so small that the sidebar is automatically hidden). In these cases, opening the sidebar first, then the [st. date_input](https://docs.streamlit.io/develop/api-reference/widgets/st.date_input), and then trying to change the month or the year results in the whole sidebar being collapsed again, rendering the input method unusable.\r\n\r\nThe problem occurs when streamlit is run locally (with the latest version 1.33.0) or in the cloud. \r\n\r\n### Reproducible Code Example\r\n\r\n```Python\r\nimport datetime\r\nimport streamlit as st\r\n\r\nd = st.sidebar.date_input(\"When's your birthday\", datetime.date(2019, 7, 6))\r\nst.write('Your birthday is:', d)\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n- Open app at https://datepicker-bug.streamlit.app (or locally)\r\n- Reduce browser window width until the sidebar is automatically hidden (not needed when opening with mobile device)\r\n- Open sidebar by clicking on the `>` in the top left\r\n- Click on the date picker\r\n- Click on the month or year to change it\r\n- The sidebar will collapse\r\n\r\n### Expected Behavior\r\n\r\nA dropdown menu opens from which month or year can be selected.\r\n\r\n### Current Behavior\r\nThe sidebar collapses and the dropdown menu is 'floating in the air'.\r\n\r\n### Is this a regression?\r\n\r\n- [X] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.33.0\r\n- Python version: 3.9.18\r\n- Operating System: Ubuntu 22.04\r\n- Browser: Chromium Version 124.0.6367.60 (Official Build) (64-bit), Firefox 125.0.2 (64-bit)\r\n\r\n\r\n### Additional Information\r\nMaybe connected to https://github.com/streamlit/streamlit/issues/6107",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-23T14:21:22Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-8556)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-04-26T23:20:13Z",
+      "body": "[USER] Thanks for reporting this issue \ud83d\udc4d  I was able to reproduce it. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-07-03T01:30:30Z",
+      "body": "A related problem with rendering this widget is that the left-most column of days gets cut off when the sidebar is narrow.\r\n![image](https://github.com/streamlit/streamlit/assets/672489/70b32a24-22ab-4e21-81b3-de15ddf6e179)\r\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-04-05T04:24:26Z",
+      "body": "See also https://github.com/streamlit/streamlit/issues/6107"
+    }
+  ]
+}

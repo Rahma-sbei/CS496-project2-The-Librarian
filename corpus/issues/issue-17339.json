@@ -1,0 +1,30 @@
+{
+  "id": "issue-17339",
+  "type": "issue",
+  "number": 17339,
+  "url": "https://github.com/streamlit/streamlit/issues/17339",
+  "title": "Top navigation section dropdown: no arrow-key support, and its items come last in the Tab order",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:frontend",
+    "area:accessibility",
+    "feature:st.navigation"
+  ],
+  "created_at": "2026-10-08T18:32:32Z",
+  "closed_at": "2026-10-14T15:45:53Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWith `st.navigation(..., position=\"top\")`, a section (\"Group\") opens on Enter and closes on Escape. But focus doesn't move into the open menu, and arrow keys do nothing. Each menu item is reached only after Tab has passed every other focusable element on the page. This fails WCAG 2.4.3 (Focus Order) and differs from the WAI-ARIA menu button pattern.\n\n### Reproducible Code Example\n\n```Python\nimport pandas as pd\nimport streamlit as st\n\n\ndef home():\n    st.title(\"Home\")\n    st.button(\"First button\")\n    st.dataframe(pd.DataFrame({\"a\": [1, 2, 3], \"b\": [\"x\", \"y\", \"z\"]}))\n    st.button(\"Last button\")\n\n\npg = st.navigation(\n    {\n        \"\": [st.Page(home, title=\"Home\")],\n        \"Group\": [\n            st.Page(lambda: st.write(\"B\"), title=\"Page B\", url_path=\"b\"),\n            st.Page(lambda: st.write(\"C\"), title=\"Page C\", url_path=\"c\"),\n        ],\n    },\n    position=\"top\",\n)\npg.run()\n```\n\n### Steps To Reproduce\n\n1. Run the app above.\n2. Tab to \"Group\" and press Enter (the menu opens).\n3. Press ArrowDown.\n4. Press Tab repeatedly.\n\n### Expected Behavior\n\nEnter, Space or ArrowDown opens the menu and moves focus to its first item; arrow keys move between items; Escape returns focus to the trigger. (Alternatively, the menu could be rendered right after its trigger in DOM order, so the next Tab reaches its items.)\n\n### Current Behavior\n\n- ArrowDown leaves focus on \"Group\".\n- Tab goes to Deploy, Main menu, then the page content (both buttons, the dataframe toolbar, the grid).\n- \"Page B\" is reached on the 14th Tab press, even in this tiny app.\n- ArrowDown on the closed section doesn't open it.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.65.0 (also reproduced on 1.61.1)\n- Python version: 3.11\n- Operating System: Linux (RHEL 8)\n- Browser: Chromium (headless, Playwright 1.63.0)\n\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-08T19:03:33Z",
+      "body": "This is a keyboard-accessibility bug in the section dropdown of `st.navigation(..., position=\"top\")`. `TopNavSection` is a button that toggles open on click, so Enter and Space open it through native button activation, and `useOverlayDismissal` closes it on Escape and returns focus to the trigger. Nothing handles ArrowUp or ArrowDown, and opening the menu never moves focus onto an item. The open menu is mounted in a bare `FloatingPortal`, which appends it to `document.body` after the app. Its page links (`SidebarNavLink`, test id `stTopNavDropdownLink`) stay in the normal tab sequence, so they are reached only after Deploy, the main menu, and the page content, which fails WCAG 2.4.3 (Focus Order). The overflow \"N more\" control uses the same component and has the same gap. `MainMenu` already focuses its first item on open and moves with the arrow keys, and that is the in-repo pattern to follow. Reproduced on 1.65.0 and 1.61.1.\n\n### Related Issues\n\nNo duplicate was found. These open issues are closely related:\n\n- [#13332](https://github.com/streamlit/streamlit/issues/13332) \u2014 The dataframe column-header menu is also not operable from the keyboard. Different surface, same kind of menu-accessibility gap.\n- [#12642](https://github.com/streamlit/streamlit/issues/12642) \u2014 Covers top navigation when the window gets narrow. Pages that collapse into the \"N more\" menu go through this same `TopNavSection` dropdown, so they inherit this keyboard and tab-order behavior.\n- [#17338](https://github.com/streamlit/streamlit/issues/17338) \u2014 From the same keyboard audit: after the header, `stMain` is a tab stop with no visible focus ring. It sits on the tab path described here and is a separate defect.\n\n---\n*This is an automated triage comment using `grok-4.7-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-08T20:55:37Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-17339)\n"
+    }
+  ]
+}

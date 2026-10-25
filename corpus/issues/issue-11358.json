@@ -1,0 +1,33 @@
+{
+  "id": "issue-11358",
+  "type": "issue",
+  "number": 11358,
+  "url": "https://github.com/streamlit/streamlit/issues/11358",
+  "title": "Disable copying data from a dataframe",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe"
+  ],
+  "created_at": "2025-05-14T07:10:40Z",
+  "closed_at": "2026-07-14T18:58:12Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nDear Streamlit Developer team,\nI have been a long user of Streamlit. I have seen it evolving and its really fantastic to work with streamlit. I have made multiple data apps for my company purely on Streamlit. But there are very critical scenarios where we dont want the user to copy or download the data from a dataframe or data editor of streamlit. As its a confidential data of ours. So right know I dont see any option in streamlit to disable these options in dataframes.\nAlso, it will very nice if we also get some return value from st.dataframe to know that the data was downloaded by the user, to take further action on it.\nI have only found a css trick to disable download button option from dataframe but it does for all the dataframes. I think it will be very nice and useful to all of us to have this control on dataframes.\n\nThank You!\n\n### Why?\n\nAs our streamlit app is used by many users in our company. So everyone has access to copy and dowload data from the dashboard... which can be misused by them. Having an option to enable disable these features from dataframe could elimate this risk.\n\n### How?\n\nIt could be something like a parameter inside st.dataframe. Like:\n\nresult = st.dataframe(data, iscopy=False, isdownload=False)\n# if isdownload=False: downlaod icon will not appear on dataframe\n# if iscopy=False: user wont be able to copy values from streamlit dataframe\n\n\nresult will have values lilke {selection: {rows:[], columns:[]}: download: False}\nresult can have download key with value True or False, lettting the user know it data was download by someone or not. \n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-14T07:10:50Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-11358)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-05-14T14:47:14Z",
+      "body": "Disabling the download button is already covered in #8402, so I'm changing this to only be about copying. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-14T19:00:13Z",
+      "body": "## Update\n\nStreamlit 1.60+ will support a config option `client.disableDataExport` to disable data download and copying in all dataframe instances. "
+    }
+  ]
+}

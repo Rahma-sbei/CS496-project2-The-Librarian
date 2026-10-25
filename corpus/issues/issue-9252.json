@@ -1,0 +1,40 @@
+{
+  "id": "issue-9252",
+  "type": "issue",
+  "number": 9252,
+  "url": "https://github.com/streamlit/streamlit/issues/9252",
+  "title": "Decorators not being printed in `st.echo()`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.echo"
+  ],
+  "created_at": "2024-08-11T17:37:13Z",
+  "closed_at": "2026-07-20T13:37:30Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n`st.echo()` does not print a decorator if there is no other line of code before the decorator.\r\n\r\nTo reproduce, run the below script:\r\n\r\n```\r\nimport streamlit as st\r\n\r\n\r\ndef decorator(*args):\r\n    pass\r\n\r\n\r\nwith st.echo():\r\n\r\n    [USER]\r\n    def function():\r\n        pass\r\n```\r\n\r\nThe output will be as shown below: \r\n![image](https://github.com/user-attachments/assets/d06cb182-7ffb-4111-90c7-b062be9ec2b7)\r\nNote that `[USER]` is not printed.\r\n\r\nNow, add anything above the decorator in the context of `st.echo()`:\r\n\r\n```\r\nimport streamlit as st\r\n\r\n\r\ndef decorator(*args):\r\n    pass\r\n\r\n\r\nwith st.echo():\r\n    \"lorem ipsum\"\r\n\r\n    [USER]\r\n    def function():\r\n        pass\r\n```\r\n\r\nThe decorator is now printed:\r\n![image](https://github.com/user-attachments/assets/70299f75-78d3-453e-97f4-085509b58d6b)\r\n\r\n\n\n### Reproducible Code Example\n\n_No response_\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.31.1\r\n- Python version: 3.10.11\r\n- Operating System: Windows11\r\n- Browser: Edge\r\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-08-11T17:37:24Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9252)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-08-12T13:23:07Z",
+      "body": "Hey [USER] thank you for opening this issue!\r\n\r\nI was able to reproduce it locally and can confirm that it is a bug "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-08-15T21:21:32Z",
+      "body": "The echo function also doesn't handle very well comments at the beginning or end of a echoed block. I'm thinking these are all three related to the way it is parsing the AST in order to figure out what lines of code to print, I'm not sure if there's a fix for the comment issue but there might be a fix for the decorator issue."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-16T08:46:27Z",
+      "body": " Hi! I\u2019m interested in working on this st.echo bug. I\u2019ll reproduce it against the current develop branch and add focused regression coverage for a decorated function appearing as the first statement in the echoed block.\nShould this contribution remain limited to preserving decorator lines, or would you also like it to cover the related leading/trailing comment behaviour mentioned in the discussion?"
+    }
+  ]
+}

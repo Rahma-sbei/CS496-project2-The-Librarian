@@ -1,0 +1,33 @@
+{
+  "id": "issue-6704",
+  "type": "issue",
+  "number": 6704,
+  "url": "https://github.com/streamlit/streamlit/issues/6704",
+  "title": "Support more specialized types for `st.text_input` (email, url, phone,...)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.text_input"
+  ],
+  "created_at": "2023-05-18T00:08:23Z",
+  "closed_at": "2026-08-10T08:35:20Z",
+  "body": "### Problem\n\nIf you have an `st.text_input` and want the user to enter their email there, it's pretty annoying to validate it. Need to do a custom regex and check it after a rerun. \n\n### Solution\n\nAdd `type=\"email\"` and make it validate email addresses before we even rerun. \n\n### Additional context\n\nAdd any other context or screenshots about the feature request here. For example, did this FR come from https://discuss.streamlit.io or another site? Link the original source here!\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-6704)",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2023-06-02T09:38:38Z",
+      "body": "Maybe make it wider and add validators (and format/mask?) to all input fields? Checking them before rerun and even in a form.\r\n\r\nWith a few pre-made validators, like e-mail, min, max, between, etc."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-03-25T14:27:53Z",
+      "body": "Hey there! I have just published a new extra **[Specialized Inputs](https://extras.streamlit.app/?extra=%E2%9C%8F%EF%B8%8F+Specialized+Inputs)** which comes with some specialized input types like e-mail, URL, phone, handles...\n\nIt also comes with a constructor so you can create your custom ones (with, think, custom prefixes or suffixes).\n\nHope that's useful. Let me know what y'all think!\n\n<img width=\"803\" height=\"458\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/7d0ed527-ccd0-4236-8c65-4003bf3efb84\" />"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-10T08:38:05Z",
+      "body": "## Update\n\nThis will be available in Streamlit 1.62+ via #16385. For example:\n\n```python\nemail = st.text_input(\"Email\", type=\"email\")\n```\n\nThe new specialized types are `\"email\"`, `\"url\"`, `\"phone\"`, and `\"search\"`."
+    }
+  ]
+}

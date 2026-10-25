@@ -1,0 +1,40 @@
+{
+  "id": "issue-2590",
+  "type": "issue",
+  "number": 2590,
+  "url": "https://github.com/streamlit/streamlit/issues/2590",
+  "title": "Deck object with PointCloudLayer cannot be integrated properly with pydeck_chart ",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.pydeck_chart"
+  ],
+  "created_at": "2021-01-12T11:58:03Z",
+  "closed_at": "2026-09-04T14:47:30Z",
+  "body": "# Summary\r\n\r\nThe `pydeck_chart` cannot properly integrate a Deck object with a `PointCloudLayer` without embedding a mapbox view.\r\nThe following example shows how to create a 3D point cloud layer with pydeck: https://deckgl.readthedocs.io/en/latest/gallery/point_cloud_layer.html\r\n\r\n\r\n# Steps to reproduce\r\n\r\nCode snippet:\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-2590)\r\n\r\n```\r\nimport pandas as pd\r\nimport pydeck as pydeck\r\nimport streamlit as st\r\n\r\ndef main():\r\n    DATA_URL = \"https://raw.githubusercontent.com/ajduberstein/geo_datasets/master/small_waterfall.csv\"\r\n    df = pd.read_csv(DATA_URL)\r\n\r\n    target = [df.x.mean(), df.y.mean(), df.z.mean()]\r\n\r\n    point_cloud_layer = pydeck.Layer(\r\n        \"PointCloudLayer\",\r\n        data=DATA_URL,\r\n        get_position=[\"x\", \"y\", \"z\"],\r\n        get_color=[\"r\", \"g\", \"b\"],\r\n        get_normal=[0, 0, 15],\r\n        auto_highlight=True,\r\n        pickable=True,\r\n        point_size=3,\r\n    )\r\n\r\n    view_state = pydeck.ViewState(target=target, controller=True, rotation_x=15, rotation_orbit=30, zoom=5.3)\r\n    view = pydeck.View(type=\"OrbitView\", controller=True)\r\n\r\n    r = pydeck.Deck(point_cloud_layer, initial_view_state=view_state, views=[view])\r\n    #r.to_html(\"point_cloud_layer.html\", css_background_color=\"#add8e6\")\r\n    st.pydeck_chart(r)\r\n\r\nif __name__ == \"__main__\":\r\n    main()\r\n```\r\n\r\n## Expected behavior:\r\n\r\nUsing `st.pydeck_chart(r)`, I would expect a visualization of the 3D point cloud as in this example: https://deckgl.readthedocs.io/en/latest/gallery/point_cloud_layer.html \r\n\r\n![image](https://user-images.githubusercontent.com/77327738/104307831-093f3480-54d0-11eb-885f-1e543d88e80b.png)\r\n\r\n## Actual behavior:\r\n\r\n- The point cloud is flat\r\n- The map cannot be disabled\r\n- The orbit view does not work\r\n\r\n![image](https://user-images.githubusercontent.com/77327738/104308270-adc17680-54d0-11eb-8566-dc1e46550700.png)\r\n\r\n## Is this a regression?\r\n\r\nno\r\n\r\n# Debug info\r\n\r\n- Streamlit version: 0.73.1\r\n- Python version: 3.8.3\r\n- Using Conda\r\n- OS version: macOS 11.0.1\r\n- Browser version: Chrome 87.0.4280.88 \r\n\r\n# Additional information\r\n\r\nWith streamlit version 0.73.1 the following error appears when navigating the map (this error does not come up with streamlit version 0.69):\r\n```\r\n/usr/local/anaconda3/lib/python3.8/site-packages/pydeck/bindings/deck.py:105: UserWarning: Mapbox API key is not set. This may impact available features of pydeck.\r\n  warnings.warn(\r\n````\r\n\r\nRelated discussion:\r\nhttps://discuss.streamlit.io/t/3d-data-visualization-point-clouds-and-triangular-meshes/1235\r\n\r\nRelated issue:\r\nhttps://github.com/streamlit/streamlit/issues/809",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2022-05-15T12:07:42Z",
+      "body": "I would really like to visualize 3D point clouds in streamlit. It would be such a nice feature!"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-07-21T13:30:48Z",
+      "body": "Possible duplicate of #2302"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T12:56:50Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-2590)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-04T14:06:42Z",
+      "body": "## Update\n\nThis will be available in Streamlit **1.64+** ([#16819](https://github.com/streamlit/streamlit/pull/16819)). `OrbitView` + `PointCloudLayer` with `map_provider=None` now renders as a rotatable 3D cloud (no street-map basemap).\n\n```python\nimport streamlit as st\nimport pydeck as pdk\n\nDATA_URL = \"https://raw.githubusercontent.com/ajduberstein/geo_datasets/master/small_waterfall.csv\"\n\nst.pydeck_chart(\n    pdk.Deck(\n        layers=[\n            pdk.Layer(\n                \"PointCloudLayer\",\n                data=DATA_URL,\n                get_position=[\"x\", \"y\", \"z\"],\n                get_color=[\"r\", \"g\", \"b\"],\n                point_size=3,\n            )\n        ],\n        initial_view_state=pdk.ViewState(\n            target=[0, 0, 0], zoom=5, rotation_x=15, rotation_orbit=30\n        ),\n        views=[pdk.View(type=\"OrbitView\", controller=True)],\n        map_provider=None,\n    )\n)\n```"
+    }
+  ]
+}

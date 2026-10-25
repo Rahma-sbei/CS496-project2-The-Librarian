@@ -1,0 +1,98 @@
+{
+  "id": "issue-5871",
+  "type": "issue",
+  "number": 5871,
+  "url": "https://github.com/streamlit/streamlit/issues/5871",
+  "title": "Provide methods to refresh caching",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:cache"
+  ],
+  "created_at": "2022-12-19T05:54:18Z",
+  "closed_at": "2026-07-24T09:09:47Z",
+  "body": "### Problem\n\nParts of my dashboard require sourcing CSV files from external hosts, and it can take a long time (60s) to download and processes that data. However, the data is made available at 6am every day. I already have a function which uses streamlit cache around my data fetching, but it would be amazing if I could say \"at 6:05am every day, call this function\".\n\n### Solution\n\n**MVP:** Streamlit should have a decorator you can apply to functions so they run at startup. These functions could make use of existing python scheduling libraries like apscheduler to call (and thus refresh) caching whenever needed.\n\n**Possible additions:** Streamlit could extend its decorators, integrating the scheduling side through decorator parameters and abstracting that away from the user.\n\n### Additional context\n\nFR raised from this forum post: https://discuss.streamlit.io/t/eagerly-execute-specific-functions-on-app-launch/34957\n\nIt seems a few people have been trying to figure out how to refresh caching, and it would be good to not have to use selenium to simulate a web request from an external service to do so.\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-5871)\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-01-26T18:14:11Z",
+      "body": "Thank you for sharing this request, [USER]! Hopefully, interested community members will upvote this request so that we can prioritize it correctly."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-03-06T10:34:20Z",
+      "body": "Can't wait for this scheduling feature to launch! Right now `ttl` seems to ignore the `timedelta` value and only runs when users open the app."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-04-18T16:36:25Z",
+      "body": "This would help us to populate the cache and not have the first user of the day wait a few minutes until everything is ready."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-10-11T13:03:26Z",
+      "body": "Any news on that? Someone knows how to hack Streamlit to do that? \r\nI know FastAPI has something like Lifespan methods:\r\n```\r\nYou can define this startup and shutdown logic using the lifespan parameter of the FastAPI app, and a \"context manager\".\r\n```\r\nhttps://fastapi.tiangolo.com/advanced/events/#lifespan\r\nIt would be nice if Streamlit could provide this kind of feature !"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-10-18T23:13:59Z",
+      "body": "Thoughts on the API? The simplest approach would just be something like:\r\n\r\n```python\r\n[USER].cache_resource(eager=True)\r\ndef func(*args, **kwargs):\r\n    return 1\r\n```\r\n\r\nBut if we wanted to support one or multiple invocations with arguments it could be something like:\r\n\r\n```python\r\n[USER].cache_resource(eager=[\r\n    (0, 1, 2, {\"kwargs\": \"value\"}),\r\n    (1, 2, 3, {\"kwargs\": \"value\"}),\r\n])\r\ndef func(*args, **kwargs):\r\n    return 1\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-10-19T14:30:00Z",
+      "body": "[USER] yes, it would be nice like that.\r\nOr like FastAPI:\r\n```\r\n[USER].cache_resource(eager=True)\r\ndef lifespan(*args, **kwargs):\r\n    logger.info(\"lifespan method on startup\")\r\n    # ... do something on startup...\r\n    yield\r\n    # ... do something on shutdown...\r\n    logger.info(\"lifespan method on shutdown\")\r\n```\r\nI tried to test your piece of code, but i noticed that is not yet available on Streamlit \ud83d\ude05\r\n```\r\nTypeError: __call__() got an unexpected keyword argument 'eager'\r\n```\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-02-28T11:39:28Z",
+      "body": "Hello, I would also be very interested by this feature. Is there any plan to have something like that?\r\n\r\nIn the meantime, the only workaround I read is using selenium, and that's not really something acceptable on a production server.\r\n \r\nSo I wrote a quick and dirty script that uses the internal websocket to mimic a user interaction, using only streamlit dependencies. This is still an ugly workaround/hack, but better than selenium I think.\r\n\r\n````python\r\nimport argparse\r\nimport asyncio\r\nimport datetime\r\n\r\nimport tornado.websocket\r\nfrom google.protobuf.json_format import MessageToDict\r\nfrom streamlit.proto.BackMsg_pb2 import BackMsg\r\nfrom streamlit.proto.ClientState_pb2 import ClientState\r\nfrom streamlit.proto.ForwardMsg_pb2 import ForwardMsg\r\nfrom streamlit.proto.WidgetStates_pb2 import WidgetStates\r\n\r\n\r\nclass WebSocketClient:\r\n    \"\"\"client heavily inspired by https://gist.github.com/sadernalwis/0a110d280b090e751a8de50d97862a35\"\"\"\r\n\r\n    def __init__(self, event_loop: asyncio.AbstractEventLoop, url):\r\n        self.url = url\r\n        self.connection: tornado.websocket.WebSocketClientConnection | None = None\r\n        self.event_loop = event_loop\r\n        self.last_message_date = None\r\n\r\n    async def start(self):\r\n        await self.connect_and_read()\r\n        if self.connection is not None:\r\n            self.connection.write_message(\r\n                BackMsg(rerun_script=ClientState(widget_states=WidgetStates())).SerializeToString(),\r\n                binary=True,\r\n            )\r\n\r\n    def stop(self):\r\n        self.event_loop.stop()\r\n\r\n    async def connect_and_read(self):\r\n        print(\"Connecting to websocket...\")\r\n        await tornado.websocket.websocket_connect(\r\n            url=self.url,\r\n            callback=self.maybe_retry_connection,\r\n            on_message_callback=self.on_message,\r\n            ping_interval=10,\r\n            ping_timeout=30,\r\n        )\r\n\r\n    def maybe_retry_connection(self, future) -> None:\r\n        try:\r\n            self.connection: tornado.websocket.WebSocketClientConnection | None = future.result()\r\n        # would be better to check the exception type here and retry only if it's retryable\r\n        # also add some sort of limit on retry\r\n        except:\r\n            print(\"Could not reconnect, retrying in 3 seconds...\")\r\n            self.event_loop.call_later(3, self.connect_and_read)\r\n\r\n    def on_message(self, message):\r\n        # weirdly seems to happen when closing the websocket, didn't check why\r\n        if not message:\r\n            return\r\n\r\n        # not useful in my example, but we could add another coroutine that check every second if the self.last_message is too old and create some sort of timeout,\r\n        # or for very long script you could need to send an heartbeat using BackMsg(app_heartbeat=True)\r\n        self.last_message_date = datetime.datetime.now()\r\n\r\n        # retrieving and parsing the websocket message\r\n        f_message = ForwardMsg()\r\n        f_message.ParseFromString(message)\r\n        message_dict = MessageToDict(f_message)\r\n\r\n        # we detect that the script is finished\r\n        if message_dict.get(\"scriptFinished\"):\r\n            print(message_dict.get(\"scriptFinished\"))\r\n            # we could also send a rerun BackMsg with different widget state or another page to run another streamlit script\r\n            # else we just stop the websocket client\r\n            self.stop()\r\n\r\n\r\ndef get_arg_parser() -> argparse.Namespace:\r\n    parser = argparse.ArgumentParser()\r\n    parser.add_argument(\r\n        \"--url\",\r\n        type=str,\r\n        default=\"ws://localhost:8501/_stcore/stream\",\r\n        help=\"url of the target streamlit instance\",\r\n    )\r\n    args = parser.parse_args()\r\n    return args\r\n\r\n\r\ndef main():\r\n    args = get_arg_parser()\r\n    event_loop = asyncio.get_event_loop()\r\n    client = WebSocketClient(event_loop, args.url)\r\n    asyncio.ensure_future(client.start())\r\n    event_loop.run_forever()\r\n\r\n\r\nif __name__ == \"__main__\":\r\n    main()\r\n\r\n````\r\n\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-30T19:05:23Z",
+      "body": "Was just struggling with this and would love to see a native solution to periodically refresh the cache, ideally by extending the current API to something like:\r\n\r\n```\r\n[USER].cache_data(ttl=3600, refresh=600)\r\ndef my_slow_function():\r\n```\r\n\r\nI tried shoving my_slow_function() into a thread, but that resulted in the well-discussed \"lack of script runner context\" error and I don't want to hack at various unsupported solutions for that.  Likewise implementing my own caching function would result in a new thread per user and thus not ideal.\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-25T09:33:47Z",
+      "body": "Also looking forward to this feature ! If this is developed, perhaps following the [cron syntax](https://en.wikipedia.org/wiki/Cron) could be a good way to provide scheduling time/frequency information, as it is already a widely adopted convention for scheduling."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-15T00:10:11Z",
+      "body": "This would be one of the most important features!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-21T10:38:39Z",
+      "body": "It's unbelievable that this doesn't exist as a feature. The API could be sth similar to what has been suggested above:\r\n\r\n```python\r\n[USER].cache_data(ttl=3600, refresh_after_ttl=True)\r\n```\r\n\r\nAnd streamlit should just call the functions decorated after the TTL expires."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-20T13:15:10Z",
+      "body": "We ended up generating cache manually and baking it into a Docker image using the info from [this forum post](https://discuss.streamlit.io/t/where-data-is-cached/2931/4) that cache is located in `~/.streamlit/cache/`, but this is not scalable so would be great if there was a proper way to do it!\n\nAnother approach to achieve this could be if Streamlit supported creating an API (which could be useful for many other purposes) because then triggering the cache refresh could be as simple as a few `curl` commands."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-04-15T14:54:06Z",
+      "body": "## Update\n\nI wrote up a spec [here](https://github.com/streamlit/streamlit/pull/14690) for a lazy-background refresh feature for cache functions. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-24T09:39:54Z",
+      "body": "## Update\n\nStreamlit 1.61 will support a `refresh_mode=\"background\"` for `cache_data` and `cache_resource` which allows expired values (based on `ttl`) to be updated in the background without blocking the user session."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-24T13:33:58Z",
+      "body": "Thanks for working on this. If I understand the spec correctly, this will essentially extend the caching to 2 x TTL, where a background refresh will get triggered between 1x <-> 2x TTL.  Beyond 2x TTL it's existing blocking cache refresh behavior.\n\nSo this will solve some subset of use cases, but will not help for infrequently accessed slow functions (where typical time between usage is longer than the tolerable data staleness/TTL).\n\nThe PR and spec discuss the potential unbound memory/resource problem that comes with solutions that would proactively refresh the cache before TTL expiration (unbound combinations of cached function parameters).  And some complexity of needing a background scheduler thread of some sort. However, it would be good for a future implementation to include this, with the user making the choice knowingly (and potentially with a max entry upper bound).\n\nI sometime use the pattern where my cached slow function is only ever executed with one set of parameters, returning potentially more data to some calling function than necessary, and let that calling function do further filtering.  This calling function is not cached and has the  unbound arbitrary user supplied parameters.  This was I get more cache hits at the expense of a bit more filtering compute.\n\nThat pattern would benefit greatly from an \"eager\"/\"proactive\" cache refresher that executes before TTL expiration."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-24T16:44:51Z",
+      "body": "[USER] thanks, great feedback! We have been thinking about this aspect quite a bit when designing the background refresh mode. The current solution is a bit of a balance to have a simple API with minimal risk for users of blowing up memory and compute. \n\nBut the good news is that it is already possible to implement a scheduled background refresh via `lifespan` in `st.App`, e.g.:\n\n```python\n# data.py\nimport streamlit as st\n\n[USER].cache_data(ttl=\"1h\", refresh_mode=\"background\")\ndef load_data(dataset: str):\n    return fetch_expensive_data(dataset)\n```\n\n```python\n# app.py\nfrom collections.abc import AsyncIterator\nfrom contextlib import asynccontextmanager\nimport logging\n\nimport anyio\nimport streamlit as st\n\nfrom data import load_data\n\n_LOGGER = logging.getLogger(__name__)\n\n\nasync def keep_cache_warm() -> None:\n    while True:\n        try:\n            # Cheap while fresh. Once stale, this returns the stale value and\n            # triggers Streamlit's deduplicated background refresh.\n            await anyio.to_thread.run_sync(load_data, \"dashboard\")\n        except Exception:\n            _LOGGER.exception(\"Scheduled cache refresh failed\")\n\n        await anyio.sleep(60)  # Check freshness every minute\n\n\n[USER]\nasync def lifespan(_app: st.App) -> AsyncIterator[None]:\n    async with anyio.create_task_group() as task_group:\n        task_group.start_soon(keep_cache_warm)\n        try:\n            yield\n        finally:\n            task_group.cancel_scope.cancel()\n\n\napp = st.App(\"dashboard.py\", lifespan=lifespan)\n```\n\nAnd we are planning to make this even simpler with a native utility command to define background tasks (related request: https://github.com/streamlit/streamlit/issues/6687)."
+    }
+  ]
+}

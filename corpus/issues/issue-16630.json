@@ -1,0 +1,31 @@
+{
+  "id": "issue-16630",
+  "type": "issue",
+  "number": 16630,
+  "url": "https://github.com/streamlit/streamlit/issues/16630",
+  "title": "Typing issue for `st.selectbox` when `index: int | None` & `accept_new_options=False`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.selectbox",
+    "area:typing"
+  ],
+  "created_at": "2026-08-24T14:53:14Z",
+  "closed_at": "2026-08-27T10:04:48Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nHello!\n\nWhen I use `st.selectbox` with an dynamic index which can be `int | None`, with the default for `accept_new_options` (so should be False), the return type includes `str`, so gives `T | str | None` instead of `T | None`...\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\nfrom typing_extensions import assert_type\n\nindex: int | None = None\n\nresult = st.selectbox(\n    \"Entity\",\n    [1, 2, 3],\n    index=index,\n    # accept_new_options=False, # default is False anyway\n)\nassert_type(result, int | None)\n```\n\n### Steps To Reproduce\n\n1. setup a venv with `streamlit` (1.62.0) & `pyrefly` (1.2.0)\n2. run `pyrefly check ./repro-file.py`\n3. notice the error: (first line)\n```\nERROR assert_type(int | str | None, int | None) failed [assert-type]\n  --> main.py:12:12\n   |\n12 | assert_type(result, int | None)\n   |            ^^^^^^^^^^^^^^^^^^^^\n   |\n INFO 1 error\n```\n\n### Expected Behavior\n\nTyping should be `T | None` since I have `accept_new_options=False` (the default), so the return can never be a `str` AFAIK \ud83e\udd14..\n\n### Current Behavior\n\nTyping gives `T | str | None`\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: found in 1.52.2 , but this example was tested on 1.62.0\n- Python version: python 3.12\n- Operating System: macOS\n- Browser: N/A\n\n### Additional Information\n\nInterestingly `mypy` doesn't report any typing error here, maybe it's less capable for this overload? \ud83e\udd14\nOr maybe this is a `pyrefly` bug?",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-24T14:53:25Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16630)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-24T15:38:45Z",
+      "body": "This is a real typing bug in `st.selectbox`, not a pyrefly-only issue. Overloads distinguish `index: int` vs `index: None` and `accept_new_options: Literal[False]` vs `Literal[True]`, then fall through to a catch-all of `index: int | None` + `accept_new_options: bool` that returns `T | str | None`. When `index` is typed as `int | None` (and `accept_new_options` is omitted / `False`), pyrefly/pyright cannot match the narrower overloads and pick that catch-all, so `str` appears in the return type even though a new option cannot be entered. mypy often expands the `index` union across overloads and reports `T | None`, which is why it stays silent. Existing type tests only cover literal `index=None` / `index=0`. A fix is to add an overload for `index: int | None` with `accept_new_options: Literal[False]` returning `T | None` (before the catch-all) and cover it in `lib/tests/streamlit/typing/selectbox_types.py`.\n\n### Related Issues\n\n- [#15529](https://github.com/streamlit/streamlit/issues/15529) (closed) \u2014 Incomplete `st.slider` overloads for type checkers; same class of bug where a union argument misses a specific overload.\n- [#13487](https://github.com/streamlit/streamlit/issues/13487) (closed) \u2014 Incomplete public API type hints (`st.date_input`) that type checkers reject despite valid runtime usage.\n- No open duplicate of this `st.selectbox` + `index: int | None` overload gap was found.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

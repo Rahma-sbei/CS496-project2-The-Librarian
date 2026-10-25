@@ -1,0 +1,23 @@
+{
+  "id": "issue-16354",
+  "type": "issue",
+  "number": 16354,
+  "url": "https://github.com/streamlit/streamlit/issues/16354",
+  "title": "Support 50 steps for font weight theming options",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:theming"
+  ],
+  "created_at": "2026-08-05T20:29:30Z",
+  "closed_at": "2026-08-07T19:37:11Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nTheming parameters that define font weights in Streamlit (e.g. `headingFontWeights`) require 100 steps (e.g. 400, 500, 600, ...). Some UI systems use a font weight of 550 though. It would be great if we could support that in all theming config options that set a font weight. \n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-05T20:29:49Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-16354)\n"
+    }
+  ]
+}

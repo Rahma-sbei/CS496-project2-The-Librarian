@@ -1,0 +1,161 @@
+---
+title: Layouts and Containers
+slug: /develop/api-reference/layout
+description: Control how elements are arranged on screen with Streamlit's layout and container components including columns, expanders, sidebars, tabs, and containers.
+keywords: layouts, containers, columns, expander, sidebar, tabs, popover, streamlit layout, ui layout, screen organization, element arrangement
+---
+
+# Layouts and Containers
+
+## Complex layouts
+
+Streamlit provides several options for controlling how different elements are laid out on the screen.
+
+<TileContainer>
+<RefCard href="/develop/api-reference/layout/st.columns">
+
+<Image pure alt="screenshot" src="/images/api/columns.jpg" />
+
+<h4>Columns</h4>
+
+Insert containers laid out as side-by-side columns.
+
+```python
+col1, col2 = st.columns(2)
+col1.write("this is column 1")
+col2.write("this is column 2")
+```
+
+</RefCard>
+<RefCard href="/develop/api-reference/layout/st.container">
+
+<Image pure alt="screenshot" src="/images/api/container.jpg" />
+
+<h4>Container</h4>
+
+Insert a multi-element container.
+
+```python
+c = st.container()
+st.write("This will show last")
+c.write("This will show first")
+c.write("This will show second")
+```
+
+</RefCard>
+<RefCard href="/develop/api-reference/execution-flow/st.dialog">
+
+<Image pure alt="screenshot" src="/images/api/dialog.jpg" />
+
+<h4>Modal dialog</h4>
+
+Insert a modal dialog that can rerun independently from the rest of the script.
+
+```python
+@st.dialog("Sign up")
+def email_form():
+    name = st.text_input("Name")
+    email = st.text_input("Email", type="email")
+```
+
+</RefCard>
+<RefCard href="/develop/api-reference/layout/st.empty">
+
+<Image pure alt="screenshot" src="/images/api/empty.jpg" />
+
+<h4>Empty</h4>
+
+Insert a single-element container.
+
+```python
+c = st.empty()
+st.write("This will show last")
+c.write("This will be replaced")
+c.write("This will show first")
+```
+
+</RefCard>
+<RefCard href="/develop/api-reference/layout/st.expander">
+
+<Image pure alt="screenshot" src="/images/api/expander.jpg" />
+
+<h4>Expander</h4>
+
+Insert a multi-element container that can be expanded/collapsed.
+
+```python
+with st.expander("Open to see more"):
+  st.write("This is more content")
+```
+
+</RefCard>
+<RefCard href="/develop/api-reference/layout/st.popover">
+
+<Image pure alt="screenshot" src="/images/api/popover.svg" />
+
+<h4>Popover</h4>
+
+Insert a multi-element popover container that can be opened/closed.
+
+```python
+with st.popover("Settings"):
+  st.checkbox("Show completed")
+```
+
+</RefCard>
+<RefCard href="/develop/api-reference/layout/st.sidebar">
+
+<Image pure alt="screenshot" src="/images/api/sidebar.jpg" />
+
+<h4>Sidebar</h4>
+
+Display items in a sidebar.
+
+```python
+st.sidebar.write("This lives in the sidebar")
+st.sidebar.button("Click me!")
+```
+
+</RefCard>
+<RefCard href="/develop/api-reference/layout/st.bottom">
+
+<Image pure alt="screenshot" src="/images/api/bottom.jpg" />
+
+<h4>Bottom</h4>
+
+Display items at the bottom of the window.
+
+```python
+st.bottom.chat_input("Say something")
+```
+
+</RefCard>
+<RefCard href="/develop/api-reference/layout/st.space">
+
+<Image pure alt="screenshot" src="/images/api/space.jpg" />
+
+<h4>Space</h4>
+
+Add vertical or horizontal space.
+
+```python
+st.space("small")
+```
+
+</RefCard>
+<RefCard href="/develop/api-reference/layout/st.tabs">
+
+<Image pure alt="screenshot" src="/images/api/tabs.jpg" />
+
+<h4>Tabs</h4>
+
+Insert containers separated into tabs.
+
+```python
+tab1, tab2 = st.tabs(["Tab 1", "Tab2"])
+tab1.write("this is tab 1")
+tab2.write("this is tab 2")
+```
+
+</RefCard>
+</TileContainer>

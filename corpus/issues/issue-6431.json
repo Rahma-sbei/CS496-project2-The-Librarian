@@ -1,0 +1,30 @@
+{
+  "id": "issue-6431",
+  "type": "issue",
+  "number": 6431,
+  "url": "https://github.com/streamlit/streamlit/issues/6431",
+  "title": "Long chart labels are cropped",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:cannot-reproduce",
+    "priority:P4",
+    "feature:st.altair_chart"
+  ],
+  "created_at": "2023-04-04T23:42:11Z",
+  "closed_at": "2026-07-19T12:21:51Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nReported by [USER], don't have a code example unfortunately. If an Altair/Vega chart has long labels on the x axis, they get cropped by Streamlit.\r\n\r\n![image](https://user-images.githubusercontent.com/5103165/229945795-49423007-2aae-4ea6-9854-ee609fc865af.png)\r\n\n\n### Reproducible Code Example\n\n_No response_\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\nChart should just become smaller, labels should show up fully. \n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\r\n- Python version:\r\n- Operating System:\r\n- Browser:\r\n- Virtual environment:\r\n\n\n### Additional Information\n\n_No response_\n\n### Are you willing to submit a PR?\n\n- [ ] Yes, I am willing to submit a PR!",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T13:05:05Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-6431)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-19T12:21:51Z",
+      "body": "Closing this since we were not able to reproduce this issue."
+    }
+  ]
+}

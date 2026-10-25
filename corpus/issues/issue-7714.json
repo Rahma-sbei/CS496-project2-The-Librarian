@@ -1,0 +1,66 @@
+{
+  "id": "issue-7714",
+  "type": "issue",
+  "number": 7714,
+  "url": "https://github.com/streamlit/streamlit/issues/7714",
+  "title": "Bar chart does not display for one column data if there is a '.' in the column name",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.altair_chart",
+    "feature:builtin-charts"
+  ],
+  "created_at": "2023-11-13T15:00:07Z",
+  "closed_at": "2026-07-28T21:17:58Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nBar chart does not display for one column data if there is a '.' in the column name.\r\n\r\n### Reproducible Code Example\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-7714)\r\n\r\n```Python\r\nimport pandas as pd\r\nimport streamlit as st\r\nimport numpy as np\r\n\r\nst.title(\"This works\")\r\nchart_data = pd.DataFrame(np.random.randn(20, 3), columns=[\"a\", \"b\", \"c\"])\r\nst.bar_chart(chart_data)\r\n\r\nst.title(\"This works\")\r\nchart_data = pd.DataFrame(np.random.randn(20, 3), columns=[\"a.b\", \"b.c\", \"c.d\"])\r\nst.bar_chart(chart_data)\r\n\r\nst.title(\"This works\")\r\nchart_data = pd.DataFrame(np.random.randn(20, 1), columns=[\"a\"])\r\nst.bar_chart(chart_data)\r\n\r\nst.title(\"This doesn't work\")\r\nchart_data = pd.DataFrame(np.random.randn(20, 1), columns=[\"a.b\"])\r\nst.bar_chart(chart_data)\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\n1. Run this\r\n2. Note the cases which do and do not display a graph\r\n\r\n### Expected Behavior\r\n\r\nThere should be four graphs.\r\n\r\n### Current Behavior\r\n\r\nThere are only three being displayed properly.\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.28.1\r\n- Python version: 3.10.12\r\n- Operating System: 5.15.0-88-generic #98-Ubuntu\r\n- Browser: Chrome Version 119.0.6045.123 (Official Build) (arm64)\r\n\r\n\r\n### Additional Information\r\n\r\nI suspect that there is somewhere in the code confusing the '.' in the column name for the dot operator. I expect that '.'s need to be escaped. Not sure why this only happens with one column and not with multiple columns.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-11-13T15:00:19Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-7714)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-11-14T15:34:38Z",
+      "body": "Hey [USER]!\r\n\r\nThank you for reporting this issue, I was able to reproduce it and can confirm that this is a bug. \r\n\r\nIssue demo link: https://issues.streamlit.app/?issue=gh-7714"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-11-29T15:03:09Z",
+      "body": "I can add to this that it also does not work for labels that contain square brackets, i.e. `\"CO\u2082 Storage [t]\"`"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-11-29T17:19:34Z",
+      "body": "This repros for all Altair-backed charts (bar, line, scatter, area), not just bar charts.\r\n\r\nThis is because [the field parameter we pass in](https://github.com/streamlit/streamlit/blob/38251aad1c2615ee8c100144f2e04eb9f26f1fd3/lib/streamlit/elements/arrow_altair.py#L1303) is sourced directly from the column name, [but _only_ for the non-\"melted\" case](https://github.com/streamlit/streamlit/blob/38251aad1c2615ee8c100144f2e04eb9f26f1fd3/lib/streamlit/elements/arrow_altair.py#L1291-L1300), and we only \"melt\" [in the multi-column case](https://github.com/streamlit/streamlit/blob/38251aad1c2615ee8c100144f2e04eb9f26f1fd3/lib/streamlit/elements/arrow_altair.py#L1208-L1227).\r\n\r\nThe reason this breaks things is Altair treats string fields with dots as nested field access; see [these encoding docs](https://altair-viz.github.io/altair-viz-v4/user_guide/encoding.html):\r\n<img width=\"709\" alt=\"image\" src=\"https://github.com/streamlit/streamlit/assets/148143395/e423619b-74c7-454a-8280-9359f2e8e443\">\r\n\r\nNote that the solution is a simple escape."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-11-29T17:25:23Z",
+      "body": "Unsurprisingly this also breaks with brackets (e.g. `columns=[\"a[b]\"]` in the example code)."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-12-05T17:15:10Z",
+      "body": "After playing around with this for a bit, escaping does _not_ seem to fix the underlying issue - at least for columns with dots in the name. There are also open bugs like [this one](https://github.com/vega/vega-lite/issues/7066) in vega-lite, which makes me think escaping simply isn't implemented correctly.\r\n\r\nI think the right solution here is to use a uniqueified column name in all cases, not just the melted case. I'm going to unassign this until I have time to investigate that solution."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-01-05T09:13:08Z",
+      "body": "+1 this was kinda confusing to me!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-06T13:57:23Z",
+      "body": "Hi! I\u2019ve been looking into this issue and I\u2019d be interested in working on it. From what I can tell, this still seems to happen in the latest versions. \n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-03-09T18:07:09Z",
+      "body": "[USER] -\n\nThis comment from me seems like the right solution:\n\n> I think the right solution here is to use a uniqueified column name in all cases, not just the melted case.\n"
+    }
+  ]
+}

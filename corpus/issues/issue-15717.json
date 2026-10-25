@@ -1,0 +1,28 @@
+{
+  "id": "issue-15717",
+  "type": "issue",
+  "number": 15717,
+  "url": "https://github.com/streamlit/streamlit/issues/15717",
+  "title": "Exception type too broad in error handling",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:backend"
+  ],
+  "created_at": "2026-06-25T20:05:38Z",
+  "closed_at": "2026-06-26T09:18:02Z",
+  "body": "## Bug Report\n\n### Description\nSome `except` clauses catch overly broad exception types (e.g., bare `except:` or `except Exception:`), which can accidentally swallow important errors like `KeyboardInterrupt` or `SystemExit`.\n\n### Example\n```python\n# Problematic:\ntry:\n    do_something()\nexcept:  # catches EVERYTHING including KeyboardInterrupt\n    pass\n\n# Better:\ntry:\n    do_something()\nexcept ValueError as e:\n    logger.warning(f\"Value error: {e}\")\n```\n\n### Expected Behavior\nException handlers should catch only the specific exceptions they know how to handle.\n\n### Impact\n- Makes it impossible to interrupt the program with Ctrl+C in some cases\n- Hides unexpected errors that should be investigated\n- Makes debugging significantly harder\n\n### Suggested Fix\nReplace broad `except` clauses with specific exception types wherever possible.\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-26T09:09:01Z",
+      "body": "This issue is a generic code-quality suggestion to replace broad `except:` / `except Exception:` clauses with more specific exception types across the Streamlit codebase. It is filed as a bug, but no concrete location, reproduction, or user-facing failure is provided \u2014 it reads like an AI-generated lint observation rather than a reported defect.\n\nNotably, this appears to be a verbatim re-post of #15696 (same title, same body, same author), which was closed yesterday with maintainer feedback that the request is \"too broad and non-specific to be actionable.\" A quick scan of `lib/streamlit/` shows roughly two dozen `except Exception:` sites, but most are intentional (e.g. log-and-continue paths in watchers, hashing, websocket handlers, CLI bootstrap). Without a specific call site that demonstrably swallows `KeyboardInterrupt`/`SystemExit` or hides a real bug, this is not actionable. Recommend asking the author to either narrow it to a concrete location/repro or close as a duplicate of #15696.\n\n### Related Issues\n\n- [#15696 \u2014 Exception type too broad in error handling](https://github.com/streamlit/streamlit/issues/15696): Verbatim duplicate by the same author, closed one day earlier with feedback that the report is too broad and non-actionable.\n- [#3426 \u2014 Ability to register custom exception handler](https://github.com/streamlit/streamlit/issues/3426): Related enhancement around how Streamlit handles/exposes unhandled exceptions; the proper place to discuss broader error-handling improvements.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-26T09:18:02Z",
+      "body": "Closing this since it appears to be too generic. Also see: https://github.com/streamlit/streamlit/issues/15696#issuecomment-4797431931"
+    }
+  ]
+}

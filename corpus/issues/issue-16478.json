@@ -1,0 +1,24 @@
+{
+  "id": "issue-16478",
+  "type": "issue",
+  "number": 16478,
+  "url": "https://github.com/streamlit/streamlit/issues/16478",
+  "title": "Add `dataframeHeaderTextColor` theme option for dataframe header text",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe",
+    "feature:theming"
+  ],
+  "created_at": "2026-08-11T20:17:16Z",
+  "closed_at": "2026-09-29T17:48:23Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAdd a `dataframeHeaderTextColor` theme option to control the foreground (text) color of `st.dataframe` / `st.data_editor` column headers. Today `dataframeHeaderBackgroundColor` exists, but the header text color can't be customized \u2014 it's always derived from the body `textColor` (as `fadedText60`), so a custom/tinted/dark header background often results in weak or unreadable header text.\n\n### Why?\n\nUsers can already set a custom header background via `dataframeHeaderBackgroundColor`, but there's no matching control for the header text. With a dark or strongly tinted header background, the faded, body-derived header text has poor contrast and can be hard to read. A dedicated `dataframeHeaderTextColor` lets the header background and foreground be styled together for a readable, on-brand look.\n\n### How?\n\nAdd a theme config option, e.g.:\n\n```toml\n[theme]\ndataframeHeaderBackgroundColor = \"#1f2937\"\ndataframeHeaderTextColor = \"#ffffff\"\n```\n\nImplementation notes:\n- Wire it through the dataframe's custom theme so it overrides the header text color instead of the hardcoded default.\n- In the frontend this currently maps to the glide-data-grid `textHeader` (and likely `textGroupHeader`), which today is set to `theme.colors.fadedText60`:\n\n```117:119:frontend/lib/src/components/widgets/DataFrame/hooks/useCustomTheme.ts\n      textHeader: theme.colors.fadedText60,\n      textHeaderSelected: theme.colors.white,\n      textGroupHeader: theme.colors.fadedText60,\n```\n\n- If unset, fall back to today's derived default (so nothing changes for existing apps).\n\n### Additional Context\n\n- Complements the existing `dataframeHeaderBackgroundColor` theme option.\n- Related: #6958 (keep header style), #6340 (style tables)",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-11T20:17:26Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-16478)\n"
+    }
+  ]
+}

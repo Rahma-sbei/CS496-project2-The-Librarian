@@ -1,0 +1,43 @@
+{
+  "id": "issue-14991",
+  "type": "issue",
+  "number": 14991,
+  "url": "https://github.com/streamlit/streamlit/issues/14991",
+  "title": "OAuth MismatchingStateError regression in 1.57.0 (works in 1.56.0)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:security",
+    "type:regression",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.login",
+    "feature:authentication"
+  ],
+  "created_at": "2026-05-01T01:28:14Z",
+  "closed_at": "2026-05-05T17:08:40Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n# Streamlit OAuth Authentication Issue on Cloud Run\n\n## Problem\n\nTwo issues with Streamlit native auth (`st.login`) on Cloud Run staging deployment:\n\n1. First-login error: clicking \"Log in with Google\" \u2192 picking account \u2192 server error. Reloading the tab made it work.\n2. Session persistence: re-authentication required on every interaction.\n\n## Root Cause\n\nRegression in Streamlit 1.57.0 affecting OAuth state/cookie handling.\n\nError from Cloud Run logs:\n\nauthlib.integrations.base_client.errors.MismatchingStateError:\nmismatching_state: CSRF Warning! State not equal in request and response.\n\nThis occurred in the `/oauth2callback` endpoint when Authlib tried to validate the OAuth `state` parameter against the session cookie. They didn't match, indicating the cookie was lost or overwritten during the OAuth roundtrip.\n\n## Investigation Path\n\n| Step | What we checked | Outcome |\n|------|-----------------|---------|\n| 1 | Cloud Run instances (min/max) | Already pinned to 1, not the cause |\n| 2 | `cookie_secret` stability | Stable across deploys, not the cause |\n| 3 | Cloud Run logs (full traceback) | Found `MismatchingStateError` in Authlib |\n| 4 | Streamlit version drift | Local: 1.56.0, Cloud Run: 1.57.0 |\n| 5 | Pinned to 1.56.0 | Fixed |\n\n## Solution\n\nPin Streamlit to 1.56.0 in `requirements.txt`:\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-01T01:28:24Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-14991)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-01T16:47:47Z",
+      "body": "### Triage Analysis\n\nThis is a reported regression in `st.login` between **1.56.0** and **1.57.0**: on Cloud Run, the OAuth callback fails with `authlib.integrations.base_client.errors.MismatchingStateError: CSRF Warning! State not equal in request and response`, and pinning back to `1.56.0` resolves it.\n\n**Likely root cause:** In 1.57.0 ([#14553](https://github.com/streamlit/streamlit/pull/14553)), Tornado was removed and Starlette/Uvicorn became the default (and only) server, switching the OAuth flow from `oauth_authlib_routes.py` (Tornado) to `starlette_auth_routes.py` (Starlette). Both versions store the per-login OAuth `state` in a **module-level, in-memory cache** (`_STARLETTE_AUTH_CACHE` / `_AsyncAuthCache` in 1.57.0; `AuthCache` in 1.56.0). On Cloud Run, even with `min=max=1`, the in-memory state can be lost if the container is restarted/replaced between the `/auth/login` request and the `/oauth2callback` (e.g. on a fresh deploy, idle scale-down, or revision change), which produces exactly this `MismatchingStateError`. The new Starlette code itself flags this as a known limitation:\n\n```117:123:lib/streamlit/web/server/starlette/starlette_auth_routes.py\n# TODO(lukasmasuch): Reevaluate whether we can remove _AsyncAuthCache and rely on Authlib's\n# built-in session storage via SessionMiddleware instead. This would simplify\n# the code but would expose OAuth state data in signed cookies rather than\n# keeping it server-side. See: https://docs.authlib.org/en/latest/client/starlette.html\n#\n# Note: For true multi-tenant support (multiple Streamlit apps in one process),\n# this cache would need to be made per-runtime rather than module-level.\n```\n\nThe reporter also mentions a secondary symptom \u2014 re-authentication required on every interaction \u2014 which suggests the auth cookies themselves may not be persisting correctly across requests in this Cloud Run setup (the new Starlette code uses `samesite=\"lax\"` and intentionally does not set `secure`, see `_set_single_cookie` in the same file). It would help to confirm whether the `_streamlit_user` / `_streamlit_session` cookies are present after callback. Reproduction details (provider, cookie config, whether SSL is terminated at the LB, exact Cloud Run revision settings) would also help triage.\n\n### Related Issues\n\n- [#12995](https://github.com/streamlit/streamlit/issues/12995) \u2014 `st.login` against MSAL: similarly fails inside Authlib during the `/oauth2callback` token exchange (different error, but same code path).\n- [#12518](https://github.com/streamlit/streamlit/issues/12518) \u2014 `st.login` fails for users with many AD groups: also `st.login` callback failing due to cookie/state handling limits.\n- [#5793](https://github.com/streamlit/streamlit/issues/5793) \u2014 Misconfigured `_xsrf` cookies behind proxies: related class of cookie/SameSite/Secure misconfiguration that causes auth flows to break in proxied/cloud environments.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-05-05T17:09:18Z",
+      "body": "[USER] This will likely be fixed in the 1.58."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-05-11T12:38:49Z",
+      "body": "[USER] if you like, you can try this preview wheel to check if this is fixing the issue:\n\n```bash\npip install -U https://core-previews.s3-us-west-2.amazonaws.com/pr-15048/streamlit-1.57.0-py3-none-any.whl\n```"
+    }
+  ]
+}

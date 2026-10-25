@@ -1,0 +1,28 @@
+{
+  "id": "issue-16773",
+  "type": "issue",
+  "number": 16773,
+  "url": "https://github.com/streamlit/streamlit/issues/16773",
+  "title": "Clarify st.number_input return type when value= int | None",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:intended-behavior"
+  ],
+  "created_at": "2026-09-02T06:30:33Z",
+  "closed_at": "2026-09-02T06:49:22Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nPassing a typed variable of int | None to the value parameter for number_input returns a float | None type.\n\nI expected this to be int | None, and that this is how you are expected to create an empty input field, that accepts integers only, assuming the step parameter would default to 1, but it appears that strictly requires value to be int.\n\nIf you set step=1, then static type checking works as expected, resolving to int | None.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\ndefault_value: int | None = None\n\nnumber = st.number_input(\n    \"Input number\",\n    value=default_value,\n)\n\nif number:\n    assert isinstance(number, int)\n    print('Number is an int')\n```\n\n### Steps To Reproduce\n\n1. Run example\n2. Input number\n\n### Expected Behavior\n\nPrints 'Number is an int'\n\n### Current Behavior\n\nAssertion fails.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.59.1\n- Python version: 3.12\n- Operating System: Windows\n- Browser: Edge\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-02T06:30:44Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16773)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-02T06:49:21Z",
+      "body": "This is expected behavior, not a typing bug we can fix with overloads.\n\n`st.number_input` infers int vs float from the runtime values of `value` / `min_value` / `max_value` / `step`. A variable annotated `int | None` is just `None` at runtime, so with no other int args the widget is a float input and returns `float | None`. Type checkers follow that: the union splits into `value: int` \u2192 `int` and `value: None` \u2192 `float | None`, which is `int | float | None` (often shown as `float | None`). An overload that reported `int | None` would disagree with runtime.\n\nWorkarounds for an empty integer input:\n\n```python\nnumber = st.number_input(\"Input number\", value=default_value, step=1)\n# or min_value=0 / max_value=... as int\n```\n\nIf you only need the annotation to be `int | None` and already know the widget is an int (e.g. you passed `step=1`):\n\n```python\nfrom typing import cast\n\nnumber = cast(int | None, st.number_input(\"Input number\", value=default_value, step=1))\n```\n\n`cast` alone does not change the runtime type. Without an int `step` / `min_value` / `max_value`, entered values are still floats."
+    }
+  ]
+}

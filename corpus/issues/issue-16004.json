@@ -1,0 +1,31 @@
+{
+  "id": "issue-16004",
+  "type": "issue",
+  "number": 16004,
+  "url": "https://github.com/streamlit/streamlit/issues/16004",
+  "title": "st.selectbox Escape no longer clears the typed search query since 1.59.0 (stale query left in the input)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.selectbox"
+  ],
+  "created_at": "2026-07-14T18:10:00Z",
+  "closed_at": "2026-07-21T13:47:41Z",
+  "body": "### Checklist\n- [x] I have searched the existing issues for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nSince 1.59.0 (the `BaseWeb` \u2192 react-aria `ComboBox` migration, #15438), pressing\n`Escape` while searching in a value-selected `st.selectbox` no longer discards the\ntyped query. The dropdown closes and the committed value is (correctly) preserved,\nbut the half-typed query stays visible in the input, so the box shows a query that\ndoes not match the actual value. In 1.58.0, `Escape` cleared the query and\nrestored the committed value.\n\n### Reproducible Code Example\n\n```python\nimport streamlit as st\n\nFRUITS = [\"Apple\", \"Apricot\", \"Banana\", \"Cherry\", \"Grape\", \"Mango\", \"Peach\", \"Pear\"]\nv = st.selectbox(\"Fruit\", FRUITS, index=2)  # Banana pre-selected\nst.write(\"value:\", v)\n```\n\n### Steps To Reproduce\n\n1. Run the app above (value is `Banana`).\n2. Click the selectbox and type `gr`.\n3. Press `Escape`.\n4. Look at what the input shows vs. the committed value.\n5. (Control) Repeat steps 2\u20133 but click elsewhere instead of pressing Escape.\n\n### Expected Behavior\n\n`Escape` discards the query and restores the committed value in the input (as in\n1.58.0): after Escape the box shows `Banana` again and `value` is still `Banana`.\n\n### Current Behavior\n\n- The dropdown closes and the committed value stays `Banana` (good \u2014 no accidental\n  commit), **but the input still shows the stale query** (`gr`; on raw 1.59.0 the\n  original append bug makes it `Bananagr`).\n- Typing again without blurring appends to the stale query (e.g. `gr` + `ap` \u2192 `grap`).\n- The control case (click away / blur) **does** correctly restore `Banana`, so only\n  the Escape path is affected.\n\n(Screenshots attached: `EVIDENCE_branch_gap2_after_escape.png` shows the stale\n`gr` after Escape on 1.59.0+; `EVIDENCE_v1_58_0_gap2_after_escape.png` shows the\ninput restored on 1.58.0.)\n\n### Is this a regression?\n- [x] Yes, this used to work in a previous version.\n\nConfirmed via bisect against official PyPI wheels: after typing `gr` and pressing\nEscape, the input is cleared/restored on **1.58.0** (BaseWeb `Select`) but retains\n`gr` / `Bananagr` on **1.59.0** (react-aria `ComboBox`). Identical in Chromium and\nWebKit. Introduced by #15438.\n\n### Debug info\n- Streamlit version: 1.59.0 (introduced); still present in current 1.59.x / dev builds\n- Python version: 3.12\n- Operating System: Linux (browser-independent)\n- Browser: Chromium and WebKit (both affected)\n\n### Additional Information\n\n- Related migration PR: #15438 (Remove `BaseWeb` for `selectbox`).\n- Discovered during QA of #15996 (which fixes the separate type-to-search append\n  bug #15985). This Escape regression is independent of that fix.\n- Likely fix: on `Escape` for a non-clearable selectbox, reset `inputValue` to the\n  committed label and clear the active-filter state (mirroring the existing\n  blur-restore path). Clearable (`index=None`) selectboxes already clear to `None`\n  on Escape via a separate code path and are not affected.\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-14T18:10:09Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16004)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-15T10:19:15Z",
+      "body": "Repro app created here: https://issues.streamlit.app/?issue=gh-16004"
+    }
+  ]
+}

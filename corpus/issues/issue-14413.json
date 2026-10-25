@@ -1,0 +1,28 @@
+{
+  "id": "issue-14413",
+  "type": "issue",
+  "number": 14413,
+  "url": "https://github.com/streamlit/streamlit/issues/14413",
+  "title": "Add a dropdown selector to `st.chat_input` similar to LLM chat interfaces",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:st.chat_input"
+  ],
+  "created_at": "2026-03-18T13:13:07Z",
+  "closed_at": "2026-07-22T08:55:59Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAdd a dropdown selector to `st.chat_input`, similar to the pattern used in ChatGPT and other LLM chat interfaces.\n\n<img width=\"309\" height=\"335\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/6a7a6382-dc99-49c1-9512-d67b7a177968\" />\n\nThis could either:\n\n- extend the current `accept_file=True` behavior, or\n\n- be introduced as a separate selector component attached to `st.chat_input`\n\nRight now, this kind of UI is not really possible to implement cleanly without something like `st.bottom`.\n\n### Why?\n\nFor data analysis workflows, it is often important to specify exactly which dataset, table, or context the model should use.\n\nA selector attached to `st.chat_input` would make that context explicit before submission, which helps:\n\n- reduce ambiguity about which data the model should query\n\n- avoid hallucinated joins or incorrect assumptions across tables\n\n- support more targeted system prompts\n\n- make it easier to drive different output modes, such as plain text, charts, or HTML reports.\n\n**Example use case**\n\nA user might choose one of the following before sending a message:\n\n- a specific table\n\n- a semantic layer or query target\n\n- an output mode such as text, chart, or report\n\nThat gives the app a structured way to route the prompt and configure the model behavior before the message is processed.\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-03-18T13:13:18Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-14413)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T08:55:59Z",
+      "body": "Closing as duplicate of https://github.com/streamlit/streamlit/issues/10737. Please comment and upvote on the linked issue. "
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "id": "issue-7946",
+  "type": "issue",
+  "number": 7946,
+  "url": "https://github.com/streamlit/streamlit/issues/7946",
+  "title": "Increase secret management's level of protection",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:community-cloud"
+  ],
+  "created_at": "2024-01-12T05:43:32Z",
+  "closed_at": "2026-07-22T09:17:52Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAdd layer of security, encrypt the secret values for the app deployed in the cloud.\r\n\r\n![secret management](https://global.discourse-cdn.com/business7/uploads/streamlit/optimized/3X/5/6/56e34fa584d11e751c5362ec1f64ed92f1adfb2b_2_690x462.png)\r\n\r\nThis is posted from [Streamlit forum](https://discuss.streamlit.io/t/secret-management-increase-level-of-protection/59342).\n\n### Why?\n\nIncrease security.\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-01-12T05:43:42Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-7946)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T09:17:52Z",
+      "body": "## Update\n\nClosing this since its possible to set `secrets` programmatically via `st.App`: https://github.com/streamlit/streamlit/pull/14861 see: https://docs.streamlit.io/develop/api-reference/server/st.app\n\nThis allows setting secrets from more secure key vaults or provides you with custom ways to encrypt/decrypt your secrets before providing it to your Streamlit app. "
+    }
+  ]
+}

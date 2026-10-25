@@ -1,0 +1,24 @@
+{
+  "id": "issue-9946",
+  "type": "issue",
+  "number": 9946,
+  "url": "https://github.com/streamlit/streamlit/issues/9946",
+  "title": "`st.date_input` doesn't show placeholder text when the initial value is a list of size one",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:st.date_input"
+  ],
+  "created_at": "2024-11-29T08:59:19Z",
+  "closed_at": "2026-08-12T19:26:43Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nYou can pass a list to `st.date_input`'s `value` parameter. An empty list will initialize the widget with an empty interval (showing placeholder text). A pair of values will initialize the widget with the given interval (showing the dates as an initial selection). However, if you pass a list of size one, the widget has only the starting date of the interval initialized with no end date. Instead of showing placeholder text for the end date, it's blank.\r\n\r\n```\r\nimport streamlit as st\r\nfrom datetime import date, datetime\r\n\r\na = st.selectbox(\"A\", [\"today\", \"2024-10-01\", date(2024,9,1), datetime(2024,8,1,12,0,0,0), None])\r\nb = st.selectbox(\"B\", [\"today\", \"2024-10-01\", date(2024,9,1), datetime(2024,8,1,12,0,0,0), None])\r\n\r\nx = st.date_input(\"Two-list\", [a,b])\r\nx\r\ny = st.date_input(\"One-list\", [a])\r\ny\r\nz = st.date_input(\"Empty-list\", [])\r\nz\r\n```\n\n### Why?\n\nPresumably, it would look better to show placeholder text for the end date when only the initial date of a range is selected. This is also how an intermediate state looks if someone selects a new start date and clicks out of the widget before selecting the end date.\n\n### How?\n\nIf someone unfocuses an (interval) date widget with only the start date selected, show the placeholder text for the missing end date.\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-11-29T08:59:31Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-9946)\n"
+    }
+  ]
+}

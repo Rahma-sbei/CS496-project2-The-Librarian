@@ -1,0 +1,36 @@
+{
+  "id": "issue-8531",
+  "type": "issue",
+  "number": 8531,
+  "url": "https://github.com/streamlit/streamlit/issues/8531",
+  "title": "Altair Grouped Barchart with st.altair_chart(use_container_width=True) creates multiple charts instead of one single grouped chart",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.altair_chart",
+    "upstream"
+  ],
+  "created_at": "2024-04-18T09:47:38Z",
+  "closed_at": "2026-09-08T18:13:57Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen creating a grouped bar chart using Altair and render it with `st.altair_chart(fig, use_container_width=True)`, multiple charts for each group, rather than a combined single chart, is created. See screenshot attached. Code to reproduce is also attached.\n\n<img width=\"1504\" alt=\"Screenshot 2024-04-18 at 5 42 59\u202fPM\" src=\"https://github.com/streamlit/streamlit/assets/3713023/dbd46a10-a216-463a-850f-40fe84102ab8\">\n\n\n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-8531)\n\n```Python\nimport streamlit as st\nimport altair as alt\nfrom vega_datasets import data\n\ndef make_plot():\n    source = data.barley()\n\n    fig = alt.Chart(source).mark_bar().encode(\n        x='year:O',\n        y='sum(yield):Q',\n        color='year:N',\n        column='site:N'\n    )\n    return fig\n\ndef main():\n    fig = make_plot()\n    # This is okay\n    st.markdown(\"This is okay\")\n    st.altair_chart(fig)\n    \n    # This creates multiple charts instead of one chart\n    st.markdown(\"This creates multiple chart, each for a 'site'/column value\")\n    with st.container():\n        st.altair_chart(fig, use_container_width=True)\n\n\nif __name__ == '__main__':\n    main()\n```\n\n\n### Steps To Reproduce\n\n1. Save the above code in a script, and run `streamlit run app.py`.\n\n### Expected Behavior\n\nExpecting a single grouped bar chart is created and spans over the width of the container, rather than having multiple charts created when rendering with `st.altair_chart(fig, use_container_width=True)`.\n\n### Current Behavior\n\nCurrent behavior is: multiple charts for each column/group is created.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.33.0\n- Python version: 3.11.7\n- Operating System: MacOS 14.4\n- Browser: Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-04-18T09:47:48Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-8531)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-06-06T23:55:47Z",
+      "body": "Hey [USER] Thanks for the issue.\r\n\r\nSo the problem is this faceted chart in vega ignores any hints from us about the responsive width. I think the goal would be to make sure vega can address this issue in their code, so we don't have to calculate the optimal size for each chart.\r\n\r\nThere is certainly more we can do to better inform the users, but we will keep track of updates."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-08T18:13:57Z",
+      "body": "Running the snippet on current develop, `st.altair_chart(fig, use_container_width=True)` renders a single grouped bar chart \u2014 one shared y-axis, one column per site \u2014 instead of splitting into a separate chart per site value. Facet charts now deliberately opt out of container-width stretching and render at their natural size, which is what removed the splitting.\n\nThe second half of the issue \u2014 that the single chart spans the container width \u2014 is not fixed, and is tracked separately in #9091. It's an upstream limitation: Vega-Lite doesn't support responsive fit sizing for faceted, concatenated, or repeated views (vega-lite#5219 (https://github.com/vega/vega-lite/issues/5219)), so `width=\"stretch\"` is currently a no-op for these charts. In a 736px container the chart renders at 484px. Please follow #9091 for that half.\n\nPlease note: `use_container_width=True` is deprecated in favour of `width=\"stretch\"`. Both behave identically for this chart."
+    }
+  ]
+}

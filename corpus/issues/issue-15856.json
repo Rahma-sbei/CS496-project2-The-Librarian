@@ -1,0 +1,34 @@
+{
+  "id": "issue-15856",
+  "type": "issue",
+  "number": 15856,
+  "url": "https://github.com/streamlit/streamlit/issues/15856",
+  "title": "st.login(): expose_tokens ignored with st.App(secrets=...)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:st.secrets",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.user",
+    "area:server",
+    "feature:st.login",
+    "feature:authentication"
+  ],
+  "created_at": "2026-07-06T22:14:59Z",
+  "closed_at": "2026-07-07T14:37:42Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nexpose_tokens ignored when using st.App(secrets=...)\nI\u2019m using Streamlit 1.59.0 with st.App(..., secrets=...) and built-in auth.\n\nLogin works, and st.secrets[\"auth\"][\"expose_tokens\"] is available inside the app, but st.user.tokens.to_dict() remains empty.\n\n**Expexted** : \n`st.user.tokens.to_dict()` should return {\"access\": \"...\"}\n\n**Actual**:\n`st.user.tokens.to_dict()` returns {}\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\napp = st.App(\n    script_path=\"main.py\",\n    secrets={\n        \"auth\": {\n            \"redirect_uri\": \".../oauth2callback\",\n            \"cookie_secret\": \"...\",\n            \"expose_tokens\": [\"access\"],\n            \"okta\": {\n                \"client_id\": \"...\",\n                \"client_secret\": \"...\",\n                \"server_metadata_url\": \"...\",\n            },\n        }\n    },\n)\n\nst.login(\"okta\")\nst.write(st.user.tokens)\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n`st.user.tokens.to_dict()` should return {\"access\": \"...\"}\n\n### Current Behavior\n\n`st.user.tokens.to_dict()` returns {}\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n**Environment**:\n- Streamlit 1.59.0\n- Python 3.11\n- Auth provider: Okta\n\n### Additional Information\n\n**Codex analyse** :\nissue is in streamlit/web/server/starlette/starlette_websocket.py.\nexpose_tokens is read once when the WebSocket handler is created:\n\ndef create_websocket_handler(runtime):\n    expose_tokens = get_expose_tokens_config()\nBut with st.App(secrets=...), programmatic secrets seem to be merged later during app startup/lifespan. So the handler may capture expose_tokens=[] before the injected secrets are available.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-06T22:15:10Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15856)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-07T08:57:28Z",
+      "body": "### Triage summary\n\nThis is a **bug** in the `st.login` / OIDC token exposure feature (`expose_tokens` \u2192 `st.user.tokens`) when secrets are provided programmatically via `st.App(secrets=...)` instead of a `secrets.toml` file.\n\n**Likely root cause:** The `expose_tokens` config is read **once, eagerly, at route-registration time** rather than per-connection. In `create_websocket_handler`, the value is captured in a closure before the connection handler is defined:\n\n```python\n# lib/streamlit/web/server/starlette/starlette_websocket.py:387\nexpose_tokens = get_expose_tokens_config()\n```\n\nHowever, with `st.App(secrets=...)`, programmatic secrets are merged **later**, during the lifespan/auto-start phase (`secrets_singleton.merge_programmatic_secrets(...)` in `starlette_app.py`, ~lines 746 and 900), which runs *after* the routes/handler are built in `_build_asgi_app` (`create_streamlit_routes` \u2192 `create_websocket_handler`). As a result `get_expose_tokens_config()` reads the not-yet-merged secrets and captures `expose_tokens = []`, so the token-filtering loop (`for token_type in expose_tokens`) produces an empty dict \u2014 even though `st.secrets[\"auth\"][\"expose_tokens\"]` reads correctly at runtime (post-merge). A likely fix is to evaluate `get_expose_tokens_config()` lazily inside `_websocket_endpoint` (per-connection) rather than capturing it at handler-creation time.\n\n### Related Issues\n\n- [#15854 \u2014 expose_tokens ignored with st.App(secrets=...)](https://github.com/streamlit/streamlit/issues/15854): Near-identical (now closed) report of the same bug; effectively a duplicate.\n- [#10378 \u2014 Option to Return Access Token in st.login](https://github.com/streamlit/streamlit/issues/10378): The feature request that introduced `expose_tokens` / `st.user.tokens`; this issue is a defect in that feature under the `st.App(secrets=...)` code path.\n- [#10543 \u2014 Set `[auth]` secrets config from environment variables or through st.login](https://github.com/streamlit/streamlit/issues/10543): Related to configuring auth secrets outside of `secrets.toml`, the same programmatic-secrets mechanism that triggers this bug.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

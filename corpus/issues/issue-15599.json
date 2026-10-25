@@ -1,0 +1,27 @@
+{
+  "id": "issue-15599",
+  "type": "issue",
+  "number": 15599,
+  "url": "https://github.com/streamlit/streamlit/issues/15599",
+  "title": "Selectbox dropdown renders behind st.dialog (options hidden, mouse clicks don't register)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P2",
+    "feature:st.selectbox",
+    "feature:st.popover",
+    "feature:st.dialog"
+  ],
+  "created_at": "2026-06-16T14:47:58Z",
+  "closed_at": "2026-06-17T20:42:13Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen an `st.selectbox` is placed inside an `st.dialog`, opening its dropdown renders the option list **behind** the dialog. The options are visually hidden and mouse clicks fall through to the widgets stacked on top, so the selection never changes. Keyboard selection (\u2193 + Enter) still works, which is the giveaway that the options exist but are not reachable by mouse.\n\n### Reproducible Code Example\n\n```python\nimport streamlit as st\n\n[USER].dialog(\"Dialog with selectboxes\")\ndef show_dialog():\n    a = st.selectbox(\"First\", [\"one\", \"two\", \"three\", \"four\", \"five\"], key=\"a\")\n    b = st.selectbox(\"Second\", [\"alpha\", \"beta\", \"gamma\"], key=\"b\")\n    c = st.selectbox(\"Third\", [\"red\", \"green\", \"blue\"], key=\"c\")\n    st.write({\"First\": a, \"Second\": b, \"Third\": c})\n\nif st.button(\"Open dialog\"):\n    show_dialog()\n```\n\n### Steps To Reproduce\n\n1. Run the app and click **Open dialog**.\n2. Click the **First** selectbox to open its dropdown.\n3. Try to pick an option with the mouse.\n\n### Expected Behavior\n\nThe dropdown option list appears on top of the dialog, and clicking an option selects it (as it does for a selectbox outside a dialog).\n\n### Current Behavior\n\nThe dropdown is painted **behind** the dialog, so the options are hidden, and mouse clicks land on the dialog's other widgets instead of the options. The selection does not change. Selecting with the keyboard (Arrow keys + Enter) does work.\n\nRoot cause is a stacking-order/z-index mismatch:\n\n- The dropdown `[data-testid=\"stSelectboxVirtualDropdown\"]` is portaled to `<body>` with `z-index: 100000`.\n- `st.dialog` (`[data-testid=\"stDialog\"]`) renders at `z-index: 1000060`.\n\nBecause the dialog's z-index is higher, it (and its child widgets) paint over the dropdown. Confirmed via `document.elementFromPoint()` over an open option's center \u2014 it returns the `stSelectbox` element above it, not the option, so the option never receives the click.\n\nWorkaround (lifts the dropdown above the dialog):\n\n```python\nst.markdown(\n    \"<style>[data-testid='stSelectboxVirtualDropdown']{z-index:1000070!important}</style>\",\n    unsafe_allow_html=True,\n)\n```\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\nAppears tied to the migration away from BaseWeb for `st.selectbox` (#15438), which introduced `stSelectboxVirtualDropdown`. The previous BaseWeb popover layered correctly inside dialogs.\n\n### Debug info\n\n- Streamlit version: 1.58.1.dev20260610\n- Python version: 3.11.11\n- Operating System: macOS 26.5\n- Browser: Chrome\n\n### Additional Information\n\n- Affects every `st.selectbox` inside an `st.dialog` (the more fields below the selectbox, the more obviously the options are covered).\n- Likely related component change: #15438 (\"Remove `BaseWeb` for `selectbox`\").\n- Possibly related dialog/popover layering reports: #13633, #13859.\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-16T14:48:11Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15599)\n"
+    }
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "id": "issue-11010",
+  "type": "issue",
+  "number": 11010,
+  "url": "https://github.com/streamlit/streamlit/issues/11010",
+  "title": "v1.44.0/1 significant slower and also shows weird behavior with multi-page app",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "status:unlikely",
+    "feature:st.page_link"
+  ],
+  "created_at": "2025-04-02T19:38:57Z",
+  "closed_at": "2026-06-13T13:44:02Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nThe update to v1.44.0 and v1.44.1 appears to significantly slower. Especially the sidebar shows far more flicker and higher load times then before?\n\nAlso, with the new release I'm seeing a \"Page cannot to be found\" dialog/error, which did not happen before. I understand this can happen (likely might) because of a bug in my code but the app does not provide any insight as to what is missing or where to check.\n\nI'm using st.switch_page()\n\n\nIs there any way I can debug this on my own?\n\nHelp is appreciated. Thanks in advance!\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-04-02T19:39:13Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11010)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-04-02T20:29:33Z",
+      "body": "Hello [USER] , thank you for filing this ticket!\n\nIt would be very helpful to get some more clarification on what you're experiencing. It sounds like there are 2 things here, so I will break it into sections. For both of these scenarios, providing minimal repros would be very appreciated!\n\n---------------\n\n1. \"The update to v1.44.0 and v1.44.1 appears to significantly slower. Especially the sidebar shows far more flicker and higher load times then before?\"\n\nCan you be more specific about \"sidebar showing far more flicker?\" This is visual flicker that happens when? On page load? When interacting with the sidebar? When expanding/collapsing the sidebar?\n\nWhen it comes to higher load time, can you narrow this down? Is this slower backend response times? Slower render times? \nIs this happening when developing locally? Or when it's deployed somewhere? There are a lot of variables when it comes to performance!\n\nOne thing that could be helpful for debugging frontend performance is to get [a Performance Trace using Chrome Devtools](https://developer.chrome.com/docs/devtools/performance#record). This produces a trace .json file. You could also get traces for different versions of Streamlit 1.43 vs 1.44 and compare them. If you could get performance traces for these scenarios and share them with us, that would be great!\n\n---------------\n\n2. \"Also, with the new release I'm seeing a \"Page cannot to be found\" dialog/error\"\n\nThere are a number of different places where an error in this vein could show up in Streamlit. Are you able to create a minimal repro of this error? With a minimal repo, are you able to validate that it works in previous versions of Streamlit? That will help us in pinpointing any possible issues.\n\nThanks again!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-16T16:51:38Z",
+      "body": "[USER] I'm sorry for taking so long to answer but I'm really swamped. The \"Page cannot to be found\" is resolved, it was an internal issue but only showed with the new release. Also, the fact that streamlit did not indicate what page was missing didn't make things easier but there's always the debugger. \n\nAs for the rendering and sidebar. I'm using a multi-page app and orchestrate the menu myself using st.page_link(...). It worked great so far and is much cleaner.\n\nStarting with v1.41.0 and also in v1.41.1 the entire sidebar seems to always get reloaded any time one moves from one menu entrance to the next. This causes visual flickering and is not great for the UX, to say the least.\n\nIn initially I thought it is cause by my modifications using st.markdown(...)\n`    # set sidebar gradient background color\n    # st.markdown(\n    #     \"\"\"\n    # <style>\n    # .st-emotion-cache-6qob1r {\n    #     position: relative;\n    #     height: 100%;\n    #     width: 100%;\n    #     overflow: overlay;\n    #     /* background: linear-gradient(to bottom, #FFFFFF, #F0F7FF); 45deg > 678AFF */\n    #     background: linear-gradient(290deg, #678AFF, transparent);\n    # }\n    # </style>\n    # \"\"\",\n    #     unsafe_allow_html=True,\n    # )\n`\nbut I have removed ALL of it and still no change. \n\nThe strange thing is this. If I create a project from scratch in the same way I don't experience this behavior! I just can't figure out where to look. \n\nI'd be really grateful for some help in this matter as it really does. not look good. Thanks in advance."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-04-21T21:05:16Z",
+      "body": "Thank you for the additional info [USER]! I synced with the team on this and it seems like the sidebar visual flicker is a known issue with the refactoring that was done to align the implementation details of our approaches to building Multipage apps.\n\nIf you are attempting to orchestra the menu yourself, our recommendation is to utilize `st.navigation` with `position=\"hidden\"` on the main file, and then manually add the `st.page_link` commands into the Sidebar. Something like this should prevent the sidebar from flickering in this case:\n\n```python\npg = st.navigation(\n    [\n        \"pages/page_1.py\",\n        \"pages/page_2.py\",\n    ],\n    position=\"hidden\",\n)\n\npg.run()\n\nwith st.sidebar:\n    st.page_link(\"pages/page_1.py\", label=\"Page 1\")\n    st.page_link(\"pages/page_2.py\", label=\"Page 2\")\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-24T14:02:27Z",
+      "body": "[USER], thanks for the update on the topic. Trouble is, I don't know how to use this within my context. \n\nLet me try to explain my use case, in hope you can help solve it. The flickering sounds like not much, but I'm getting a lot of heat for it.\n\nAll my pages call make_sidebar() based on login status. I can't see why this would cause flickering?\n\nHere's some more detail:\n\nI created a `navigation.py` with logic to load pages from a .yaml file, e.g.\n\n    `\n    sections:\n      - name: \"Home\"\n        expanded: true\n        icon: \":material/home_app_logo:\"\n        pages:\n          - path: \"pages/0_Main_Page.py\"\n            label: \"Home\"\n            icon: \":material/manage_search:\"\n          - path: \"pages/1_Manage_Classes.py\"\n            label: \"Manage Classes\"\n            icon: \":material/school:\"\n          - path: \"pages/2_Start_Class.py\"\n            label: \"Start Class\"\n            icon: \":material/record_voice_over:\"\n    `\nthe `load_entity_navigation` function reads the yaml.\n\nwithin that file I have a function that set's the sidebar. The main logic is:\n\n      `  \n      def make_sidebar(sidebar_state=st.session_state.get(\"initial_sidebar_state\", \"auto\")):\n          with st.sidebar:\n              if st.session_state.get(\"login_status\", False):\n                  st.logo(\n                      image=f\"{config.LOGO_PATH}\",\n                      size=\"large\",\n                      link=f\"{config.LOGO_LINK}\",\n                      icon_image=f\"{config.LOGO_PATH_SMALL}\",\n                  )\n      \n                  st.markdown(\n                      f\"\"\"<p style='color: #525252; margin-top: -20px;'>Active user: {st.session_state[\"userinfo\"][\"preferred_username\"]} ({st.session_state[\"userinfo\"][\"entity_org\"]})</p>\"\"\",\n                      unsafe_allow_html=True,\n                  )\n      \n                  # Check if YAML configuration exists for this entity\n                  entity_config = None\n                  if st.session_state.login_user:\n                      entity_config = load_entity_navigation(st.session_state.login_user)\n      \n      ......\n      \n              elif get_current_page_name() != \"Home\":\n                  # If anyone tries to access a secret page without being logged in, redirect them to the login page\n                  st.switch_page(\"gui/Home.py\")\n      \n      `\nI adjusted `get_current_page_name` after your refactoring to retrieve the proper name of the current page.\n\n      `\n      from streamlit.runtime.scriptrunner import get_script_run_ctx\n          #\n      def get_current_page_name():\n          ctx = get_script_run_ctx()\n      \n          # we can local info like timezone froom ctx object.\n          if ctx is None:\n              raise RuntimeError(\"Couldn't get script context\")\n      \n          page_name = Path(ctx.main_script_path).stem\n          # logger.info(f\"Current page name: {page_name}\")\n      \n          return page_name\n      `\n\nI am using st.page_link e.g.\n\n      `                            \n      def make_sidebar(sidebar_state=st.session_state.get(\"initial_sidebar_state\", \"auto\")):\n      \n                                # Render pages in this section\n                                  for page in section.get(\"pages\", []):\n                                      st.page_link(\n                                          page[\"path\"],\n                                          label=page.get(\"label\", os.path.basename(page[\"path\"])),\n                                          icon=page.get(\"icon\", \"\"),\n                                      )\n      `\n\n__________________________________________\n\nI love your product, but frankly, the navigation concept is a total mess and feels unsupported. Every reasonable app requires more sophisticated menu management than what is available.\n\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-30T22:26:04Z",
+      "body": "Any news on this. My perfectly fine app now flickers like a bad website from the '90th. What happened?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-09-15T18:27:44Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-11010)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-13T13:44:02Z",
+      "body": "Closing this since we won't bring back the old `page_link` optimization we had in some older versions. Using `st.navigation` is the suggested way for the most optimized multipage setup."
+    }
+  ]
+}

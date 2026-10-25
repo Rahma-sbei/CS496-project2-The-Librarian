@@ -1,0 +1,32 @@
+{
+  "id": "issue-16977",
+  "type": "issue",
+  "number": 16977,
+  "url": "https://github.com/streamlit/streamlit/issues/16977",
+  "title": "Scroll to st.chat_input",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:layout",
+    "area:frontend",
+    "status:confirmed",
+    "priority:P2",
+    "feature:st.chat_input"
+  ],
+  "created_at": "2026-09-15T12:26:27Z",
+  "closed_at": "2026-09-17T17:19:53Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nPlacing `st.chat_input` inside `st.bottom` causes an otherwise non-chat page to scroll to the bottom immediately on initial load, without any user interaction or chat messages. This hides the heading and initial content when using the bottom container for a persistent assistant alongside a dashboard. Replacing only `st.chat_input` with `st.text_input` prevents the unsolicited scrolling.\n\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nst.title(\"Dashboard heading\")\nfor number in range(30):\n    st.write(f\"Dashboard row {number}\")\n\nwith st.bottom:\n    st.chat_input(\"Ask about the dashboard\")\n```\n\n### Steps To Reproduce\n\n1. Install `streamlit==1.63.0` and run the example with `streamlit run app.py`.\n2. Open a fresh browser tab/context with a viewport around 1280 x 720, so the main content exceeds the viewport height.\n3. Do not click, type, or scroll. Wait for rendering to settle.\n4. Observe that the main page has scrolled to the bottom and the dashboard heading is offscreen.\n5. As a control, replace `st.chat_input` with `st.text_input`, restart/reload in a fresh browser context, and observe that the page stays at the top.\n\nNo custom CSS, JavaScript, Snowflake connection, fragments, tabs, navigation, or third-party component is needed to reproduce this.\n\n### Expected Behavior\n\nAn initial dashboard load should remain at the top. A bottom-docked input should not make non-chat content above it auto-scroll before any conversation exists. If automatic scrolling is intentional for chat-first apps, an opt-out for this mixed dashboard/assistant use case would be helpful.\n\n\n### Current Behavior\n\nThe page scrolls to the bottom on its own. In three fresh Chrome contexts per variant, measured after rendering settled at a 1280 x 720 viewport:\n\n| Bottom widget | Main scrollTop | Main scrollHeight | Main clientHeight |\n| --- | ---: | ---: | ---: |\n| `st.chat_input` (all 3 runs) | 843 | 1563 | 720 |\n| `st.text_input` (all 3 control runs) | 0 | 1573 | 720 |\n\nThe scroll position was read from the main scrollable section (`section.stMain`), not `window.scrollY`. No Streamlit exception was displayed. Measurements used Playwright with installed Chrome in headless mode; the same symptom was first noticed in interactive Chrome in a larger app.\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.63.0 (also the latest GitHub release at the time of filing)\n- Python version: 3.14.3\n- Operating System: macOS 26.6, ARM64\n- Browser: Google Chrome 152.0.7977.83\n- Deployment: local `streamlit run`, default theme for the minimal example\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-15T12:26:45Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16977)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-15T14:47:04Z",
+      "body": "Placing `st.chat_input` in `st.bottom` (or calling it at the main-app root, which enqueues it there) is currently treated as a chat layout: `AppView` swaps `stMain` for `ScrollToBottomContainer`, and `useScrollToBottom` sets stickiness on first load so the main section animates to the bottom. That matches the control in the report (`st.text_input` in `st.bottom` does not activate this path) and the e2e guard that only skips auto-scroll when the bottom container has no chat input. The behavior is intentional for chat-first apps (kept on purpose in the `st.bottom` public API work), but it is a poor default for mixed dashboard + assistant pages because the heading and initial content are scrolled offscreen before any messages exist. A fix would likely mean not auto-scrolling on initial load unless chat content is present, or adding an explicit opt-out.\n\n### Related Issues\n\n- [#13249](https://github.com/streamlit/streamlit/issues/13249) \u2014 Same auto-scroll / stick-to-bottom machinery on containers; related UX for users who need control over when the view jumps to the latest content.\n- [#8363](https://github.com/streamlit/streamlit/issues/8363) \u2014 Open report of unexpected main-area scroll interaction when `st.chat_input` / `st.chat_message` are present (jitter rather than a one-shot jump to the bottom).\n- [#8836](https://github.com/streamlit/streamlit/issues/8836) \u2014 Original request for \u201cscroll to bottom\u201d chat/log behavior; that feature is what this dashboard layout is hitting on load.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

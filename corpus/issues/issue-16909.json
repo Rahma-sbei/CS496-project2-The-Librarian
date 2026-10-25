@@ -1,0 +1,38 @@
+{
+  "id": "issue-16909",
+  "type": "issue",
+  "number": 16909,
+  "url": "https://github.com/streamlit/streamlit/issues/16909",
+  "title": "st.data_editor NumberColumn: typing a value starting with \".\" (no leading zero) drops the decimal point and reads digits as a whole number",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:frontend",
+    "status:confirmed",
+    "priority:P2",
+    "feature:st.data_editor",
+    "feature:st.column_config",
+    "upstream"
+  ],
+  "created_at": "2026-09-09T21:45:45Z",
+  "closed_at": "2026-09-18T11:44:49Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen a NumberColumn cell is selected and you type a value that starts with `.` (e.g. `.01`), the `.` is silently dropped and the remaining digits are committed as a whole number \u2014 `.01` becomes `1`, `.07` becomes `7`. Typing the same value with a leading zero (`0.01`) works correctly, and **pasting** `.01` into the cell also works correctly. So this is specific to the character-by-character typed-entry path.\n\nImpact\nThis is a real-world data-entry trap: any user in the habit of typing .01-style shorthand (common for percentage/margin fields) silently enters a value the cell just shows a plausible-looking wrong number.\n\n### Reproducible Code Example\n\n```Python\nimport pandas as pd\nimport streamlit as st\ndf = pd.DataFrame({\"Customer\": [\"A\", \"B\"], \"Margin\": [12.0, 8.0]})\nst.data_editor(\n    df,\n    column_config={\n        \"Margin\": st.column_config.NumberColumn(\"Margin\", format=\"%.4f\", step=0.0001),\n    },\n)\n```\n\n### Steps To Reproduce\n\nClick the Margin cell for row A (shows 12.0000).\nType .07 (as literal keystrokes: ., 0, 7).\nPress Enter.\n\n\n\n### Expected Behavior\n\nExpected: cell shows 0.0700.\n\n\n### Current Behavior\n\nActual: cell shows 7.0000.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\nStreamlit version: 1.61.1\nPython version: 3.12/3.14\nBrowser: Chrome\nOS: Windows\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-09T21:45:54Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16909)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-09T23:50:09Z",
+      "body": "This is a frontend bug in `st.data_editor` `NumberColumn`: typing a value that starts with `.` (e.g. `.07`) silently drops the decimal, so the remaining digits commit as an integer (`7.0000` instead of `0.0700`). Pasting `.01` and typing `0.01` both work, which matches the two different input paths. Streamlit\u2019s own parsers are not the problem \u2014 `toSafeNumber` / `NumberColumn.getCell` already accept leading-dot strings such as `\".1312314\"` (covered by unit tests), and paste goes through `getCell` with the full string. Typed entry instead uses Glide Data Grid\u2019s built-in `GridCellKind.Number` overlay (`react-number-format`), which Streamlit does not replace (`useCustomEditors` returns `undefined` for number cells). That overlay is a controlled numeric input that reports a JS `floatValue` on every keystroke; a lone `.` is not a valid number, so the decimal is discarded and later digits are read as a whole number. A fix would keep the in-progress text (similar to `st.number_input`\u2019s `formattedValue`) or patch the overlay so incomplete input like `.` / `.0` is preserved.\n\n### Related Issues\n\n- [#16129](https://github.com/streamlit/streamlit/issues/16129) \u2014 Same Glide `NumberColumn` overlay editor; IME composition committed after the first keystroke. Streamlit already patches that overlay for #16129, so this is another overlay typing-path bug rather than a `getCell` parsing issue.\n- [#12886](https://github.com/streamlit/streamlit/issues/12886) \u2014 Similar \u201cdecimal disappears while typing\u201d symptom in `st.number_input` (`1.0` collapsing to `1`). Related UX, but a different widget and input implementation; not a duplicate.\n- [#11519](https://github.com/streamlit/streamlit/issues/11519) \u2014 Another `NumberColumn` editing-path numeric distortion (`4.52` rounding to `4.51` with `step`/`format`). Same feature area, different failure mode.\n\nNo exact duplicate of the leading-`.` typed-entry case was found.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-10T12:59:59Z",
+      "body": "Thanks [USER] I was able to reproduce this with the app here: https://issues.streamlit.app/?issue=gh-16909"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "issue-13473",
+  "type": "issue",
+  "number": 13473,
+  "url": "https://github.com/streamlit/streamlit/issues/13473",
+  "title": "Issue with MIME type ('text/plain') when using local echarts.min.js in Streamlit",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:static-file-serving"
+  ],
+  "created_at": "2025-12-27T05:37:57Z",
+  "closed_at": "2026-06-14T19:50:31Z",
+  "body": "I am trying to use a local `echarts.min.js` file and have configured my project as follows:\n\n```\nproject\n\u251c\u2500\u2500 .streamlit/\n\u2502   \u2514\u2500\u2500 config.toml\n\u251c\u2500\u2500 static/\n\u2502   \u2514\u2500\u2500 echarts.min.js\n\u2514\u2500\u2500 app.py\n```\n\nThe content of `.streamlit/config.toml` is:\n```toml\n[server]\nenableStaticServing = true\n```\n\nI added the `CurrentConfig` settings in my Python script:\n```python\nfrom pyecharts.globals import CurrentConfig\nCurrentConfig.ONLINE_HOST = \"/app/static/\"\n```\n\nI have already set the `Content Type` value to `application/javascript` in the following registry keys: \n- `HKEY_CLASSES_ROOT\\.js`\n- `HKEY_LOCAL_MACHINE\\SOFTWARE\\Classes\\.js`\n- `HKEY_CURRENT_USER\\SOFTWARE\\Classes\\.js`\n\nRunning `python -c \"import mimetypes; print (mimetypes.guess_type('echarts.min.js'))\"` in the terminal also returns `('application/javascript', None)`.\n\nHowever, when running the Python file, the browser console shows the following error:\n```\nRefused to execute script from 'http://localhost:8501/app/static/echarts.min.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled.\nabout:srcdoc:13 Uncaught ReferenceError: echarts is not defined\nat about:srcdoc:13:54\n```\n\nI tried adding `mimetypes.add_type('application/javascript', '.js')` at the top of my Python file to force the correct MIME type for `.js` files, but the error persists. How can I resolve this issue?\n\nThank you!\n\n\n- Streamlit version: 1.52.2\n- Python version: 3.11.3\n- Operating System: win11\n- Browser: Google Chrome 143.0.7499.42",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-27T05:38:10Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-13473)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-12-29T06:34:04Z",
+      "body": "Hi [USER], thanks for you submission!\nThis is actually expected behavior in that static file serving does not currently support JS files (see documentation [here](https://docs.streamlit.io/develop/concepts/configuration/serving-static-files)). Because it is not an accepted file extension, the handler explicitly overrides the MIME type to `text/plain` for any `.js` file served via `static/`. This decision was made for security reasons.\n\nSwitching this to and enhancement request. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-29T06:34:30Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-13473)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-14T19:50:31Z",
+      "body": "We recently changed our static serving to always serve with the correct mime type"
+    }
+  ]
+}

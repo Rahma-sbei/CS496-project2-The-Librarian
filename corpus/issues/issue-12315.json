@@ -1,0 +1,38 @@
+{
+  "id": "issue-12315",
+  "type": "issue",
+  "number": 12315,
+  "url": "https://github.com/streamlit/streamlit/issues/12315",
+  "title": "When uploading multiple files with st.chat_input, the X to remove file is not visually close to its file",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.chat_input"
+  ],
+  "created_at": "2025-08-25T21:57:18Z",
+  "closed_at": "2026-07-22T09:37:56Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWe recently added directory upload to st.chat_input, making it easy to upload many files. When viewing those files above chat input, the X to remove a file is not clearly visually associated to the correct file. It's equidistant from its intended file and neighbor. This is confusing when scrolled in the middle of a file list.\n\n<img width=\"814\" height=\"159\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/75f06f5b-7e04-4c3e-8ecb-df8a096bc954\" />\n\n\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nm = st.chat_input(\"Type a message\", accept_file=\"directory\")\nif m and m[\"files\"]:\n    m[\"files\"]\n```\n\n### Steps To Reproduce\n\n1. Run the app\n2. Upload a directory with multiple files to fill the horizontal scroll width\n\n### Expected Behavior\n\nThe X to remove a file should be visually clearly associated to its file.\n\n### Current Behavior\n\nThe X to remove a file isn't visually clearly associated to its file.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.48.2.dev20250824\n- Python version: 3.13\n- Operating System: Mac\n- Browser: Prism\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-08-25T21:57:33Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-12315)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-08-25T23:16:56Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12315)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-08-25T23:17:05Z",
+      "body": "Makes sense! We want to change the design here anyway, so will probably fix as part of that. Turning into an enhancement request since it's not technically a bug. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T09:37:56Z",
+      "body": "Closing this since we changed the design recently."
+    }
+  ]
+}

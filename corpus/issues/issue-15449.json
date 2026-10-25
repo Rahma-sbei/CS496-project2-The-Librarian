@@ -1,0 +1,46 @@
+{
+  "id": "issue-15449",
+  "type": "issue",
+  "number": 15449,
+  "url": "https://github.com/streamlit/streamlit/issues/15449",
+  "title": "Support `bind=\"query-params\"` in `st.expander` and `st.tabs`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:query-params",
+    "feature:st.expander",
+    "feature:st.tabs"
+  ],
+  "created_at": "2026-06-05T13:39:50Z",
+  "closed_at": "2026-09-21T16:59:04Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nAdd support for `bind=\"query-params\"` in `st.expander` and `st.popover`.\n\n### Why?\n\nI love both the new `bind=\"query-params\"` feature, as well as the new \"dynamic\" `st.expander` (#13888), `st.tabs` (#13910), and `st.popover` (#13914) feature, and I'd like to use them together.\n\n### How?\n\nSupport `bind=\"query-params\"` in `st.expander()`, `st.tabs()`, and `st.popover()`.\n\n### Additional Context\n\nAs a workaround for `st.tabs(bind=\"query-params\")`, I have been using `st.segmented_control(bind=\"query-params\")`, but it's not as nice visually.\n\nFor a while now, in my app, I hacked together a dynamic expander + query param, using a `st.button`. It works, but it's messy.\n```py\nfrom typing import Callable\n\nimport streamlit as st\n\n\ndef set_bool_query_param(key: str, value: bool):\n    \"\"\"Set a boolean query parameter in the URL.\"\"\"\n    if value:\n        st.query_params[key] = value\n    else:\n        st.query_params.pop(key, None)\n\n\n[USER].fragment\ndef dynamic_expander(\n    label: str,\n    content: Callable,\n    *,\n    key: str,\n    help: str | None = None,  # noqa: A002 Shadowing a Python builtin\n):\n    \"\"\"Create an expander that only generates the content if it is expanded.\n\n    Unlike `st.expander()`, which is a frontend component that always generates the content,\n    this `dynamic_expander()` only generates the content if it is expanded.\n    \"\"\"\n    expanded = key in st.query_params\n\n    button = {\n        \"label\": label,\n        \"help\": help,\n        \"type\": \"tertiary\",\n        \"icon\": f\":material/expand_{'less' if expanded else 'more'}:\",\n    }\n\n    with st.container(border=True, key=key):\n        placeholder = st.empty()\n        if expanded:\n            placeholder.button(key=f\"{key}_button_disabled\", disabled=True, **button)\n\n            try:\n                with st.spinner(\"Loading...\"):\n                    content()\n            except Exception as e:\n                st.exception(e)\n\n        placeholder.button(\n            key=f\"{key}_button\",\n            on_click=set_bool_query_param,\n            args=(key, not expanded),\n            **button,\n        )\n\n\ndef example():\n    st.write(\"Content\")\n\n\ndynamic_expander(\"Example\", example, key=\"example\")\n```",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-05T13:40:02Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-15449)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-07T16:18:58Z",
+      "body": "Good catch. I'll keep this in mind for my own projects."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-16T17:54:36Z",
+      "body": "Hi [USER], thanks for your submission!\n\nI am currently working on extending `bind=\"query-params\"` in `st.expander` & `st.tabs` but am conflicted on whether it should be enabled for `st.popover` - do you have a use case for this?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-16T23:02:57Z",
+      "body": "Hi [USER]!\n\nThanks for you interest in this issue. \u2764\ufe0f\n\nI personally have encountered use cases for `bind=\"query-params\"` in `st.expander` and in `st.tabs`, but not in `st.popover`. My reasoning was that `st.expander` and `st.popover` have a very similar API, so I would expect them to support the same features. And I'm sure someone (or maybe me on the future \ud83d\ude1d) could one day encounter a use case for it in `st.popover` too.\n\nThat said, if the implementation differs for `st.popover`, for technical reasons, I wouldn't hold on to `st.expander` and `st.tabs`; they can be considered two distinct feature requests. Let me know if you'd like me to file a new issue or something."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-21T16:59:04Z",
+      "body": "Closing this issue as support for `bind=\"query-params\"` has now been implemented in `st.expander` (https://github.com/streamlit/streamlit/pull/15462) and `st.tabs` (https://github.com/streamlit/streamlit/pull/16988) - will be included in `1.65.0` release"
+    }
+  ]
+}

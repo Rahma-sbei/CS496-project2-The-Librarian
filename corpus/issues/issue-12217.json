@@ -1,0 +1,75 @@
+{
+  "id": "issue-12217",
+  "type": "issue",
+  "number": 12217,
+  "url": "https://github.com/streamlit/streamlit/issues/12217",
+  "title": "Add `height=\"stretch\"` to `st.tabs`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "area:layout",
+    "feature:st.tabs"
+  ],
+  "created_at": "2025-08-14T15:27:03Z",
+  "closed_at": "2026-07-14T05:40:02Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nIn 1.48 AdvancedLayout features were added, but st.tabs was not updated to support it. Specially the \"height\" property.\n\n### Why?\n\nFor completenes and make the new AdvanceLayouts works when you use st.tabs.\n\nAs of now, I have to add custom CSS with more or less complicated selectors to be able to change the height of the generated and intermediate containers.\n\n### How?\n\n[USER] knows how :-)\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-08-14T15:27:15Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12217)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-08-14T15:33:03Z",
+      "body": "[USER] just to clarify, do you want something like `height = \"stretch\" | \"content\" | int` for the tab container. Then, when a height is provided, if the content overflows, the container will be scrolling similar to `st.container`. \n\nIn the meantime, adding a fixed height container around the tabs might achieve something similar. But maybe I don't fully understand what you are trying to do. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-14T17:44:12Z",
+      "body": "The AdvancedLayout features allow you to configure how the container works. Tabs are also a container, so they should allow you to also select how the generated container(s) works. Without it, it just breaks the AdvanceLayout experience.\n\nIn the meantime, I'm just making it work with CSS, just as I had it working before 1.48, but now I wanted to drop my custom css and use streamlit native feature."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-14T17:50:10Z",
+      "body": "Fixed height doesnt work for me. I need it to adjust dynamically to the page height.\n\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-08-14T18:45:01Z",
+      "body": "I see [USER] , thank you for providing more detail. It sounds like you want something a bit different than what we are providing for `st.container` currently, where the container elements would stretch to the screen height. I will discuss with [USER] . "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-08-14T23:33:04Z",
+      "body": "[USER] I'm not sure I really understand. Do you want:\n\n1. All the parameters we have on `st.container` (such as `height`, `horizontal`, alignment etc) also on `st.tabs`? If yes, we probably won't do this since you can simply use an `st.container` inside of `st.tabs` to achieve all the layout things you want. I don't want to replicate all of these parameters for every single container. \nThe only exception to this could be `height`, which might make sense to add to `st.tabs` as well. The reason we didn't do this so far is that on `st.container`, setting an explicit `height` also always makes the container have a border, but that would look awkward in `st.tabs`. Maybe something to rethink...\n\n2. Have something like `height=\"screen\"`? It's possible we'd support that at some point but probably first for `st.container` and then we might bring it to other elements as well. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-14T23:59:20Z",
+      "body": "First of all, thanks for following up!\n\nI see your logic here, and I agree with you. The main problem I'm currently facing is stTabs and internal div structure are setup with: \"display: block\". So they don't flow nicely inside an st.container that has `height=\"stretch\". containers are using flex layout, so making stTabs to be flex compatible would make things a lot easier.\n\n\n```python\nimport streamlit as st\n\nst.markdown(\"# Example Container Tabs\")\nwith st.container(horizontal=True, height=\"stretch\"):\n    with st.container(border=True, height=\"stretch\"):\n        st.text_area(\"Document 1\", height=\"stretch\")\n\n    with st.container(border=True, height=\"stretch\"):\n        t1, _= st.tabs([\"Tab 1\", \"Tab 2\"])\n        with t1:\n            st.text_area(\"Document 2\", height=\"stretch\")\n\n\nst.markdown(\n    \"\"\"\n    <style>\n        .stMainBlockContainer {\n            border: solid 1px blue;\n            height: 100%;\n        }\n\n        .stMainBlockContainer > div.stVerticalBlock {\n            border: solid 1px red;\n            height: 100%;\n        }\n    </style>\n\"\"\",\n    unsafe_allow_html=True,\n)\n```\n\n<img width=\"828\" height=\"1036\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/9978c980-db5b-4c1a-b7b6-e9782c60d47e\" />\n\nI would like for the content inside the tab to work just like the container on the left. \n\n\nNote: It would be great if we could set the height of the app as well from the API instead of hacking around with css."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-08-15T00:50:57Z",
+      "body": "Oooh gotcha!! Yeah ok I agree for this case we do need `height` on `st.tabs`, otherwise you can't make the tabs container on the right fill the parent container. Btw I think for the parent container above you set a fixed height, otherwise I get a different result than you. Fixed this and simplified the example a bit:\n\n```python\nwith st.container(horizontal=True, height=500):\n    st.container(border=True, height=\"stretch\")\n    tab1, tab2 = st.tabs([\"Tab 1\", \"Tab 2\"])  # need to set `height=\"stretch\"` here\n    tab1.container(height=\"stretch\", border=True)\n```\n\n\n<img width=\"757\" height=\"530\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/48c02a77-9378-417c-855d-c9ae71a59215\" />\n\nBtw [USER] I guess that's related to the min width/flex basis stuff we anyway wanted to have another look at, but I'd also expect that both the container and the tabs container have the same width here. \n\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-08-16T19:13:08Z",
+      "body": "\n[USER] I'm achieving that by setting this (is the custom css in the example):\n```css\n\n        .stMainBlockContainer {\n            border: solid 1px blue;\n            height: 100%;\n        }\n\n        .stMainBlockContainer > div.stVerticalBlock {\n            border: solid 1px red;\n            height: 100%;\n        }\n```\n\nWhich it would be great to be able to set in the `st.set_page_config` call with a `height = \"stretch\"` as well.\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-24T15:12:41Z",
+      "body": "Hi! I\u2019m interested in working on this issue and can start investigating right away"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-15T12:39:13Z",
+      "body": "hey [USER] , would love to contribute to this \n.\n"
+    }
+  ]
+}

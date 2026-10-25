@@ -1,0 +1,268 @@
+{
+  "id": "issue-5908",
+  "type": "issue",
+  "number": 5908,
+  "url": "https://github.com/streamlit/streamlit/issues/5908",
+  "title": "Button or API for users to switch between themes",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:theming"
+  ],
+  "created_at": "2023-01-04T00:59:01Z",
+  "closed_at": "2026-03-08T12:46:45Z",
+  "body": "### Problem\n\nAs of now (version 1.15.2), for users to switch the theme, they have to go to the hamburger menu to access the setting. This is not very intuitive for the end users if they are not familiar with Streamlit. In addition, if I hide the hamburger menu in my app, the users won't be able to change the theme by themselves at all.\n\n### Solution\n\nIt would be nice to have a button outside the hamburger menu for users to quickly switch between light mode and dark mode (or other themes if available). \n\nAnother solution would be to provide an API for switching between the themes, so the developers can implement the theme switcher by themselves if needed.\n\n![Views](https://api.views-badge.org/badge/st-issue-5908)",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2023-01-09T02:49:23Z",
+      "body": "very nice suggestion! "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-02-07T06:43:11Z",
+      "body": "> \r\n\r\nYes! That would be awesome!! I have the same issue and I think that is something that the streamlit team should prioritize! \ud83d\udc4d "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-06-09T04:47:28Z",
+      "body": "Yes ! "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-08-05T19:31:22Z",
+      "body": "Yes, please!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-10-05T07:32:29Z",
+      "body": "yes\uff01 please"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-11-15T12:25:35Z",
+      "body": "+1!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-11-20T13:49:31Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-11-20T16:06:07Z",
+      "body": "Great suggestion!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-11-29T10:30:17Z",
+      "body": "yes"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-12-06T02:07:35Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-12-20T16:05:04Z",
+      "body": "yes"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-12-23T23:06:06Z",
+      "body": "yes"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-12-27T13:39:34Z",
+      "body": "+1\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-01-06T15:05:49Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-01-06T19:35:50Z",
+      "body": "+1\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-01-19T00:13:28Z",
+      "body": "+1\r\nI really thought this would be part of the base code and was going crazy trying to find out how to do it. Great ER please!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-01-27T04:33:19Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-02-08T07:46:01Z",
+      "body": "I also want to access current theme, I created different place holders for both Light and Dark themes but I can't get the Theme value for decide to show which placeholder."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-02-10T04:04:55Z",
+      "body": "I'd love to have this"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-02-13T21:51:08Z",
+      "body": "https://discuss.streamlit.io/t/changing-the-streamlit-theme-with-a-toggle-button-solution/56842"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-02-16T15:52:43Z",
+      "body": "> [discuss.streamlit.io/t/changing-the-streamlit-theme-with-a-toggle-button-solution/56842](https://discuss.streamlit.io/t/changing-the-streamlit-theme-with-a-toggle-button-solution/56842)\r\nIt works, but its server-wide, i have deployed this for an app that i have and the users complained that they can change the theme of session of each other :rofl: \r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-02-20T10:12:15Z",
+      "body": "I think this should be done in a priority basis because there are some gamers who love to change the theme frequently"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-02-29T13:12:18Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-03-01T14:32:35Z",
+      "body": "yes please"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-08T19:43:06Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-12T16:02:16Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-04-27T23:12:01Z",
+      "body": "yes, please allow the users to toggle between custom made themes and allow theme changes to be made programmatically. this would greatly impact the user's experience when app is deployed. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-13T21:06:00Z",
+      "body": "+1"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-05-15T20:33:57Z",
+      "body": "# Update\r\n\r\nHey all! We haven't started working on this but thanks for all the comments and upvotes! I'm not sure if we can move it completely outside of the app menu since then we'd potentially have a lot of controls (especially if deployed on Community Cloud). But I agree having it in the settings dialog is pretty unintuitive. One idea I had was to put a theme switch directly inside of the app menu, similar to the toggles in Notion's page menu below. Any opinions? \r\n\r\n![CleanShot 2024-05-15 at 22 32 54](https://github.com/streamlit/streamlit/assets/5103165/7c61fb1f-e06a-4875-a09a-06a2327b086e)\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-26T16:26:12Z",
+      "body": "+ 1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-27T22:32:39Z",
+      "body": "i think that would work as well"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-27T22:32:48Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-05T10:03:23Z",
+      "body": "+1\r\n\r\nWhy not implement the button for light and dark mode like the one in the streamlit documentation pages? looks very good"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-16T21:01:09Z",
+      "body": "For my application, I use the following code snippet to do this exact thing (on v1.35), tho sometimes the page doesn't refresh properly, hence why I also put a refresh button.. for just in case:\r\n```\r\nif st.toggle(\"Dark Mode\", value=True) is False:\r\n      st._config.set_option(f'theme.base', \"light\")\r\nelse:\r\n      st._config.set_option(f'theme.base', \"dark\")\r\nif st.button(\"Refresh\"):\r\n      st.rerun()\r\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-06-18T05:36:48Z",
+      "body": "> For my application, I use the following code snippet to do this exact thing (on v1.35), tho sometimes the page doesn't refresh properly, hence why I also put a refresh button.. for just in case:\r\n> \r\n> ```\r\n> if st.toggle(\"Dark Mode\", value=True) is False:\r\n>       st._config.set_option(f'theme.base', \"light\")\r\n> else:\r\n>       st._config.set_option(f'theme.base', \"dark\")\r\n> if st.button(\"Refresh\"):\r\n>       st.rerun()\r\n> ```\r\n\r\nThis doesn't work for me"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-12T20:04:59Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-22T16:48:40Z",
+      "body": "+1 please"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-12-04T09:22:01Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-12-09T08:48:09Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-12-30T19:16:01Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-01-06T13:38:01Z",
+      "body": "I like that"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-01-22T17:20:19Z",
+      "body": "highly anticipated feature!!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-01-26T07:24:24Z",
+      "body": "> For my application, I use the following code snippet to do this exact thing (on v1.35), tho sometimes the page doesn't refresh properly, hence why I also put a refresh button.. for just in case:\n> \n> ```\n> if st.toggle(\"Dark Mode\", value=True) is False:\n>       st._config.set_option(f'theme.base', \"light\")\n> else:\n>       st._config.set_option(f'theme.base', \"dark\")\n> if st.button(\"Refresh\"):\n>       st.rerun()\n> ```\n\nThanks! Here a slightly more robust version. Would be great if the streamlit team would provide a non-private access to set_option, at least for ui settings like dark mode.\n```\ntoggle_dark = st.toggle(\"Dark Layout\", value=True)\nif st.get_option(\"theme.base\") == \"light\" and toggle_dark:\n    st._config.set_option(\"theme.base\", \"dark\")  # type: ignore # noqa: SLF001\n    st.rerun()\nelif st.get_option(\"theme.base\") == \"dark\" and not toggle_dark:\n    st._config.set_option(\"theme.base\", \"light\")  # type: ignore # noqa: SLF001\n    st.rerun()\n```\n\nOn my local machine this works for me (in Firefox), despite throwing an exception. But when deploying to a server it does not work.\n```\nstreamlit.errors.StreamlitAPIException: theme.base cannot be set on the fly. Set as command line option, e.g. streamlit run script.py --theme.base, or in config.toml instead.\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-18T12:52:28Z",
+      "body": "Here is the solution provided by [Cursor](https://www.cursor.com/) :)\n\nIt involves putting a file `themes.toml` in `.streamlit` folder which has all the themes you want to select from.\n\n```\n# Load themes from themes.toml\ndef load_themes():\n    themes_file = os.path.join('.streamlit', 'themes.toml')\n    if os.path.exists(themes_file):\n        with open(themes_file, 'r') as f:\n            themes = toml.load(f)\n            return {k.replace('theme.', ''): v for k, v in themes.items()}\n    return {}\n\n# Update theme function\ndef update_theme(theme_dict):\n    for key, value in theme_dict.items():\n        st._config.set_option(f\"theme.{key}\", value)  # type: ignore # noqa: SLF001\n\n\n# Theme selector\nthemes = load_themes()\ntheme_names = list(themes.keys())\nselected_theme = st.sidebar.selectbox(\n    \"Select Theme\",\n    theme_names,\n    index=theme_names.index('dark') if 'dark' in theme_names else 0\n)\n\n# Apply theme if changed\nif 'current_theme' not in st.session_state:\n    st.session_state.current_theme = selected_theme\n\nif selected_theme != st.session_state.current_theme:\n    update_theme(themes[selected_theme])\n    st.session_state.current_theme = selected_theme\n    st.rerun()\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-03-04T04:18:38Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-07T10:14:21Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-21T05:26:10Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-28T06:48:08Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-12T14:31:34Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-12T17:29:37Z",
+      "body": "Yes please - I'd love to have `x` different themes (ex: light / dark / cyber punk) for users to pick from via a select box in the sidebar. \n\nTrying to do this with css inserts is painful and inconsistent (especially with a chat interface).\n\nMaybe something in the `config.toml` like:\n```toml\n[theme_x]\n<user_inserts_theme>\n\n[theme_y]\n<user_inserts_theme>\n```\n\nThen the user can call something like\n```py\nst.select_theme(theme_x)\n```\n\nTo change between the desired themes.\n\nWould be awesome!"
+    }
+  ]
+}

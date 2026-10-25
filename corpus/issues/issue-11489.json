@@ -1,0 +1,40 @@
+{
+  "id": "issue-11489",
+  "type": "issue",
+  "number": 11489,
+  "url": "https://github.com/streamlit/streamlit/issues/11489",
+  "title": "Crash while trying to render SVG plots with matplotlib",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.pyplot"
+  ],
+  "created_at": "2025-05-30T13:27:43Z",
+  "closed_at": "2026-08-05T19:56:33Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nHi.\n\nInvoking `streamlit.pyplot(..., format=\"svg\")` crashes with matplotlib plots.\n\n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-11489)\n\n```Python\nimport matplotlib.pyplot as plt\nimport streamlit\n\nstreamlit.set_page_config(page_title=\"Crash\")\nfig, ax = plt.subplots(1, 1, figsize=(30, 15))\nstreamlit.pyplot(fig, format=\"svg\")\n```\n\n### Steps To Reproduce\n\n1. Run `streamlit run my_page.py`\n2. Open web browser\n3. Crash\n\n### Expected Behavior\n\nThe plot to be rendered in SVG, not blurry.\n\n### Current Behavior\n\nCrash\n```\n2025-05-30 15:21:55.997 Uncaught app execution\nTraceback (most recent call last):\n  File \"streamlit\\runtime\\scriptrunner\\exec_code.py\", line 121, in exec_func_with_error_handling\n    result = func()\n  File \"streamlit\\runtime\\scriptrunner\\script_runner.py\", line 648, in code_to_exec\n    exec(code, module.__dict__)\n  File \"my_page.py\", line 8, in <module>\n    streamlit.pyplot(fig, format=\"svg\")\n  File \"streamlit\\runtime\\metrics_util.py\", line 444, in wrapped_func\n    result = non_optional_func(*args, **kwargs)\n  File \"streamlit\\elements\\pyplot.py\", line 125, in pyplot\n    marshall(\n  File \"streamlit\\elements\\pyplot.py\", line 180, in marshall\n    marshall_images(\n  File \"streamlit\\elements\\lib\\image_utils.py\", line 442, in marshall_images\n    proto_img.url = image_to_url(\n  File \"streamlit\\elements\\lib\\image_utils.py\", line 334, in image_to_url\n    image_data = _ensure_image_size_and_format(image_data, width, image_format)\n  File \"streamlit\\elements\\lib\\image_utils.py\", line 188, in _ensure_image_size_and_format\n    pil_image: PILImage = Image.open(io.BytesIO(image_data))\n  File \"PIL\\Image.py\", line 3281, in open\n    raise UnidentifiedImageError(msg)\nPIL.UnidentifiedImageError: cannot identify image file b'<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\\n<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\"\\n  \"http://www.w3.org/Graph'\n```\n\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.45.0\n- Python version: 3.10\n- Operating System: Windows\n- Browser: any (using chrome)\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-30T13:27:55Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11489)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-30T17:36:41Z",
+      "body": "Hi [USER] thanks for filing this issue. I can confirm this is reproducible in the latest nightly of streamlit."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-06-02T17:52:35Z",
+      "body": "For anyone else running into this, we suggest using a different value such as `png` for this parameter."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-06-14T07:04:09Z",
+      "body": "I think streamlit.pyplot does not support svg format. it only work for binary images. wither remove svg or use st.components.v1.html for svg"
+    }
+  ]
+}

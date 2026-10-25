@@ -1,0 +1,38 @@
+{
+  "id": "issue-14925",
+  "type": "issue",
+  "number": 14925,
+  "url": "https://github.com/streamlit/streamlit/issues/14925",
+  "title": "Allow customizing generic uncaught exception message when client.showErrorDetails=\"none\"",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:config"
+  ],
+  "created_at": "2026-04-26T12:12:46Z",
+  "closed_at": "2026-07-22T09:32:47Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nWhen `client.showErrorDetails = \"none\"` is configured, Streamlit correctly redacts uncaught exception details, but the browser still shows a hard-coded generic message:\n\n> This app has encountered an error. The original error message is redacted to prevent data leaks. Full error details have been recorded in the logs (if you're on Streamlit Cloud, click on 'Manage app' in the lower right of your app).\n\nIt would be useful to have a supported way to customize this generic message.\n\n\n### Why?\n\n\nFor production apps, the current hard-coded message is not always appropriate:\n\n- Self-hosted apps may not use Streamlit Cloud, so the \u201cManage app\u201d guidance is irrelevant.\n- Some products need simpler user-facing copy, e.g. `This app has encountered an error.`\n- Some deployments prefer a branded fallback page or a minimal status-code-style message.\n- App developers can catch many errors manually, but import-time errors or framework-handled uncaught exceptions still fall back to Streamlit\u2019s built-in error UI.\n\n\n### How?\n\nWith:\n\n```toml\n[client]\nshowErrorDetails = \"none\"\n\n### Additional Context\n\nStreamlit redacts the original exception, type, and stack trace, but displays the hard-coded generic message above.\n\nIn Streamlit 1.56.0, this appears to be defined as _GENERIC_UNCAUGHT_EXCEPTION_TEXT in streamlit/elements/exception.py.\n\nDesired behavior\nProvide a supported configuration option for customizing the generic uncaught exception message shown when error details are hidden.\n\nFor example:\n\n[client]\nshowErrorDetails = \"none\"\ngenericErrorMessage = \"This app has encountered an error.\"\nor:\n\n[client]\nshowErrorDetails = \"none\"\nuncaughtExceptionMessage = \"This app has encountered an error.\"\nAlternatives considered\nApp-level exception boundaries can catch runtime errors and render custom UI, but they cannot reliably cover all cases, especially errors that happen before the app\u2019s main function runs.\n\nPatching Streamlit internals is possible but brittle and not suitable for production deployments.\n\nAdditional context\nThis would make client.showErrorDetails = \"none\" more production-friendly for self-hosted and branded applications while preserving Streamlit\u2019s current secure default behavior.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-26T12:12:57Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-14925)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-04-26T12:15:43Z",
+      "body": "I'm also happy to open a PR with a proposed fix"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-04-29T20:50:35Z",
+      "body": "We are working on allowing providing a custom script error handler in https://github.com/streamlit/streamlit/pull/14972, which would also allow showing custom error messages for uncaught exceptions. See the spec [here](https://github.com/streamlit/streamlit/blob/develop/specs/2026-04-20-exception-handler/product-spec.md). "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T09:32:47Z",
+      "body": "## Update:\n\nYou can define a custom exception handler via `on_script_error ` in `st.App` which allows you to redact these error with a custom message."
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "id": "issue-7015",
+  "type": "issue",
+  "number": 7015,
+  "url": "https://github.com/streamlit/streamlit/issues/7015",
+  "title": "Buttons in dataframe / table cells with callbacks",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe",
+    "feature:st.data_editor",
+    "feature:st.column_config"
+  ],
+  "created_at": "2023-07-14T10:11:01Z",
+  "closed_at": "2026-06-05T22:47:56Z",
+  "body": "### Summary\n\nAllow adding action buttons to dataframe rows, which can be configured to trigger an action in the Streamlit app for a specific row.\n\n### How?\n\nCould be implemented via column config (`st.columnConfig.ButtonColumn`) or as a new parameter that can be configured with `st.dataframe`, e.g.: `st.dataframe(..., actions=[])`.\n\n### Additional Context\n\nInspirations:\n\n<img width=\"2048\" height=\"557\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/ba4297aa-3d61-4d73-a2b8-d5f5865ff59e\" />\n\n<img width=\"1950\" height=\"278\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/6a7b08ad-976a-4d31-81e3-cfa89eec5c6c\" />\n\n<img height=\"300\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/97ef4001-8acc-4182-94e0-b28e2c85e815\" />\n\n<img width=\"1434\" height=\"206\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/b93aba1b-1437-47a9-b22f-64ef205da28a\" />\n\nRelated to https://github.com/streamlit/streamlit/issues/10212",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-07-16T19:35:07Z",
+      "body": "Hey [USER],\r\n\r\nThanks for sharing this request! \r\n\r\nDisplaying a table with a link in a cell is already possible today via `st.dataframe` or `st.data_editor` (check out the doc [here](https://docs.streamlit.io/library/api-reference/data/st.column_config/st.column_config.linkcolumn)). Using this functionality, you could add a link to a specific page to your `st.dataframe` or `st.data_editor.`\r\n\r\nWhat's not possible today is displaying a button within a cell of `st.dataframe` or `st.data_editor` or programmatically switching navigating the pages of your app.\r\n\r\nThere is an open feature request **[here](https://github.com/streamlit/streamlit/issues/4832)** for programmatically navigating the pages of your multipage app \u2013 please upvote that request if you'd like to see it prioritized."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-07-17T09:59:33Z",
+      "body": "yes https://github.com/streamlit/streamlit/issues/7015#issuecomment-1637172592 is what I'd need but it be nice if LinkColumn could be used to trigger it.\r\n\r\nthanks"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-10-03T20:29:13Z",
+      "body": "Ability to display buttons with callbacks on tables could be nice sometimes to run actions on specific row (well, at least till there's a way to get selected row for dataframe)"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-01-31T11:01:49Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-7015)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-04T02:46:56Z",
+      "body": "I'd like to +1 this feature request as well. There are [many widgets](https://docs.streamlit.io/develop/api-reference/data/st.column_config) that can be used with `st.dataframe`, yet a **button** or **internal link** are missing.\r\n\r\nMy use case would be a list of items where each item can have some related operations: view details, edit entry (via dialog), delete entry, go to a different page related to this entry... This is basically a button or link with a callback.\r\n\r\nAlthough, there may be limitations to implementing a callback function to a link/button in a dataframe cell, it would be a very useful feature that I've seen requested many times when researching this topic.\r\n\r\nThe current way to solve it is to create [`st.columns`](https://docs.streamlit.io/develop/api-reference/layout/st.columns) and populating the cells with said buttons/links. That is a workaround, more cumbersome to code and, although looks OK (IMHO) it _feels_ wrong when it would be more appropriate to use [`st.dataframe`](https://docs.streamlit.io/develop/api-reference/data/st.dataframe) or [`st.table`](https://docs.streamlit.io/develop/api-reference/data/st.table), especially considering all the [nice column configurations we already get](https://docs.streamlit.io/develop/api-reference/data/st.column_config)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-07T16:27:18Z",
+      "body": "Agree on all what's been said so far, and my use-case is also very similar to [USER]'s. I've been wanting to use buttons in tables multiple times now."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-27T15:19:33Z",
+      "body": "up"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-19T04:49:26Z",
+      "body": "up "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-24T20:03:30Z",
+      "body": "+1 this feature. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-28T10:16:36Z",
+      "body": "+1 here too. \nBeside the fact that it can be nice to have multiple action to be done in a single row (for instance: detail, delete), the actual way of selecting rows via checkboxes is bare visible, when none is selected (e.g., at startup), so users don't know that something can be done.\nAlso, using checkboxes to perform actions different that selecting multiple rows is not a good UX practice."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-29T17:13:30Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-30T23:34:03Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-05-19T00:36:19Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-06-08T01:53:41Z",
+      "body": "up"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-16T13:39:02Z",
+      "body": "up"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-17T10:29:39Z",
+      "body": "up"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-09-21T09:13:14Z",
+      "body": "up"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-09-22T18:49:34Z",
+      "body": "up"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-13T10:51:44Z",
+      "body": "up"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-17T09:24:49Z",
+      "body": "Is there any info on the future of this request?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-22T00:05:47Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-22T17:47:18Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-06T16:21:02Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-06T16:24:13Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-07T15:57:10Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-11T16:12:38Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-13T15:41:09Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-11-22T07:16:08Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-13T23:47:01Z",
+      "body": "+1\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-29T11:35:10Z",
+      "body": "+1"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-25T08:20:45Z",
+      "body": "+1"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-03-25T23:09:04Z",
+      "body": "Hey all! We're looking into this feature, would love to learn a bit more about concrete use cases so we can design this in the best way possible. Anyone here interested in doing a short user interview in the next few weeks? We'll also send you some stickers/swag as a thank you :)"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-26T00:24:23Z",
+      "body": "1 now we can use the check box to select rows and then scroll the screen to click a button to edit / delete a record. if buttons embedded in each row of a dataframe, evel one column one button, we can just click the corresponding button to edit or delete this row. \n2 click to show the image or something to check / label\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-03-27T17:05:44Z",
+      "body": "## Update\n\nWe started working on a `ButtonColumn` for `st.dataframe`. Here is a demo: https://button-column.streamlit.app/"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-27T18:20:16Z",
+      "body": "Demo looks great! I'm up for a user interview."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-28T03:19:25Z",
+      "body": "Great! Thanks [USER] "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-28T08:02:56Z",
+      "body": "That looks amazing. This was the feature I was really needing. Can\u2019t wait to try it out. Thanks !"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-30T10:36:26Z",
+      "body": "Nice!\nWill these changes be applied also to `st.table` and `st.data_editor`?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-04-08T19:14:24Z",
+      "body": "[USER] `st.data_editor` probably yes. But won't be added for `st.table`. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-11T13:08:27Z",
+      "body": "## Update\n\nThis will be possible via the `st.column_config.ButtonColumn` in Streamlit 1.59+.\n\nThe values in the configured column become the button labels, and when a button is clicked Streamlit stores a one-shot click payload in `st.session_state[key]` with the clicked `row` and `label`.\n\nFor example:\n\n```python\nimport pandas as pd\nimport streamlit as st\n\ndf = pd.DataFrame(\n    {\n        \"name\": [\"Alice\", \"Bob\", \"Charlie\"],\n        \"action\": [\":material/visibility: View\"] * 3,\n    }\n)\n\n\ndef handle_view():\n    click = st.session_state.view_click\n    row = df.iloc[click[\"row\"]]\n    st.toast(f\"Viewing {row['name']}\")\n\n\nst.dataframe(\n    df,\n    column_config={\n        \"action\": st.column_config.ButtonColumn(\n            \"Action\",\n            type=\"tertiary\",\n            on_click=handle_view,\n            key=\"view_click\",\n        )\n    },\n    hide_index=True,\n)\n```\n\nYou can also provide multiple actions per row by using a list of labels in the cell value:\n\n```python\ndf = pd.DataFrame(\n    {\n        \"name\": [\"Alice\", \"Bob\", \"Charlie\"],\n        \"actions\": [\n            [\":material/edit: Edit\", \":material/delete: Delete\"],\n            [\":material/edit: Edit\", \":material/delete: Delete\"],\n            [\":material/edit: Edit\"],\n        ],\n    }\n)\n\n\ndef handle_action():\n    click = st.session_state.action_click\n    row = df.iloc[click[\"row\"]]\n\n    if \"Delete\" in click[\"label\"]:\n        st.warning(f\"Deleting {row['name']}\")\n    elif \"Edit\" in click[\"label\"]:\n        st.info(f\"Editing {row['name']}\")\n\n\nst.dataframe(\n    df,\n    column_config={\n        \"actions\": st.column_config.ButtonColumn(\n            \"Actions\",\n            on_click=handle_action,\n            key=\"action_click\",\n        )\n    },\n    hide_index=True,\n)\n```\n\n`ButtonColumn` also works in `st.data_editor`; the button cells are read-only, but clicks still trigger the callback.\n"
+    }
+  ]
+}

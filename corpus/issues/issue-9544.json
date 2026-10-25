@@ -1,0 +1,45 @@
+{
+  "id": "issue-9544",
+  "type": "issue",
+  "number": 9544,
+  "url": "https://github.com/streamlit/streamlit/issues/9544",
+  "title": "`st.container` : Enable horizontal scrolling",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:layout",
+    "feature:st.container",
+    "type:possible-component"
+  ],
+  "created_at": "2024-09-25T09:42:12Z",
+  "closed_at": "2026-08-17T19:15:41Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\r\n- [X] I added a descriptive title and summary to this issue.\r\n\r\n### Summary\r\n\r\nContainers today only enable a vertical scrolling of inner elements (widgets, or nested containers). Enabling horizontal behaviour would allow a lot of new interesting UI/UX patterns to emerge.\r\n\r\n### Why?\r\n\r\nThere has been several occurences where I thought a horizontal container would work best, as a method to optimize the layout for complex ideas. For example, when developing a sort of workbench for a specific AI use case, where I want to build a lot of different purpose driven interfaces.\r\n\r\nI feel that some basic but powerful layout options like horizontal scrolling is still what hinders from using streamlit has a SPA/App Platform when the use case gets richer.\r\n\r\n### How?\r\n\r\nIntroduce the `direction` or `scrolling` parameter to `st.container` . I believe containers are the right place for layout options, since they can be nested into columns and combine to create very rich and intuitive horizontal and vertical layout options, without much cognitive load. \r\n\r\n### Additional Context\r\n\r\nToday, creating something similar to this requires a lot of column nesting which in my experience is tough to make readable at all screen sizes, and is very annoying to develop for.\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-09-25T09:42:23Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-9544)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-09-25T12:39:59Z",
+      "body": "Hey, thanks for the suggestion! We just started looking at new layout options, and indeed, one idea is to extend `st.container` as a basic building block for layout and turn it into something like a simplified flexbox. Haven't considered horizontal scrolling yet but will have a look!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-06-10T21:09:42Z",
+      "body": "For those who don't want to wait for this to get out (there are a lot of things in the backlog), I'm working on it in one of my app and my solution was to include a css that modifies the appearance of the streamlit element with the key `mykey`, which is the key of my section (I have it templated in Python where I call `st.write(css.format(...))`).\n\n```css\ndiv.st-key-mykey {{\n    display: flex;\n    flex: 1 1 0%;\n    height: 100%;\n    max-height: 100%;\n    position: relative;\n    gap: 0.5rem;\n    overflow-x: scroll;\n    flex-direction: row;\n}}\n\ndiv.st-key-mykey>div {{\n    // Size of the sub elements is hard coded here, because scaling is out of whack\n}}\n```\n\nIt's not perfect, but it is much better."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-29T14:58:16Z",
+      "body": "> For those who don't want to wait for this to get out (there are a lot of things in the backlog), I'm working on it in one of my app and my solution was to include a css that modifies the appearance of the streamlit element with the key `mykey`, which is the key of my section (I have it templated in Python where I call `st.write(css.format(...))`).\n> \n> div.st-key-mykey {{\n>     display: flex;\n>     flex: 1 1 0%;\n>     height: 100%;\n>     max-height: 100%;\n>     position: relative;\n>     gap: 0.5rem;\n>     overflow-x: scroll;\n>     flex-direction: row;\n> }}\n> \n> div.st-key-mykey>div {{\n>     // Size of the sub elements is hard coded here, because scaling is out of whack\n> }}\n> It's not perfect, but it is much better.\n\nDo you mind to share an example usage? I'm trying to use but cannot figure it out."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-17T19:50:42Z",
+      "body": "## Update\n\nStreamlit 1.63+ will allow to activate horizontal scrolling via `wrap=False`:\n\n```python\nwith st.container(horizontal=True, wrap=False):\n   ...\n```"
+    }
+  ]
+}

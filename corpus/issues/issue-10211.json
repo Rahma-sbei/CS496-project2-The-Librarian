@@ -1,0 +1,45 @@
+{
+  "id": "issue-10211",
+  "type": "issue",
+  "number": 10211,
+  "url": "https://github.com/streamlit/streamlit/issues/10211",
+  "title": "Provide a new dataframe column type to insert Markdown text",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe",
+    "feature:st.data_editor",
+    "feature:st.column_config"
+  ],
+  "created_at": "2025-01-19T06:54:04Z",
+  "closed_at": "2026-06-16T15:24:27Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nI have a nested data to render as data frame, Some columns shall be rendered neatly when I have ability insert markdown column type. TextColumn is neither rendering HTML nor Markdown , I could not even insert simple \"\\n\".\n\n### Why?\n\nI tried option to inherit the TextColumn  and modify the behavior to render Markdown , It seem too complex . To render complex data , simple string based Text Column itself is not enough.\n\n### How?\n\nProvide a st.column_config.MardownColumn() , similar as TextColumn  where the user can input markdown formatted string. Expectation is table display markdown data \n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-01-19T06:54:16Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-10211)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-17T08:27:18Z",
+      "body": "This would be an amazing feature to have!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-12-10T12:00:31Z",
+      "body": "> I could not even insert simple \"\\n\"\n\nMarkdown support would be great but I'd settle for being able to see multi-line strings (without clicking on the cell)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-01-18T15:18:17Z",
+      "body": "Hi! I\u2019d love to work on this issue as an open-source contribution.\nPlease let me know if I can take it up. Thanks!"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-16T15:25:27Z",
+      "body": "## Update\n\n`MarkdownColumn` for `st.dataframe` and `st.data_editor` will be released on Streamlit 1.59. "
+    }
+  ]
+}

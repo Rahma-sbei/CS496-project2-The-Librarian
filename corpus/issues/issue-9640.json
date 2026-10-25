@@ -1,0 +1,53 @@
+{
+  "id": "issue-9640",
+  "type": "issue",
+  "number": 9640,
+  "url": "https://github.com/streamlit/streamlit/issues/9640",
+  "title": "Streamlit changed the behavior of jupyter_client",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:dependencies"
+  ],
+  "created_at": "2024-10-10T08:26:05Z",
+  "closed_at": "2026-07-22T09:46:33Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nI want to use streamlit to display the image from a code execution result from jupyter_client.\r\n\r\nHowever, I found that importing streamlit will change the msg_type from jupyter_client, from `display_data` to `stream`\r\nSo I can't get the image to display.\r\n\r\nLooks like that after importing,  streamlit changed the stdout or something similar.\r\nIs this normal?\n\n### Reproducible Code Example\n\n```Python\nfrom jupyter_client import KernelManager\r\nimport re\r\nimport streamlit as st #if you do not import streamlit, the behavior will be normal\r\n\r\ndef extract_code(text):\r\n    import json5\r\n\r\n    # Match triple backtick blocks first\r\n    triple_match = re.search(r'[^\\n]*\\n(.+?)```', text, re.DOTALL)\r\n    # Match single backtick blocks second\r\n    single_match = re.search(r'`([^`]*)`', text, re.DOTALL)\r\n    if triple_match:\r\n        text = triple_match.group(1)\r\n    elif single_match:\r\n        text = single_match.group(1)\r\n    else:\r\n        try:\r\n            text = json5.loads(text)['code']\r\n        except Exception:\r\n            pass\r\n    # If no code blocks found, return original text\r\n    return text\r\n\r\n# start the kernel and manager\r\n\r\nkm = KernelManager()\r\nkm.start_kernel()\r\nkc = km.client()\r\n\r\ncommand = \"\\nimport matplotlib.pyplot as plt\\neven_numbers = list(range(2, 101, 2))\\nplt.bar(range(len(even_numbers)), even_numbers)\\nplt.xlabel('Even Numbers')\\nplt.ylabel('Value')\\nplt.title('Even Numbers in the Range 1-100')\\nplt.show()```\"\r\ncommand = extract_code(command)\r\nkc.execute(command)\r\nwhile True:\r\n    msg = kc.get_iopub_msg(timeout=5)\r\n    msg_type = msg['msg_type']\r\n    print(msg_type)\r\n    print(msg)\r\n    if msg_type == 'status':\r\n        if msg['content'].get('execution_state') == 'idle':\r\n            break\n```\n\n\n### Steps To Reproduce\n\nrun the above code with streamlit imported\r\nand run it again without streamlit imported\r\nyou will see the difference\n\n### Expected Behavior\n\nThe msg_type from jupyter_client should be `display_data` and it contains the base64 image\r\n![image](https://github.com/user-attachments/assets/5d2f808f-4629-4a9a-a522-9227d552d0ea)\r\n\n\n### Current Behavior\n\nThe msg_type from jupyter_client is `stream` and it does not contain the base64 image\r\n![image](https://github.com/user-attachments/assets/c4e4a37f-9bcf-45ce-bc1f-dd2e88e3685f)\r\n\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.38.0\r\n- Python version: 3.9.19\r\n- Operating System: MacOS 14.6.1\r\n- Browser: Not related\r\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-10-10T08:26:17Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9640)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-10-10T12:50:28Z",
+      "body": "Thanks for reporting this issue. We are configuring a specific matplotlib backend on import: https://github.com/streamlit/streamlit/blob/d47ec47654990ee199c951bafbd5006d33df2ae5/lib/streamlit/__init__.py#L56 maybe this is causing the difference. Maybe it will fix it if you set it to a different backend `os.environ[\"MPLBACKEND\"] = \"<backend>\"` after the Streamlit import?\r\n\r\nChanging this enhancement, since it doesn't look like a bug in core Streamlit. But if there is enough interest we could improve the integration for this scenario."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-10-10T12:50:58Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Visits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fstreamlit%2Fstreamlit%2Fissues%2F9640&title=visits&edge_flat=false)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-11T02:52:01Z",
+      "body": "> Thanks for reporting this issue. We are configuring a specific matplotlib backend on import:\r\n> \r\n> https://github.com/streamlit/streamlit/blob/d47ec47654990ee199c951bafbd5006d33df2ae5/lib/streamlit/__init__.py#L56\r\n> maybe this is causing the difference. Maybe it will fix it if you set it to a different backend `os.environ[\"MPLBACKEND\"] = \"<backend>\"` after the Streamlit import?\r\n> \r\n> Changing this enhancement, since it doesn't look like a bug in core Streamlit. But if there is enough interest we could improve the integration for this scenario.\r\n\r\nThanks Lucas. Yes this cause the difference. I fix it by setting\r\n```python\r\nos.environ[\"MPLBACKEND\"] =\"\"\r\n```\r\nin my case.\r\n\r\n\r\nAgree that this is not a bug in Streamlit, but just wondering if there is any solution to avoid setting MPLBACKEND when importing Streamlit?\r\nOr, if not, I think it would be better to add this information in docs."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-11T02:59:26Z",
+      "body": "BTW, I am using MacOS but I didn't see any crash when running on a thread,\r\nI have commended this line to avoid setting MPLBACKEND\r\n\r\nhttps://github.com/streamlit/streamlit/blob/d47ec47654990ee199c951bafbd5006d33df2ae5/lib/streamlit/__init__.py#L56\r\n\r\nHere is my code\r\n```python\r\nfrom jupyter_client import KernelManager\r\nimport re\r\nimport streamlit as st\r\nimport threading\r\n\r\ndef extract_code(text):\r\n    import json5\r\n\r\n    # Match triple backtick blocks first\r\n    triple_match = re.search(r'```[^\\n]*\\n(.+?)```', text, re.DOTALL)\r\n    # Match single backtick blocks second\r\n    single_match = re.search(r'`([^`]*)`', text, re.DOTALL)\r\n    if triple_match:\r\n        text = triple_match.group(1)\r\n    elif single_match:\r\n        text = single_match.group(1)\r\n    else:\r\n        try:\r\n            text = json5.loads(text)['code']\r\n        except Exception:\r\n            pass\r\n    # If no code blocks found, return original text\r\n    return text\r\n\r\ndef run_code():\r\n    km = KernelManager()\r\n    km.start_kernel()\r\n    kc = km.client()\r\n\r\n    command = \"```python\\nimport matplotlib.pyplot as plt\\neven_numbers = list(range(2, 101, 2))\\nplt.bar(range(len(even_numbers)), even_numbers)\\nplt.xlabel('Even Numbers')\\nplt.ylabel('Value')\\nplt.title('Even Numbers in the Range 1-100')\\nplt.show()```\"\r\n    command = extract_code(command)\r\n    kc.execute(command)\r\n    while True:\r\n        msg = kc.get_iopub_msg(timeout=5)\r\n        msg_type = msg['msg_type']\r\n        print(msg_type)\r\n        print(msg)\r\n        if msg_type == 'status':\r\n            if msg['content'].get('execution_state') == 'idle':\r\n                break\r\n\r\nthread = threading.Thread(target=run_code)\r\nthread.start()\r\n\r\nthread.join()\r\n\r\nprint(\"Thread completed\")\r\n```"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-10-11T09:49:17Z",
+      "body": "Yep, setting this might not be needed anymore. But we would need to evaluate this somehow. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T09:46:33Z",
+      "body": "Closing this since we are not planning any changes on this"
+    }
+  ]
+}

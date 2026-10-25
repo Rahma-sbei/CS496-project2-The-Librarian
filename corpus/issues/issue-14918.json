@@ -1,0 +1,48 @@
+{
+  "id": "issue-14918",
+  "type": "issue",
+  "number": 14918,
+  "url": "https://github.com/streamlit/streamlit/issues/14918",
+  "title": "Option to enable/disable the select all option on `st.multiselect`",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.multiselect"
+  ],
+  "created_at": "2026-04-24T06:36:31Z",
+  "closed_at": "2026-06-22T08:46:57Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nI would like to see a parameter on the `st.multiselect` widget to enable or disable the \"Select all\" option.\nThe suggested parameter `select_all` can be True by default to sustain the current behavier.\n\n### Why?\n\nCurrently, I've an application where users can choose a single or multiple options to plot each option a line object on a Plotly chart. However, for this use case, the number of options exceeds over a 1000.\n\nIf the user selects the first \"Select all\" option, the application will create 1000+ Plotly line objects and create a cluttered and very resource heavy plot that doesn't serve any practical use case.\n\nThere is of course the `max_selections` parameter to limit the number of selected options, but there are use cases that all options don't per se relate to each other. This workaround also creates confusion to the end-users since the \"Select all\" option doesn't select all available options due to the `max_selections` limitation.\n\n### How?\n\nInclude the following parameter: `select_all_opt`:\n\n```python\ndef multiselect (**other_existing_params, select_all_opt:bool = True)\n\"\"\"\n[Current description of multiselect]\n\nParameters\n----------\n[Other current parameters]\n\nselect_all_opt: bool, default = True\n   Option to enable or disable the \"Select all\" option on this widget. If `True`, the user can select all available options in one click. If `max_selections` is provided, the widget will only select the first n of available options\n\"\"\"\n- \n```\n\n### Additional Context\n\n- [Discussion (by another Streamlit user)](https://discuss.streamlit.io/t/multiselect-select-all-option/120975)\n- [My earlier issue on the Streamlit docs repo](https://github.com/streamlit/docs/issues/1450) \n- [Creation of the \"select all\" option](https://discuss.streamlit.io/t/multiselect-select-all-option/120975)",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-04-24T06:36:42Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-14918)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-03T10:39:44Z",
+      "body": "Yes in my case I created a custom component that has a \"All\" checkbox next to the multiselect. I don't need the \"Select All\" option."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-14T15:18:20Z",
+      "body": "The relevant code that adds the \"Select All\" option was added by PR https://github.com/streamlit/streamlit/pull/13015"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-20T15:43:58Z",
+      "body": "\u2795 on this. I currently have a workaround for this that detects \"Select All\" and makes it work as \"Clear All\"\n\n```python\nselected = st.multiselect(label, options=options, key=key)\n\nif len(options) > 1 and len(selected) == len(options):\n    del st.session_state[key]\n    st.rerun()\n```"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-14T12:48:11Z",
+      "body": "## Update\n\nI wrote a spec to make this configurable [here](https://github.com/streamlit/streamlit/pull/15300)."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-22T08:46:41Z",
+      "body": "Thank you for developing this solution for this issue! Now i can safely upgrade from v1.54 to v1.58 \ud83c\udf89 "
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "id": "issue-2910",
+  "type": "issue",
+  "number": 2910,
+  "url": "https://github.com/streamlit/streamlit/issues/2910",
+  "title": "Altair mark_geo chart not rendered",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:arrow",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.altair_chart",
+    "feature:st.vega_lite_chart",
+    "area:geospatial"
+  ],
+  "created_at": "2021-03-07T14:50:49Z",
+  "closed_at": "2026-09-09T09:27:03Z",
+  "body": "### Summary\nAltair mark_geo chart not rendered\n\n### Steps to reproduce\n\n\nCode snippet:\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-2910)\n\n```\nimport altair as alt\nfrom vega_datasets import data\n\nstates = alt.topo_feature(data.us_10m.url, 'states')\npop = data.population_engineers_hurricanes()\n\nalt.Chart(states).mark_geoshape().encode(\n\tcolor='population:Q'\n).transform_lookup(\n\tlookup='id',\n\tfrom_=alt.LookupData(pop, 'id', list(pop.columns))\n).properties(\n\twidth=500,\n\theight=300\n).project(\n\ttype='albersUsa'\n)\n\n```\n\n\n**Expected behavior:**\nworks fine with altair\n![image](https://user-images.githubusercontent.com/43062719/110243821-fd836200-7f96-11eb-85ac-e323b3c02432.png)\n\n**Actual behavior:**\nwhen i do st.write(chart), i get an empty graph\n![image](https://user-images.githubusercontent.com/43062719/110243912-679c0700-7f97-11eb-8e5e-47df763303e4.png)\n\n\n### Debug info\n\n- Streamlit version: 0.62.1\n- Python version: 3.7.8\n- Using Pyenv\n- OS version: macos 10.15.7\n- Browser version: chrome & safari both failed\n\n### Additional information\n\nIf needed, add any other context about the problem here. For example, did this bug come from https://discuss.streamlit.io or another site? Link the original source here!\n",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2021-03-07T15:07:25Z",
+      "body": "it seems that transform_lookup is what causes this error, when i removed it the graph could be rendered"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-03-13T22:58:29Z",
+      "body": "Hey [USER] ! Thanks for reporting the issue. I could reproduce it. It seems like we've had some Altair chart issues that need addressing. I've noted this bug within the group."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-10-15T12:00:09Z",
+      "body": "I think this happens for any geojson data that is not defined only by the URL. I get the same error when trying to draw a map using a geojson dict passed directly to the function instead of one loaded from a URL.\r\n\r\nHere is a minimal example, using very basic geojson data:\r\n\r\n```\r\nimport altair as alt\r\nimport streamlit as st\r\n\r\n#simple polygon data, raw from github\r\nurl_geojson = 'https://raw.githubusercontent.com/mattijn/datasets/master/two_polygons.geo.json'\r\ndata_geojson_remote = alt.Data(url=url_geojson, format=alt.DataFormat(property='features',type='json'))\r\n\r\n#chart object for remote data\r\nch_remote = alt.Chart(data_geojson_remote).mark_geoshape(\r\n).encode(\r\n    color=\"properties.name:N\"\r\n).project(\r\n    type='identity', reflectY=True\r\n)\r\n\r\n#Same data, defined in python as a dict\r\nvar_geojson = {\r\n  \"type\": \"FeatureCollection\",\r\n  \"features\": [\r\n    {\r\n      \"type\": \"Feature\",\r\n      \"geometry\": {\r\n        \"type\": \"Polygon\",\r\n        \"coordinates\": [[[0, 0], [1, 0], [1, 1], [0, 1], [0, 0]]]\r\n      },\r\n      \"properties\": {\"name\": \"abc\"}\r\n    },\r\n    {\r\n      \"type\": \"Feature\",\r\n      \"geometry\": {\r\n        \"type\": \"Polygon\",\r\n        \"coordinates\": [[[1, 0], [2, 0], [2, 1], [1, 1], [1, 0]]]\r\n      },\r\n      \"properties\": {\"name\": \"def\"}\r\n    }\r\n  ]\r\n}\r\n\r\n\r\n# inline geojson data object\r\ndata_geojson = alt.InlineData(values=var_geojson, format=alt.DataFormat(property='features',type='json')) \r\n\r\n# chart object using local data\r\nch_local = alt.Chart(data_geojson).mark_geoshape(\r\n).encode(\r\n    color=\"properties.name:N\"\r\n).project(\r\n    type='identity', reflectY=True\r\n)\r\nst.write(ch_remote)\r\nst.write(ch_local)\r\n```\r\n\r\nThe result:\r\n![4bd398c4c714035431ab35b9224b424e889a86e0](https://user-images.githubusercontent.com/46822548/137482932-787b18a8-8d4d-426c-a908-6402a446b55d.png)\r\n\r\nI haven't been able to dig into it with a debugger to watch what happens, but it seems that the geometry data gets lost when the dataset is cleaned from the chart object and streamlit attempts to convert it into a table. It happens with the legacy Altair (streamlit attempts to convert the data into a data frame) and the latest (streamlit attempts to convert the data into a ln arrow dataframe). As far as I can tell, the data is only defined in the `dataset` attribute of the chart, not the `data` attribute, so it may even be completely deleted when streamlit begins rendering the chart.\r\n\r\nThe question I have is why does it work when the json data is loaded fully from a URL? If that still works quickly, why not add some kind of condition to detect geojson data and skip the part where it tries to get converted into an arrow table? Surely passing simple data in memory isn't much worse than loading it from a URL?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2021-12-18T12:02:40Z",
+      "body": "Same problem reported here:\r\nhttps://github.com/streamlit/streamlit/issues/1002#issuecomment-967582597\r\n\r\nDetailed demo:\r\nhttps://share.streamlit.io/fgenoese/st_bugreports/main/geopandas_map.py"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-09-30T16:27:26Z",
+      "body": "Is there any update on this issue please? It is pretty severe in terms of functionality."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T12:56:53Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-2910)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-22T07:29:21Z",
+      "body": "### Triage summary\n\nThis is a confirmed bug: Altair `mark_geoshape()` charts render as an empty plot in Streamlit even though they display correctly in native Altair. The community discussion narrows it down to how Streamlit handles chart data: inline GeoJSON/TopoJSON geometry (and, as the reporter noticed, data pulled in via `transform_lookup`) gets dropped, so the shapes have nothing to draw.\n\n**Likely root cause:** When converting an Altair chart to a Vega-Lite spec, Streamlit installs a custom data transformer (`_to_arrow_dataset` in `lib/streamlit/elements/vega_charts.py`) that serializes every inline dataset to Arrow IPC bytes via `convert_anything_to_arrow_bytes()`. Geometry / nested GeoJSON structures don't round-trip through a tabular Arrow/DataFrame representation \u2014 the geometry (`coordinates`, `features`, etc.) is flattened or lost during serialization \u2014 so `mark_geoshape` ends up with no geometry to render. This matches the observation that a chart defined purely by a remote data URL renders, while inline/GeoPandas geometry does not.\n\n### Related Issues\n\n- [#1002 - Add support for geometry dtype in `st.altair_chart`](https://github.com/streamlit/streamlit/issues/1002) \u2014 Directly linked in this thread; same underlying limitation that geometry data types aren't supported by Streamlit's Arrow-based chart data serialization.\n- [#6099 - `st.altair_chart` removes data from a compound plot with interaction that works with `altair`](https://github.com/streamlit/streamlit/issues/6099) \u2014 Same class of bug where data is dropped for charts with transforms/interactions, consistent with the reporter finding that `transform_lookup` triggers the empty render.\n- [#6269 - `st.altair_chart` unable to display alt.Chart that is deserialized from json](https://github.com/streamlit/streamlit/issues/6269) \u2014 Another case where a valid Altair spec renders as a blank chart due to how Streamlit marshals the chart data.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

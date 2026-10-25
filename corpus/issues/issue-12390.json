@@ -1,0 +1,84 @@
+{
+  "id": "issue-12390",
+  "type": "issue",
+  "number": 12390,
+  "url": "https://github.com/streamlit/streamlit/issues/12390",
+  "title": "Regression in v1.49.0 when showing layered altair chart in dialog - tooltips not showing when a facet option is specified",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.altair_chart",
+    "feature:st.vega_lite_chart",
+    "upstream",
+    "feature:st.dialog"
+  ],
+  "created_at": "2025-09-01T12:26:10Z",
+  "closed_at": "2026-05-18T16:00:17Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nI have encountered a regression in how layered altair charts are displayed in dialogs in 1.49.0 vs how they worked in 1.48.0. If you specify a facet (`color`, `strokeWidth`, ...) in the chart encoding, tooltips only show up for the last layer in the chart and the other layers no longer show a tooltip. This only happens for dialogs and not for showing the chart in the page regularly.\n\nIf you remove the facet encoding (`color` for example), it works correctly, but this means that we would need to have as many chart layers as we have variables, which is quite inconvenient and breaks how altair usually expects data to be fed to it.\n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-12390)\n\n```Python\nimport streamlit as st\nimport pandas as pd\nimport altair as alt\n\n\ndef _create_chart():\n    \"\"\"\n    Same chart code for both page and dialog\n    \"\"\"\n    df = pd.DataFrame(\n        {\n            \"x\": [1, 2, 3],\n            \"y\": [4, 5, 6],\n            \"y2\": [1, 2, 3],\n            # in this case, having a facet encoding doesn't make sense, but usually we'd have multiple kpis here\n            \"kpi\": [\"kpi1\", \"kpi1\", \"kpi1\"],\n        }\n    )\n    chart1 = (\n        alt.Chart(df)\n        .mark_line(point=alt.OverlayMarkDef(size=80))\n        .encode(x=\"x\", y=\"y\", color=\"kpi\", tooltip=[\"x\", \"y\"])\n        .interactive()\n    )\n    chart2 = (\n        alt.Chart(df)\n        .mark_area()\n        .encode(x=\"x\", y=\"y2\", color=\"kpi\", tooltip=[\"x\", \"y2\"])\n    )\n    chart = alt.layer(chart1, chart2)\n    return chart\n\n\n[USER].dialog(\"Dialog with Chart\", width=\"large\")\ndef show_dialog():\n    # show the chart in the dialog\n    chart = _create_chart()\n    st.altair_chart(chart)\n\n\n# show the chart in the page\nchart = _create_chart()\nst.altair_chart(chart)\n\nshow_dialog_btn = st.button(\"Show Dialog\")\n\n\nif show_dialog_btn:\n    show_dialog()\n```\n\n### Steps To Reproduce\n\n1. Hover over both layers in the page chart, make sure both are showing up\n2. Click on the \"Show Dialog\" button\n3. Hover over both layers in the dialog, only the area chart tooltip shows up\n\n<img width=\"1309\" height=\"504\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/dfe829fa-c5ca-4db8-9d9b-52b170bba366\" />\n\n<img width=\"1342\" height=\"503\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/713b018f-8705-4a17-ba48-4072d913b1b5\" />\n\n### Expected Behavior\n\nTooltips should show up for all layers for both page and dialog\n\n### Current Behavior\n\nOnly the tooltip for the last layer in the layered chart in the dialog is shown\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.49.0, 1.49.1\n- Python version: 3.12\n- Operating System: MacOS\n- Browser: Safari, Chrome, Firefox\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-09-01T12:26:23Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-12390)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-09-01T14:53:34Z",
+      "body": "[USER] Thanks for reporting this issue. I reproduced it [here](https://issues.streamlit.app/?issue=gh-12390). This might even be an upstream bug with the latest Vega version, which was updated [in 1.49](https://github.com/streamlit/streamlit/pull/11580)."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-09-02T16:19:55Z",
+      "body": "[USER] , thanks for the reply. I have run a small dirty test to see if it's an upstream bug or a streamlit-specific bug:\n- In my project I installed the streamlit `1.49.1` python package\n- Tested the charts in the dialog, confirmed the tooltips are not working as expected\n- Now, I downloaded the streamlit repo, set it up, switched to the `1.48.1` tag, built just the frontend and copied it to my venv's streamlit package`static` folder. Then I tested the charts in the dialog, confirmed that the tooltips are working correctly\n- Finally, while still on the `1.48.1` branch on the streamlit repo, I updated the packages in the `frontend/lib/package.json` just like dependabot did, then re-built the frontend and copied it again to the `static` folder, restarted the server and cleared the cache. The tooltips **were still working correctly**\n\nSo if I didn't mess anything up in my test, I think that maybe one of the other frontend changes in `1.49` were responsible for this regression. I will try to pinpoint the issue exactly by successively reverting the PRs, but if you have a better idea or a hunch of where the issue could be coming from, please let me know."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-09-02T16:45:14Z",
+      "body": "[USER] Thanks for doing a deep-dive! :) We didn't do a lot of changes between 1.48.1 & 1.49.1 that might have impacted this, maybe https://github.com/streamlit/streamlit/pull/12231 or https://github.com/streamlit/streamlit/pull/10311, but there isn't anything obvious which might have caused this."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-09-03T12:26:43Z",
+      "body": "Hey [USER] , thanks for the hints. I tested them and it's not actually any of those, but your initial guess was correct and my dirty test was faulty, it's a upstream bug, particularly in the `vega-embed` library, the 6.29.0 -> 7.0.2 upgrade is the one that caused the regression. I tested it both on the `1.48.1` and `1.49.0` streamlit codebases and setting the value of this library to 6.29.0 on both versions fixes the issue. \n\nWould it be possible to revert the version of this package to `6.29.0` until the regression is fixed in the upstream? I can contribute a PR if needed."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-09-03T13:07:15Z",
+      "body": "Thanks for taking another look \ud83d\ude4f\n\n> Would it be possible to revert the version of this package to 6.29.0 until the regression is fixed in the upstream? I can contribute a PR if needed.\n\nYep, I think it would be fine to roll back vega-embed temporarily. Feel free to contribute a PR \ud83d\udc4d It would also be great if you could [report this finding to vega-embed](https://github.com/vega/vega-embed/issues) as well "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-09-04T09:32:42Z",
+      "body": "hey [USER] , sure thing. I'll get to work on the PR tomorrow and open an issue with vega-embed. Thanks for the support \ud83d\ude42 "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-10-05T19:08:46Z",
+      "body": "hey [USER] , sorry for the big delay here, I went on vacation shortly after our last interaction. I tried now to create a branch on the repo where I can push my changes, but I am getting a Permission denied error. I tried with a personal repo and I am able to pull / push there with no issues with the same SSH key, so it's not an SSH issue. Do I need to be added as a collaborator to the repo to be able to push to a branch there?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-11-13T13:42:10Z",
+      "body": "Hey [USER] , could I be added to the contributors list please?"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-11-14T00:39:15Z",
+      "body": "Unfortunately, we cannot add people to the contributor list (other the snowflake accounts). But you can create a PR it this repo from a repo fork. This is how we handle external contributions. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-31T14:35:42Z",
+      "body": "This is a confirmed regression in v1.49.0 affecting tooltips in layered Altair charts when displayed inside `st.dialog`. According to the issue investigation, the root cause has been identified as an **upstream bug in the `vega-embed` library** - specifically the upgrade from version 6.29.0 to 7.0.2 introduced in [#11580](https://github.com/streamlit/streamlit/pull/11580). The bug only manifests when charts are rendered in dialogs with facet encodings (like `color`), where tooltips work only for the last layer instead of all layers. Charts rendered on the main page work correctly.\n\nA workaround has been identified: rolling back `vega-embed` to version 6.29.0 fixes the issue. A contributor has volunteered to submit a PR with the rollback and report the issue upstream to the vega-embed team.\n\n### Related Issues\n\n1. **[#8643](https://github.com/streamlit/streamlit/issues/8643)** - Support chart selections for multi-view vega-lite & altair charts - Related to interactivity issues with layered/multi-view Altair charts, though focused on selections rather than tooltips.\n\n2. **[#6099](https://github.com/streamlit/streamlit/issues/6099)** - `st.altair_chart` removes data from a compound plot with interaction - Related to compound/layered charts with interactive features not rendering correctly in Streamlit.\n\n3. **[#7994](https://github.com/streamlit/streamlit/issues/7994)** - `add_rows()` silently fails on compound altair chart - Related to issues with compound/layered Altair charts not functioning as expected.\n\n---\n*This is an automated triage comment. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-14T18:39:10Z",
+      "body": "Hey [USER] , been a while since I last visited this PR \ud83d\ude42 . I had opened an issue with the vega-embed repo, but it was closed since I couldn't reproduce it in the vega editor. I finally had some time this week to debug and figure out the issue. \n\nWith the upgrade of `vega-embed`, the default render changed from canvas to SVG (https://github.com/vega/vega-embed/pull/1386), and that's what triggered the bug. You can check that it doesn't manifest with the canvas renderer by replacing:\n```python\nchart = alt.layer(chart1, chart2)\n```\nwith:\n```python\nchart = alt.layer(chart2, chart1).properties(\n     usermeta={\"embedOptions\": {\"renderer\": \"canvas\"}}\n)\n```\nin the example above.\n\nIt turned out that with SVG in an `st.dialog`, path background elements were getting a style that blocks mouse events from reaching the underlying marker, producing the error. I have created the PR: https://github.com/streamlit/streamlit/pull/15191 to fix that and added more details about the issue there."
+    }
+  ]
+}

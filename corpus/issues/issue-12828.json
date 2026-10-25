@@ -1,0 +1,33 @@
+{
+  "id": "issue-12828",
+  "type": "issue",
+  "number": 12828,
+  "url": "https://github.com/streamlit/streamlit/issues/12828",
+  "title": "Display full precision of all decimals in st.dataframe() instead of default 4 decimal limit",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.dataframe"
+  ],
+  "created_at": "2025-10-20T13:10:30Z",
+  "closed_at": "2026-07-22T10:10:14Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nDefault st.dataframe() beheviour is only displaying 4 decimals, and then you have to double click on the cell to actual see if it has more decimals to it. \nThe pandas dataframe is rounded and might show inaccurate number depending on your desires.\nWhat I've found in my situation is that I want the actual precison as if I viewed the data in a speadsheet.\n\n\n\n\n### Why?\n\nI desired in many cases to have full decimal presion when showing number in a st.dataframe()\n\n### How?\n```python\nimport streamlit as st\nimport pandas as pd\n\ndef show_dataframe_with_full_decimal_presion(df):\n    column_config = {\n        col: st.column_config.NumberColumn(col, format=\"%f\")\n        for col in df.select_dtypes(include=\"number\").columns\n    }\n    st.data_editor(df, column_config=column_config)\n\n# Sample DataFrame\ndf = pd.DataFrame({\n    \"item\": [\"A\", \"B\", \"C\", \"D\"],\n    \"value\": [123.456, 78.1234567, 45.1, 12.0],\n    \"otherValue\": [1.22323123123, 3.456789, 7.0, 0.0001234],\n    \"role\": [\"x\", \"z\", \"k\", \"j\"]\n})\n\n\n# show with defaul streamlit behavior\n\nst.header(\"default dataframe limited to 4 deimals\")\nst.dataframe(df)\n\nst.header(\"full presision\")\nshow_dataframe_with_full_decimal_presion(df)\n```\n### Additional Context\n\nIt could be awesome to have a option:\nst.dataframe(myDf, full_decimal_precision=true) \n\nIts the equvilient of displaying a regular pandas dataframe in st.dataframe() and then press the \"3 dots\" near the column header, choosing \"format\" and choosing \"plain\"\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-10-20T13:10:42Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12828)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-02-06T12:01:48Z",
+      "body": "Hey Streamlit [USER]  ,\ni just wanted to ping the issue in hope of that its was bumped up somehow, so this could become default. I accidentally closed it :D sorry. here it is reopened. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T10:10:14Z",
+      "body": "Closing this since its possible via `format=\"plain\"` in `st.column_config.NumberColumn` or `st.column_config.NumberColumn(col, format=\"%f\")` shown in the snippet above. We don't plan to add another dataframe wide option to make this configurable. "
+    }
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "id": "issue-11031",
+  "type": "issue",
+  "number": 11031,
+  "url": "https://github.com/streamlit/streamlit/issues/11031",
+  "title": "st.plotly_chart ignores font_family and font_color in fig.update_layout for Sankey diagrams, but fig.show() renders correctly",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.plotly_chart"
+  ],
+  "created_at": "2025-04-04T00:12:58Z",
+  "closed_at": "2026-07-27T18:55:22Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nHi Streamlit team \ud83d\udc4b\n\nI'm experiencing an issue when displaying a Plotly Sankey diagram in Streamlit. When I use `fig.update_layout()` to customize the font \u2014 specifically `font_family` and `font_color` \u2014 these settings are not reflected in the Streamlit app using `st.plotly_chart()`. However, when I call `fig.show()`, the chart renders correctly with the intended font and color\n\n\n### Reproducible Code Example\n\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-11031)\n\n```Python\nimport streamlit as st\nimport plotly.graph_objects as go\n\nfig = go.Figure(data=[go.Sankey(\n    node=dict(\n        pad=15,\n        thickness=20,\n        line=dict(color=\"black\", width=0.5),\n        label=[\"A\", \"B\", \"C\", \"D\"],\n        color=\"blue\"\n    ),\n    link=dict(\n        source=[0, 1, 0, 2, 3],\n        target=[2, 3, 3, 3, 0],\n        value=[8, 4, 2, 8, 4]\n    )\n)])\n\nfig.update_layout(\n    title=\"Sankey Diagram Example\",\n    font_family=\"Times New Roman\",\n    font_color=\"blue\",\n    font_size=14  # This is the only setting that works\n)\n\nst.plotly_chart(fig)  # Font family and color are ignored\n# fig.show()          # Shows correct font and color\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\nAll font-related layout settings (family, color, size) should be applied when rendering the chart via `st.plotly_chart.`\n\n### Current Behavior\n\n* `font_size` works \u2705\n\n* `font_family` and `font_color` are ignored \u274c when rendered in Streamlit, but work in native Plotly (`fig.show()`)\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.44.1\n- Plotly version: 6.0.1\n- Python version: 3.11.11\n- Operating System: macOS\n- Browser: Brave Version 1.74.50\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-04-04T00:13:08Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11031)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-04-04T16:17:25Z",
+      "body": "Hi [USER] thank you for filing this ticket!\n\nThe theming behavior with the code written here is expected since we apply a Streamlit theme by default for a great out of-the-box experience. However, Streamlit also supports utilizing Plotly theming constructs! Utilize the `theme=None` parameter to do so. In this example, it would become `st.plotly_chart(fig, theme=None)`.\n\nFor additional documentation, take a look at our [doc pages for Plotly theming](https://docs.streamlit.io/develop/api-reference/charts/st.plotly_chart#:~:text=Copy-,Theming,-Plotly%20charts%20are).\n\nLet me know if this solves the issue at hand. Thanks for using Streamlit!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-04T18:56:25Z",
+      "body": "Hi [USER], thanks for getting back to me!\n\nI hadn't noticed that parameter before\u2014appreciate the pointer. I gave it a try, and while it does change the title styling, it doesn\u2019t seem to affect the node name text.\n\nHere\u2019s what I tested:\n\n```\nfig.show()\ncol1, col2 = st.columns(2)\nwith col1:\n    st.plotly_chart(fig)\nwith col2:\n    st.plotly_chart(fig, theme=None)\n```\n\nAnd here\u2019s what I\u2019m seeing in the Streamlit app:\n\n<img width=\"1437\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/a0e9b254-3d7c-4be5-ad0f-98bb20313c10\" />\n\nThis is the output from`fig.show()`:\n\n<img width=\"1432\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/7e53fd5e-e08a-4e77-a77d-35c01a415fe8\" />\n\nInterestingly, even in the native Plotly render, the node font color doesn't change\u2014but in the Streamlit app, the font style is noticeably different and harder to read.\n\nLet me know if I might be missing something else or if there's a workaround for the font styling in node labels.\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-04-04T22:12:47Z",
+      "body": "Thank you [USER], I see what you mean in this case!\n\nI did some debugging and found that we do mutate some colors [here](https://github.com/streamlit/streamlit/blob/develop/frontend/lib/src/components/elements/PlotlyChart/utils.ts#L150-L152), and I think the Sankey Node text is an edge case that isn't being properly handled. I will talk with the team about this. Thank you for filing this!"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-04-04T22:19:16Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11031)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-04-04T23:13:11Z",
+      "body": "Thanks for the update, [USER]. That explains the behavior I was seeing. I appreciate you checking it out and bringing it to the team\u2019s attention!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-06T17:37:18Z",
+      "body": "[USER] if a workaround is required in the meantime, setting the font params in `textfont` in `go.Sankey` allows changing font color.\n\n```python\nimport streamlit as st\nimport plotly.graph_objects as go\n\nfig = go.Figure(data=[go.Sankey(\n    node=dict(\n        pad=15,\n        thickness=20,\n        line=dict(color=\"black\", width=0.5),\n        label=[\"A\", \"B\", \"C\", \"D\"],\n        color=\"blue\"\n    ),\n    link=dict(\n        source=[0, 1, 0, 2, 3],\n        target=[2, 3, 3, 3, 0],\n        value=[8, 4, 2, 8, 4]\n    ),\n    textfont=dict(\n        family=\"Times New Roman\",\n        color=\"red\",\n        shadow=\"\",\n        size=14\n    )\n)])\n\nfig.update_layout(\n    title=\"Sankey Diagram Example\",\n)\n\nst.plotly_chart(fig)\n```\n\n<img width=\"1357\" height=\"729\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/44f5ee3a-0f68-4646-ab89-3170c6966a56\" />"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-12-31T15:02:53Z",
+      "body": "This is a confirmed bug where `st.plotly_chart` ignores user-specified `font_family` and `font_color` settings from `fig.update_layout()` when displaying Sankey diagrams (and other chart types). The root cause is in Streamlit's Plotly theming implementation: the Sankey-specific template in `streamlit_plotly_theme.py` explicitly sets `textfont.color` to a placeholder color, and the frontend's `CustomTheme.tsx` uses a `merge()` operation that overwrites user values with theme defaults instead of respecting user-specified settings. The `font_size` parameter works because it's not explicitly set in the theme template. A workaround is to use `st.plotly_chart(fig, theme=None)`, but this disables all Streamlit theming.\n\n### Related Issues\n\n- **#7955** - [Cannot set custom st.plotly_chart() font attributes with fig.update_layout()](https://github.com/streamlit/streamlit/issues/7955) - This is essentially the same bug. It reports that `st.plotly_chart` ignores font settings passed via `fig.update_layout()`, using Streamlit's theme fonts instead. Users want the option to override the theme and use custom fonts. **Likely duplicate.**\n\n- **#4178** - [Cannot set Plotly theme because Streamlit overrides user values](https://github.com/streamlit/streamlit/issues/4178) - Related issue where `st.plotly_chart` overrides user-defined Plotly templates/themes with Streamlit's theme. This is part of the same underlying problem where user customizations are not respected.\n\n- **#12425** - [Make charts use `textColor` for all text](https://github.com/streamlit/streamlit/issues/12425) - Enhancement request to make chart text colors respect the global `textColor` theme setting. Related to the broader issue of font/color customization in charts.\n\n---\n*This is an automated triage comment. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "issue-16686",
+  "type": "issue",
+  "number": 16686,
+  "url": "https://github.com/streamlit/streamlit/issues/16686",
+  "title": "st.date_input dropdown showing the wrong year in constrained range",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:frontend",
+    "area:widgets",
+    "status:confirmed",
+    "priority:P2",
+    "feature:st.date_input",
+    "upstream"
+  ],
+  "created_at": "2026-08-28T09:17:58Z",
+  "closed_at": "2026-08-29T07:09:38Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen selecting a date from the dropdown with a range defined that crosses the boundary between two years, the year is pinned to the earlier of the two even when looking at months in the later. If a date is selected, it renders correctly in the input box but the dropdown continues to be wrong.\n\nI used uv to install streamlit 1.62.0.\n\n### Reproducible Code Example\n\n```Python\n#In main.py:\nfrom datetime import datetime\nimport streamlit as st\n\na = st.date_input(\"Input:\", min_value=datetime(2024,8,3), max_value=datetime(2025,2,3), value=None)\nst.write(a)\n\n#----------------------------------------------------\n\n#In pyproject.toml:\n[project]\nname = \"streamlit-bug\"\nversion = \"0.1.0\"\nrequires-python = \">=3.13\"\ndependencies = [\n    \"streamlit>=1.62.0\",\n]\n```\n\n### Steps To Reproduce\n\n1. Create directory containing main.py and pyproject.toml as given in the code example.\n2. Run `uv sync` to set up environment\n3. Run the app with `uv run streamlit run main.py`\n4. On the app page, select the date input.\n\n### Expected Behavior\n\nThe date input dropdown should open in February, 2025. When the 1st of February is selected, the input should display 2025/02/01. If the year in the dropdown menu is selected, it should display a list of 2024 and 2025.\n\n### Current Behavior\n\nThe date dropdown opens in February, 2025 but displays it as February, 2024. When the 1st of February is selected, the input displays 2025/02/01. If the year in the dropdown menu is selected, it displays a list of only 2024.\n\n<img width=\"759\" height=\"364\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/82d4c42e-8872-49b8-bcbb-650472825c79\" />\n\n<img width=\"738\" height=\"343\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/772c10dc-da40-4dd2-be3d-d8a78f6234bd\" />\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.62.0\n- Python version: 3.13.14\n- Operating System: Ubuntu 26.04 LTS (running in WSL)\n- Browser: Google Chrome\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-28T09:18:08Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16686)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-28T11:50:25Z",
+      "body": "This is a frontend bug in the `st.date_input` calendar header: when `min_value`/`max_value` span a year boundary and the max date\u2019s month/day is earlier than the min date\u2019s (here `2024-08-03` \u2192 `2025-02-03`), the popover grid is on February 2025 but the header shows **February 2024**, and the year dropdown lists only **2024**. Selecting a day still commits the correct 2025 date, so the value path is fine; only the month/year picker UI is wrong. The same header is shared with `st.datetime_input`.\n\nLikely cause: React Aria\u2019s `CalendarYearPicker` (`useCalendarYearPicker`, `react-aria-components` 1.20.0) builds year options by starting at `minValue` and adding one year at a time until the date exceeds `maxValue`. `2024-08-03 + 1 year` is `2025-08-03`, which is after `2025-02-03`, so 2025 is never added. Streamlit then renders the year trigger from that item list (`CalendarPopoverHeader`), so it stays on the only remaining year (2024) even while the calendar grid shows February 2025. There is already a local workaround in `CalendarPopoverHeader` for a related RAC year-picker bug (stale month on controlled `focusedValue`), but it does not fix year-list generation. A secondary Streamlit issue: `getInitialFocusedDate` clamps to `minDate` but not `maxDate`, so with `value=None` and today after the max, the focused date starts out of range.\n\n### Related Issues\n\n- [#9667](https://github.com/streamlit/streamlit/issues/9667) \u2014 Same class of year-dropdown failure when the allowed range crosses a year boundary (years missing/disabled). Filed against the old Baseweb picker and closed after the RAC migration; this issue is the RAC equivalent, not a duplicate.\n- [#9922](https://github.com/streamlit/streamlit/issues/9922) \u2014 Year options were treated as unavailable unless the *currently displayed month* was valid in that year. Same underlying \u201cyear list does not mean any date in that year is selectable\u201d problem; also Baseweb-era and closed.\n- [#14799](https://github.com/streamlit/streamlit/issues/14799) \u2014 Duplicate of #9667 with a side-by-side repro of inconsistent year enabling at range edges. Useful for expected vs actual year-picker behavior; closed as duplicate/upstream.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

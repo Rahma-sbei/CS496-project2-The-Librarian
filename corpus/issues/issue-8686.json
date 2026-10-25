@@ -1,0 +1,25 @@
+{
+  "id": "issue-8686",
+  "type": "issue",
+  "number": 8686,
+  "url": "https://github.com/streamlit/streamlit/issues/8686",
+  "title": "st.button - add delay to `help` tooltip",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:tooltip",
+    "feature:st.button"
+  ],
+  "created_at": "2024-05-16T08:12:23Z",
+  "closed_at": "2026-09-03T10:49:56Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nIn similar way to other framework, there should be an additional parameter, named, for example, \"tooltip_delay\", which would delay the display of the Help string.\n\n### Why?\n\nIt's annoying that the string appears right away and then covers other nearby elements.\n\n### How?\n\n If the new parameter \"tooltip_delay\" is 0, tooltip appears immediately. When value increase (ms), help string is not show even if the mouse pointer remains positioned on the button. If you move the pointer and the delay is still in progress, the tooltip will not be shown at all. You could even add another parameter that moves the tooltip display manually: for example: above, below, left, right...\n\n### Additional Context\n\nHere the example in Angula Material:\r\nhttps://material.angular.io/components/tooltip/overview",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-05-16T08:12:39Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-8686)\n"
+    }
+  ]
+}

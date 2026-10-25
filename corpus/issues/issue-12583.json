@@ -1,0 +1,24 @@
+{
+  "id": "issue-12583",
+  "type": "issue",
+  "number": 12583,
+  "url": "https://github.com/streamlit/streamlit/issues/12583",
+  "title": "Control wrap behavior for text (`st.markdown`, `st.text`, ...)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:markdown",
+    "feature:st.text"
+  ],
+  "created_at": "2025-09-22T00:13:16Z",
+  "closed_at": "2026-08-28T15:29:04Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nToday, text created with `st.markdown` or other commands always wraps to new lines. This can be annoying in tight layouts. It would be good to add a parameter to not wrap to new lines in those cases but rather ellipsize the text (i.e. cut it and add `...`). \n\n### Why?\n\nE.g. if you have this at the top of a dashboard, if you make the window smaller, it might look better to ellipsize the text instead of making a widget wrap to the next line or wrapping the text:\n\n<img width=\"1235\" height=\"165\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/49bb1de1-ec34-4473-afac-2a846866d53f\" />\n\n### How?\n\nMaybe simply `wrap=True|False`. Or something like `ellipsize`? See also some related considerations in #12582. Note that `st.code` also has a parameter `wrap_lines`. \n\n### Additional Context\n\nRelated:\n\n- #12582",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-09-22T00:13:27Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12583)\n"
+    }
+  ]
+}

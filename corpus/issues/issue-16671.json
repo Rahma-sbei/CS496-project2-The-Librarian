@@ -1,0 +1,23 @@
+{
+  "id": "issue-16671",
+  "type": "issue",
+  "number": 16671,
+  "url": "https://github.com/streamlit/streamlit/issues/16671",
+  "title": "MMMENACE",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:needs-triage"
+  ],
+  "created_at": "2026-08-27T13:07:29Z",
+  "closed_at": "2026-08-27T13:28:40Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nThis page describes how to use the web preview feature in Cloud Shell.\nThis feature lets you run web applications on the Cloud Shell virtual\nmachine instance and preview them from the [Google Cloud console](https://console.cloud.google.com/).\n\nThe Web Preview button ![Web Preview Button](https://docs.cloud.google.com/static/shell/docs/images/web_preview.svg)\ncan be found on the top right of the Cloud Shell taskbar.\n\n## Start the web application\n\nYou can run any web application that listens to HTTP requests on the\nCloud Shell virtual machine. The web\napplication must listen for HTTP requests on ports within the permitted range\n2000 to 65000. These ports are only available to the secure Cloud Shell proxy\nservice, which restricts access over HTTPS to your user account only.\n\n### Simple server example\n\nTo start a simple Python HTTP server from the Cloud Shell command\nprompt:\n\n```sh\ncd `mktemp -d` \\\n    && echo '<html><body>Hello World</body></html>' >./index.html \\\n    && python -m http.server 8080\n```\n\n## Preview the application\n\nClick the **Web Preview** button\n![Web Preview Button](https://docs.cloud.google.com/static/shell/docs/images/web_preview.svg) and then select\nthe port number from the displayed menu. Cloud Shell opens the preview URL on\nits proxy service in a new browser window.\n\nYou can also access the preview URL by combining the port with the environment\nvariable `WEB_HOST` in the Cloud Shell terminal using the format `https://$PORT-$WEB_HOST`,\nor by using the [Cloud Shell API](https://docs.cloud.google.com/shell/docs/reference/rpc/google.cloud.shell.v1#environment).\n\n## Accessing Streamlit applications\n\nWeb preview in Cloud Shell works through a series of HTTP proxies.\nStreamlit applications require [additional arguments](https://github.com/streamlit/streamlit/issues/6305) to function when running\nbehind an HTTP proxy. When running these applications, make sure you specify\n`--browser.serverAddress=localhost --server.enableCORS=false --server.enableXsrfProtection=false`\non the command line.\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n&& echo '<html><body>Hello World</body></html>' >./index.html \\\n    && python -m http.server 8080const jwt = require('jsonwebtoken');\n\nconst authenticateToken = (req, res, next) => {\n  const authHeader = req.headers['authorization'];\n  const token = authHeader && authHeader.split(' ')[1]; // Extract token from \"Bearer <token>\"\n\n  if (!token) {\n    return res.status(401).json({ error: 'Access token missing' });\n  }\n\n  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {\n    if (err) {\n      return res.status(403).json({ error: 'Invalid or expired token' });\n    }\n    req.user = user; // Attach decoded payload (e.g., wallet address) to request\n    next();\n  });\n};\n\n\n### Expected Behavior\n\nMMMENACE RUNNING TESTS AND ANALYZING ERRORS\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-27T13:07:40Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16671)\n"
+    }
+  ]
+}

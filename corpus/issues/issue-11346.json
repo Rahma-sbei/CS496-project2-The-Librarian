@@ -1,0 +1,52 @@
+{
+  "id": "issue-11346",
+  "type": "issue",
+  "number": 11346,
+  "url": "https://github.com/streamlit/streamlit/issues/11346",
+  "title": "Tick styling inconsistent in `st.bokeh_chart()` vs `streamlit_bokeh()` for caliber theme",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:styling",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.bokeh_chart",
+    "upstream"
+  ],
+  "created_at": "2025-05-13T17:46:54Z",
+  "closed_at": "2026-09-10T01:14:35Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n`streamlit_bokeh` fails to generate correct axes using the caliber theme after setting the plot background and border colors.  The tick styling fails to output ticks of the requested color.  Legacy `st.bokeh_chart()` renders the ticks as expected.\n\n\n### Reproducible Code Example\n\n```Python\n# See: https://github.com/pr3d4t0r/SSScoring/blob/master/LICENSE.txtl\n\n# Streamlit Bokeh bug report runner\n\n\nimport bokeh.models as bm\nimport bokeh.plotting as bp\nimport streamlit as st\n\nbackgroundColorName='#2c2c2c'\ncolorName = 'lightsteelblue'\nTHEME='caliber'\nx = [ x for x in range(1,6) ]\ny = [ 6, 7, 6, 4, 5, ]\n\n\ndef BUG_st_bokeh():\n    # REQUIRES: pip install streamlit_bokeh\n    from streamlit_bokeh import streamlit_bokeh\n\n    plot = bp.figure(\n                title='TICK MARKS MISSING - theme: %s' % THEME,\n                width=500,\n                height=300,\n                background_fill_color=backgroundColorName,\n                border_fill_color=backgroundColorName,\n    )\n    plot.title.text_font = 'Arial'\n    plot.title.text_color = 'red'\n    plot.xaxis.axis_label_text_color=colorName\n    plot.xaxis.major_label_text_color=colorName\n    plot.xaxis.axis_line_color=colorName\n    plot.xaxis.major_tick_line_color=colorName\n    plot.xaxis.minor_tick_line_color=colorName\n    plot.yaxis.axis_label_text_color=colorName\n    plot.yaxis.major_label_text_color=colorName\n    plot.yaxis.axis_line_color=colorName\n    plot.yaxis.major_tick_line_color=colorName\n    plot.yaxis.minor_tick_line_color=colorName\n    plot.line(x, y, line_color='orange')\n    linearAxis = bm.LinearAxis(\n            axis_label_text_color = colorName,\n            axis_line_color = colorName,\n            major_label_text_color = colorName,\n            axis_label = 'Foo',\n            major_tick_line_color='yellow',\n            minor_tick_line_color='yellow',\n            y_range_name = 'Bar'\n    )\n    plot.extra_y_ranges = { 'Bar': bm.Range1d(start = 0, end = 10) }\n    plot.add_layout(linearAxis, 'left')\n    streamlit_bokeh(plot, use_container_width=False, theme=THEME)\n\n\ndef WORKS_st_bokeh_chart():\n    # REQUIRES: pip install bokeh==2.4.3\n    import bokeh.io as bi\n\n    bi.curdoc.theme = THEME\n    plot = bp.figure(\n                title='TICK MARKS SHOW - theme: %s' % THEME,\n                width=500,\n                height=300,\n                background_fill_color=backgroundColorName,\n                border_fill_color=backgroundColorName,\n    )\n    plot.title.text_font = 'Arial'\n    plot.title.text_color = colorName\n    plot.xaxis.axis_label_text_color=colorName\n    plot.xaxis.major_label_text_color=colorName\n    plot.xaxis.axis_line_color=colorName\n    plot.xaxis.major_tick_line_color=colorName\n    plot.xaxis.minor_tick_line_color=colorName\n    plot.yaxis.axis_label_text_color=colorName\n    plot.yaxis.major_label_text_color=colorName\n    plot.yaxis.axis_line_color=colorName\n    plot.yaxis.major_tick_line_color=colorName\n    plot.yaxis.minor_tick_line_color=colorName\n    plot.line(x, y, line_color='orange')\n    linearAxis = bm.LinearAxis(\n            axis_label_text_color = colorName,\n            axis_line_color = colorName,\n            major_label_text_color = colorName,\n            axis_label = 'Foo',\n            major_tick_line_color='yellow',\n            minor_tick_line_color='yellow',\n            y_range_name = 'Bar'\n    )\n    plot.extra_y_ranges = { 'Bar': bm.Range1d(start = 0, end = 10) }\n    plot.add_layout(linearAxis, 'left')\n    st.bokeh_chart(plot, use_container_width=False)\n\n\nif '__main__' == __name__:\n    WORKS_st_bokeh_chart()\n    # BUG_st_bokeh()\n```\n\n### Steps To Reproduce\n\n1. Save the reproducible code example as buggy.py\n2. Ensure that `bokeh==2.4.3` is installed and that `streamlit_bokeh` is not present in the current environment\n3. `streamlit run buggy.py` - This code uses `st.bokeh_chart()` and renders the ticks for the x, y, and extra y axes/ranges\n4. Close the browser and `Ctrl-C` to exit `streamlit`\n5. Go to line 95 of the reproducible example and comment out `# WORKS_st_bokeh_chart()`\n6. Go to line 96 of the reproducible example and enable `BUG_st_bokeh()`\n7. Install `streamlit_bokeh` and its dependencies\n8. `streamlit run buggy.py` - This code uses `streamlit_bokeh()` and fails to render ticks for the x, y, and extra y axes/ranges.  Inspecting the output shows that the ticks are present in a dark grey color, unaffected by rendeding settings in `bm.LinearAxis` construction and `bp.plot` instance configuration.\n\nThe implementations of `WORKS_st_bokeh_chart()` and `BUG_st_bokeh()` are identical (check with `diff -y` if needed).\n\n### Expected Behavior\n\nPlots rendered using the caliber theme feature tick marks along the axes.  When using `st.bokeh_chart()` and Bokeh 2.4.3 (legacy) the plots render the tick marks for the main axes and for any extra X or Y ranges and axes.\n\n\n### Current Behavior\n\n`streamlit_bokeh` fails to generate correct axes using the caliber theme after setting the plot background and border colors.  The tick styling fails to output ticks of the requested color.  Legacy `st.bokeh_chart()` renders the ticks as expected.\n\nCompare the output from both function calls (legacy `st.bokeh_chart()` vs `streamlit_bokeh()` generated by identical code.  This must be executed to experience the differences.\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.45.1\n- Python version: 3.13.3, others prior\n- Operating System: macOS 15.4.1\n- Browser: Firefox, Safari, LibreWolf, Brave\n\nAll browsers run at their latest available GA version.\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-05-13T17:47:06Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-11346)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-05-13T22:18:11Z",
+      "body": "Inconsistent theme application to tick marks\n**st.bokeh_chart**\n<img width=\"554\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/16a21895-4a14-4064-8b6b-53c8be941b00\" />\n**streamlit_bokeh**\n<img width=\"540\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/7de0d957-78f5-4d82-9274-4ec0adc6e58c\" />"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-18T16:37:53Z",
+      "body": "Greetings.  Checking what's the status of this bug fix.  No super rush if the old Bokeh support will remain.  Thanks in advance and have a great weekend."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-03-20T07:26:03Z",
+      "body": "Hi, I would like to work on this issue. \nI have experience with Streamlit and Python. \nCan you assign it to me?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-23T19:05:39Z",
+      "body": "Hi, I\u2019d like to work on this issue if it\u2019s still available.\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-05T01:03:09Z",
+      "body": "This one looks obsolete \u2014 the command it reports on no longer exists, so I think it can be closed.\n\n`st.bokeh_chart` has been removed from the library. On current `develop`:\n\n- No `bokeh_chart` in `lib/streamlit/__init__.py` or anywhere under `lib/streamlit/elements/`\n- No bokeh source files anywhere in the tree (`git ls-tree -r origin/develop` matches nothing on `bokeh`)\n- The only surviving mentions are a docstring example and a telemetry name list, and both refer to the third-party `streamlit-bokeh` component rather than a built-in command:\n\n```\nlib/streamlit/components/v2/manifest_scanner.py:354:  The distribution name (e.g., \"streamlit-bokeh\").\nlib/streamlit/runtime/metrics_util.py:229:            \"bokeh\",\n```\n\nSince the issue is a styling comparison *between* `st.bokeh_chart()` and `streamlit_bokeh`, and the former side of that comparison is gone, there is nothing left to reconcile \u2014 bokeh charts now go through `streamlit-bokeh` only, so its tick styling is whatever that component produces.\n\nIf any of the original tick-styling behaviour is still wrong inside `streamlit-bokeh` itself, that would belong in that component's own repo rather than here.\n"
+    }
+  ]
+}

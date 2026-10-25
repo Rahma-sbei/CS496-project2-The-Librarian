@@ -1,0 +1,61 @@
+{
+  "id": "issue-6687",
+  "type": "issue",
+  "number": 6687,
+  "url": "https://github.com/streamlit/streamlit/issues/6687",
+  "title": "Non-script blocking functions for long-running tasks (background execution)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:cache",
+    "area:performance",
+    "type:possible-component",
+    "area:threading/processing"
+  ],
+  "created_at": "2023-05-15T16:03:52Z",
+  "closed_at": "2026-10-13T16:23:23Z",
+  "body": "### Problem\n\nMany applications require long-running functions. In many cases, `[USER].cache_data` and `[USER].cache_resource` will suffice to achieve good performance, but these are not suitable when the inputs to the function change very frequently. \n\nOne common sub-case of this is where the output of the function is important, but not time critical. In this case it would be good to render the page and then \"fill-in\" the missing parts when the function finishes running.\n\n### Solution\n\n**MVP:** What's the smallest possible solution that would get 80% of the problem out of the way?\n\nI propose a decorator `st.run_in_background` that returns a spinner (like the `st.cache_resource` decorator) while a function is running, but does not block the execution of the application. \n\nTo illustrate the idea:\n\n```python\n[USER].run_in_background(show_spinner='Generating the plot')\ndef plot_data(data):\n    '''Just an example of a slow function'''\n    return sns.pairplot(data)\n\ndef get_results(data):\n    '''Just an example of a fast function'''\n    return 'All good' \n\nst.title('My app')\n\nselected_data = ... # let's assume this changes a lot, eg. due to interactive filters\nresults = get_results(selected_data)\n\nfig = plot_data(selected_data ) # This is slow to run\nst.pyplot(fig)\n\nst.write(results)\n```\n\nIn the code above, it'd be great if `st.pyplot` displayed a spinner while `plot_data` is executing (without blocking `st.write(results)`) and then \"fill-in\" the space with the plot once `plot_data` finishes executing.\n\n**Possible additions:** What are other things that could be added to the MVP over time to make it better?\n\nSmart error handling to turn any operation on a \"delayed\" object would be very cool.\n\nFor example, in this code:\n\n```python\nfig = plot_data(data)\nfig.update_axes(...) # this would error if fig is not a matplotlib figure, it'd be awesome if streamlit could figure out this is still being loaded without blocking execution\n```\n\n### Additional context\n\nUltimately I'm proposing that streamlit replicate the lazy loading as done in PowerBI (for example)\n\n![image](https://apps.provingground.io/wp-content/uploads/sites/2/2020/08/Tracer-OfficeSpaceDash.gif)\n\nNote that every chart is \"loading separately\" as far as the users are concerned. \n\n\n---\n\n### Related Issues\n\n[Joining user threads](https://github.com/streamlit/streamlit/issues/5826)\n[Trigger a script re-run from another thread](https://github.com/streamlit/streamlit/issues/2838)\n\n---\n\nCommunity voting on feature requests enables the Streamlit team to understand which features are most important to our users.\n\n**If you'd like the Streamlit team to prioritize this feature request, please use the \ud83d\udc4d (thumbs up emoji) reaction in response to the initial post.**\n\n![Views](https://api.views-badge.org/badge/st-issue-6687)\n",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2023-05-15T16:26:14Z",
+      "body": "Thanks for adding this [USER]!\r\n\r\nI have been thinking about a similar enhancement request using a context manager instead (e.g., \"`with st.background_thread:`\"), but still need to think through some of the implications.\r\n\r\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-05-16T08:54:56Z",
+      "body": "Approaching this with a context manager would also work - it'd be fairly elegant I suppose. \r\n\r\nDo you know of any implementation of `with st.background_thread` or was that illustrative? "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2023-05-30T17:15:24Z",
+      "body": "Super interesting idea! We don't have any concrete plans right now but background tasks is something we talked about in the past. Could even be that we just improve threading/multiprocessing support to let you do that yourself a little bit more easily. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-05-31T16:22:36Z",
+      "body": "[USER] Sorry for the late reply, it was merely illustrative \ud83d\ude04\r\n\r\n[USER] Glad to hear it's been talked about. One counter argument I guess is that it is quite easy to implement edge functions with a cloud provider, and perform expensive calculations completely outside the app. I actually run a micro-SaaS built on Streamlit and use this concept to keep things smooth \ud83d\ude05"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-06-02T09:36:19Z",
+      "body": "If there'd be a way to report progress (not just spinner) for such task too - would be awesome."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-06-02T11:02:08Z",
+      "body": "I found this code to be a good starting point:\r\n\r\nhttps://github.com/cocuni80/thread_decorator/blob/master/thread_decorator/core.py\r\n\r\nI think this solves the problem: \r\n\r\n```python\r\nimport streamlit as st \r\nimport time\r\nimport functools \r\nimport threading\r\n\r\nclass ResultThread(threading.Thread):\r\n    \"\"\"\r\n    A custom Thread that can return the value of the function \r\n    runned inside it\r\n    \"\"\"\r\n    fx_output = None\r\n    error = None\r\n\r\n    def run(self, *args, **kwargs):\r\n        try:\r\n            if self._target:\r\n                self.fx_output = self._target(*self._args, **self._kwargs)\r\n        except Exception as e:\r\n            self.error = e\r\n        finally:\r\n            del self._target, self._args, self._kwargs\r\n\r\n    def await_output(self):\r\n        \"\"\"\r\n        Wait for the thread to finish and return the return value of fx\r\n        \"\"\"\r\n        self.join()\r\n        return self.fx_output\r\n\r\n    def get_error(self):\r\n        \"\"\"\r\n        Return error if any, return None if no error occured\r\n        \"\"\"\r\n        self.join()\r\n        return self.error\r\n\r\ndef threaded(daemon=False):\r\n    \"\"\"\r\n    A decorator to run a function in a separate thread, this is useful\r\n    when you want to do any IO operations (network request, prints, etc...)\r\n    and want to do something else while waiting for it to finish.\r\n    :param fx: the function to run in a separate thread\r\n    :param daemon: boolean whether or not to run as a daemon thread\r\n    :return: whatever fx returns\r\n    \"\"\"\r\n    def _threaded(fx):\r\n        [USER].wraps(fx)\r\n        def wrapper(*args, **kwargs):\r\n            thread = ResultThread(target=fx, daemon=daemon,\r\n                                  args=args, kwargs=kwargs)\r\n            thread.start()\r\n            return thread\r\n        return wrapper\r\n\r\n    return _threaded\r\n\r\n[USER].cache_resource()\r\n[USER]()\r\ndef foo1()->ResultThread:\r\n    time.sleep(1)\r\n    return 'Slow 1'\r\n\r\n[USER].cache_resource\r\n[USER]()\r\ndef foo2()->ResultThread:\r\n    time.sleep(2)\r\n    return 'Slow 2' \r\n\r\n[USER].cache_resource\r\n[USER]()\r\ndef foo3()->ResultThread:\r\n    time.sleep(3)\r\n    return 'Slow 3'\r\n\r\n[USER].cache_resource\r\n[USER]()\r\ndef foo4()->ResultThread:\r\n    time.sleep(4)\r\n    return 'Slow 4'\r\n\r\n[USER].cache_data\r\ndef slow_important_function()->ResultThread:\r\n    time.sleep(3)\r\n    return 'This was the day!'\r\n\r\n# Here I'm kicking things off \r\na,b,c,d = foo1(), foo2(), foo3(), foo4()\r\n\r\nc1,c2,c3,c4 = st.columns(4)\r\n\r\nwith c1:\r\n    st.write('Col 1')\r\n    a_result = st.empty()\r\n    a_result.image('https://i.gifer.com/origin/34/34338d26023e5515f6cc8969aa027bca_w200.gif', width=35)\r\n    \r\nwith c2:\r\n    st.write('Col 2')\r\n    b_result = st.empty()\r\n    b_result.image('https://i.gifer.com/origin/34/34338d26023e5515f6cc8969aa027bca_w200.gif', width=35)\r\n\r\nwith c3:\r\n    st.write('Col 3')\r\n    c_result = st.empty()\r\n    c_result.image('https://i.gifer.com/origin/34/34338d26023e5515f6cc8969aa027bca_w200.gif', width=35)\r\n    \r\nwith c4:\r\n    st.write('Col 4')\r\n    d_result = st.empty()\r\n    d_result.image('https://i.gifer.com/origin/34/34338d26023e5515f6cc8969aa027bca_w200.gif', width=35)\r\n \r\n \r\nst.success(slow_important_function()) # <- Let's imagine this is important\r\n \r\n## in this section I'll resolve the stuff that was kicked off but not yet displayed\r\na_result.write(a.await_output())\r\nb_result.write(b.await_output())\r\nc_result.write(c.await_output())\r\nd_result.write(d.await_output())\r\n\r\n```\r\nIt'd be good to have an easy way to access the streamlit default spinner - and then the \"feature\" would be done as far as I'm concerned. \r\n\r\n[scrnli_6_2_2023_12-01-44 PM.webm](https://github.com/streamlit/streamlit/assets/112868935/41ee6214-bb17-4ad4-92c4-a1ae6ae4fd83)\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-03-25T20:04:37Z",
+      "body": "Hey all \u2014 this issue has been on my radar and I wanted to share some design thinking. Sharing it here since this issue already captures the problem well and I'd love to get reactions.\n\n### The idea: `st.background_task`\n\nA managed API for kicking off long-running work that survives reruns:\n\n```python\ntask = st.background_task(slow_query, args=(params,), key=\"my_query\")\n\nif task.running:\n    st.info(\"Query running...\")\nelif task.done:\n    st.dataframe(task.result)\n```\n\nThe `key` deduplicates across reruns (same key = same task, not a new one). When the task finishes, the runtime automatically triggers a rerun so you can render the result \u2014 no polling needed. Tasks get cleaned up when the session ends.\n\nThe workaround [USER] shared above with raw threads works, but threads created outside Streamlit don't have access to `ScriptRunContext`, can't trigger reruns on completion, and aren't tied to the session lifecycle. This would handle all of that.\n\n### How it relates to parallel fragments\n\nWe're working on `[USER].fragment(parallel=True)` ([#14277](https://github.com/streamlit/streamlit/pull/14277)) which gives concurrency *within* a single script run \u2014 independent UI sections load at the same time. Background tasks would be different: the work outlives reruns, produces data rather than UI, and doesn't block interactions. They'd be complementary.\n\n### Open questions\n\n- Does the API shape feel right? The original proposal here used a decorator (`[USER].run_in_background`) \u2014 any preference?\n- What are your actual use cases? Long queries, model training, batch jobs?\n- How important is cancellation when inputs change?\n\nWould love to hear what people think.\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-13T16:23:23Z",
+      "body": "An update here: now that we have the features of `st.cache_data(refresh_mode=\"background\")` and `st.fragment(parallel=True)` there is a pattern for this combining these. \n\nSee the app that I have created here illustrating how to use these for long-running tasks: https://long-query-patterns.streamlit.app/\nSee also this PR updating our skills: https://github.com/streamlit/streamlit/pull/17446\n\nNote, there is a gap associated with this that has surfaced while testing this pattern, when you have a user interaction with an element that is inside a fragment, that will not interrupt the main run and will need to wait for the long running task to complete. I created an issue to track this here: https://github.com/streamlit/streamlit/issues/17445 . If this is affecting your use case, please upvote and comment on that issue. Please let me know if you have any other use cases which this suggested pattern does not address \ud83d\ude4f "
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "id": "issue-3508",
+  "type": "issue",
+  "number": 3508,
+  "url": "https://github.com/streamlit/streamlit/issues/3508",
+  "title": "A way to add Python functionalities/custom HTML/CSS code to streamlit",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:custom-components"
+  ],
+  "created_at": "2021-07-03T07:39:25Z",
+  "closed_at": "2026-07-22T09:58:14Z",
+  "body": "### Problem\r\n\r\nI'm finding it a bit difficult to add a few Python functions onto the existing `components.html()`. Like say I'm scraping data from a \r\nsite using bs4 or something, and write a function to extract certain data from a given URL and then pass it on as an input to get \r\nsome prediction from it and I want to add some specific styling to it. `components.html()` and `components.iframe()` are not really fitting the bill.\r\n\r\n### Solution\r\n\r\n**MVP:** The smallest possible solution to get at least a few things out of the way is to use f-strings to load in variables, but that \r\ndoesn't solve the problem of especially using functions, loops and styling, for which I have to keep going back to Flask, which \r\nmakes things more difficult, since streamlit is being used to make it easy in the first place\r\n\r\n**Possible additions:** Possibly, some arguments can be added on to `components.html()` to be able to use jinja-like syntax to \r\nsolve the issue or add new functionalities for it.\r\n\r\n**Preferred solution:** I've done something to solve this very issue, called [Sierra](https://github.com/BrainStormYourWayIn/sierra), which can make adding functions, loops, variables, conditions - anything you can do on Python, to the webpage in a really easy way. The syntax is small and simple, so using it makes it easy on the user too. One can add this to streamlit and use it, since doing it personally might make it difficult to go the original index.html file which is being hosted on localhost and use this on that.  \r\n\r\nIt would probably be easy to able to use this/something like this along with streamlit.\r\n\r\n\r\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2021-07-08T04:24:09Z",
+      "body": "Thank you [USER] for sharing your ideas about adding Python native HTML/CSS code to Streamlit here. Our mission is to make Streamlit the best way to build data apps, and your thoughts help us focus our roadmap where people feel the most pain. We're going to get this in front of our product team to see how we can best integrate this with our future plans.\r\n\r\nWe can't integrate every feature into the mainline codebase, but alternatively there are lots of interesting ways to extend Streamlit for your use cases via our Custom Components framework. You can read the docs about components [here](https://docs.streamlit.io/en/stable/streamlit_components.html). If you can't use Custom Components, don't forget, Streamlit is really just Python, so the possibilities are endless! \ud83d\ude42\r\n\r\nWe'll get back to you if we are able to prioritize this work!"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2022-02-15T17:32:16Z",
+      "body": "Hey [USER], one of our co-founder has also written [this library](https://github.com/tvst/htbuilder) a long time ago, which looks pretty similar to Sierra. Do you think something like that would solve your needs?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2022-02-18T07:50:51Z",
+      "body": "Hi [USER] . It does pretty similar, yes. I had built it to use this with Flask as a simple templating engine (I didn't want to use Jinja2 (now 3) then), then removed that feature and made it as a general purpose Python library that writes HTML and CSS directly to files (or just one file, there an option for that), instead of printing. The option of writing CSS and JS directly along with HTML in Python was an attractive prospect for me, so I wanted to focus on not just HTML. That was my only issue with streamlit - if I wanted to add CSS and/or JS to any bit of text/image/thing, it wouldn't be possible. I also wanted to be able new tags (if I willed) in my HTML, which I'm sure is there in htbuilder. It would (mainly) make the use of JS possible. If you see https://brainstormyourwayin.github.io/sierra.github.io/Documentation.html#tags, you can see how you can create different behaving custom tags. \r\n\r\nIt wouldn't be possible within the available streamlit functions (`components.html` and `iframe`) to do something like this - https://colab.research.google.com/drive/1M5T3YzbR-mDVVzzV98xArLp96AxsvTik?usp=sharing (it doesn't run now because I've somewhere messed up the versions and it was a while ago, but you'll get the point if you read the code)\r\n\r\nI had, in my issue, suggested that this provision (using a library like htbuilder or sierra) be added *into* streamlit for use. I meant an integration of their features into streamlit, natively, which would make it better, since 1. people wouldn't have to go searching for it and 2. They wouldn't have to bother much about any HTML/CSS/JS native syntax - using simple Python functions for all of em would do it. "
+    }
+  ]
+}

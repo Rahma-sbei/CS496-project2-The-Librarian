@@ -1,0 +1,40 @@
+{
+  "id": "issue-16607",
+  "type": "issue",
+  "number": 16607,
+  "url": "https://github.com/streamlit/streamlit/issues/16607",
+  "title": "`st.iframe` hardcodes the frame title, so every embed on a page has the same accessible name",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:frontend",
+    "feature:custom-components",
+    "area:accessibility"
+  ],
+  "created_at": "2026-08-21T19:48:01Z",
+  "closed_at": "2026-09-22T17:02:58Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nThe `<iframe>` that `st.iframe` renders always carries `title=\"st.iframe\"`, and there is no parameter to change it. An `<iframe>`'s accessible name comes from its `title`, so a page with several embeds presents several frames that a screen reader announces identically. Under WCAG 2.2 that is a **4.1.2 Name, Role, Value** failure.\n\nThis affects any library that embeds interactive content \u2014 charts, maps, players \u2014 where telling one embed from another is the whole point.\n\n### Reproducible Code Example\n\n```Python\n# app.py\nimport streamlit as st\n\nst.write(\"First chart\")\nst.iframe(\"data:text/html,<h1>Sales by region</h1>\", height=80)\n\nst.write(\"Second chart\")\nst.iframe(\"data:text/html,<h1>Revenue over time</h1>\", height=80)\n```\n\n### Steps To Reproduce\n\n1. Save the snippet above as `app.py` and run `streamlit run app.py`.\n2. Open the app, then run this in the browser console:\n\n```js\n[...document.querySelectorAll(\"iframe[data-testid='stIFrame']\")]\n    .map(f => f.title)\n// \u2192 [\"st.iframe\", \"st.iframe\"]\n```\n\n### Expected Behavior\n\nEach embed can be given a name that describes its content, e.g. `st.iframe(..., title=\"Sales by region\")`.\n\n### Current Behavior\n\nBoth frames have the accessible name `st.iframe`. A screen-reader user tabbing the page hears \"st.iframe, frame\" twice and has nothing to tell the charts apart.\n\n### Scope\n\nAll three embedding paths share the frame component and none accepts a title:\n\n| API | accepts `title`? | rendered `title` |\n|---|---|---|\n| `st.iframe` | no | `st.iframe` |\n| `st.components.v1.iframe` | no | `st.iframe` |\n| `st.components.v1.html` | no | `st.iframe` |\n\nVerified on **Streamlit 1.61.1** by rendering all three on one page: three frames, one distinct accessible name.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.61.1\n- Python version: not a factor \u2014 the title is emitted by the frontend, independent of the Python version\n- Operating System: Linux\n- Browser: Chrome\n\n### Additional Information\n\n### Where it comes from\n\nIn the shipped frontend bundle the title is a literal in the element's props, immediately beside a prop that *is* forwarded from the component's arguments:\n\n```js\ntitle: `st.iframe`, tabIndex: e.tabIndex ?? void 0\n```\n\nSo the plumbing to pass a value through already exists on this element; `title` simply is not wired to it.\n\n### Suggested fix\n\nAdd an optional `title` to `st.iframe` (and the two `components.v1` entry points), forwarded to the element and defaulting to the current literal so nothing changes for existing apps.\n\n### Workaround, and why it is not sufficient\n\nPlacing an `st.caption` or a heading next to each embed gives a sighted-adjacent cue and helps somewhat. It does not fix the frame's own accessible name, which is what is announced when focus enters the frame and what appears in a screen reader's list of frames.\n\nRelated note: because the frame's name cannot be set, adding a tab stop on it with `tab_index=0` makes the situation worse rather than better \u2014 every stop announces \"st.iframe\" \u2014 so embedding libraries are pushed to leave the frame out of the tab order entirely.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-21T19:48:12Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16607)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-21T20:05:59Z",
+      "body": "This is a valid accessibility bug, not a duplicate. `st.iframe`, `st.components.v1.iframe`, and `st.components.v1.html` all render through the same frontend `IFrame` component, which hardcodes `title=\"st.iframe\"`. An iframe\u2019s accessible name comes from that attribute, so multiple embeds on one page are announced identically (WCAG 2.2 4.1.2). The IFrame protobuf currently only carries `src`/`srcdoc`, `scrolling`, and `tab_index` \u2014 there is no `title` field, and none of the three Python APIs accept one. `tabIndex` is already forwarded from proto to the element, so an optional `title` (defaulting to `\"st.iframe\"`) would follow the same pattern without changing existing apps. Custom components v1 already set `title={componentName}` on their iframes, so they are not affected in the same way.\n\n### Related Issues\n\n- [#16148](https://github.com/streamlit/streamlit/issues/16148) \u2014 Fullscreen toolbar buttons also use a hard-coded accessible name, so screen-reader users cannot tell which image or chart each control belongs to. Same class of duplicate-name a11y failure.\n- [#8563](https://github.com/streamlit/streamlit/issues/8563) \u2014 Request for `alt_text` on images and charts so assistive tech can distinguish visual content. Parallel gap: embedded content has no author-supplied accessible name.\n- [#8399](https://github.com/streamlit/streamlit/issues/8399) \u2014 Broader request for basic web accessibility (page language, named structure). This iframe-title gap is a concrete instance of that theme.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-21T21:50:12Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-16607)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-21T21:50:42Z",
+      "body": "Related to: https://github.com/streamlit/streamlit/issues/8563 we should probably also provide an `alt` parameter for `st.iframe` that sets this attribute. st.components.v1.iframe and st.components.v1.html are both deprecated, so unlikely that we will apply changes to those commands."
+    }
+  ]
+}

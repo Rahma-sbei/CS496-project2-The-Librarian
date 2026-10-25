@@ -1,0 +1,28 @@
+{
+  "id": "issue-4675",
+  "type": "issue",
+  "number": 4675,
+  "url": "https://github.com/streamlit/streamlit/issues/4675",
+  "title": "Time Input Function doesn't support each single time",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.time_input"
+  ],
+  "created_at": "2022-05-03T07:07:22Z",
+  "closed_at": "2026-07-24T19:28:33Z",
+  "body": "Is there any way to show the time menu like below on streamlit? This menu should show every single hour and minute. Other hand streamlit time input provides only pre defined time arrivals like 08:00 08:15 08:30 08:45 etc. I don't want this. How can I solve this problem?\r\nHere the details and issue related this:\r\nhttps://stackoverflow.com/questions/72054228/streamlit-time-input-function-doesnt-support-each-single-time\r\n\u0130f the above feature is not possible the enhancement is required for number input. Because there is no way for choosing every single time value as 00:00 format on streamlit . Here the related issue link:\r\nhttps://stackoverflow.com/questions/72069754/format-changing-problem-of-number-input-in-streamlit",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2022-05-03T07:08:52Z",
+      "body": "\r\n![streamlit](https://user-images.githubusercontent.com/71190059/166415963-c264e858-6de6-44b7-a9bc-546e39d48ad6.png)\r\n\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-06-15T12:59:18Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-4675)\n"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "id": "issue-15287",
+  "type": "issue",
+  "number": 15287,
+  "url": "https://github.com/streamlit/streamlit/issues/15287",
+  "title": "st.context.theme.type does not trigger a rerun when the theme changes",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:bug",
+    "status:needs-triage",
+    "feature:theming",
+    "feature:st.context"
+  ],
+  "created_at": "2026-05-21T06:43:09Z",
+  "closed_at": "2026-05-26T16:11:52Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nAccording to [this comment](https://github.com/streamlit/streamlit/issues/5009#issuecomment-2946544937), accessing `st.context.theme.type` in a script should cause the app to automatically rerun when the user changes the theme. This does not happen, the value only updates after a manual rerun.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nst.write(f\"Current theme: `{st.context.theme.type}`\")\nst.write(\"Change the theme in Settings \u2014 this text should update automatically.\")\n```\n\n### Steps To Reproduce\n\n1. Run the script above with `streamlit run app.py`\n2. Note the theme value shown\n3. Open the Settings menu (\u2630 \u2192 Settings) and switch between Light and Dark theme\n4. Observe that the displayed theme value does NOT change\n5. Manually click the Rerun button. The value now updates correctly\n\n### Expected Behavior\n\nThe app reruns automatically when the theme changes, and `st.context.theme.type `reflects the new value without requiring a manual rerun.\n\n\n### Current Behavior\n\nNo automatic rerun occurs. `st.context.theme.type` keeps returning the old value until the user manually triggers a rerun.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.57.0\n- Python version: 3.14.4\n- Operating System: Linux (kernel 7.0.0-15-generic)\n- Browser: Chrome  148\n\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-21T06:43:19Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15287)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-21T14:27:02Z",
+      "body": "This is a bug report (and partly a known limitation) about `st.context.theme.type` not auto-updating when the user switches the Light/Dark theme via Settings \u2014 the value only refreshes after a manual rerun or another widget interaction.\n\n**Likely root cause:** `st.context.theme.type` is populated from `ctx.context_info.color_scheme` in `lib/streamlit/runtime/context.py`, which is set from the `RerunData.color_scheme` field that the frontend sends on `BackMsg` (`getThemeColorScheme()` in `frontend/app/src/App.tsx` ~L1945). When the theme is changed via `setAndSendTheme` / `updateTheme` in `frontend/app/src/util/useThemeManager.ts`, only the local React `activeTheme` state is updated and a `SET_THEME_CONFIG` host message is emitted \u2014 no `BackMsg` (rerun) is sent to the backend, so the cached `color_scheme` on the session stays stale until the next user-triggered rerun.\n\nThis is the known tradeoff introduced by PR #11870 (which fixed a MPA regression from #11797) and is already documented in the docstring of `st.context.theme` with a pointer to umbrella issue #11920. A targeted fix would be to trigger a rerun (or send an updated `color_scheme` via a `BackMsg`) from `setAndSendTheme` when the active theme's color scheme changes \u2014 ideally only when the script actually accesses `st.context.theme` to avoid unnecessary reruns.\n\n### Related Issues\n\n- [#11920 \u2014 Make `st.context.theme` work in all situations](https://github.com/streamlit/streamlit/issues/11920): Umbrella issue tracking the known reliability problems with `st.context.theme.type` (first run, MPA, and theme switches). This issue is essentially a concrete report of one of the cases covered there and is likely a duplicate.\n- [#11536 \u2014 Expose all theming config options in `st.context.theme`](https://github.com/streamlit/streamlit/issues/11536): Related feature work on `st.context.theme`; any fix here should ideally generalize to keep all exposed theme fields in sync after a theme change.\n- [#5009 \u2014 Detect if the app is in Light/Dark mode at runtime](https://github.com/streamlit/streamlit/issues/5009) (closed): Original feature request that led to `st.context.theme.type`; referenced by the reporter and useful context for the intended behavior.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-05-26T16:11:52Z",
+      "body": "Thanks for reporting this issue. This is a know issue already reported in [#11920](https://github.com/streamlit/streamlit/issues/11920). Please comment and upvote the linked issue. "
+    }
+  ]
+}

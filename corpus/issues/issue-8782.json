@@ -1,0 +1,70 @@
+{
+  "id": "issue-8782",
+  "type": "issue",
+  "number": 8782,
+  "url": "https://github.com/streamlit/streamlit/issues/8782",
+  "title": "plotly_chart updating results flickering since Version 1.35.0",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.plotly_chart"
+  ],
+  "created_at": "2024-05-29T06:58:17Z",
+  "closed_at": "2024-10-13T10:59:42Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nWhen updating a plotly_chart, with for ex. a scatter_mapbox, the resulting map is flickering.\r\nThis was not the case before the 1.35.0 upgrade.\r\n\r\n### Reproducible Code Example\r\n\r\n[![Open in Streamlit Cloud](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://issues.streamlitapp.com/?issue=gh-8782)\r\n\r\n```Python\r\nimport random\r\nimport time\r\n\r\nimport pandas as pd\r\nimport plotly.express as px\r\nimport streamlit as st\r\n\r\ndfData = {'longitude': [0.0], 'latitude': [0.0]}\r\ndf = pd.DataFrame(dfData)\r\n\r\nmapData = px.scatter_mapbox(df, lat=\"latitude\", lon=\"longitude\", zoom=6, width=400, height=300)\r\nmapData.update_layout(mapbox_style=\"open-street-map\")\r\n\r\nlatitude = 57.0\r\nlongitude = -110.0\r\n\r\nmapDisplay = st.empty()\r\nwhile True:\r\n    latitude += random.uniform(-0.005, 0.005)\r\n    longitude += random.uniform(-0.005, 0.005)\r\n    mapData.data[0].lat = [latitude]\r\n    mapData.data[0].lon = [longitude]\r\n    mapData.update_layout(mapbox_center={\"lat\": latitude, \"lon\": longitude})\r\n    mapDisplay.plotly_chart(mapData, use_container_width=True)\r\n    time.sleep(0.1)\r\n```\r\n\r\n\r\n### Steps To Reproduce\r\n\r\nIn order to reproduce the issue update streamlit to 1.35.0 (currently latest) version and run the code above.\r\nTo get it working nicely downgrade to 1.34.0.\r\n\r\n### Expected Behavior\r\n\r\nExpected would be a non flickering updating of the map.\r\n\r\n### Current Behavior\r\n\r\nSadly the chart flickers as its been updated.\r\n\r\n### Is this a regression?\r\n\r\n- [X] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.35.0\r\n- Python version: 3.8.10\r\n- Operating System: Ubuntu 20.04\r\n- Browser: Tested on Vivaldi (Chrome), Firefox, Edge on Android\r\n\r\n\r\n### Additional Information\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-05-29T06:58:27Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Visits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fstreamlit%2Fstreamlit%2Fissues%2F8782&title=visits&edge_flat=false)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-05-29T10:42:25Z",
+      "body": "[USER] Thanks for reporting this issue. I reproduced it [here](https://issues.streamlit.app/?issue=gh-8782). This is mostly expected with the new version since we added a stable identity to a plotly chart based on its parameters. Changing the parameter will create a new frontend instance for the plotly chart. This resolved various other issues with plotly, but negatively impacted this type of usecase of updating plotly charts. We should probably provide a way via the `key` parameter to keep the plotly chart identity stable.  "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-29T11:29:40Z",
+      "body": "[USER] , thanks for you quick response. Is that a complicated endavor? I would also be willing to work around it with folium in the meantime.\r\nBut dynamically updating a folium map is a whole other endavor, but I think possible. Sadly the same blinking happens here aswell.\r\nUsing:\r\n```\r\nimport random\r\nimport time\r\n\r\nimport folium\r\nimport streamlit as st\r\nfrom streamlit_folium import st_folium\r\n\r\nlatitude = 57.0\r\nlongitude = -110.0\r\n\r\nmap_display = st.empty()\r\n\r\nm = folium.Map(location=[latitude, longitude], zoom_start=6)\r\n\r\nwhile True:\r\n    latitude += random.uniform(-0.005, 0.005)\r\n    longitude += random.uniform(-0.005, 0.005)\r\n\r\n    marker = folium.Marker(location=[latitude, longitude])\r\n    marker.add_to(m)\r\n\r\n    with map_display:\r\n        st_folium(m, width=400, height=300)\r\n\r\n    time.sleep(0.1)\r\n```\r\nBut it would be really nifty to have the plotly_chart version working of cause :). \r\nWhat could I provide or do to get this started? I am sadly not really familiar with any kind of web developement or advanced python mechanics. My go to is C++ :). "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-05-29T11:40:48Z",
+      "body": "[USER] Thanks for offering help. I don't think there is a lot you can do right now to drive this forward. There is a good solution for that on our side - the same solution we would also need to resolve [this issue](https://github.com/streamlit/streamlit/issues/7749) - but it needs some validation and decisions on our side. "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-29T11:50:31Z",
+      "body": "[USER] Alright, is there any way to locally build and install said solution or is the solution not yet implemented? November 23 is a few days in the past, so do you think this will happen anytime soon? :)"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-05-29T11:59:40Z",
+      "body": "The solution is not yet built-in, but I will keep this issue up-to-date once there is a PR/branch. I'm planning to do something on https://github.com/streamlit/streamlit/issues/7749 soon and I would likely group this issue in with the fix, but there are other higher-prio projects that needs to get finished first "
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-05-29T12:33:19Z",
+      "body": "Alright, that sounds lovely, thank you very much!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-08-06T08:34:49Z",
+      "body": "[USER] hello, are there any new things that came up? Or could I provide any assistance?"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-10-13T10:59:42Z",
+      "body": "Alright, since there are other issues already covering this, im closing this one, and build everything myself."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-06-18T18:58:47Z",
+      "body": "[USER] I am running into the same issue but haven't found a workaround yet. Could you take a look into the issue again and fix? Would be great, thanks!"
+    }
+  ]
+}

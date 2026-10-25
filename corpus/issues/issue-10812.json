@@ -1,0 +1,28 @@
+{
+  "id": "issue-10812",
+  "type": "issue",
+  "number": 10812,
+  "url": "https://github.com/streamlit/streamlit/issues/10812",
+  "title": "Streamlit cloud app does not stay awake on repo commits",
+  "state": "closed",
+  "state_reason": "not_planned",
+  "labels": [
+    "type:bug",
+    "feature:community-cloud"
+  ],
+  "created_at": "2025-03-18T00:38:59Z",
+  "closed_at": "2026-06-06T22:00:50Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nI have an app deployed on Streamlit Cloud. \nThe doc says:- To keep your app awake, simply visit the app or commit to your app's repository, even if it's an empty commit!\nhttps://docs.streamlit.io/deploy/streamlit-community-cloud/manage-your-app\n\nThere are frequent commits to the repo yet the app appears to go to sleep with no traffic.\n\nThanks!\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-18T00:39:09Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-10812)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-26T22:03:27Z",
+      "body": "Hey, [USER]. We're actually in the process of adjusting the sleep logic for Streamlit Community Cloud apps _at this very moment_ and you may be noticing one of the changes we're enacting.\n\nThe latest logic is: make the app go to sleep after 12h of inactivity.\n\nSo maybe your auto-committer is set to an interval longer than 12h? \n\nAlso be aware that we may soon change the definition of \"activity\" to \"user activity\" rather than \"user activity or commits\". And although we don't currently have any plans to block users from programmaticaly keeping their apps up, I can't promise we won't start trying to block them at some point. After all, Streamlit Community Cloud is meant as a free space for the community to share what they're building, and without strong guard rails we'll quickly enter a [tragedy of the commons](https://en.wikipedia.org/wiki/Tragedy_of_the_commons) scenario.\n\nIf you're using Community Cloud for professional purposes, consider a paid solution, like [Snowflake](https://signup.snowflake.com/?utm_source=streamlit&utm_medium=referral&utm_campaign=main&utm_content=-ss-github-issue). These can provide much stronger guarantees around uptime, stability, security, and performance."
+    }
+  ]
+}

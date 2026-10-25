@@ -1,0 +1,48 @@
+{
+  "id": "issue-7869",
+  "type": "issue",
+  "number": 7869,
+  "url": "https://github.com/streamlit/streamlit/issues/7869",
+  "title": "Display the file on screen when its uploaded with the help of st.file_uploader widget",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.file_uploader"
+  ],
+  "created_at": "2023-12-21T17:29:14Z",
+  "closed_at": "2026-07-30T08:59:57Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nThanks for implementing the file_uploader widget, I was really looking forward for that.\r\nDisplay the file when its uploaded with the help of st.file_uploader widget.\r\nI would like to suggest to add a parameter to st.file_uploader widget.\r\n\r\n\r\n\n\n### Why?\n\n![image](https://github.com/streamlit/streamlit/assets/105560839/060741bc-fe91-4a7b-9dbd-a3bfae22414c)\r\n\r\nI want to display the file when it has been uploaded using st.file_uploader.\n\n### How?\n\nAdd parameter as display_file=true to st.file_uploader widget\n\n### Additional Context\n\nThanks in advance for considering the changes.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2023-12-21T17:29:27Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-7869)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-12-22T20:15:51Z",
+      "body": "That shouldn't be part of the `st.file_uploader` widget, rather a standalone previewer, imo. There was a discussion somewhere on PDF previewer for Streamlit, images can already be shown.\r\n\r\nThis might help you currently: https://discuss.streamlit.io/t/using-st-markdown-to-show-embedded-pdf-file-gets-page-not-found/35527/5 in particular - base64 encoding"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2023-12-23T06:45:52Z",
+      "body": "It would be nice to add parameter to he st.file_uploader widget instead of using another widget."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2024-01-02T17:50:40Z",
+      "body": "Two notes:\r\n\r\n1) We definitely want to add a built-in PDF viewer, so you can easily build this yourself (please upvote #7235 for that!). \r\n2) We were thinking about adding some file-specific uploader widgets in the future, e.g. an `st.document_uploader` or an `st.image_uploader`. These would automatically display the uploaded files in a nice way and do a few extra things (e.g. return images as Numpy arrays or PIL files, or automatically extract the text from PDF documents). Let me know if you have thoughts on this!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2024-01-03T05:52:00Z",
+      "body": "> Two notes:\r\n> \r\n>     1. We definitely want to add a built-in PDF viewer, so you can easily build this yourself (please upvote [Add in a fully functioning PDF viewer #7235](https://github.com/streamlit/streamlit/issues/7235) for that!).\r\n> \r\n>     2. We were thinking about adding some file-specific uploader widgets in the future, e.g. an `st.document_uploader` or an `st.image_uploader`. These would automatically display the uploaded files in a nice way and do a few extra things (e.g. return images as Numpy arrays or PIL files, or automatically extract the text from PDF documents). Let me know if you have thoughts on this!\r\n\r\nI think, it's a fantastic proposal that will have the capability to display the uploaded files and do a few extra things."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-30T08:59:57Z",
+      "body": "Closing this since there is `st.pdf` to display pdf files and somewhat related also https://github.com/streamlit/streamlit/issues/8578"
+    }
+  ]
+}

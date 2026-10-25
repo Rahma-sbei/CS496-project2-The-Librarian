@@ -1,0 +1,30 @@
+{
+  "id": "issue-17338",
+  "type": "issue",
+  "number": 17338,
+  "url": "https://github.com/streamlit/streamlit/issues/17338",
+  "title": "Main scroll region (`stMain`) takes keyboard focus with no visible focus indicator",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:frontend",
+    "area:styling",
+    "area:accessibility"
+  ],
+  "created_at": "2026-10-08T18:32:30Z",
+  "closed_at": "2026-10-13T03:18:40Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n`section[data-testid=\"stMain\"]` is a Tab stop, which is right for keyboard scrolling (axe `scrollable-region-focusable`). But when it has focus it shows no indicator: `outline-style: none` and `box-shadow: none`. On every page, the Tab stop after the header is invisible, which fails WCAG 2.4.7 (Focus Visible).\n\n### Reproducible Code Example\n\n```Python\nimport pandas as pd\nimport streamlit as st\n\n\ndef home():\n    st.title(\"Home\")\n    st.button(\"First button\")\n    st.dataframe(pd.DataFrame({\"a\": [1, 2, 3], \"b\": [\"x\", \"y\", \"z\"]}))\n    st.button(\"Last button\")\n\n\npg = st.navigation(\n    {\n        \"\": [st.Page(home, title=\"Home\")],\n        \"Group\": [\n            st.Page(lambda: st.write(\"B\"), title=\"Page B\", url_path=\"b\"),\n            st.Page(lambda: st.write(\"C\"), title=\"Page C\", url_path=\"c\"),\n        ],\n    },\n    position=\"top\",\n)\npg.run()\n```\n\n### Steps To Reproduce\n\n1. Run the app above.\n2. Press Tab from the top of the page. Stops 1\u20134 are the top-nav items, Deploy and Main menu (Main menu shows a box-shadow ring).\n3. Press Tab once more.\n\n### Expected Behavior\n\nA `:focus-visible` indicator on the main region, such as the ring other controls use.\n\n### Current Behavior\n\nStop 5 is `stMain`, with `outline: none` and `box-shadow: none`. Nothing on screen shows where focus is.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.65.0 (also reproduced on 1.61.1)\n- Python version: 3.11\n- Operating System: Linux (RHEL 8)\n- Browser: Chromium (headless, Playwright 1.63.0)\n\n\n### Additional Information\n\nObserved with `st.navigation(position=\"top\")`. Workaround we use in our app:\n\n```css\n[data-testid=\"stMain\"]:focus-visible { outline: 2px solid <primary>; outline-offset: -2px; }\n```\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-08T19:03:34Z",
+      "body": "`section[data-testid=\"stMain\"]` is a tab stop on purpose. `AppView` renders the main scroll container (`StyledAppViewMain`, or `ScrollToBottomContainer` when an auto-positioned chat input is present) with `tabIndex={0}` so arrow keys can scroll it, which satisfies the axe `scrollable-region-focusable` rule. That element then clears the browser outline in `frontend/app/src/components/AppView/styled-components.ts` (`&:focus { outline: \"none\" }`) and has no `:focus-visible` rule that draws `theme.shadows.focusRing`, the ring used by code blocks and widgets. Global styles only suppress outlines on `[tabindex=\"-1\"]` elements that are not `:focus-visible`, so the invisible stop comes from this component style. The `tabIndex` is applied even when `disableScrolling` sets `overflow: hidden`. This matches the report on 1.65.0 and 1.61.1 and is longstanding behavior (the outline suppression dates to 2020), so it is a bug rather than a regression.\n\n### Related Issues\n\n- [#17337](https://github.com/streamlit/streamlit/issues/17337) \u2014 Same reporter and the same repro app, filed with this issue. The `st.dataframe` toolbar stays in the tab order at `opacity: 0` during keyboard focus, which is a separate WCAG 2.4.7 failure on a different element.\n- [#17339](https://github.com/streamlit/streamlit/issues/17339) \u2014 Same keyboard pass through top navigation. A section dropdown in `st.navigation(position=\"top\")` does not move focus into the open menu or respond to arrow keys, so its items come after every other control (WCAG 2.4.3). Those nav items are the tab stops immediately before `stMain` in this report.\n\n---\n*This is an automated triage comment using `grok-4.7-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-10-08T20:55:19Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-17338)\n"
+    }
+  ]
+}

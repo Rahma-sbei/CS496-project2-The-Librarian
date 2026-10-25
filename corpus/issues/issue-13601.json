@@ -1,0 +1,23 @@
+{
+  "id": "issue-13601",
+  "type": "issue",
+  "number": 13601,
+  "url": "https://github.com/streamlit/streamlit/issues/13601",
+  "title": "Extend `st.chat_input` to support embedded controls (buttons, dropdowns, toggles, etc.)",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:enhancement",
+    "feature:st.chat_input"
+  ],
+  "created_at": "2026-01-15T16:31:17Z",
+  "closed_at": "2026-06-14T20:07:04Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nCurrently, `st.chat_input` provides a clean and simple text + audio + attachments input experience, which is great for basic chat use cases.\nHowever, for more advanced AI-driven applications, this component feels limiting compared to modern AI chat interfaces.\n\nMany AI chat products (e.g. ChatGPT, VS Code Copilot Chat, etc.) allow users to configure options at the moment of sending a message, such as:\n- Selecting the model to use\n- Enabling/disabling web search or retrieval\n- Activating deep research / reasoning modes\n- Toggling custom features (tools, plugins, etc.)\n\n_Examples:_\n<img width=\"333\" height=\"277\" alt=\"ChatGPT Chat Input\" src=\"https://github.com/user-attachments/assets/864a66d0-54a5-42ef-8d8a-9f63ab794b4e\" />\n <br/>\n<img width=\"511\" height=\"161\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/8420ae18-59ae-405f-a945-b5f1d5163a5d\" />\n\n\n\n## \u2705 Proposed improvement\n- Extend st.chat_input to support embedded UI components, such as:\n  - Dropdowns\n  - Toggles / Checkboxes\n  - Buttons\n  - And more\n\n### Why?\n\n## \u274c Current limitations\nWith Streamlit today:\n- These options must be placed outside the chat input, like sidebar\n- This breaks the conversational UX and feels disconnected from the message being sent\n\n### How?\n\n_No response_\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-01-15T16:31:28Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-13601)\n"
+    }
+  ]
+}

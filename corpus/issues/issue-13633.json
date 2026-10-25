@@ -1,0 +1,47 @@
+{
+  "id": "issue-13633",
+  "type": "issue",
+  "number": 13633,
+  "url": "https://github.com/streamlit/streamlit/issues/13633",
+  "title": "`st.popover` with `st.date_input` opens the date input dropdown",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.date_input",
+    "feature:st.popover",
+    "feature:st.dialog"
+  ],
+  "created_at": "2026-01-18T08:27:23Z",
+  "closed_at": "2026-07-20T15:26:20Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nRelated to #9243:\n\nWhile it's fine to autofocus the first element in a popover/dialog, if the first element is an `st.date_input`, it will not only focus that element but also open its dropdown. That feels like a clear bug to me, which is creating a very annoying and confusing UX, see video below. \n\nNote that e.g. for `st.selectbox`, the dropdown does not open if it's inside a popover. This also happens in `st.dialog`. \n\nhttps://github.com/user-attachments/assets/505e68e3-1fe4-47ec-ad9a-8ddd14f19267\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\nwith st.popover(\"Show details\"):\n    st.date_input(\"Select a date\")\n```\n\n### Steps To Reproduce\n\nRun app, click on popover. \n\n### Expected Behavior\n\nDate input is focused, but dropdown is closed. \n\n### Current Behavior\n\nDropdown is open. \n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.53\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-01-18T08:27:32Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-13633)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-01-20T10:06:45Z",
+      "body": "I [USER] picking up this issue\n[USER] "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-01-20T10:52:45Z",
+      "body": "This bug occurs when `st.date_input` is the first widget inside an `st.popover` or `st.dialog`. When the popover/dialog opens, it auto-focuses on the first focusable element (the date input field). The BaseWeb Datepicker component used by `st.date_input` is designed to open its calendar dropdown when the input receives focus, which creates the unintended UX of the calendar immediately appearing when the popover opens. This contrasts with `st.selectbox` which only opens on click, not focus.\n\n**Root cause**: The combination of two behaviors: (1) popover/dialog auto-focus on first widget, and (2) BaseWeb Datepicker opening on focus. A fix could either modify the autofocus behavior in popover/dialog, or prevent `st.date_input` from opening on programmatic/initial focus (only on user click).\n\n### Related Issues\n\n- **#9243** - [Don't autofocus first element in `st.popover` and `st.dialog`](https://github.com/streamlit/streamlit/issues/9243): This is the parent issue that #13633 is directly related to. The current bug is a specific manifestation where the autofocus on `st.date_input` causes its dropdown to automatically open.\n\n- **#8284** - [`st.popover` not closing when opening another PopOver](https://github.com/streamlit/streamlit/issues/8284): Related popover/dropdown interaction bug where dropdown-containing widgets inside popovers cause UI state issues.\n\n---\n*This is an automated triage comment. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-01-20T17:12:36Z",
+      "body": "This is a confirmed bug related to the auto-focus behavior in `st.popover` and `st.dialog` containers. When a popover/dialog opens, it auto-focuses the first focusable widget inside it. For `st.date_input`, this focus event triggers the calendar dropdown to open automatically, creating a confusing UX. The root cause is in the BaseWeb Popover component's default `autoFocus` behavior combined with the BaseWeb Datepicker's behavior of opening its calendar when receiving focus. The fix likely involves either disabling auto-focus on the popover/dialog containers or preventing the date picker from opening on focus.\n\n### Related Issues\n\n- **#9243** This is the parent issue that discusses the general auto-focus behavior. The current issue is a specific symptom where the auto-focus causes the date input dropdown to open, which is more problematic than just visual focus.\n- **#8556**: Related issue about `st.date_input` interaction problems in constrained UI contexts (sidebar/mobile).\n\n---\n*This is an automated triage comment. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-20T15:26:00Z",
+      "body": "Closing this since it was resolved with the recent migration from baseweb to react-aria."
+    }
+  ]
+}

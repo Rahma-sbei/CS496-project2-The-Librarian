@@ -1,0 +1,44 @@
+{
+  "id": "issue-9242",
+  "type": "issue",
+  "number": 9242,
+  "url": "https://github.com/streamlit/streamlit/issues/9242",
+  "title": "st.fragment incompatible with streamlit.testing.v1.AppTest",
+  "state": "closed",
+  "state_reason": "not_planned",
+  "labels": [
+    "type:enhancement",
+    "papercut",
+    "feature:app-testing"
+  ],
+  "created_at": "2024-08-08T17:06:12Z",
+  "closed_at": "2026-10-21T14:32:59Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nStreamlit dashboards with st.fragment and the unit testing framework are not compatible. When a function is defined with st.fragment, it never runs in unit tests, so it can't be tested\n\n### Reproducible Code Example\n\n```Python\nApp file\r\n\r\n[USER].fragment()\r\ndef dummy_result():\r\n  return \"testing\"\r\n```\r\nUnit test file\r\n```\r\nfrom streamlit.testing.v1 import AppTest\r\nfrom app import dummy_result\r\n\r\nat = AppTest.from_file(\"app.py\")\r\nat.run()\r\nresult = dummy_result()\r\nassert result == \"testing\"\r\n\r\n```\n```\n\n\n### Steps To Reproduce\n\n`pytest test.py`\n\n### Expected Behavior\n\nthe test should pass\n\n### Current Behavior\n\nIt fails because result is NoneType\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.37.0\r\n- Python version: 3.11.5\r\n- Operating System: MacOs\r\n\r\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-08-08T17:06:24Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-9242)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-08-08T19:45:21Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Visits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fstreamlit%2Fstreamlit%2Fissues%2F9242&title=visits&edge_flat=false)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-01-15T08:05:13Z",
+      "body": "Still the problem occures, What is seen only status changed here."
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-02-27T06:19:58Z",
+      "body": "If you enable the debugger, you will notice there some element of the UnknownElement type\nIn addition, the list **currently** does not have  `fragment` https://docs.streamlit.io/develop/api-reference/app-testing/st.testing.v1.apptest\n\nAs far as I understand, testing support is only for important action elements. To write a good test, you need to interact with buttons and so on."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-10-21T14:32:50Z",
+      "body": "I checked this against current `develop`. Fragments do run under `AppTest`:\n\n- During `AppTest.from_file(\"app.py\").run()`, the fragment body runs and its return value reaches the script.\n- A button inside the fragment works with `.click().run()`. `AppTest` reruns the whole script rather than only the fragment. That gives the same result unless a test depends on the rest of the script *not* rerunning.\n\nThe test in the report calls `dummy_result()` directly from the test module. A `[USER].fragment` function runs only during a Streamlit script run. Outside one, it returns `None` without running its body, so `result` is `None`. Instead, assert on what the app renders through `AppTest`. Or move the logic into a plain function and unit-test that function directly.\n\n#17605 documents this in the bundled testing skill. `AppTest` doesn't support fragment-scoped reruns yet (rerunning only the fragment, as the browser does). That gap is tracked with dialog inner widgets in #9786, so I'm closing this one as working as intended.\n"
+    }
+  ]
+}

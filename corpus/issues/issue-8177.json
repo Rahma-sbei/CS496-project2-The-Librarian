@@ -1,0 +1,36 @@
+{
+  "id": "issue-8177",
+  "type": "issue",
+  "number": 8177,
+  "url": "https://github.com/streamlit/streamlit/issues/8177",
+  "title": "Altair \"Save as PNG\" downloads a low-res blurry image",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.altair_chart",
+    "upstream"
+  ],
+  "created_at": "2024-02-19T12:52:06Z",
+  "closed_at": "2026-08-03T13:05:53Z",
+  "body": "### Checklist\r\n\r\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\r\n- [X] I added a very descriptive title to this issue.\r\n- [X] I have provided sufficient information below to help reproduce this issue.\r\n\r\n### Summary\r\n\r\nStreamlit renders Altair plots perfectly as long as they are visualized within a browser.\r\n\r\nHowever, if i want to download the graph as a .png, the downloaded file is very low quality (blurry). \r\n\r\nThis can be validated by going here and downloading an image from any of the charts:\r\nhttps://docs.streamlit.io/library/api-reference/charts/st.altair_chart\r\n\r\nThis makes it impossible to use these downloaded PNG:s in a report (powerpoint).\r\n\r\nThis seems to because altair defaults to using a PPI of 72 when rendering. Altair does support using a 'ppi' parameter when calling chart.save:\r\nhttps://altair-viz.github.io/user_guide/saving_charts.html#png-figure-size-resolution\r\n\r\nIn order to create and download a higher-resolution image i can run the following code:\r\n\r\n```python\r\n    b = st.altair_chart(chart, use_container_width=False)\r\n\r\n    chart.save(\"test.png\", ppi=200)\r\n    with open(\"test.png\", \"rb\") as file:\r\n        btn = st.download_button(label=\"Download image\", data=file, file_name=\"test.png\", mime=\"image/png\")\r\n```\r\n\r\n**The problem with this approach is that the Streamlit theme is not used in the resulting graph.**\r\n\r\n\r\nIs there any way to support:\r\n* Setting PPI to be used for \"Save as PNG\" calls?\r\n* Using the Streamlit theme in chart.save ?\r\n\r\n### Reproducible Code Example\r\nIn order to create a higher-resolution image i can run the following code:\r\n```Python\r\n    b = st.altair_chart(chart, use_container_width=False)\r\n\r\n    chart.save(\"test.png\", ppi=200)\r\n    with open(\"test.png\", \"rb\") as file:\r\n        btn = st.download_button(label=\"Download image\", data=file, file_name=\"test.png\", mime=\"image/png\")\r\n\r\n```\r\nThe problem with this approach is that the Streamlit theme is not used in the resulting graph.\r\n\r\n### Steps To Reproduce\r\n\r\n1. Go to https://docs.streamlit.io/library/api-reference/charts/st.altair_chart\r\n2. Click \"Download as PNG\" from any of the charts\r\n3. Open the blurry image from your downloads folder\r\n\r\n### Expected Behavior\r\n\r\nI expect a high pixel density in the downloaded image.\r\n\r\n### Current Behavior\r\n\r\nI get a low pixel density in the downloaded image\r\n\r\n### Is this a regression?\r\n\r\n- [ ] Yes, this used to work in a previous version.\r\n\r\n### Debug info\r\n\r\n- Streamlit version: 1.31.1\r\n- Python version: 3.9.16\r\n- Operating System: MacOS Sonoma 14.1.1\r\n- Browser: Chrome\r\n\r\n\r\n### Additional Information\r\n\r\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-02-19T12:52:17Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-8177)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-02-14T04:50:23Z",
+      "body": "Tagging this as upstream - linked relevant [issue](https://github.com/vega/vega-embed/issues/1192) open in the `vega-embed` lib to support the `ppi` arg in addition to `scaleFactor`."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-03T13:05:53Z",
+      "body": "Closed by https://github.com/streamlit/streamlit/pull/16170"
+    }
+  ]
+}

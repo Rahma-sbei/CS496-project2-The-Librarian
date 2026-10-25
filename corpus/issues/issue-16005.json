@@ -1,0 +1,47 @@
+{
+  "id": "issue-16005",
+  "type": "issue",
+  "number": 16005,
+  "url": "https://github.com/streamlit/streamlit/issues/16005",
+  "title": "Widgets in an st.popover opened inside an st.dialog are occluded by the dialog and unusable",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "status:confirmed",
+    "priority:P2",
+    "feature:st.popover",
+    "feature:st.dialog"
+  ],
+  "created_at": "2026-07-14T18:28:04Z",
+  "closed_at": "2026-07-20T15:04:39Z",
+  "body": "### Checklist\n- [x] I have searched the existing issues for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen an `st.popover` is used inside an `st.dialog`, the popover opens but its body\nis rendered underneath the dialog's interaction layer. Widgets inside the popover\n(e.g. a `selectbox`) cannot be interacted with, and clicking them lands on the\ndialog's dismissable overlay \u2014 which can close the dialog. This is a regression\nfrom the migration of `st.dialog` to React Aria (#15327); it worked in 1.58.0.\n\n### Reproducible Code Example\n\n```python\nimport streamlit as st\n\n\n[USER].dialog(\"My dialog\")\ndef show_dialog():\n    st.write(\"dialog content\")\n    with st.popover(\"Open popover\"):\n        fruit = st.selectbox(\"Fruit\", [\"Apple\", \"Banana\", \"Cherry\"])\n        st.write(f\"picked: {fruit}\")\n\n\nif st.button(\"Open dialog\"):\n    show_dialog()\n```\n\n### Steps To Reproduce\n\n1. Run the app and click **Open dialog**.\n2. Inside the dialog, click **Open popover** (the popover body appears).\n3. Try to open the popover's `selectbox` dropdown and pick an option.\n4. The dropdown does not open; clicking in the popover body instead hits the\n   dialog overlay (and can dismiss the dialog).\n\n### Expected Behavior\n\nThe popover body renders above the dialog and its widgets are fully interactive:\nopening the `selectbox`, picking an option, and having the value commit \u2014\ndismissing neither the popover nor the dialog. (This is how it behaved in 1.58.0.)\n\n### Current Behavior\n\nThe popover body is occluded by the dialog. The in-popover widget is not\ninteractable, and interacting with it can close the dialog.\n\nObjective evidence (Playwright, both Chromium and WebKit): hit-testing the\nin-popover selectbox at its own center with `document.elementFromPoint` returns\nthe dialog rather than the widget, and the dropdown cannot be opened even with a\nforced click:\n\n```\nselectbox_hit = { topTestId: \"stDialog\", inBody: false, inDialog: true }\ndropdown_opened = false\n```\n\nRoot cause: the popover body is portalled to `document.body` (outside the dialog's\nDOM subtree), while `st.dialog` is now a React Aria (`data-rac`) overlay that\nestablishes its own stacking/overlay layer that paints and hit-tests above the\nportalled popover body. Control: a BaseWeb overlay opened from a widget placed\n**directly** in the dialog (e.g. a `multiselect` in the dialog) renders correctly\nabove the dialog, so the dialog does not occlude all portalled overlays \u2014 only the\npopover body at the `popup` z-tier.\n\n### Is this a regression?\n- [x] Yes, this used to work in a previous version.\n\nConfirmed via `git bisect` (probe: is the in-popover selectbox usable above the\ndialog?):\n\n| Commit | Description | Result |\n|--------|-------------|--------|\n| tag `1.58.0` (`209ad55c`) | 1.58.0 release (does not contain #15327) | PASS |\n| `590deca9` | parent of #15327 | PASS |\n| **`a7200715` (#15327)** | **Remove `BaseWeb` for `Dialog` (React Aria migration)** | **FAIL (first bad commit)** |\n| `d65a3aae` (#15339) | Remove BaseWeb for Popover (floating-ui) | FAIL (not the cause) |\n| current `develop` | \u2014 | FAIL |\n\n#15327 shipped in 1.59.0 and is not in 1.58.0, which is why 1.58.0 works and\n1.59.0+ is broken. This is independent of the `st.popover` floating-ui migration\n(#15339). There is a prior related fix, #15876 \"Fix React Aria dialog overlay\nstacking\", which does not cover this popover-in-dialog case.\n\n### Debug info\n\n- Streamlit version: `develop` (reproduces on 1.59.0 and later; first broken in #15327)\n- Python version: 3.12.3\n- Operating System: Linux\n- Browser: Chromium and WebKit (both affected)\n\n### Additional Information\n\n- Scope: only the combination **popover inside a dialog** is affected. Standalone\n  popovers, and widgets placed directly in a dialog, work correctly.\n- Suggested direction for a fix: render/portal the popover body into the dialog's\n  overlay/stacking context when it is opened inside a dialog, or raise the popover\n  body to a tier that clears the React Aria dialog overlay (mirroring how direct\n  BaseWeb overlays clear it via the `basewebOverlay` tier).\n- Found during QA of PR #15961 (which fixes the separate #15959 popover-overlay\n  stacking/dismissal issues). This popover-in-dialog gap is not caused by, and is\n  out of scope for, that PR.\n",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-14T18:28:18Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16005)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-15T09:05:26Z",
+      "body": "There is also a related issue where it closes the popover when selecting something from a widget menu thats outside the popover."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-15T09:17:30Z",
+      "body": "Reproduction app here: https://issues.streamlit.app/?issue=gh-16005"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-20T10:04:12Z",
+      "body": "Maybe this is related, so I'll just post it here:\n\nI also got an issue with a date_input widget that is inside a non-dialog based popover. I get the same behaviour where the date_input is rendered behind the popover. (version 1.59.2)\n\nThis is the only widget type that does this for me. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-20T12:59:21Z",
+      "body": "[USER] we also had this issue which sounds the same as yours https://github.com/streamlit/streamlit/issues/15959 the fix will be in the next release which will happen within the next couple of week. You could try the nightly build to see if it resolves your issue.  "
+    }
+  ]
+}

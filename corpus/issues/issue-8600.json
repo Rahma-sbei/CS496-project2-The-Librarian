@@ -1,0 +1,50 @@
+{
+  "id": "issue-8600",
+  "type": "issue",
+  "number": 8600,
+  "url": "https://github.com/streamlit/streamlit/issues/8600",
+  "title": "`st.runtime.get_instance()._session_mgr.list_active_sessions()[0].client.request.protocol` is http on https pages.",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "feature:community-cloud",
+    "priority:P4",
+    "status:unlikely"
+  ],
+  "created_at": "2024-05-03T03:05:17Z",
+  "closed_at": "2026-06-14T19:54:05Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [X] I added a very descriptive title to this issue.\n- [X] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\n`st.runtime.get_instance()._session_mgr.list_active_sessions()[0].client.request.protocol` is http on https pages.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\r\n\r\nst.write( st.runtime.get_instance()._session_mgr.list_active_sessions()[0].client.request.protocol )\r\n\r\n# When run from an https source, like *.streamlit.app, this will still list http.\n```\n\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\nShould be https\n\n### Current Behavior\n\nIs http\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: Streamlit, version 1.33.0\r\nAnd also whatever streamlit community cloud uses.\r\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-05-03T03:05:29Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-8600)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-05-06T18:25:18Z",
+      "body": "Hey [USER] and thank you for opening this issue!\r\n\r\nCould you please describe your use case why you need to use protocol in your streamlit app?\r\n\r\nThis probably a issue on interaction with Cloud / Streamlit Open source library, since Streamlit apps there deployed under reverse proxy, so most probably corresponding headers doesn't pass to Streamlit app itself."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-05-06T18:32:39Z",
+      "body": "Simply put, I want my app to use the URL on which it is deployed for\r\nvarious purposes (such as displaying to the end user and for implementing\r\nGoogle sign-in), and the protocol is part of that url.\r\n\r\nOn Mon, May 6, 2024, 2:25\u202fPM Karen Javadyan ***@***.***>\r\nwrote:\r\n\r\n> Hey [USER] <https://github.com/wyattscarpenter> and thank you\r\n> for opening this issue!\r\n>\r\n> Could you please describe your use case why you need to use protocol in\r\n> your streamlit app?\r\n>\r\n> This probably a issue on interaction with Cloud / Streamlit Open source\r\n> library, since Streamlit apps there deployed under reverse proxy, so most\r\n> probably corresponding headers doesn't pass to Streamlit app itself.\r\n>\r\n> \u2014\r\n> Reply to this email directly, view it on GitHub\r\n> <https://github.com/streamlit/streamlit/issues/8600#issuecomment-2096650176>,\r\n> or unsubscribe\r\n> <https://github.com/notifications/unsubscribe-auth/AGQZNEA5CWA5HA3NEEZIQELZA7DKHAVCNFSM6AAAAABHEZD6VOVHI2DSMVQWIX3LMV43OSLTON2WKQ3PNVWWK3TUHMZDAOJWGY2TAMJXGY>\r\n> .\r\n> You are receiving this because you were mentioned.Message ID:\r\n> ***@***.***>\r\n>\r\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-05-06T23:49:10Z",
+      "body": "Hi [USER],\r\n\r\nI'm not sure if there's much we can do about this in the Streamlit OS lib side. The issue is most likely because, in a Community Cloud deployment, the connection is indeed an http connection since the TLS connection isn't terminated by the Streamlit server, it's terminated at the load balancer level (and security is maintained by having the network permissions set such that the Streamlit server only accepts traffic from the load balancer in front of it).\r\n\r\nThis would be true of any deployment made where the Streamlit server itself isn't configured to terminate the TLS connection, and while we do have some basic configurability for this included in our config options (see the `server.sslCertFile` and `server.sslKeyFile`), it's unlikely we'll add full support for this in Community Cloud given the community focus of the product."
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-05-07T08:45:01Z",
+      "body": "Interesting!\r\n\r\nWell, fixing this isn't crucial for me, so feel free to deprioritize it, etc."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-06-14T19:54:05Z",
+      "body": "Closing this since this is referring to an internal tornado API, and we have migrated to Starlette recently"
+    }
+  ]
+}

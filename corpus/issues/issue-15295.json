@@ -1,0 +1,34 @@
+{
+  "id": "issue-15295",
+  "type": "issue",
+  "number": 15295,
+  "url": "https://github.com/streamlit/streamlit/issues/15295",
+  "title": "Drag down to copy values in st.data_editor doesn't work for the rightmost column if there is a scrollbar",
+  "state": "closed",
+  "state_reason": "duplicate",
+  "labels": [
+    "type:bug",
+    "status:needs-triage",
+    "feature:st.data_editor"
+  ],
+  "created_at": "2026-05-21T13:13:33Z",
+  "closed_at": "2026-05-22T21:35:41Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nIt's not possible to drag down (using the \"+\") to copy values in the `st.data_editor` for the rightmost column if there is a scrollbar. It's either not possible to find the \"+\" or if it's found, then the values are not copied.\n\n### Reproducible Code Example\n\n```Python\nimport pandas as pd\nimport streamlit as st\n\ndf_rank = pd.DataFrame(\n    {\n        \"Fleet customer\": [\n            \"Volvo Fleet Demo AB\",\n            \"Nordic Lease Partner\",\n            \"City Mobility Co\",\n            \"Green Transport AS\",\n            \"LogiNorth AB\",\n            \"Urban Move Oy\",\n            \"Swift Logistics AB\",\n            \"EcoDrive Solutions\",\n            \"Metro Fleet Services\",\n            \"Nordic Fleet Management\",\n        ],\n        \"Order count\": [420, 315, 288, 241, 198, 175, 160, 145, 130, 120],\n        \"Margin\": [\n            58.2,\n            44.7,\n            39.1,\n            31.6,\n            26.8,\n            23.5,\n            21.0,\n            18.7,\n            16.5,\n            15.0,\n        ],\n    }\n)\nst.data_editor(df_rank, height=200)\n```\n\n### Steps To Reproduce\n\n1. Hover over a cell in the \"Margin\" column until you see the \"+\" sign\n2. Click and try to drag down to copy\n\n### Expected Behavior\n\nI expect to be able to easily find the \"+\" sign and drag down to copy the values of the cell, as it works for the \"Order count\" column in the example.\n\n### Current Behavior\n\nNothing will be copied and you have only moved the scrollbar. Often it's not even possible to find the \"+\".\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.56.0\n- Python version: 3.12\n- Operating System: Debian 12\n- Browser: Chrome, firefox, edge\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-21T13:13:48Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15295)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-21T14:17:41Z",
+      "body": "This is a bug report for `st.data_editor`: the drag-to-fill (\"+\") handle on cells in the rightmost column is obscured by the dataframe's vertical scrollbar (rendered by the underlying `glide-data-grid` library). Because the scrollbar sits on top of the cell's bottom-right corner, mouse interactions hit the scrollbar instead of the fill handle, so click-and-drag scrolls the grid instead of copying values down. The reporter's example uses `height=200` to force a scrollbar, but the same problem occurs whenever the grid overflows (e.g. `use_container_width=True` with enough rows).\n\nThis appears to be a duplicate of the already-confirmed issue #9971 (status:confirmed, priority:P3, upstream). A known CSS workaround is to apply `scrollbar-gutter: stable both-edges` to the `.dvn-scroller` element so the scrollbar no longer overlaps the fill handle, but this introduces whitespace on the right edge of the header. A proper fix likely needs to land upstream in `glide-data-grid` (see `frontend/lib/src/components/widgets/DataFrame/styled-components.ts` where `.dvn-scroller` overflow is configured, and `useDataFrameCapabilities.ts` which enables `supportsFillHandle`).\n\n### Related Issues\n\n- [#9971 \u2014 Unable to drag to copy a value from one cell to a range of cells in the rightmost column of st.data_editor](https://github.com/streamlit/streamlit/issues/9971): Same root cause (scrollbar overlapping the fill handle in the rightmost column); already confirmed, prioritized P3, and tagged `upstream`. This new issue should likely be closed as a duplicate.\n- [#11998 \u2014 Minor styling issue with data editor causing highlight color to be clipped](https://github.com/streamlit/streamlit/issues/11998): Another confirmed `upstream` data-editor styling/clipping issue in the same scrollbar/edge area of the grid.\n- [#8504 \u2014 Prevent layout shift caused by scrollbars](https://github.com/streamlit/streamlit/issues/8504): Related general request to use `scrollbar-gutter` to reserve space for scrollbars \u2014 the same CSS mechanism that works around this bug.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-05-21T14:23:33Z",
+      "body": "Great, it was already reported! Didn't find that one when I searched. Will up-vote than and try with if the workaround works for us. So you can close this one if you want to!"
+    }
+  ]
+}

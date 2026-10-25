@@ -1,0 +1,46 @@
+{
+  "id": "issue-16598",
+  "type": "issue",
+  "number": 16598,
+  "url": "https://github.com/streamlit/streamlit/issues/16598",
+  "title": "st.spinner doesnt animate in recent versions (at least 1.60, and 1.61)",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:frontend",
+    "area:styling",
+    "feature:st.spinner",
+    "area:accessibility"
+  ],
+  "created_at": "2026-08-21T10:11:20Z",
+  "closed_at": "2026-08-25T03:32:35Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nHi,\n\nFor the last few versions of streamlit I have noticed that st.spinner doesnt animate for me. It just shows the circle with the black segment at the top for the duration of the spinner.\n\nI've tested on Chrome and Edge on upto date Windows 11.\n\nI see the problem on the documentation example.\n\nhttps://docs.streamlit.io/develop/api-reference/status/st.spinner\n\nThe time animates, but the circle doesn't.\n\nAppreciate any guidance for how to fix this.\n\nThanks\nMike\n\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\nimport time\n\nwith st.spinner(\"Wait for it...\", show_time=True):\n    time.sleep(5)\nst.success(\"Done!\")\nst.button(\"Rerun\")\n```\n\n### Steps To Reproduce\n\n1. Goto https://docs.streamlit.io/develop/api-reference/status/st.spinner\n2. Scroll to Examples section.\n3. Observe the spinner, or click Rerun to run it again.\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-21T10:11:30Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-16598)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-21T12:09:39Z",
+      "body": "The spinner circle is a CSS-animated border (`StyledSpinnerIcon`) while the elapsed-time text is updated in JS. That matches this report: on 1.60/1.61 the timer still ticks, but the circle stays frozen with the dark segment at the top (the `rotate(0deg)` rest pose). Since 1.58 ([#15163](https://github.com/streamlit/streamlit/pull/15163)), the BaseWeb spinner was replaced with a custom CSS rotation that also disables animation under `[USER] (prefers-reduced-motion: reduce)`. That is the most likely cause here: the reporter sees it in both Chrome and Edge on Windows 11, including the docs example, which Chromium maps from **Settings \u2192 Accessibility \u2192 Visual effects \u2192 Animation effects**. Worth confirming that OS setting (and whether a non-`show_time` spinner is also static) before treating this as a general animation regression.\n\n### Related Issues\n\nNo duplicate of a non-rotating `st.spinner` icon was found. Closest related issues:\n\n- [#13387](https://github.com/streamlit/streamlit/issues/13387) \u2014 Same docs/`show_time=True` spinner example; a closed visual styling bug (timer alignment), not the rotation itself.\n- [#11720](https://github.com/streamlit/streamlit/issues/11720) \u2014 Closed bug about the spinner **timer** pausing when the tab is backgrounded, which is the JS clock path rather than the CSS circle animation.\n- [#14555](https://github.com/streamlit/streamlit/issues/14555) \u2014 Open spinner visual issue (cache spinner overlapping a progress bar); same component, different symptom.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-08-21T12:17:15Z",
+      "body": "[USER] can you check your accessibility settings as suggested in https://github.com/streamlit/streamlit/issues/16598#issuecomment-5369623258? You can also check this by running the following in the browser dev console:\n\n```\nwindow.matchMedia(\"(prefers-reduced-motion: reduce)\").matches\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-08-21T14:06:07Z",
+      "body": "Hi [USER],\n\nThanks for following up, I can confirm that reactivating the Animation Effects toggle restores the functionality.\n\nHowever, reading the AI synopsis of the Animation Effects suggests it is intended for window reveal/movement animations, menus etc. not active progress updates (see below).\n\n<img width=\"668\" height=\"321\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/348fe8cb-03ea-4b10-8737-a7f1eaf98af6\" />\n\nI have Windows Animation Effects turned off as I like to have windows mini/maximise immediately etc.\n\nMaybe this could be reverted?\n\nMany thanks\nMike\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-08-23T23:59:40Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-16598)\n"
+    }
+  ]
+}

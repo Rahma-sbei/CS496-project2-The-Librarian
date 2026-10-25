@@ -1,0 +1,23 @@
+{
+  "id": "issue-9618",
+  "type": "issue",
+  "number": 9618,
+  "url": "https://github.com/streamlit/streamlit/issues/9618",
+  "title": "www prefix should be supported on streamlit community cloud apps",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:community-cloud"
+  ],
+  "created_at": "2024-10-07T15:37:05Z",
+  "closed_at": "2026-07-22T09:50:43Z",
+  "body": "### Checklist\n\n- [X] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [X] I added a descriptive title and summary to this issue.\n\n### Summary\n\nRecently, a user of mine tried to visit www.[myapp].streamlit.app instead of [myapp].streamlit.app, and got a certificate error.\n\n### Why?\n\nIn my opinion the optional www prefix, although a stupid relic of the past, should be supported if possible, because some tools (and, presumably, people) still put it in automatically.\n\n### How?\n\nwww.whatever.streamlit.app should redirect you (or something like that) to whatever.streamlit.app. The certificate will also need to be adjusted.\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2024-10-07T15:37:16Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-9618)\n"
+    }
+  ]
+}

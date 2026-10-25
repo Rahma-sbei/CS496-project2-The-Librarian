@@ -1,0 +1,28 @@
+{
+  "id": "issue-12302",
+  "type": "issue",
+  "number": 12302,
+  "url": "https://github.com/streamlit/streamlit/issues/12302",
+  "title": "Support Apache ECharts natively",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:charts"
+  ],
+  "created_at": "2025-08-24T12:49:29Z",
+  "closed_at": "2026-09-05T08:59:09Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nThe [streamlit-echarts](https://github.com/andfanilo/streamlit-echarts) custom component is quite popular and echarts provides a [huge number of chart types](https://echarts.apache.org/examples/en/index.html) complementing plotly & vega charts. Unfortunately, [streamlit-echarts](https://github.com/andfanilo/streamlit-echarts) isn't maintained anymore. Maybe we should add echarts support natively as `st.echarts_chart`?\n\n### Why?\n\n_No response_\n\n### How?\n\n_No response_\n\n### Additional Context\n\n- There is also a popular python API for creating echarts: https://github.com/pyecharts/pyecharts",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-08-24T12:49:37Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12302)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-04T23:56:01Z",
+      "body": "## Update\n\nNative Apache ECharts support via `st.echarts_chart` is coming in 1.64+.\n\n```python\nimport streamlit as st\n\nst.echarts_chart(\n    {\n        \"xAxis\": {\"type\": \"category\", \"data\": [\"A\", \"B\", \"C\", \"D\", \"E\"]},\n        \"yAxis\": {\"type\": \"value\"},\n        \"series\": [{\"type\": \"bar\", \"data\": [5, 20, 36, 10, 10]}],\n    }\n)\n```"
+    }
+  ]
+}

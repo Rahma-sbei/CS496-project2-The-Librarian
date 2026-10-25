@@ -1,0 +1,68 @@
+{
+  "id": "issue-10603",
+  "type": "issue",
+  "number": 10603,
+  "url": "https://github.com/streamlit/streamlit/issues/10603",
+  "title": "Rerun fragment from anywhere, not just from within itself",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "feature:st.fragment"
+  ],
+  "created_at": "2025-03-03T14:55:41Z",
+  "closed_at": "2026-09-07T11:29:09Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nRelated to #8511 and #10045.\n\nCurrently the only way to rerun a fragment is calling `st.rerun(scope=\"fragment\")` from within itself. Allowing a fragment rerun to be triggered from anywhere (another fragment or the main app) would unlock new powerful use-cases.  \n\n### Why?\n\nWhen a fragment is dependent on another fragment or on a change on the main app, the only current way to reflect that dependency is to rerun the full application whenever a dependency changes.\n\n### How?\n\nI think adding a key to each fragment would allow the user to build his custom logic to manage the dependency chain and take full control on when to run a given fragment:\n\n```python\n[USER].fragment(key=\"depends_on_b\")\ndef a():\n    st.write(st.session_state.input_for_a)\n\n[USER].fragment(key=\"depends_on_main\")\ndef b():\n    st.session_state.input_for_a = ...\n    if st.button(\"Should rerun a\"):\n        st.rerun(scope=\"fragment\", key=\"depends_on_b\")\n\nif other_condition:\n    st.rerun(scope=\"fragment\", key=\"depends_on_main\")\n```\n\nThis implementation doesn't go the full mile to describe the dependency chain in the fragment's definition and let streamlit handle the rerun logic as suggested in #10045, but provides more flexibility for the user to rerun a fragment from anywhere and under any conditions that fits his use-case\n\n### Additional Context\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-03-03T14:55:51Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-10603)\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-07-03T08:44:19Z",
+      "body": "Any hope for this? This would really help. "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-09-22T15:58:16Z",
+      "body": "We should look into adding this to the official API somehow, but in the meantime you can write your own code for that:\n\n```py\ndef rerunable_fragment(func, **kwargs):\n    frag = st.fragment(func, **kwargs)\n    container_ref = []\n\n    def wrapper():\n        if not container_ref:\n            container_ref.append(st.empty())\n\n        container = container_ref[0]\n\n        with container:\n            frag()\n\n    return wrapper\n```\n\nThen you can use it like this:\n\n```py\n[USER]_fragment\ndef frag1():\n    st.write(\"Frag 1\", datetime.now().isoformat())\n\n\n[USER]_fragment\ndef frag2():\n    st.write(\"Frag 2\", datetime.now().isoformat())\n\n    if st.button(\"Update\"):\n        frag1()\n\n\nfrag1()\nfrag2()\n```"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2025-10-11T11:12:08Z",
+      "body": "[USER] Thank you for the workaround! You could also replace the `container_ref` list with a simple assignment like so:\n\n```python\ndef rerunable_fragment(func, **kwargs):\n    frag = st.fragment(func, **kwargs)\n    container = None\n\n    def wrapper():\n        nonlocal container\n        if container is None:\n            container = st.empty()\n\n        with container:\n            frag()\n\n    return wrapper\n```\n\nLooking at the logic for `st.rerun` gave me an inspiration on how to use script requests to remotely trigger a fragment rerun.\n\n<details>\n<summary>Implementation of `rerunable_fragment` using script requests</summary>\n\n```python\nfrom collections.abc import Callable\n\nimport streamlit as st\nfrom streamlit.errors import StreamlitAPIException\nfrom streamlit.runtime.fragment import F\nfrom streamlit.runtime.scriptrunner import (\n    RerunData,\n    get_script_run_ctx,\n)\n\nst.session_state.setdefault('_rerunable_fragments', {})\n\n\ndef _rerunable_fragment(func, *, key, **kwargs):\n    if func is None:\n\n        def wrapper(f: F) -> F:\n            return rerunable_fragment(func=f, key=key, **kwargs)\n\n        return wrapper\n\n    frag = st.fragment(func, **kwargs)\n\n    def wrapper():\n        ctx = get_script_run_ctx()\n        old_fragment_storage = ctx.fragment_storage._fragments.copy()\n\n        frag()\n\n        new_fragment_storage = ctx.fragment_storage._fragments.copy()\n\n        if len(new_fragment_storage) > len(old_fragment_storage):\n            fragment_id = list(new_fragment_storage)[-1]\n            st.session_state._rerunable_fragments[key] = fragment_id\n\n    return wrapper\n\n\ndef rerunable_fragment(func: F | None = None, *, key: str, **kwargs) -> Callable[[F], F] | F:\n    return _rerunable_fragment(func, key=key, **kwargs)\n\n\ndef rerun_fragment(*, key: str) -> None:\n    fragment_id = st.session_state._rerunable_fragments.get(key, None)\n\n    if fragment_id is None:\n        raise KeyError(f'No fragment with key \"{key}\" was found')\n\n    ctx = get_script_run_ctx()\n    script_requests = ctx.script_requests\n\n    if ctx and script_requests:\n        if not ctx.fragment_ids_this_run:\n            raise StreamlitAPIException('`rerun_fragment` can be only be called from `[USER].fragment`-decorated functions during fragment reruns.')\n\n        script_requests.request_rerun(\n            RerunData(\n                query_string=ctx.query_string,\n                page_script_hash=ctx.page_script_hash,\n                fragment_id=fragment_id,\n                is_fragment_scoped_rerun=False,\n                cached_message_hashes=ctx.cached_message_hashes,\n                context_info=ctx.context_info,\n            )\n        )\n```\n</details>\n\nThis approach seems, like it could be easily integrated into the existing API by extending the `[USER].fragment` decorator and the `st.rerun` function with a `key`-keyword.\n\nI would like to give the implementation a shot. What do you think?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-22T19:24:09Z",
+      "body": "We have an upcoming feature that addresses this!\n\nRight now we have a prototype here with a wheel file if you want to give it a try: https://github.com/streamlit/streamlit/pull/15794\n\nThere is also a demo app here: https://event-scoped-fragment-updates.streamlit.app/\n\nI'd love to hear any feedback you may have!"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-22T19:59:33Z",
+      "body": "[USER] OMG thank you so much guys, this is EXACTLY how I was imagining the feature, I'm so excited to see it working live. This is a big deal. Congratulations! \nI have one note on the background tasks feature from the what's next section: \nI see now it's mentioned as an alternative way to manual refreshing. However the way I see this is as a completely independent feature: regardless of what the fragment do, if it's in progress it should not freeze the rest of the app, nor anything you do on the rest of the app should interrupt the currently running (in background) fragment, I don't think it has anything to do with manual vs scheduled periodic refresh. It could be anything else, for example event based refresh which is up to the app developer to implement (like in #9052).\n\n "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-22T20:28:49Z",
+      "body": "[USER] I think what you are talking about is aligned with how I am thinking of this. I suppose there are three options: background task runs until completion, background task runs periodically on a schedule, background task continuously runs throughout the session. Is the third one what you have in mind? "
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-22T20:38:30Z",
+      "body": "There is also some discussion about background tasks here with an API proposal I added: https://github.com/streamlit/streamlit/issues/6687\n"
+    },
+    {
+      "role": "NONE",
+      "created_at": "2026-07-23T00:11:46Z",
+      "body": "Thanks for the reference!\n\n> Is the third one what you have in mind?\n\nYes.\n\nOne thing I\u2019d add: I see fragments closer to independent tasks than execution blocks.\nSo rerunning a fragment feels more like restarting a task than re-entering part of the script.\nIn that sense, I\u2019d expect non-blocking behavior by default, with control over lifecycle (start(first time you call a fragement) / cancel (to be defined?) / restart(when you call rerun).\nCurious if that direction matches what you have in mind with the API proposal."
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-09-07T11:27:38Z",
+      "body": "## Update\n\nThis is available in Streamlit 1.63+. You can name a fragment with `[USER].fragment(key=...)` and rerun it from a widget callback:\n\n```python\n[USER].fragment(key=\"charts\")\ndef charts():\n    st.line_chart(load(st.session_state.region))\n\ncharts()\n\nst.selectbox(\n    \"Region\",\n    REGIONS,\n    key=\"region\",\n    on_change=lambda: st.rerun(\"charts\"),\n)\n```"
+    }
+  ]
+}

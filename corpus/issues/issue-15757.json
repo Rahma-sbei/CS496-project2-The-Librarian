@@ -1,0 +1,20 @@
+{
+  "id": "issue-15757",
+  "type": "issue",
+  "number": 15757,
+  "url": "https://github.com/streamlit/streamlit/issues/15757",
+  "title": "SuperCompress: Free open-source LLM prompt compression - cut token costs ~65%",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [],
+  "created_at": "2026-06-30T02:45:34Z",
+  "closed_at": "2026-06-30T04:13:14Z",
+  "body": "## SuperCompress: Open-Source Prompt Compression\n\n[SuperCompress](https://github.com/arjunkshah/supercompress) is an MIT-licensed prompt compression library that reduces LLM token costs by ~65% before inference. ~5K parameter CPU policy, 100% oracle recall. pip install supercompress.\n\nLive demo: https://supercompress.dev  |  GitHub: https://github.com/arjunkshah/supercompress",
+  "comments": [
+    {
+      "role": "NONE",
+      "created_at": "2026-06-30T04:13:13Z",
+      "body": "Closing this issue. It was created with a generic template and isn't personalized to this project. Keeping only genuinely useful, repo-specific content. Sorry for the noise!"
+    }
+  ]
+}

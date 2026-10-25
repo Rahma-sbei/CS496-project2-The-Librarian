@@ -1,0 +1,37 @@
+{
+  "id": "issue-15985",
+  "type": "issue",
+  "number": 15985,
+  "url": "https://github.com/streamlit/streamlit/issues/15985",
+  "title": "Typing into the selectbox doesn't search anymore after #15870",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "area:frontend",
+    "status:confirmed",
+    "priority:P1",
+    "feature:st.selectbox"
+  ],
+  "created_at": "2026-07-14T07:36:16Z",
+  "closed_at": "2026-07-14T18:26:12Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen typing into a selectbox, it is expected, that the existing content is cleared and search is started for a new element, which is matching to the typed content.\n\nSince 1.59.0 (probably #15870 ), this doesn't work anymore. Typing now adds text behind the current selection\n\n<img width=\"485\" height=\"297\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/d928b059-6ae7-49ac-9add-d51d30f7d091\" />\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.59.2\n- Python version: 3.14\n- Operating System: Windows\n- Browser: MS Edge\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-14T07:36:26Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15985)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-14T08:27:44Z",
+      "body": "### Analysis\n\nThis is a **frontend regression** in `st.selectbox`. When an option is already selected and the user starts typing, the committed label is no longer cleared \u2014 the typed characters are appended *after* the existing text (e.g. `United States` + `g` \u2192 `United Statesg`), so the fuzzy search matches nothing.\n\n**Likely root cause:** `st.selectbox` was migrated from BaseWeb to react-aria's `ComboBox` in #15438. In the current implementation (`frontend/lib/src/components/shared/Dropdown/Selectbox.tsx`) the input is a controlled `inputValue` that is seeded with the committed value, and there is no select-all / clear-on-focus behavior (`handleInputPointerDown` only opens the dropdown). As a result, focusing the field places the caret in the existing text and new keystrokes insert at the caret instead of starting a fresh search \u2014 the old BaseWeb widget cleared the field on focus. A fix would likely add an `onFocus` handler that selects/clears the input text so the first keystroke replaces the selection.\n\n**Note on #15870:** The reporter suspects #15870, but that PR only virtualized the dropdown *list rendering* (wrapping the `ListBox` in a `Virtualizer` and switching to the `items` render-prop API) and did not touch input/focus handling. #15870 also landed *after* the `1.59.0` tag (`1.59.0-2`, i.e. in `1.59.1`), whereas the react-aria migration (#15438) shipped in `1.59.0` \u2014 so the migration is the more probable origin of the behavior change reported \"since 1.59.0\". Worth confirming via bisect.\n\n### Related Issues\n\n- [#5240 \u2014 Impossible to highlight the selection text in `st.selectbox` to delete it all at once](https://github.com/streamlit/streamlit/issues/5240): Closest conceptual match \u2014 both are about the inability to clear/replace the committed selection text when the user wants to search for something new.\n- [#15829 \u2014 Screen reader does not announce the list information on the combo box list item (Windows)](https://github.com/streamlit/streamlit/issues/15829): Another recently reported bug in the newly migrated react-aria selectbox combobox (same component, also on Windows), useful for tracking migration follow-ups.\n- [#12260 \u2014 Regression: Selectbox/Multiselect keyboard focus not activating on mobile](https://github.com/streamlit/streamlit/issues/12260): A related regression affecting typing/search entry into `st.selectbox` (mobile-specific), in the same \"typing to search is broken\" theme.\n\n---\n*This is an automated triage comment using `claude-opus-4-8-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-07-14T09:20:24Z",
+      "body": "Thanks for reporting this [USER] , I was able to reproduce and have created a reproduction app here: https://issues.streamlit.app/?issue=gh-15985\n\nNote, it was also confirmed in 1.59.0 so likely introduced in the migration as the triage comment notes."
+    }
+  ]
+}

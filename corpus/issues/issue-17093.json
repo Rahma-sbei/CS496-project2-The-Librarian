@@ -1,0 +1,32 @@
+{
+  "id": "issue-17093",
+  "type": "issue",
+  "number": 17093,
+  "url": "https://github.com/streamlit/streamlit/issues/17093",
+  "title": "BUG: wrong value returned by backend vs frontend, when a widget is rendered after a previous page run set a default value in session state",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:widgets",
+    "status:confirmed",
+    "priority:P2",
+    "feature:st.number_input",
+    "feature:st.session_state"
+  ],
+  "created_at": "2026-09-23T17:38:50Z",
+  "closed_at": "2026-09-25T08:07:24Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nIf a default value is set in session state on one page run, and then subsequently a widget is rendered with a corresponding `key`, then the default value is not picked up properly and the frontend and backend show different values for that widget.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\n# Sets default on first page run\nst.session_state.setdefault(\"foo\", 100.0)\n\nif st.toggle(\"Show\"):\n    foo = st.number_input(\"Foo\", key=\"foo\")  # Shows 0.00\n    st.write(\"You entered:\", foo)  # Shows 100.0\n```\n\n### Steps To Reproduce\n\n1.Turn on the  toggle\n2. Compare the value in the widget vs the value printed underneath\n\n### Expected Behavior\n\nThe value in the widget should match the number reported underneath.\n\n### Current Behavior\n\nThe input widget displays `0.00`, but the backend reports `You entered: 100`.\n\nIf `r` is pressed to trigger a re-run, then the frontend updates to display `0.0` and the default value is lost.\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.64.0\n- Python version: 3.14.7\n- Operating System: Ubuntu 22.04\n- Browser: Chrome\n\n\n### Additional Information\n\nThis bug is problematic for more complex pages, where widgets may need to be \"loaded\" or \"reset\" programmatically, and some widgets may be conditionally hidden depending on a toggle or checkbox.\n\nThe bug does not happen if `persist_state=\"page\"` is passed to `number_input`.\n\nPossibly related: #15660 seems to have fixed a similar bug for when persist_state is passed, but not for when persist_state=None.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-23T17:39:04Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-17093)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-09-23T19:11:36Z",
+      "body": "When a keyed widget is first rendered on a later run than the one that wrote its `st.session_state` default (e.g. `setdefault` while the widget is hidden behind a toggle), the backend returns that stored value but the frontend mounts at the widget element default. A follow-up rerun then writes the frontend default back into session state, so the programmatic value is lost. Root cause: `SessionState.register_widget` only sets `value_changed=True` for same-run assignments (`is_new_state_value`) or for `persist_state` remounts (`restored_persisted_value` from PR #15660). For `persist_state=None`, a previous-run user-key value in `_old_state` is resolved on the Python side but never sent via `set_value`, so `st.number_input` (and other widgets) render `0.00` / empty while returning `100.0`. Passing `persist_state=\"page\"` works because that path already tells the frontend to adopt the backend value.\n\n### Related Issues\n\n- [#5620](https://github.com/streamlit/streamlit/issues/5620) \u2014 Likely duplicate: a keyed `st.text_input` revealed by a checkbox does not load a `session_state` value set on a prior run.\n- [#9082](https://github.com/streamlit/streamlit/issues/9082) \u2014 Same `setdefault` + conditional-widget pattern; the first-rendered widget gets the default, later-revealed widgets do not, and hiding them can clear session state.\n- [#16388](https://github.com/streamlit/streamlit/issues/16388) \u2014 Related frontend/backend split for keyed widgets, but triggered by deleting a session-state key rather than delayed first mount.\n\n---\n*This is an automated triage comment using `cursor-grok-4.6-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

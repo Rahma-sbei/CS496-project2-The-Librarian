@@ -1,0 +1,32 @@
+{
+  "id": "issue-15084",
+  "type": "issue",
+  "number": 15084,
+  "url": "https://github.com/streamlit/streamlit/issues/15084",
+  "title": "app crashes on a fragment chain if later fragment has `run_every` and and later no longer runs",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "type:regression",
+    "area:frontend",
+    "status:confirmed",
+    "priority:P3",
+    "feature:st.fragment"
+  ],
+  "created_at": "2026-05-07T10:23:29Z",
+  "closed_at": "2026-05-13T18:03:34Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen a fragment sits in a fragment and runs, where the later fragment has a run_every set, when an earlier fragment reruns but switches path to not run later fragment the app crashes.\n\n### Reproducible Code Example\n\n```Python\nimport streamlit as st\n\n\n[USER].fragment\ndef function_1():\n    if st.toggle(label=\" \", value=True):\n        function_2()\n\n\n[USER].fragment\ndef function_2():\n    function_3()\n\n\n[USER].fragment(run_every=3)\ndef function_3():\n    pass\n\n\nfunction_1()\n```\n\n### Steps To Reproduce\n\n1. Run app \n2. set toggle to off on app\n3. wait for 3 seconds (or however long the run_every parameter is set to)\n\n### Expected Behavior\n\nApp should not crash and just re-run earlier fragment without the later fragments.\n\n### Current Behavior\n\nApp crashes and goes into a white screen, on browser console we see\n\n```\nUncaught Error: Cannot set a node at a delta path\n```\n\n### Is this a regression?\n\n- [x] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version: 1.55.0\n- Python version: 3.12.8\n- Operating System: Windows 11\n- Browser: Firefox\n\n\n### Additional Information\n\nSeems to work in version 1.37.0 when fragments were inrtoduced, after a while instead of crashing we get a bad message format pop up. on 1.55.0 and a few earlier versions the screen goes white",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-07T10:23:38Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15084)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-05-07T12:14:48Z",
+      "body": "### Triage Analysis\n\nThis is a **bug / regression** affecting nested `st.fragment` chains where an inner fragment uses `run_every`. In the repro, `function_1` (toggle) \u2192 `function_2` \u2192 `function_3 (run_every=3)`. After the user toggles off, an `function_1` fragment-rerun no longer descends into `function_2`/`function_3`, but `function_3` is still scheduled to auto-rerun via `run_every`. When that scheduled rerun fires, the frontend throws `Uncaught Error: Cannot set a node at a delta path` and the app goes to a white screen.\n\n**Likely root cause (preliminary):**\n\n- When a fragment is run via `fragment_id_queue` (auto-rerun or widget-triggered), `_fragment_storage.clear(...)` is **not** called \u2014 that only runs in the full-app branch (`lib/streamlit/runtime/scriptrunner/script_runner.py` ~L709\u2013L716). So after the toggle-off rerun of `function_1`, the inner fragments `function_2`/`function_3` remain registered in `fragment_storage` and `function_3`'s `auto_rerun` timer is still in flight.\n- The rerun of `function_1` re-creates its child container, so the delta-path coordinates that `function_3` originally captured (relative to its enclosing container/fragment cursor in `lib/streamlit/runtime/fragment.py` ~L226\u2013L231) no longer point at a valid block in the new tree.\n- When `function_3`'s auto-rerun then sends a delta, `SetNodeByDeltaPathVisitor` walks the path and hits the `if (!node.children[currentIndex])` + `remainingPath.length > 0` branch, raising `\"Cannot set a node at a delta path\"` (`frontend/lib/src/render-tree/visitors/SetNodeByDeltaPathVisitor.ts` L123\u2013L126), which is the exact error reported.\n\nIn other words, an inner fragment whose ancestor was not re-executed on the latest run becomes \"orphaned\" but continues to emit periodic deltas at a stale path. The fix likely needs to either (a) prevent orphaned descendant fragments from auto-rerunning when an ancestor fragment ran without re-registering them, or (b) make the frontend gracefully drop deltas pointing into a missing sub-tree (instead of crashing).\n\nThe reporter notes 1.37.0 just worked, while a few recent versions show \"bad message format\" before transitioning to the white-screen crash on 1.55.0 \u2014 consistent with this being a regression in the fragment lifecycle handling.\n\n### Related Issues\n\n- [#10719 \u2013 Nested periodic st.fragments can cause StreamlitDuplicateElementId](https://github.com/streamlit/streamlit/issues/10719) \u2014 Same area (nested fragments + `run_every`) and very similar lifecycle/ordering pitfalls; likely shares root cause around how nested fragments and their delta paths/IDs are reconciled across reruns.\n- [#11971 \u2013 SelectboxColumn in data editor not working when fragment with run_every is active](https://github.com/streamlit/streamlit/issues/11971) \u2014 Another `run_every` fragment side-effect bug where periodic reruns disturb sibling tree state, suggesting general issues with how `run_every` deltas interact with the rest of the tree.\n- [#12514 \u2013 Fragments within container disappearing on rerender](https://github.com/streamlit/streamlit/issues/12514) \u2014 Also about nested fragments inside containers losing/corrupting their tree state on subsequent renders, which is the same family of \"fragment + container delta path\" reconciliation problems.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    }
+  ]
+}

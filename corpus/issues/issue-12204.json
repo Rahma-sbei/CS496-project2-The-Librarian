@@ -1,0 +1,33 @@
+{
+  "id": "issue-12204",
+  "type": "issue",
+  "number": 12204,
+  "url": "https://github.com/streamlit/streamlit/issues/12204",
+  "title": "Automatically reformat in CI on lint failure",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:enhancement",
+    "area:contribution"
+  ],
+  "created_at": "2025-08-13T23:16:43Z",
+  "closed_at": "2026-07-22T10:06:22Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar feature requests.\n- [x] I added a descriptive title and summary to this issue.\n\n### Summary\n\nCurrently, the CI fails a check if `ruff format --check` fails, thus preventing poorly-formatted code from making it into the codebase, which is good. However, the CI should simply make the reformatting commit for the user. This is almost always desireable. And, in rare cases when it's not desireable, the user can always rollback the automatic commit and manually add the noqa comments they will need, or whatever, so no harm no foul.\n\n### Why?\n\nDev QoL\n\n### How?\n\nI think mypy achieves this with a \"pre-commit\" github action, but there are probably a couple ways.\n\n### Additional Context\n\nHere's an example from mypy, for reference https://github.com/python/mypy/pull/19494/commits/7f102209eaab90297b6bbac4066419accc281050\n\nI run afoul of lint rules all the time, because I don't care about code line length at all and just keep typing; so I love it when the reformatter just takes care of it without complaint, according to the preferences of the repo owner. The popular python reformatters I know about (ruff, black) are also 100% safe in the sense of never changing code meaning by reformatting (except for the occasional formatter bug). There may be security implications for hooking up this action, altho' probably not more than hooking up other actions.",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2025-08-13T23:16:57Z",
+      "body": "**To help Streamlit prioritize this feature, react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour vote helps us identify which enhancements matter most to our users.\n\n![Views](https://api.views-badge.org/badge/st-issue-12204)\n"
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2025-08-14T00:12:02Z",
+      "body": "Yep, we have been planning to add some autofix CI functionality for some time:\n- https://github.com/streamlit/streamlit/pull/11139\n- https://github.com/streamlit/streamlit/pull/12030\n\nWe eventually decided against pre-commit CI, but are planning to add our own workflow. This requires a GH service account and that has to go through some processes. But I hope we can have this working within the next couple of weeks. "
+    },
+    {
+      "role": "COLLABORATOR",
+      "created_at": "2026-07-22T10:06:22Z",
+      "body": "Closing this since we have the `autofix` label that can be applied to PRs to autofix these aspects. "
+    }
+  ]
+}

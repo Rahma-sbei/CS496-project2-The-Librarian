@@ -1,0 +1,40 @@
+{
+  "id": "issue-15653",
+  "type": "issue",
+  "number": 15653,
+  "url": "https://github.com/streamlit/streamlit/issues/15653",
+  "title": "The hover effect of st.date_input varies depending on the value of min_value",
+  "state": "closed",
+  "state_reason": "completed",
+  "labels": [
+    "type:bug",
+    "area:styling",
+    "status:cannot-reproduce",
+    "feature:st.date_input"
+  ],
+  "created_at": "2026-06-22T03:19:09Z",
+  "closed_at": "2026-06-29T12:50:02Z",
+  "body": "### Checklist\n\n- [x] I have searched the [existing issues](https://github.com/streamlit/streamlit/issues) for similar issues.\n- [x] I added a very descriptive title to this issue.\n- [x] I have provided sufficient information below to help reproduce this issue.\n\n### Summary\n\nWhen the value of `min_value` in `st.date_input` falls within the current month, no hover effect is applied when hovering over the dates in the calendar.\n\n```\nfrom datetime import datetime, timedelta\n\nimport streamlit as st\n\nspecified_date_input = st.date_input(\n    label=\"test\",\n    key=\"test\",\n    value=None,\n    max_value=\"today\",\n    min_value=(datetime.now() - timedelta(days=7)).date(),\n    disabled=False,\n)\n```\n<img width=\"768\" height=\"437\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/b452b7e0-f560-4410-8b82-711ee95eae51\" />\n\nHowever, when the value of `min_value` extends into the previous month, a hover effect is applied.\n\n```\nfrom datetime import datetime, timedelta\n\nimport streamlit as st\n\nspecified_date_input = st.date_input(\n    label=\"test\",\n    key=\"test\",\n    value=None,\n    max_value=\"today\",\n    min_value=(datetime.now() - timedelta(days=31)).date(),\n    disabled=False,\n)\n```\n<img width=\"747\" height=\"416\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/18538e9b-94e1-466e-b0ff-60ccd6ed8386\" />\n\nIs this behavior a bug? Is it possible to standardize the hover effect?\n\n### Reproducible Code Example\n\n```Python\n\n```\n\n### Steps To Reproduce\n\n_No response_\n\n### Expected Behavior\n\n_No response_\n\n### Current Behavior\n\n_No response_\n\n### Is this a regression?\n\n- [ ] Yes, this used to work in a previous version.\n\n### Debug info\n\n- Streamlit version:\n- Python version:\n- Operating System:\n- Browser:\n\n\n### Additional Information\n\n_No response_",
+  "comments": [
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-22T03:19:20Z",
+      "body": "**If this issue affects you, please react with a \ud83d\udc4d (thumbs up emoji) to the initial post.**\n\nYour feedback helps us prioritize which bugs to investigate and address first.\n\n![Views](https://api.views-badge.org/badge/st-issue-15653)\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-22T13:20:11Z",
+      "body": "This is a visual bug in `st.date_input`'s calendar popover where the per-day hover ring indicator is inconsistent depending on whether the `min_value` falls within the currently visible month. When `min_value` is within the current month (so the visible month contains a mix of disabled and enabled dates), hovering an enabled date does not show the hover ring; when `min_value` lies in a previous month (so all dates in the visible month are enabled), the hover ring renders normally.\n\nLooking at `frontend/lib/src/components/widgets/DateInput/DateInput.tsx` (the `Day` overrides around lines 345\u2013395), the hover ring is driven by BaseWeb's `$isHighlighted` state on the `::after` pseudo-element:\n\n```tsx\n\"::after\": {\n  borderColor: $isHighlighted\n    ? colors.primary\n    : colors.transparent,\n},\n```\n\nThe likely root cause is upstream in BaseWeb's Datepicker: when `minDate` falls inside the visible month, BaseWeb appears to suppress/skip the `$isHighlighted` state on hover for the focusable days (probably tied to how it manages keyboard focus/highlight initialization when disabled days are present in the same month). Background coloring via `::before` (`$isHovered`) still works, but the ring on `::after` (`$isHighlighted`) does not. This may need to be either worked around in our overrides (e.g. fall back to `$isHovered` for the ring border) or reported/fixed upstream in BaseWeb.\n\n### Related Issues\n\n- [#10929](https://github.com/streamlit/streamlit/issues/10929) (closed) \u2014 Previous hover-color bug in `st.date_input` where hovered dates inside a selected range didn't change color. Closely related (same widget, same hover-style area) and the fix touched the exact `Day` overrides where this new regression appears.\n- [#9667](https://github.com/streamlit/streamlit/issues/9667) \u2014 `st.date_input` greys out years that fall within the valid `min_value`/`max_value` range. Related: another visual inconsistency in the calendar UI tied to `min_value`/`max_value` (also flagged as `upstream` BaseWeb behavior).\n- [#12802](https://github.com/streamlit/streamlit/issues/12802) \u2014 Hover border color inconsistency in `st.segmented_control`. Not the same widget, but the same class of bug: per-cell hover styling that renders inconsistently depending on neighboring state.\n\n---\n*This is an automated triage comment using `claude-opus-4-7-thinking-xhigh`. Please verify the suggested labels and related issues.*\n"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-22T13:32:56Z",
+      "body": "[USER] I made a repro app here https://issues.streamlit.app/?issue=gh-15653\n\nThe behaviour I observed is that disabled dates have not hover effect, but enabled dates do. So, in your example, hovering over 15-22 does show a hover effect, but hovering over 1-14 does not. \n\nDoes this match what you are seeing? If not, can you provide more repro details on which version you are using and which browser?"
+    },
+    {
+      "role": "CONTRIBUTOR",
+      "created_at": "2026-06-29T12:50:02Z",
+      "body": "[USER] closing this as unable to reproduce. Please re-open if you are able to provide more details. Thank you!"
+    }
+  ]
+}
