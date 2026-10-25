@@ -46,12 +46,12 @@ cannot answer (`data/eval_dataset.json`).
 
 **Retrieval** (does the right passage come back?):
 
-| Search | Recall@1 | Recall@5 | Recall@20 | Search time (p50) |
-|---|---|---|---|---|
-| Keyword only (BM25) | 0.29 | 0.69 | 0.89 | 13 ms |
-| Vector only | 0.47 | 0.70 | 0.85 | 23 ms |
-| **Hybrid (used)** | 0.38 | **0.80** | 0.90 | 41 ms |
-| Hybrid + reranker | 0.43 | 0.79 | 0.93 | 2,098 ms |
+| Search              | Recall@1 | Recall@5 | Recall@20 | Search time (p50) |
+| ------------------- | -------- | -------- | --------- | ----------------- |
+| Keyword only (BM25) | 0.29     | 0.69     | 0.89      | 13 ms             |
+| Vector only         | 0.47     | 0.70     | 0.85      | 23 ms             |
+| **Hybrid (used)**   | 0.38     | **0.80** | 0.90      | 41 ms             |
+| Hybrid + reranker   | 0.43     | 0.79     | 0.93      | 2,098 ms          |
 
 **Generation** (5 passages, `gpt-4o-mini`, graded by an LLM judge): correct on **86.6%** of all 112 questions;
 **98.5%** of claims supported by a retrieved passage; the cited passage states the claim **99.1%** of the time; "I don't
@@ -79,32 +79,29 @@ venv/Scripts/python build_corpus.py --max-issues 600 && venv/Scripts/python inde
 
 ## What's in the repository
 
-| Path | What it is |
-|---|---|
-| `build_corpus.py` | Downloads the docs, closed issues and releases, removes personal data → `corpus/` |
-| `index_corpus.py` | Cleans and chunks the corpus, builds vectors and the BM25 keyword index → `index/` |
-| `generate.py` | Hybrid search + `gpt-4o-mini` answer with citations; usable from the command line |
-| `app.py`, `static/` | The web service (FastAPI) and the chat page |
-| `data/eval_dataset.json` | 100 questions with answers and exact source passages, plus 12 unanswerable questions |
-| `eval/` | `retrieval_eval.py` (recall@k + ablation), `generation_eval.py` (faithfulness, correctness, citations, latency, cost), `run_eval.py` (both), `validate_eval.py` (dataset check) |
-| `results/` | Evaluation outputs used in the report |
-| `design.md` | Chunking, index choice, retrieval, generation, known failure cases |
-| `optimisation.md` | Week 8: what we changed and what it saved, before/after |
-| `postmortem.md` | What went wrong and what we learned |
-| `report.pdf` | The project report |
-| `render.yaml`, `requirements-deploy.txt` | Deployment on Render (free plan, no PyTorch) |
+| Path                                     | What it is                                                                                                                                                                      |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `build_corpus.py`                        | Downloads the docs, closed issues and releases, removes personal data → `corpus/`                                                                                               |
+| `index_corpus.py`                        | Cleans and chunks the corpus, builds vectors and the BM25 keyword index → `index/`                                                                                              |
+| `generate.py`                            | Hybrid search + `gpt-4o-mini` answer with citations; usable from the command line                                                                                               |
+| `app.py`, `static/`                      | The web service (FastAPI) and the chat page                                                                                                                                     |
+| `data/eval_dataset.json`                 | 100 questions with answers and exact source passages, plus 12 unanswerable questions                                                                                            |
+| `eval/`                                  | `retrieval_eval.py` (recall@k + ablation), `generation_eval.py` (faithfulness, correctness, citations, latency, cost), `run_eval.py` (both), `validate_eval.py` (dataset check) |
+| `results/`                               | Evaluation outputs used in the report                                                                                                                                           |
+| `design.md`                              | Chunking, index choice, retrieval, generation, known failure cases                                                                                                              |
+| `optimisation.md`                        | Week 8: what we changed and what it saved, before/after                                                                                                                         |
+| `postmortem.md`                          | What went wrong and what we learned                                                                                                                                             |
+| `report.pdf`                             | The project report                                                                                                                                                              |
+| `render.yaml`, `requirements-deploy.txt` | Deployment on Render (free plan, no PyTorch)                                                                                                                                    |
 
 No API keys or personal data are in the repository: `.env` and `logs/` are ignored by git, and issue threads are
 scrubbed of usernames, emails and tokens before they are saved.
 
 ## Contributions
 
-| Member | Contribution |
-|---|---|
-| Rahma Sbei | Project setup; corpus collection (`build_corpus.py`); cleaning, chunking and indexing (`index_corpus.py`); dataset validation and repair; evaluation scripts (`eval/`); design, optimisation and postmortem documents |
-| Mariem Lahmer | Answer generation with citations and "I don't know" (`generate.py`) |
-| Nadia Ben Njima | Evaluation dataset: questions, answers and source passages (`data/`) |
-| Ahmed Brini | UI building (`app.py`, `static/`) and deployment (`render.yaml`, `requirements-deploy.txt`); report creation (`report.pdf`) |
-
-Most scripts were drafted with an AI coding assistant, then run, checked and corrected by the team on our own data
-(see [postmortem.md](postmortem.md)). Every member reviewed the code so that each of us can explain every line.
+| Member          | Contribution                                                                                                                                                                                                          |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Rahma Sbei      | Project setup; corpus collection (`build_corpus.py`); cleaning, chunking and indexing (`index_corpus.py`); dataset validation and repair; evaluation scripts (`eval/`); design, optimisation and postmortem documents |
+| Mariem Lahmer   | Answer generation with citations and "I don't know" (`generate.py`)                                                                                                                                                   |
+| Nadia Ben Njima | Evaluation dataset: questions, answers and source passages (`data/`)                                                                                                                                                  |
+| Ahmed Brini     | UI building (`app.py`, `static/`) and deployment (`render.yaml`, `requirements-deploy.txt`); report creation (`report.pdf`)                                                                                           |
