@@ -1,15 +1,14 @@
-"""Validate the eval dataset against the real index.
+"""Validate the eval dataset against the chunks stored in the vector store.
 
 Usage (from the repo root):
-    python eval/validate_eval.py                       # data/eval_dataset.json against index/
-    python eval/validate_eval.py data/eval_dataset.json --index index_small
+    python eval/validate_eval.py                                   # data/eval_dataset.json against the collection
+    python eval/validate_eval.py data/eval_dataset.json --collection librarian_c150
 
 Checks, per entry:
   1. required fields present and non-empty, unique ids, known question_type and split
-  2. answerable entries: every gold passage appears verbatim (ignoring markdown decoration and
-     whitespace) inside a chunk of its own gold doc, doc_id is the first gold doc, and the stored
-     gold_chunk_ids match the chunks recomputed from the passages
-  3. unanswerable entries have no gold passages or chunks
+  2. answerable entries: every gold passage appears verbatim (ignoring markdown decoration and whitespace) inside a
+     single chunk of its own gold document, and doc_id is the first gold document
+  3. unanswerable entries have no gold passages
 Structural only: it cannot tell whether a passage really supports the answer, so review by hand.
 Prints a summary and writes eval_problems.json listing every failing entry.
 """
@@ -18,6 +17,7 @@ from collections import Counter
 from pathlib import Path
 
 from common import ROOT, doc_index, gold_chunks
+import store
 
 REQUIRED = ["id", "category", "question_type", "question", "answer", "split"]
 ANSWERABLE = ["doc_id", "source_type", "url", "source_file", "source_passage", "gold_doc_ids", "gold_passages"]
@@ -35,28 +35,25 @@ def check(e, by_doc, seen):
         errs.append(f"split must be dev or test: {e.get('split')}")
 
     if e.get("answerable") is False:
-        if e.get("gold_passages") or e.get("gold_chunk_ids") or str(e.get("source_passage") or "").strip():
-            errs.append("unanswerable entry should have no gold passages or chunks")
+        if e.get("gold_passages") or str(e.get("source_passage") or "").strip():
+            errs.append("unanswerable entry should have no gold passages")
         return errs
     errs += [f"missing or empty field: {k}" for k in ANSWERABLE if not e.get(k)]
     if errs:
         return errs
     for g in e["gold_passages"]:
         if g["doc_id"] not in by_doc:
-            errs.append(f"doc_id not in index: {g['doc_id']}")
+            errs.append(f"doc_id not in the vector store: {g['doc_id']}")
         elif not gold_chunks(dict(gold_passages=[g]), by_doc):
             errs.append(f"passage not found in any chunk of {g['doc_id']}: {g['passage'][:60]!r}")
     if e["gold_doc_ids"][0] != e["doc_id"] or {g["doc_id"] for g in e["gold_passages"]} != set(e["gold_doc_ids"]):
         errs.append("doc_id / gold_doc_ids / gold_passages disagree")
-    if not errs and sorted(e.get("gold_chunk_ids") or []) != gold_chunks(e, by_doc):
-        errs.append("gold_chunk_ids out of date for this index (recompute from gold_passages)")
     return errs
 
 
-def main(path, index):
+def main(path, collection):
     data = json.load(open(path, encoding="utf-8"))
-    chunks = [json.loads(l) for l in open(Path(index) / "chunks.jsonl", encoding="utf-8")]
-    by_doc, seen, problems = doc_index(chunks), set(), []
+    by_doc, seen, problems = doc_index(store.all_chunks(collection)), set(), []
     for e in data:
         errs = check(e, by_doc, seen)
         if errs:
@@ -64,7 +61,7 @@ def main(path, index):
 
     n, ans = len(data), sum(e.get("answerable") is not False for e in data)
     print(f"{n} entries ({ans} answerable, {n - ans} unanswerable), {n - len(problems)} OK, "
-          f"{len(problems)} with problems")
+          f"{len(problems)} with problems (collection {collection}, {store.count(collection)} chunks)")
     for field in ("question_type", "source_type", "split"):
         print(f"  {field}: {dict(Counter(str(e.get(field)) for e in data))}")
     kinds = Counter(m.split(":")[0] for p in problems for m in p["problems"])
@@ -78,6 +75,6 @@ def main(path, index):
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("path", nargs="?", default=str(ROOT / "data" / "eval_dataset.json"))
-    ap.add_argument("--index", default=str(ROOT / "index"))
+    ap.add_argument("--collection", default=store.COLLECTION)
     a = ap.parse_args()
-    main(a.path, a.index)
+    main(a.path, a.collection)

@@ -26,10 +26,6 @@
         "doc_id": "get-started__fundamentals__summary.md",
         "passage": "Every time a user interacts with a widget, your script is re-executed and Streamlit redraws its output in the browser."
       }
-    ],
-    "gold_chunk_ids": [
-      1527,
-      1539
     ]
   },
   {
@@ -64,11 +60,6 @@
         "doc_id": "develop__concepts__architecture__session-state.md",
         "passage": "values stored in Session State persist across full-script and fragment reruns."
       }
-    ],
-    "gold_chunk_ids": [
-      200,
-      661,
-      1517
     ]
   },
   {
@@ -98,10 +89,6 @@
         "doc_id": "get-started__fundamentals__advanced-concepts.md",
         "passage": "`st.cache_data` is the recommended way to cache computations that return data."
       }
-    ],
-    "gold_chunk_ids": [
-      595,
-      1515
     ]
   },
   {
@@ -131,10 +118,6 @@
         "doc_id": "get-started__fundamentals__advanced-concepts.md",
         "passage": "**It returns the cached object itself**, which is shared across all reruns and sessions without copying or duplication."
       }
-    ],
-    "gold_chunk_ids": [
-      594,
-      1515
     ]
   },
   {
@@ -164,10 +147,6 @@
         "doc_id": "develop__quick-references__api-cheat-sheet.md",
         "passage": "Rerun script immediately: st.rerun()"
       }
-    ],
-    "gold_chunk_ids": [
-      281,
-      948
     ]
   },
   {
@@ -197,10 +176,6 @@
         "doc_id": "develop__api-reference__control-flow___index.md",
         "passage": "Define a fragment to rerun independently from the rest of the script."
       }
-    ],
-    "gold_chunk_ids": [
-      281,
-      644
     ]
   },
   {
@@ -229,9 +204,6 @@
         "doc_id": "kb__FAQ__where-file-uploader-store-when-deleted.md",
         "passage": "This means Streamlit removes a file from memory when: - The user uploads another file, replacing the original one - The user clears the file uploader - The user closes the browser tab where they uploaded the file"
       }
-    ],
-    "gold_chunk_ids": [
-      1650
     ]
   },
   {
@@ -266,11 +238,6 @@
         "doc_id": "develop__api-reference__layout___index.md",
         "passage": "Insert containers laid out as side-by-side columns."
       }
-    ],
-    "gold_chunk_ids": [
-      172,
-      336,
-      514
     ]
   },
   {
@@ -305,11 +272,6 @@
         "doc_id": "develop__api-reference__layout___index.md",
         "passage": "Insert a multi-element container that can be expanded/collapsed."
       }
-    ],
-    "gold_chunk_ids": [
-      172,
-      336,
-      514
     ]
   },
   {
@@ -339,12 +301,6 @@
         "doc_id": "develop__api-reference___index.md",
         "passage": "Display a data editor widget."
       }
-    ],
-    "gold_chunk_ids": [
-      166,
-      169,
-      170,
-      493
     ]
   },
   {
@@ -369,9 +325,6 @@
         "doc_id": "develop__api-reference___index.md",
         "passage": "Display a metric in big bold font, with an optional indicator of how the metric changed."
       }
-    ],
-    "gold_chunk_ids": [
-      166
     ]
   },
   {
@@ -404,10 +357,6 @@
         "doc_id": "develop__concepts__connections__secrets-management.md",
         "passage": "the recommended solution is to store those credentials outside the repository"
       }
-    ],
-    "gold_chunk_ids": [
-      758,
-      759
     ]
   },
   {
@@ -442,11 +391,6 @@
         "doc_id": "deploy__community-cloud__share-your-app__share-previews.md",
         "passage": "Set the `page_title` parameter in [`st.set_page_config()`](/develop/api-reference/configuration/st.set_page_config) to your desired title."
       }
-    ],
-    "gold_chunk_ids": [
-      118,
-      122,
-      1634
     ]
   },
   {
@@ -475,9 +419,6 @@
         "doc_id": "develop__concepts__architecture__run-your-app.md",
         "passage": "When passing your script some custom arguments, they must be passed after two dashes."
       }
-    ],
-    "gold_chunk_ids": [
-      659
     ]
   },
   {
@@ -511,11 +452,6 @@
         "doc_id": "get-started__fundamentals__main-concepts.md",
         "passage": "Whenever a callback is passed to a widget via the `on_change` (or `on_click`) parameter, the callback will always run before the rest of your script."
       }
-    ],
-    "gold_chunk_ids": [
-      679,
-      683,
-      1527
     ]
   },
   {
@@ -544,10 +480,6 @@
         "doc_id": "develop__concepts__architecture__widget-behavior.md",
         "passage": "**With a key**: The key is the primary determinant of the widget's identity."
       }
-    ],
-    "gold_chunk_ids": [
-      680,
-      681
     ]
   },
   {
@@ -576,10 +508,6 @@
         "doc_id": "develop__concepts__architecture__forms.md",
         "passage": "For widgets inside a form, the script will rerun when the form is submitted and all widgets within the form will send their updated values to the Python backend."
       }
-    ],
-    "gold_chunk_ids": [
-      634,
-      637
     ]
   },
   {
@@ -608,9 +536,6 @@
         "doc_id": "develop__concepts__architecture__caching.md",
         "passage": "Tip: You can also set `ttl` values using `timedelta`"
       }
-    ],
-    "gold_chunk_ids": [
-      606
     ]
   },
   {
@@ -639,9 +564,6 @@
         "doc_id": "develop__api-reference__caching-and-state__cache-data.md",
         "passage": "st.cache_data.clear()"
       }
-    ],
-    "gold_chunk_ids": [
-      190
     ]
   },
   {
@@ -670,10 +592,6 @@
         "doc_id": "develop__concepts__architecture__caching.md",
         "passage": "@st.cache_data(max_entries=1000)"
       }
-    ],
-    "gold_chunk_ids": [
-      606,
-      607
     ]
   },
   {
@@ -702,9 +620,6 @@
         "doc_id": "develop__concepts__architecture__caching.md",
         "passage": "you might pass an unhashable database connection or ML model to your cached function."
       }
-    ],
-    "gold_chunk_ids": [
-      608
     ]
   },
   {
@@ -734,10 +649,6 @@
         "doc_id": "develop__quick-references__api-cheat-sheet.md",
         "passage": "Stop execution immediately: st.stop()"
       }
-    ],
-    "gold_chunk_ids": [
-      281,
-      948
     ]
   },
   {
@@ -766,9 +677,6 @@
         "doc_id": "get-started__fundamentals__advanced-concepts.md",
         "passage": "Since \"counter\" is already a key in Session State, it is not reinitialized."
       }
-    ],
-    "gold_chunk_ids": [
-      1519
     ]
   },
   {
@@ -797,9 +705,6 @@
         "doc_id": "develop__api-reference__caching-and-state__query_params.md",
         "passage": "All keys and values will be set and returned as strings. When you write to `st.query_params`, key-value pair prefixed with `?` is added to the end of your app's URL."
       }
-    ],
-    "gold_chunk_ids": [
-      197
     ]
   },
   {
@@ -829,10 +734,6 @@
         "doc_id": "develop__api-reference__control-flow___index.md",
         "passage": "@st.fragment(run_every=\"10s\")"
       }
-    ],
-    "gold_chunk_ids": [
-      281,
-      653
     ]
   },
   {
@@ -865,10 +766,6 @@
         "doc_id": "develop__concepts__architecture__widget-behavior.md",
         "passage": "When Streamlit gets to the end of a script run, it will delete the data for any widgets it has in memory that were not rendered on the screen, unless `persist_state` is set."
       }
-    ],
-    "gold_chunk_ids": [
-      688,
-      693
     ]
   },
   {
@@ -902,10 +799,6 @@
         "doc_id": "develop__quick-references__api-cheat-sheet.md",
         "passage": "Show a spinner during a process with st.spinner(text=\"In progress\"):"
       }
-    ],
-    "gold_chunk_ids": [
-      360,
-      953
     ]
   },
   {
@@ -934,10 +827,6 @@
         "doc_id": "develop__concepts__architecture__caching.md",
         "passage": "`st.cache_data` creates a copy of the cached return value each time the function is called."
       }
-    ],
-    "gold_chunk_ids": [
-      602,
-      625
     ]
   },
   {
@@ -962,9 +851,6 @@
         "doc_id": "develop__api-reference__caching-and-state__session_state.md",
         "passage": "Modifying the value of a widget via the Session state API, after instantiating it, is not allowed and will raise a `StreamlitAPIException`."
       }
-    ],
-    "gold_chunk_ids": [
-      208
     ]
   },
   {
@@ -994,10 +880,6 @@
         "doc_id": "develop__tutorials__llms__llm-quickstart.md",
         "passage": "st.sidebar.text_input(\"OpenAI API Key\", type=\"password\")"
       }
-    ],
-    "gold_chunk_ids": [
-      990,
-      1451
     ]
   },
   {
@@ -1030,9 +912,6 @@
         "doc_id": "kb__FAQ__how-download-file-streamlit.md",
         "passage": "st.download_button('Download file', binary_contents)  # Defaults to 'application/octet-stream'"
       }
-    ],
-    "gold_chunk_ids": [
-      1630
     ]
   },
   {
@@ -1065,9 +944,6 @@
         "doc_id": "develop__api-reference__layout__bottom.md",
         "passage": "Use `st.bottom` to force the chat input to the bottom in those cases:"
       }
-    ],
-    "gold_chunk_ids": [
-      338
     ]
   },
   {
@@ -1096,9 +972,6 @@
         "doc_id": "develop__tutorials__llms__conversational-apps.md",
         "passage": "`st.chat_message`'s first parameter is the `name` of the message author, which can be either `\"user\"` or `\"assistant\"` to enable preset styling and avatars"
       }
-    ],
-    "gold_chunk_ids": [
-      1435
     ]
   },
   {
@@ -1128,10 +1001,6 @@
         "doc_id": "develop__api-reference__widgets__text_input.md",
         "passage": "Text input widgets can also be disabled with the `disabled` parameter"
       }
-    ],
-    "gold_chunk_ids": [
-      430,
-      438
     ]
   },
   {
@@ -1165,10 +1034,6 @@
         "doc_id": "develop__api-reference__widgets__radio.md",
         "passage": "If \"collapsed\", both the label and the space are removed. Default is \"visible\"."
       }
-    ],
-    "gold_chunk_ids": [
-      430,
-      438
     ]
   },
   {
@@ -1202,10 +1067,6 @@
         "doc_id": "develop__concepts__app-design__layouts-and-containers.md",
         "passage": "The sidebar is a persistent panel on the left side of your app."
       }
-    ],
-    "gold_chunk_ids": [
-      345,
-      512
     ]
   },
   {
@@ -1240,11 +1101,6 @@
         "doc_id": "develop__api-reference__layout___index.md",
         "passage": "Insert containers separated into tabs."
       }
-    ],
-    "gold_chunk_ids": [
-      172,
-      336,
-      515
     ]
   },
   {
@@ -1274,10 +1130,6 @@
         "doc_id": "develop__api-reference___index.md",
         "passage": "Insert a multi-element container."
       }
-    ],
-    "gold_chunk_ids": [
-      172,
-      513
     ]
   },
   {
@@ -1311,10 +1163,6 @@
         "doc_id": "develop__api-reference___index.md",
         "passage": "Insert a single-element container."
       }
-    ],
-    "gold_chunk_ids": [
-      172,
-      517
     ]
   },
   {
@@ -1344,10 +1192,6 @@
         "doc_id": "develop__api-reference___index.md",
         "passage": "Insert a multi-element popover container that can be opened/closed."
       }
-    ],
-    "gold_chunk_ids": [
-      172,
-      516
     ]
   },
   {
@@ -1382,12 +1226,6 @@
         "doc_id": "develop__quick-references__api-cheat-sheet.md",
         "passage": "Define a dialog function @st.dialog(\"Welcome!\")"
       }
-    ],
-    "gold_chunk_ids": [
-      172,
-      180,
-      281,
-      948
     ]
   },
   {
@@ -1416,9 +1254,6 @@
         "doc_id": "develop__concepts__app-design__layouts-and-containers.md",
         "passage": "col1, col2 = st.columns(2, gap=\"large\")"
       }
-    ],
-    "gold_chunk_ids": [
-      519
     ]
   },
   {
@@ -1443,9 +1278,6 @@
         "doc_id": "develop__concepts__app-design__layouts-and-containers.md",
         "passage": "You can add a visible border with `border=True`:"
       }
-    ],
-    "gold_chunk_ids": [
-      513
     ]
   },
   {
@@ -1475,10 +1307,6 @@
         "doc_id": "develop__concepts__architecture__app-chrome.md",
         "passage": "You can also force your app to appear in wide mode, even if not set within the script using [`st.set_page_config`](/develop/api-reference/configuration/st.set_page_config)."
       }
-    ],
-    "gold_chunk_ids": [
-      580,
-      1634
     ]
   },
   {
@@ -1508,10 +1336,6 @@
         "doc_id": "develop__concepts__multipage-apps__page_directory.md",
         "passage": "Streamlit also ignores Python files in subdirectories of `pages/`."
       }
-    ],
-    "gold_chunk_ids": [
-      920,
-      936
     ]
   },
   {
@@ -1544,10 +1368,6 @@
         "doc_id": "develop__concepts__multipage-apps__page-and-navigation.md",
         "passage": "`st.navigation` returns the selected page. You must manually execute that page with the `.run()` method."
       }
-    ],
-    "gold_chunk_ids": [
-      927,
-      928
     ]
   },
   {
@@ -1577,10 +1397,6 @@
         "doc_id": "develop__quick-references__api-cheat-sheet.md",
         "passage": "Navigate to another page: st.switch_page(\"pages/my_page.py\")"
       }
-    ],
-    "gold_chunk_ids": [
-      926,
-      948
     ]
   },
   {
@@ -1609,11 +1425,6 @@
         "doc_id": "develop__concepts__custom-components__components-v1__v1-component-api.md",
         "passage": "import streamlit.components.v1 as components"
       }
-    ],
-    "gold_chunk_ids": [
-      769,
-      770,
-      780
     ]
   },
   {
@@ -1647,10 +1458,6 @@
         "doc_id": "develop__api-reference___index.md",
         "passage": "Display a static table."
       }
-    ],
-    "gold_chunk_ids": [
-      166,
-      335
     ]
   },
   {
@@ -1679,9 +1486,6 @@
         "doc_id": "get-started__fundamentals__main-concepts.md",
         "passage": "st.line_chart(chart_data)"
       }
-    ],
-    "gold_chunk_ids": [
-      1532
     ]
   },
   {
@@ -1710,9 +1514,6 @@
         "doc_id": "get-started__fundamentals__main-concepts.md",
         "passage": "columns=['lat', 'lon'])"
       }
-    ],
-    "gold_chunk_ids": [
-      1533
     ]
   },
   {
@@ -1746,10 +1547,6 @@
         "doc_id": "develop__api-reference___index.md",
         "passage": "Configure the display and editing behavior of dataframes and data editors."
       }
-    ],
-    "gold_chunk_ids": [
-      166,
-      502
     ]
   },
   {
@@ -1779,10 +1576,6 @@
         "doc_id": "develop__api-reference__status___index.md",
         "passage": "Display a progress bar."
       }
-    ],
-    "gold_chunk_ids": [
-      360,
-      455
     ]
   },
   {
@@ -1819,10 +1612,6 @@
         "doc_id": "develop__api-reference__write-magic__magic.md",
         "passage": "magicEnabled = false"
       }
-    ],
-    "gold_chunk_ids": [
-      442,
-      443
     ]
   },
   {
@@ -1851,9 +1640,6 @@
         "doc_id": "develop__api-reference__configuration__config-toml.md",
         "passage": "For MacOS/Linux, this will be `~/.streamlit/config.toml`. For Windows, this will be `%userprofile%/.streamlit/config.toml`."
       }
-    ],
-    "gold_chunk_ids": [
-      252
     ]
   },
   {
@@ -1883,10 +1669,6 @@
         "doc_id": "develop__api-reference__configuration__config-toml.md",
         "passage": "The port where the server will listen for browser connections. # # Default: 8501 port = 8501"
       }
-    ],
-    "gold_chunk_ids": [
-      257,
-      1623
     ]
   },
   {
@@ -1915,9 +1697,6 @@
         "doc_id": "develop__concepts__connections__secrets-management.md",
         "passage": "Tip: You can access `st.secrets` via attribute notation (e.g. `st.secrets.key`), in addition to key notation (e.g. `st.secrets[\"key\"]`)"
       }
-    ],
-    "gold_chunk_ids": [
-      760
     ]
   },
   {
@@ -1951,10 +1730,6 @@
         "doc_id": "develop__concepts__connections__secrets-management.md",
         "passage": "you'll need to also set up your secrets in the Community Cloud Secrets Management console."
       }
-    ],
-    "gold_chunk_ids": [
-      20,
-      762
     ]
   },
   {
@@ -1989,12 +1764,6 @@
         "doc_id": "develop__concepts__configuration__theming-colors-and-borders.md",
         "passage": "if you set `theme.sidebar.primaryColor`, this will override `theme.primaryColor` in the sidebar"
       }
-    ],
-    "gold_chunk_ids": [
-      252,
-      711,
-      733,
-      734
     ]
   },
   {
@@ -2027,9 +1796,6 @@
         "doc_id": "develop__concepts__connections__connecting-to-data.md",
         "passage": "Convenience methods like `query()` and `read()` will typically cache results by default using [`st.cache_data`](/develop/api-reference/caching-and-state/st.cache_data) without an expiration."
       }
-    ],
-    "gold_chunk_ids": [
-      754
     ]
   },
   {
@@ -2062,9 +1828,6 @@
         "doc_id": "deploy__community-cloud__deploy-your-app__deploy.md",
         "passage": "Every Community Cloud app is deployed to a subdomain on `streamlit.app`"
       }
-    ],
-    "gold_chunk_ids": [
-      10
     ]
   },
   {
@@ -2098,10 +1861,6 @@
         "doc_id": "deploy__concepts__dependencies.md",
         "passage": "Each line of a `requirements.txt` file is a package to `pip install`."
       }
-    ],
-    "gold_chunk_ids": [
-      6,
-      135
     ]
   },
   {
@@ -2130,9 +1889,6 @@
         "doc_id": "develop__api-reference__configuration__config-toml.md",
         "passage": "If you set `server.headless=True`, Streamlit will not show this prompt."
       }
-    ],
-    "gold_chunk_ids": [
-      257
     ]
   },
   {
@@ -2166,10 +1922,6 @@
         "doc_id": "develop__concepts__connections__secrets-management.md",
         "passage": "Important: Add this file to your `.gitignore` so you don't commit your secrets!"
       }
-    ],
-    "gold_chunk_ids": [
-      759,
-      763
     ]
   },
   {
@@ -2203,13 +1955,6 @@
         "doc_id": "develop__quick-references__api-cheat-sheet.md",
         "passage": "if not st.user.is_logged_in: st.login(\"my_provider\")"
       }
-    ],
-    "gold_chunk_ids": [
-      738,
-      744,
-      745,
-      746,
-      953
     ]
   },
   {
@@ -2243,10 +1988,6 @@
         "doc_id": "kb__deployments__remote-start.md",
         "passage": "If the file uploader widget returns an error with status code 403, this is probably due to a misconfiguration in your app's"
       }
-    ],
-    "gold_chunk_ids": [
-      257,
-      1625
     ]
   },
   {
@@ -2271,11 +2012,6 @@
         "doc_id": "deploy__tutorials__docker.md",
         "passage": "HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health"
       }
-    ],
-    "gold_chunk_ids": [
-      143,
-      147,
-      148
     ]
   },
   {
@@ -2309,10 +2045,6 @@
         "doc_id": "develop__api-reference__testing___index.md",
         "passage": "These can then be run using a tool like pytest."
       }
-    ],
-    "gold_chunk_ids": [
-      374,
-      537
     ]
   },
   {
@@ -2346,10 +2078,6 @@
         "doc_id": "develop__api-reference__configuration__config-toml.md",
         "passage": "Max size, in megabytes, for files uploaded with the file_uploader."
       }
-    ],
-    "gold_chunk_ids": [
-      257,
-      1617
     ]
   },
   {
@@ -2367,8 +2095,7 @@
     "source_file": null,
     "source_passage": "",
     "gold_doc_ids": [],
-    "gold_passages": [],
-    "gold_chunk_ids": []
+    "gold_passages": []
   },
   {
     "id": "eval_102",
@@ -2385,8 +2112,7 @@
     "source_file": null,
     "source_passage": "",
     "gold_doc_ids": [],
-    "gold_passages": [],
-    "gold_chunk_ids": []
+    "gold_passages": []
   },
   {
     "id": "eval_103",
@@ -2403,8 +2129,7 @@
     "source_file": null,
     "source_passage": "",
     "gold_doc_ids": [],
-    "gold_passages": [],
-    "gold_chunk_ids": []
+    "gold_passages": []
   },
   {
     "id": "eval_104",
@@ -2421,8 +2146,7 @@
     "source_file": null,
     "source_passage": "",
     "gold_doc_ids": [],
-    "gold_passages": [],
-    "gold_chunk_ids": []
+    "gold_passages": []
   },
   {
     "id": "eval_105",
@@ -2439,8 +2163,7 @@
     "source_file": null,
     "source_passage": "",
     "gold_doc_ids": [],
-    "gold_passages": [],
-    "gold_chunk_ids": []
+    "gold_passages": []
   },
   {
     "id": "eval_106",
@@ -2457,8 +2180,7 @@
     "source_file": null,
     "source_passage": "",
     "gold_doc_ids": [],
-    "gold_passages": [],
-    "gold_chunk_ids": []
+    "gold_passages": []
   },
   {
     "id": "eval_107",
@@ -2475,8 +2197,7 @@
     "source_file": null,
     "source_passage": "",
     "gold_doc_ids": [],
-    "gold_passages": [],
-    "gold_chunk_ids": []
+    "gold_passages": []
   },
   {
     "id": "eval_108",
@@ -2493,8 +2214,7 @@
     "source_file": null,
     "source_passage": "",
     "gold_doc_ids": [],
-    "gold_passages": [],
-    "gold_chunk_ids": []
+    "gold_passages": []
   },
   {
     "id": "eval_109",
@@ -2511,8 +2231,7 @@
     "source_file": null,
     "source_passage": "",
     "gold_doc_ids": [],
-    "gold_passages": [],
-    "gold_chunk_ids": []
+    "gold_passages": []
   },
   {
     "id": "eval_110",
@@ -2529,8 +2248,7 @@
     "source_file": null,
     "source_passage": "",
     "gold_doc_ids": [],
-    "gold_passages": [],
-    "gold_chunk_ids": []
+    "gold_passages": []
   },
   {
     "id": "eval_111",
@@ -2547,8 +2265,7 @@
     "source_file": null,
     "source_passage": "",
     "gold_doc_ids": [],
-    "gold_passages": [],
-    "gold_chunk_ids": []
+    "gold_passages": []
   },
   {
     "id": "eval_112",
@@ -2565,8 +2282,7 @@
     "source_file": null,
     "source_passage": "",
     "gold_doc_ids": [],
-    "gold_passages": [],
-    "gold_chunk_ids": []
+    "gold_passages": []
   },
   {
     "id": "eval_113",
@@ -2599,10 +2315,6 @@
         "doc_id": "develop__concepts__app-design__button-behavior-and-examples.md",
         "passage": "When dynamically adding widgets to the page, make sure to use an index to keep the keys unique and avoid a `DuplicateWidgetID` error."
       }
-    ],
-    "gold_chunk_ids": [
-      469,
-      682
     ]
   },
   {
@@ -2631,9 +2343,6 @@
         "doc_id": "develop__concepts__app-design__multithreading.md",
         "passage": "\"missing ScriptRunContext!\""
       }
-    ],
-    "gold_chunk_ids": [
-      528
     ]
   },
   {
@@ -2666,11 +2375,6 @@
         "doc_id": "develop__concepts__architecture__caching.md",
         "passage": "you can use the `hash_funcs` parameter to specify a custom hashing function for the model."
       }
-    ],
-    "gold_chunk_ids": [
-      608,
-      609,
-      610
     ]
   },
   {
@@ -2699,9 +2403,6 @@
         "doc_id": "kb__FAQ__serializable-session-state.md",
         "passage": "When the config option is enabled, adding unserializable data to session state should result in an exception."
       }
-    ],
-    "gold_chunk_ids": [
-      1644
     ]
   },
   {
@@ -2726,9 +2427,6 @@
         "doc_id": "kb__dependencies__libgl.md",
         "passage": "If you use OpenCV in your app, include `opencv-python-headless` in your requirements file on Streamlit Community Cloud in place of `opencv_contrib_python` and `opencv-python`."
       }
-    ],
-    "gold_chunk_ids": [
-      1607
     ]
   },
   {
@@ -2753,9 +2451,6 @@
         "doc_id": "kb__dependencies__module-not-found-error.md",
         "passage": "This error occurs when you import a module on Streamlit Community Cloud that isn’t included in your requirements file."
       }
-    ],
-    "gold_chunk_ids": [
-      1608
     ]
   },
   {
@@ -2784,9 +2479,6 @@
         "doc_id": "develop__concepts__architecture__architecture.md",
         "passage": "Any command that allows the user to upload files can also be impacted and may raise HTTP status code 400."
       }
-    ],
-    "gold_chunk_ids": [
-      590
     ]
   },
   {
@@ -2811,9 +2503,6 @@
         "doc_id": "develop__quick-references__release-notes__2025.md",
         "passage": "Introducing [`st.pdf`](/develop/api-reference/media/st.pdf) to beautifully render PDF documents in your app!"
       }
-    ],
-    "gold_chunk_ids": [
-      1097
     ]
   },
   {
@@ -2838,9 +2527,6 @@
         "doc_id": "develop__quick-references__release-notes__2024.md",
         "passage": "Introducing `st.experimental_dialog`! Create a modal overlay that can also rerun independently from the rest of your app."
       }
-    ],
-    "gold_chunk_ids": [
-      1073
     ]
   },
   {
@@ -2869,9 +2555,6 @@
         "doc_id": "develop__quick-references__release-notes__2024.md",
         "passage": "Introducing [`st.feedback`](/develop/api-reference/widgets/st.feedback) to collect ratings and sentiment from your users!"
       }
-    ],
-    "gold_chunk_ids": [
-      1064
     ]
   },
   {
@@ -2900,9 +2583,6 @@
         "doc_id": "develop__quick-references__release-notes__2024.md",
         "passage": "Introducing `st.html` to insert custom HTML into your app!"
       }
-    ],
-    "gold_chunk_ids": [
-      1076
     ]
   },
   {
@@ -2931,9 +2611,6 @@
         "doc_id": "develop__quick-references__release-notes__2023.md",
         "passage": "Introducing `st.divider` — a command that displays a horizontal line in your app."
       }
-    ],
-    "gold_chunk_ids": [
-      1041
     ]
   },
   {
@@ -2962,9 +2639,6 @@
         "doc_id": "develop__quick-references__release-notes__2022.md",
         "passage": "Introducing `st.tabs` to have tab containers in your app."
       }
-    ],
-    "gold_chunk_ids": [
-      1016
     ]
   },
   {
@@ -2989,9 +2663,6 @@
         "doc_id": "develop__quick-references__release-notes__2026.md",
         "passage": "Mistyped or removed `st.*` commands raise an `AttributeError` that suggests the correct name or replacement"
       }
-    ],
-    "gold_chunk_ids": [
-      1132
     ]
   },
   {
@@ -3020,9 +2691,6 @@
         "doc_id": "develop__quick-references__release-notes___index.md",
         "passage": "Streamlit no longer requires the `toml` dependency"
       }
-    ],
-    "gold_chunk_ids": [
-      1188
     ]
   },
   {
@@ -3047,9 +2715,6 @@
         "doc_id": "develop__quick-references__release-notes__2026.md",
         "passage": "Invalid API usage raises specific `StreamlitAPIException` subclasses for missing, incompatible, out-of-range, and wrongly typed parameters instead of generic Streamlit, `TypeError`, or `ValueError` failures"
       }
-    ],
-    "gold_chunk_ids": [
-      1141
     ]
   },
   {
@@ -3078,10 +2743,6 @@
         "doc_id": "release-1.52.0",
         "passage": "Add audio_sample_rate parameter to chat_input for customizable recording quality"
       }
-    ],
-    "gold_chunk_ids": [
-      3486,
-      3487
     ]
   },
   {
@@ -3106,9 +2767,6 @@
         "doc_id": "release-1.60.0",
         "passage": "Support integer pixel values for `gap` parameter (#13005)"
       }
-    ],
-    "gold_chunk_ids": [
-      3528
     ]
   },
   {
@@ -3133,9 +2791,6 @@
         "doc_id": "release-1.60.0",
         "passage": "Add `height` parameter to `st.tabs` (#12217)"
       }
-    ],
-    "gold_chunk_ids": [
-      3528
     ]
   },
   {
@@ -3168,9 +2823,6 @@
         "doc_id": "issue-16697",
         "passage": "The same `/_stcore/upload_file` route is used by `st.camera_input` and `st.chat_input` attachments."
       }
-    ],
-    "gold_chunk_ids": [
-      2575
     ]
   },
   {
@@ -3199,9 +2851,6 @@
         "doc_id": "issue-16341",
         "passage": "**Workaround confirmed by multiple reporters:** pin `starlette<1.4.0` (e.g. `starlette==1.3.1`) in `requirements.txt`."
       }
-    ],
-    "gold_chunk_ids": [
-      2435
     ]
   },
   {
@@ -3230,9 +2879,6 @@
         "doc_id": "issue-15374",
         "passage": "Changing the wrapper to `def _run_with_thread_state(*args, **kwargs)` and forwarding to `original_run(*args, **kwargs)` should fix this."
       }
-    ],
-    "gold_chunk_ids": [
-      2164
     ]
   },
   {
@@ -3257,9 +2903,6 @@
         "doc_id": "issue-15863",
         "passage": "This will be fixed in the patch 1.59.1 that will be released today."
       }
-    ],
-    "gold_chunk_ids": [
-      2304
     ]
   },
   {
@@ -3284,10 +2927,6 @@
         "doc_id": "issue-15855",
         "passage": "This will be fixed in the patch 1.59.1 that will be released today."
       }
-    ],
-    "gold_chunk_ids": [
-      2283,
-      2284
     ]
   },
   {
@@ -3317,10 +2956,6 @@
         "doc_id": "issue-14991",
         "passage": "This will likely be fixed in the 1.58."
       }
-    ],
-    "gold_chunk_ids": [
-      1162,
-      2066
     ]
   },
   {
@@ -3345,9 +2980,6 @@
         "doc_id": "issue-16358",
         "passage": "This issue was fixed in Streamlit 1.61.1 patch yesterday. Updating to the latest version should fix this."
       }
-    ],
-    "gold_chunk_ids": [
-      2444
     ]
   },
   {
@@ -3380,9 +3012,6 @@
         "doc_id": "issue-11384",
         "passage": "The mapped values are then available through `st.user`."
       }
-    ],
-    "gold_chunk_ids": [
-      1752
     ]
   },
   {
@@ -3411,9 +3040,6 @@
         "doc_id": "issue-11099",
         "passage": "the default is now *no* cursor (pass e.g. `cursor=\"▏\"` to restore a glyph)"
       }
-    ],
-    "gold_chunk_ids": [
-      1732
     ]
   },
   {
@@ -3438,9 +3064,6 @@
         "doc_id": "issue-10721",
         "passage": "Mermaid support will be released in 1.59+ via markdown code-blocks and a dedicated `st.mermaid_chart` command."
       }
-    ],
-    "gold_chunk_ids": [
-      1698
     ]
   },
   {
@@ -3469,9 +3092,6 @@
         "doc_id": "issue-16111",
         "passage": "For st.table(): replace with st.write() / st.markdown() to avoid PyArrow entirely"
       }
-    ],
-    "gold_chunk_ids": [
-      2387
     ]
   },
   {
@@ -3501,10 +3121,6 @@
         "doc_id": "release-1.52.0",
         "passage": "support width=\"content\" on `st.container`"
       }
-    ],
-    "gold_chunk_ids": [
-      1803,
-      3486
     ]
   }
 ]

@@ -1,25 +1,23 @@
-"""Chunk the corpus and build a flat-file hybrid index (vectors + BM25).
+"""Clean and chunk documents, then write them to the Qdrant vector store (see store.py).
 
 Usage:
-    python index_corpus.py                       # build with defaults
-    python index_corpus.py --chunk-size 150 --overlap 30 --out index_small
-    python index_corpus.py --out index --query "how do I keep state between reruns?"
+    python index_corpus.py --recreate                 # (re)build the whole collection from corpus/
+    python index_corpus.py                            # upsert corpus/ into the existing collection
+    python index_corpus.py --collection librarian_c150 --chunk-size 150 --overlap 25 --recreate   # experiment
+    python index_corpus.py --add notes.md --type doc --title "My page" --url https://...  # add one document
+    python index_corpus.py --query "how do I keep state between reruns?"   # compare keyword / vector / hybrid
 
-Output (in --out, default ./index):
-    chunks.jsonl      one chunk per line: text + metadata (title, url, section, ...)
-    embeddings.npy    float32 matrix, one normalised row per chunk
-    bm25.pkl          keyword index
-    config.json       chunk size, overlap, model: so every result is reproducible
+Adding content later goes through add_document(): it chunks the text with the same rules, embeds it and replaces
+any earlier version of that document. The web service exposes it as POST /api/documents.
 """
-import argparse, html, json, pickle, re, time
+import argparse, html, json, re, time
 from pathlib import Path
 
-import numpy as np
+import store
 
-MODEL = "BAAI/bge-small-en-v1.5"
-QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
 DOCS_BASE = "https://docs.streamlit.io"
 ADMONITIONS = "Note|Important|Tip|Warning|Caution"
+CHUNK_SIZE, OVERLAP, MIN_WORDS = 250, 40, 40           # chosen settings (see design.md)
 
 
 # ---------------- chunking ----------------
@@ -182,122 +180,114 @@ def merge_small(chunks, min_words, max_words):
 
 
 # ---------------- loading + chunking per source ----------------
-def doc_chunks(path, size, overlap, clean=True):
+def finish(chunks, min_words, cap, merge=True):
+    """Merge tiny chunks into a neighbour, drop empty leftovers, number the chunks inside their document."""
+    chunks = merge_small(chunks, min_words, cap) if merge else chunks
+    chunks = [c for c in chunks if words(c["text"]) >= 3]
+    for n, c in enumerate(chunks):
+        c["chunk"] = n
+    return chunks
+
+
+def text_chunks(doc_id, type, title, text, url="", date=None, size=CHUNK_SIZE, overlap=OVERLAP,
+                min_words=MIN_WORDS, clean=True):
+    """Chunk one document's text: split at headings, pack paragraphs up to `size` words, never split code."""
+    body = clean_mdx(text) if clean and type != "issue" else text
+    chunks = [dict(doc_id=doc_id, type=type, title=title, section=head, url=url, date=date, text=c)
+              for head, sec in (split_sections(body) or [("", body)]) for c in pack(split_blocks(sec), size, overlap)]
+    return finish(chunks, min_words, size)
+
+
+def doc_chunks(path, size, overlap, min_words, clean=True):
     meta, body = front_matter(path.read_text(encoding="utf-8", errors="ignore"))
-    body = clean_mdx(body) if clean else body
-    title = meta.get("title") or path.stem
     slug = meta.get("slug")
-    url = DOCS_BASE + slug if slug else DOCS_BASE
-    for head, sec in split_sections(body):
-        for c in pack(split_blocks(sec), size, overlap):
-            yield dict(doc_id=path.name, type="doc", title=title, section=head,
-                       url=url, date=None, text=c)
+    return text_chunks(path.name, "doc", meta.get("title") or path.stem, body, DOCS_BASE + slug if slug else DOCS_BASE,
+                       None, size, overlap, min_words, clean)
 
 
 def issue_chunks(path, size, overlap):
     d = json.loads(path.read_text(encoding="utf-8"))
     head = f"Issue #{d['number']}: {d['title']}\nLabels: {', '.join(d['labels'])}\n\n{d['body'] or ''}"
-    parts = [("Description", split_blocks(head))]
     comments = [(f"[{c['role']}] {c['body']}", False) for c in d["comments"] if c["body"]]
-    parts.append(("Discussion", comments))
-    for sec, blocks in parts:
-        for c in pack(blocks, size, overlap):
-            yield dict(doc_id=d["id"], type="issue", title=d["title"], section=sec,
-                       url=d["url"], date=d["closed_at"], text=c)
+    chunks = [dict(doc_id=d["id"], type="issue", title=d["title"], section=sec, url=d["url"], date=d["closed_at"],
+                   text=c)
+              for sec, blocks in [("Description", split_blocks(head)), ("Discussion", comments)]
+              for c in pack(blocks, size, overlap)]
+    return finish(chunks, 0, size, merge=False)          # issue chunks are not merged
 
 
-def release_chunks(path, size, overlap, clean=True):
+def release_chunks(path, size, overlap, min_words, clean=True):
     d = json.loads(path.read_text(encoding="utf-8"))
-    notes = clean_mdx(d["body"] or "") if clean else (d["body"] or "")
-    for head, sec in split_sections("## Notes\n" + notes):
-        for c in pack(split_blocks(sec), size, overlap):
-            yield dict(doc_id=d["id"], type="release", title=d["title"], section=head,
-                       url=d["url"], date=d["date"], text=c)
+    return text_chunks(d["id"], "release", d["title"], "## Notes\n" + (d["body"] or ""), d["url"], d["date"],
+                       size, overlap, min_words, clean)
 
 
-def build_chunks(corpus, size, overlap, min_words=40, clean=True):
-    chunks, cap = [], size
+def build_chunks(corpus, size=CHUNK_SIZE, overlap=OVERLAP, min_words=MIN_WORDS, clean=True):
+    chunks = []
     for p in sorted((corpus / "docs").glob("*.md")):
-        chunks += merge_small(list(doc_chunks(p, size, overlap, clean)), min_words, cap)
+        chunks += doc_chunks(p, size, overlap, min_words, clean)
     for p in sorted((corpus / "issues").glob("*.json")):
-        chunks += list(issue_chunks(p, size, overlap))
+        chunks += issue_chunks(p, size, overlap)
     for p in sorted((corpus / "releases").glob("*.json")):
-        chunks += merge_small(list(release_chunks(p, size, overlap, clean)), min_words, cap)
-    chunks = [c for c in chunks if words(c["text"]) >= 3]       # drop empty leftovers
-    for i, c in enumerate(chunks):
-        c["id"] = i
+        chunks += release_chunks(p, size, overlap, min_words, clean)
     return chunks
 
 
-# ---------------- indexing ----------------
-def tokenize(t):
-    return re.findall(r"\w+", t.lower())
+# ---------------- writing to the vector store ----------------
+def add_document(doc_id, type, title, text, url="", date=None, collection=store.COLLECTION,
+                 size=CHUNK_SIZE, overlap=OVERLAP, min_words=MIN_WORDS):
+    """Add one document to the RAG system, or replace it if `doc_id` already exists: chunk it with the corpus rules,
+    embed it and upsert it. Returns the number of chunks written."""
+    chunks = text_chunks(doc_id, type, title, text, url, date, size, overlap, min_words)
+    store.ensure_collection(collection)
+    store.delete_document(doc_id, collection)          # drop every chunk of an earlier (maybe longer) version
+    store.upsert_chunks(chunks, collection)
+    return len(chunks)
 
 
-def embed_text(c):
-    return f"{c['title']} > {c['section']}\n{c['text']}"
-
-
-def build_index(chunks, out, model_name, cfg):
-    from sentence_transformers import SentenceTransformer
-    from rank_bm25 import BM25Okapi
-
-    out.mkdir(parents=True, exist_ok=True)
+def index_corpus(corpus, collection=store.COLLECTION, recreate=False, size=CHUNK_SIZE, overlap=OVERLAP,
+                 min_words=MIN_WORDS, clean=True):
     t0 = time.time()
-    model = SentenceTransformer(model_name)
-    emb = model.encode([embed_text(c) for c in chunks], batch_size=64,
-                       normalize_embeddings=True, show_progress_bar=True).astype("float32")
-    np.save(out / "embeddings.npy", emb)
-    bm25 = BM25Okapi([tokenize(embed_text(c)) for c in chunks])
-    with open(out / "bm25.pkl", "wb") as f:
-        pickle.dump(bm25, f)
-    with open(out / "chunks.jsonl", "w", encoding="utf-8") as f:
-        for c in chunks:
-            f.write(json.dumps(c, ensure_ascii=False) + "\n")
-    cfg.update(model=model_name, n_chunks=len(chunks), build_seconds=round(time.time() - t0, 1),
-               avg_words=round(sum(words(c["text"]) for c in chunks) / len(chunks), 1))
-    (out / "config.json").write_text(json.dumps(cfg, indent=2))
-    print(cfg)
+    chunks = build_chunks(Path(corpus), size, overlap, min_words, clean)
+    print(f"{len(chunks)} chunks from {len({c['doc_id'] for c in chunks})} documents; embedding and uploading...")
+    store.ensure_collection(collection, recreate=recreate)
+    store.upsert_chunks(chunks, collection, progress=True)
+    print(dict(collection=collection, points=store.count(collection), chunk_size=size, overlap=overlap,
+               min_words=min_words, clean_mdx=clean, seconds=round(time.time() - t0, 1),
+               avg_words=round(sum(words(c["text"]) for c in chunks) / len(chunks), 1)))
 
 
-# ---------------- quick search demo (also the seed of your ablation) ----------------
-def search(out, query, k=5):
-    from sentence_transformers import SentenceTransformer
-    chunks = [json.loads(l) for l in open(out / "chunks.jsonl", encoding="utf-8")]
-    emb = np.load(out / "embeddings.npy")
-    bm25 = pickle.load(open(out / "bm25.pkl", "rb"))
-    cfg = json.loads((out / "config.json").read_text())
-    q = SentenceTransformer(cfg["model"]).encode([QUERY_PREFIX + query], normalize_embeddings=True)[0]
-    vec_rank = np.argsort(-(emb @ q))[:50]
-    kw_rank = np.argsort(-bm25.get_scores(tokenize(query)))[:50]
-    rrf = {}                                          # reciprocal rank fusion
-    for rank_list in (vec_rank, kw_rank):
-        for r, i in enumerate(rank_list):
-            rrf[int(i)] = rrf.get(int(i), 0) + 1 / (60 + r)
-    for name, ids in [("VECTOR", vec_rank[:k]), ("BM25", kw_rank[:k]),
-                      ("HYBRID", sorted(rrf, key=rrf.get, reverse=True)[:k])]:
-        print(f"\n== {name} ==")
-        for i in ids:
-            c = chunks[int(i)]
+def compare(query, collection=store.COLLECTION, k=5):
+    """Quick look at what each search mode returns for one question."""
+    for mode in ("vector", "bm25", "hybrid"):
+        print(f"\n== {mode.upper()} ==")
+        for c in store.search(query, k=k, mode=mode, collection=collection)[0]:
             print(f"- [{c['type']}] {c['title']} > {c['section']}  {c['url']}")
 
 
 if __name__ == "__main__":
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--corpus", default="corpus")
-    ap.add_argument("--out", default="index")
-    ap.add_argument("--chunk-size", type=int, default=250, help="target words per chunk")
-    ap.add_argument("--overlap", type=int, default=40, help="words carried to next chunk")
-    ap.add_argument("--min-words", type=int, default=40, help="merge doc/release chunks shorter than this")
+    ap.add_argument("--collection", default=store.COLLECTION)
+    ap.add_argument("--recreate", action="store_true", help="delete and rebuild the collection")
+    ap.add_argument("--chunk-size", type=int, default=CHUNK_SIZE, help="target words per chunk")
+    ap.add_argument("--overlap", type=int, default=OVERLAP, help="words carried to the next chunk")
+    ap.add_argument("--min-words", type=int, default=MIN_WORDS, help="merge doc/release chunks shorter than this")
     ap.add_argument("--no-clean", action="store_true", help="skip MDX/JSX cleaning (for ablations)")
-    ap.add_argument("--model", default=MODEL)
-    ap.add_argument("--query", help="skip building; search an existing index")
+    ap.add_argument("--query", help="don't build; compare the search modes for this question")
+    ap.add_argument("--add", help="add or replace one document from this text/Markdown file")
+    ap.add_argument("--type", default="doc", choices=["doc", "issue", "release"])
+    ap.add_argument("--title")
+    ap.add_argument("--url", default="")
+    ap.add_argument("--doc-id", help="defaults to the file name")
+    ap.add_argument("--date")
     a = ap.parse_args()
-    out = Path(a.out)
     if a.query:
-        search(out, a.query)
+        compare(a.query, a.collection)
+    elif a.add:
+        path = Path(a.add)
+        n = add_document(a.doc_id or path.name, a.type, a.title or path.stem, path.read_text(encoding="utf-8"),
+                         a.url, a.date, a.collection, a.chunk_size, a.overlap, a.min_words)
+        print(f"{a.doc_id or path.name}: {n} chunks written to {a.collection}")
     else:
-        chunks = build_chunks(Path(a.corpus), a.chunk_size, a.overlap, a.min_words, not a.no_clean)
-        print(f"{len(chunks)} chunks")
-        build_index(chunks, out, a.model, {"chunk_size": a.chunk_size, "overlap": a.overlap,
-                                           "min_words": a.min_words, "clean_mdx": not a.no_clean})
+        index_corpus(a.corpus, a.collection, a.recreate, a.chunk_size, a.overlap, a.min_words, not a.no_clean)

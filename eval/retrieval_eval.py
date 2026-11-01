@@ -3,10 +3,10 @@
 No LLM calls, so it is free to run. Usage (from the repo root):
     python eval/retrieval_eval.py                         # all four modes, whole dataset
     python eval/retrieval_eval.py --split test            # held-out questions only
-    python eval/retrieval_eval.py --index index_small     # chunk-size experiment on another index
+    python eval/retrieval_eval.py --collection librarian_c150   # chunk-size experiment on another collection
 
 Hit rule (fixed): a question is a hit at k if any of the top-k chunks contains one of its gold passages
-(gold chunks are recomputed from gold_passages for the index being tested, so re-chunked indexes work).
+(gold chunks are recomputed from gold_passages for the collection being tested, so re-chunked collections work).
 Doc recall is the looser version: any top-k chunk comes from one of the gold_doc_ids.
 Writes results/retrieval_<tag>.json and prints the summary.
 """
@@ -14,6 +14,8 @@ import argparse, json, time
 
 from common import (add_common_args, doc_index, get_reranker, gold_chunks, load_eval, load_librarian,
                     md_table, pct, save_json)
+import store
+from index_corpus import CHUNK_SIZE, OVERLAP
 
 KS = (1, 3, 5, 10, 20)
 MODES = {"bm25": "keyword only (BM25)", "vector": "vector only", "hybrid": "hybrid (RRF)",
@@ -34,7 +36,7 @@ def search(lib, a, query, mode, k):
 
 def run(a, lib):
     data = load_eval(a)
-    by_doc = doc_index(lib.chunks)
+    by_doc = doc_index(store.all_chunks(a.collection))
     gold = {e["id"]: set(gold_chunks(e, by_doc)) for e in data if e["answerable"]}
     no_gold = sorted(i for i, g in gold.items() if not g)
     if no_gold:                                # a passage split across two chunks of this index
@@ -76,7 +78,8 @@ def run(a, lib):
     sweep = [dict(min_score=t, unanswerable_refused=sum(s < t for s in una) / len(una) if una else None,
                   answerable_refused=sum(s < t for s in ans) / len(ans)) for t in THRESHOLDS]
 
-    result = dict(config=dict(json.load(open(f"{a.index}/config.json")), split=a.split,
+    result = dict(config=dict(collection=a.collection, n_chunks=store.count(a.collection), chunk_size=CHUNK_SIZE,
+                              overlap=OVERLAP, dense_model=store.DENSE_MODEL, sparse_model=store.SPARSE_MODEL, split=a.split,
                               n_questions=len(questions), n_unanswerable=len(una), no_gold_in_index=no_gold,
                               rerank_model=a.rerank_model, rerank_pool=a.rerank_pool, tag=a.tag),
                   summary=summary, idk_threshold_sweep=sweep, per_question=per_q)

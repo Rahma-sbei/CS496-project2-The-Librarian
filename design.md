@@ -7,8 +7,8 @@ passages don't contain the answer.
 ```
 OFFLINE (once)                                           ONLINE (every question)
 build_corpus.py  -> corpus/  (docs, issues, releases)    question --(optional rewrite)--> hybrid search
-index_corpus.py  -> index/   (chunks, vectors, BM25)        BM25 top 50 + vector top 50, fused (RRF), filtered by type
-                                                            -> top 5 chunks -> gpt-4o-mini with numbered sources
+index_corpus.py  -> Qdrant   (chunks, dense + BM25 vectors) BM25 top 50 + vector top 50, fused (RRF), filtered by type
+                                                            -> top 10 chunks -> gpt-4o-mini with numbered sources
                                                             -> answer with [n] citations, or "I don't know"
 ```
 
@@ -42,28 +42,47 @@ Every chunk keeps its metadata: `doc_id`, `type` (doc / issue / release), `title
 gets embedded is `title > section` followed by the chunk, so a chunk carries its heading's context.
 
 **Chosen setting: 250 words with a 40-word overlap** (3,562 chunks, 147 words on average). Why this size: a
-docs section is typically 100 to 300 words, so 250 keeps most sections whole, and with the top 5 chunks the model
-receives about 1,700 tokens, cheap for `gpt-4o-mini`. Cleaning and merging small chunks took the index from 4,007
-noisy chunks to 3,562. The evaluation scripts can score any rebuilt index (`--index`), so comparing 150 and 400 words
-is one command each; we did not finish that comparison (see the report).
+docs section is typically 100 to 300 words, so 250 keeps most sections whole, and with the top 10 chunks the model
+receives about 3,400 tokens, still cheap for `gpt-4o-mini`. Cleaning and merging small chunks took the index from 4,007
+noisy chunks to 3,562. The chunk size is a setting of `index_corpus.py`: building a second collection with other sizes
+(`--collection librarian_c150 --chunk-size 150 --recreate`) and scoring it (`--collection` on the eval scripts) is
+one command each; we did not finish that comparison (see the report).
 
-## 3. Index: flat files
+## 3. Index: the Qdrant vector database
 
-| Part | File | What it is |
+All chunks live in one Qdrant collection (`librarian`, on Qdrant Cloud). Each chunk is one **point** with two vectors
+and its text as payload:
+
+| Part | In Qdrant | What it is |
 |---|---|---|
-| Chunks + metadata | `index/chunks.jsonl` | one JSON line per chunk |
-| Vectors | `index/embeddings.npy` | 3,562 × 384 float32, normalised, from `BAAI/bge-small-en-v1.5` |
-| Keyword index | `index/bm25.pkl` | `rank_bm25.BM25Okapi` over lower-cased word tokens |
-| Settings | `index/config.json` | chunk size, overlap, model, chunk count, build time |
+| Meaning vector | named vector `dense` | 384 numbers from `BAAI/bge-small-en-v1.5`, cosine similarity |
+| Keyword vector | named sparse vector `bm25` | word weights from `Qdrant/bm25`; Qdrant applies the word-rarity (IDF) part on the server |
+| Chunk + metadata | payload | `doc_id`, `chunk` (its number in the document), `type`, `title`, `section`, `url`, `date`, `text` |
+| Indexes | payload indexes on `type` and `doc_id` | fast filtering by source type and fast deletion of one document |
 
-**Why flat files instead of a vector database or Postgres:** 3,562 vectors take 5 MB, so comparing the question with
-every chunk (one matrix product) takes a few milliseconds. There is no server to run or pay for, the index ships inside
-the app, and one script rebuilds it in about 5 minutes. The trade-offs we accept: filtering is done in Python, there are
-no incremental updates (full rebuild), and the BM25 file is a pickle, which must only be loaded from our own repository.
-We would switch to a vector database if the corpus grew about a hundred times.
+`store.py` is the only file that talks to Qdrant: it creates the collection, embeds and writes chunks, deletes a
+document, searches, and lists all chunks for the evaluation.
 
-**Embedding model:** `bge-small-en-v1.5` runs on a laptop CPU with no API key or cost, and is a strong small
-retrieval model. It reads at most 512 tokens, so the end of very long chunks is not embedded (see failure cases).
+**Why a vector database.** The first version kept everything in flat files loaded into memory: fine for 3,562 chunks,
+but every new document meant rebuilding the whole index, the keyword index was a pickle file, and the app had to hold
+everything in RAM. With Qdrant:
+
+- **Adding content is incremental.** `add_document()` in `index_corpus.py` (exposed as `POST /api/documents`) chunks a
+  new document with the same rules, embeds it and upserts it. Nothing else is touched, and the keyword weights stay
+  correct because word rarity is computed by Qdrant at query time, not stored in a file.
+- **Replacing is safe.** Point ids are derived from `(doc_id, chunk number)`, so adding a document again overwrites it,
+  and its old chunks are deleted first in case the new version is shorter.
+- **It scales.** Search happens on the Qdrant server (HNSW index for vectors, inverted index for keywords), so the app
+  stays small whatever the corpus size, and several app instances can share one collection.
+- **Filtering is native** (payload filter on `type`) instead of filtering rows in Python.
+
+The trade-off: every search is a network call to Qdrant Cloud (both searches go in one batched request). Without
+`QDRANT_URL`, `store.py` falls back to an embedded local Qdrant in `.qdrant/`, so a fresh clone can build its own copy
+with `python index_corpus.py --recreate` (about 10 minutes on a laptop).
+
+**Embedding models.** `bge-small-en-v1.5` runs on a CPU with no API key or cost and is a strong small retrieval model;
+it reads at most 512 tokens, so the end of very long chunks is not embedded (see failure cases). Both models run
+through `fastembed` (ONNX runtime), so the project needs no PyTorch.
 
 ## 4. Retrieval
 
@@ -73,12 +92,13 @@ retrieval model. It reads at most 512 tokens, so the end of very long chunks is 
    finds the Session State pages). Streamlit questions contain both kinds.
 3. **Reciprocal rank fusion** (constant 60) merges the two lists: a chunk ranked high by both wins.
 4. **Metadata filter**: the user can restrict the search to docs, issues or release notes.
-5. The top 5 chunks go to the language model.
+5. The top 10 chunks go to the language model (10 is the accuracy-tuned default; see [optimisation.md](optimisation.md)).
 
-**Reranker: measured, not enabled.** We tested a cross-encoder (`cross-encoder/ms-marco-MiniLM-L-6-v2`) that rescores
-the top 30 hybrid results. It improves the first result (recall@1 0.38 → 0.43) and recall@20, but not recall@5 (0.80 →
-0.79), which is what the model receives, and it adds about 2 s per question on a CPU (41 ms → 2,098 ms). "Skipping the reranker" is also
-one of the course's suggested Week 8 savings. The full ablation is in [report.pdf](report.pdf).
+**Reranker: measured, not enabled.** We tested a cross-encoder (`ms-marco-MiniLM-L-6-v2`, run through ONNX) that rescores
+the top 30 hybrid results. It lifts recall@3 (0.66 → 0.75) and recall@5 (0.77 → 0.80), but adds about 3.5 s per
+question on a CPU (60 ms → 3,526 ms), more than doubling the response time. For an interactive service we skip it;
+reranking only when the first search is unsure is the next thing to try. "Skipping the reranker" is also one of the
+course's suggested Week 8 savings. The full ablation is in [report.pdf](report.pdf).
 
 ## 5. Generation
 
@@ -100,17 +120,18 @@ the passages; the report shows how well it does that.
 
 ## 6. Service
 
-`app.py` (FastAPI) loads the index and model once and serves the page in `static/`. Each request is logged with its
+`app.py` (FastAPI) connects to Qdrant and loads the embedding models once, and serves the page in `static/`. Each request is logged with its
 latency, tokens and cost (`logs/requests-*.jsonl`); the page's 👍/👎 buttons are saved to `logs/feedback-*.jsonl`. Because the URL will
 be public and every question costs money, each visitor is limited to 10 questions a minute and the whole service to
 300 a day. Repeated questions are answered from an in-memory cache at no cost. On a host whose disk is wiped on restart,
 the logs can be pushed to a private Hugging Face dataset every 5 minutes (`HF_LOGS_REPO`).
 
-**Deployment.** The service runs on Render's free plan (512 MB), set up by `render.yaml`. With PyTorch loaded only to
-embed the question, the service needed about 640 MB, so the deployed version runs the same `bge-small-en-v1.5` model
-through `fastembed` (ONNX): about 290 MB. We checked that this changes nothing: question vectors match PyTorch's with
-cosine ≥ 0.99999 on all 112 evaluation questions, and the retrieval evaluation gives identical recall at every k.
-The index itself is unchanged.
+**Adding content.** `POST /api/documents` (title, text, type, url, optional `doc_id` and date) adds or replaces a
+document; `DELETE /api/documents/{doc_id}` removes one. Both require the `LIBRARIAN_ADMIN_TOKEN` secret and clear the
+answer cache, so the next question sees the new content.
+
+**Deployment.** The service runs on Render's free plan (512 MB), set up by `render.yaml`. The chunks live in Qdrant
+Cloud and the embedding models run through ONNX, so the app itself only holds the two models (about 300 MB).
 
 ## 7. Known failure cases
 
@@ -125,8 +146,8 @@ The index itself is unchanged.
 - **Leftover markup.** The cleaner covers the MDX components we saw; others may remain.
 - **Issues are noisy.** A thread can contain a wrong first answer corrected later, and issue chunks are not cleaned.
 - **Dates.** Docs pages have no date, so "since version X" questions rely on the release notes, not on filtering.
-- **Dotted names in keyword search.** BM25 splits `st.cache_data` into `st` and `cache_data`; it still matches, but the
-  exact name is not one token.
+- **Dotted names in keyword search.** The BM25 tokenizer splits `st.cache_data` into separate words; it still matches,
+  but the exact name is not one token.
 - **Model knowledge leaking in.** Streamlit is popular, so the model may "know" an answer that isn't in the passages;
   the faithfulness measure in the report catches this.
 - **Citations on every sentence are not guaranteed.** The model sometimes cites only some sentences; the report

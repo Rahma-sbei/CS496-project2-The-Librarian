@@ -1,9 +1,9 @@
 requests
 python-dotenv
 numpy
-sentence-transformers
-rank-bm25
 openai
+qdrant-client
+fastembed
 fastapi
 uvicorn
 huggingface_hub

@@ -6,36 +6,44 @@ On Render, render.yaml starts it with the port Render provides.
 
 Environment:
     OPENAI_API_KEY          required (read from .env locally, the host's secret settings when deployed)
+    QDRANT_URL, QDRANT_API_KEY   the Qdrant vector store holding the chunks (see store.py)
+    LIBRARIAN_ADMIN_TOKEN   enables POST/DELETE /api/documents (adding content); unset = adding is disabled
     LIBRARIAN_MIN_SCORE     "I don't know" when the best vector score is below this (default 0: the LLM decides)
-    LIBRARIAN_K             chunks sent to the LLM (default 5)
+    LIBRARIAN_K             chunks sent to the LLM (default 10)
     LIBRARIAN_RATE_PER_MIN  questions per visitor per minute (default 10)
     LIBRARIAN_DAILY_CAP     questions per day for the whole service (default 300), protects the OpenAI bill
     LIBRARIAN_CACHE_SIZE    answers kept in memory; a repeated question is served free (default 256, 0 = off)
     HF_LOGS_REPO, HF_TOKEN  if set, logs/ is pushed every 5 minutes to that private Hugging Face dataset,
                             for hosts whose disk is wiped on every restart
 
+Adding content: POST /api/documents with {"title", "text", "type", "url", "doc_id"?, "date"?} and the header
+"Authorization: Bearer <LIBRARIAN_ADMIN_TOKEN>" chunks, embeds and stores the document (replacing an earlier version
+with the same doc_id); DELETE /api/documents/{doc_id} removes it. Both clear the answer cache.
+
 Every request is appended to logs/requests-<run>.jsonl (latency, tokens, cost: the Week 8 "before" numbers) and
 every 👍/👎 rating to logs/feedback-<run>.jsonl. One file per server run, so a restarted
 server never overwrites the files it pushed before. logs/ holds user questions, so it is never committed.
 """
-import json, os, threading, time, uuid
+import hmac, json, os, re, threading, time, uuid
 from collections import OrderedDict
 from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Literal
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Header, HTTPException, Request
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+import store
 from generate import IDK, LLM_MODEL, Librarian
+from index_corpus import add_document
 
 ROOT = Path(__file__).parent
 LOGS = ROOT / "logs"
 RUN = time.strftime("%Y%m%d-%H%M%S") + "-" + uuid.uuid4().hex[:6]
 MIN_SCORE = float(os.getenv("LIBRARIAN_MIN_SCORE", "0"))
-K = int(os.getenv("LIBRARIAN_K", "5"))
+K = int(os.getenv("LIBRARIAN_K", "10"))
 CACHE_SIZE = int(os.getenv("LIBRARIAN_CACHE_SIZE", "256"))
 lib = scheduler = None
 log_lock, cache_lock = threading.Lock(), threading.Lock()
@@ -77,7 +85,7 @@ async def lifespan(app):
         from huggingface_hub import CommitScheduler
         scheduler = CommitScheduler(repo_id=os.environ["HF_LOGS_REPO"], repo_type="dataset", folder_path=LOGS,
                                     every=5, private=True, token=os.getenv("HF_TOKEN"))
-    lib = Librarian(str(ROOT / "index"))   # load the index and the embedding model once, not per request
+    lib = Librarian()                      # connect to Qdrant and load the embedding models once, not per request
     yield
     if scheduler:                          # push what is left before the container stops
         scheduler.trigger().result(timeout=60)
@@ -91,6 +99,15 @@ class Ask(BaseModel):
     question: str = Field(min_length=1, max_length=1000)
     rewrite: bool = False
     types: list[Literal["doc", "issue", "release"]] | None = None   # metadata filter; None searches everything
+
+
+class Document(BaseModel):
+    title: str = Field(min_length=1, max_length=300)
+    text: str = Field(min_length=1, max_length=200_000)
+    type: Literal["doc", "issue", "release"] = "doc"
+    url: str = Field(default="", max_length=500)
+    doc_id: str | None = Field(default=None, max_length=200)   # same doc_id again = replace that document
+    date: str | None = Field(default=None, max_length=40)
 
 
 class Feedback(BaseModel):
@@ -116,7 +133,7 @@ def index():
 
 @app.get("/api/health")
 def health():
-    return {"ok": lib is not None, "model": LLM_MODEL, "chunks": len(lib.chunks), "k": K, "min_score": MIN_SCORE,
+    return {"ok": lib is not None, "model": LLM_MODEL, "chunks": store.count(lib.collection), "k": K, "min_score": MIN_SCORE,
             "logs_synced_to_hub": scheduler is not None, "questions_today": limiter.count,
             "daily_cap": limiter.per_day}
 
@@ -154,7 +171,8 @@ def ask(req: Ask, request: Request):      # sync endpoint: FastAPI runs it in a 
 
     cited = {c["n"] for c in res["citations"]}
     sources = [dict(n=n, id=c["id"], type=c["type"], title=c["title"], section=c["section"], url=c["url"],
-                    date=c["date"], score=round(c["score"], 3), cited=n in cited, text=c["text"])
+                    date=c["date"], score=None if c["score"] is None else round(c["score"], 3), cited=n in cited,
+                    text=c["text"])
                for n, c in enumerate(res["sources"], 1)]
     log("requests", dict(id=rid, ts=now(), question=question, query=res["query"], rewrite=req.rewrite,
                          types=req.types, cached=cached, idk=res["answer"].strip() == IDK,
@@ -172,3 +190,33 @@ def ask(req: Ask, request: Request):      # sync endpoint: FastAPI runs it in a 
 def feedback(fb: Feedback):
     log("feedback", dict(fb.model_dump(), ts=now()))
     return {"ok": True}
+
+
+# ---------------- adding content (admin only) ----------------
+def require_admin(authorization):
+    token = os.getenv("LIBRARIAN_ADMIN_TOKEN")
+    if not token:
+        raise HTTPException(403, "Adding documents is disabled on this server (no LIBRARIAN_ADMIN_TOKEN set).")
+    if not hmac.compare_digest(authorization or "", f"Bearer {token}"):
+        raise HTTPException(401, "Missing or wrong admin token.")
+
+
+@app.post("/api/documents")
+def add(doc: Document, authorization: str | None = Header(default=None)):
+    require_admin(authorization)
+    doc_id = doc.doc_id or "added-" + (re.sub(r"[^a-z0-9]+", "-", doc.title.lower()).strip("-") or uuid.uuid4().hex[:8])
+    n = add_document(doc_id, doc.type, doc.title, doc.text, doc.url, doc.date, lib.collection)
+    with cache_lock:                       # cached answers may now be out of date
+        cache.clear()
+    log("documents", dict(ts=now(), action="add", doc_id=doc_id, type=doc.type, title=doc.title, chunks=n))
+    return {"doc_id": doc_id, "chunks": n, "total_chunks": store.count(lib.collection)}
+
+
+@app.delete("/api/documents/{doc_id}")
+def remove(doc_id: str, authorization: str | None = Header(default=None)):
+    require_admin(authorization)
+    store.delete_document(doc_id, lib.collection)
+    with cache_lock:
+        cache.clear()
+    log("documents", dict(ts=now(), action="delete", doc_id=doc_id))
+    return {"doc_id": doc_id, "deleted": True, "total_chunks": store.count(lib.collection)}

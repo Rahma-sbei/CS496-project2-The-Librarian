@@ -21,6 +21,7 @@ import argparse, json, time
 
 from common import (RESULTS, add_common_args, cost, doc_index, get_reranker, gold_chunks, load_eval,
                     load_librarian, mean, md_table, pct, save_json)
+import store
 from generate import LLM_MODEL, format_sources
 
 JUDGE_PROMPT = """You grade answers from a question-answering system about Streamlit.
@@ -47,7 +48,8 @@ def add_args(ap):
     ap.add_argument("--rewrite", action="store_true", help="rewrite each question before searching")
     ap.add_argument("--min-score", type=float, default=0.0, help="generate.py 'I don't know' threshold")
     ap.add_argument("--rerank", action="store_true", help="rerank hybrid results before generating")
-    ap.add_argument("--judge-model", default="gpt-4o-mini")
+    ap.add_argument("--judge-model", default="gpt-4.1-mini",
+                    help="grader model; a different, stronger model than the one being graded avoids self-preference bias")
     ap.add_argument("--daily-requests", type=int, default=100, help="traffic assumed by the cost model")
     ap.add_argument("--resume", action="store_true", help="keep finished questions of this --tag")
 
@@ -151,7 +153,7 @@ def run(a, lib):
     if a.rerank and a.rewrite:
         raise SystemExit("--rerank with --rewrite is not supported yet: the rewrite happens after the search")
     data = load_eval(a)[:a.limit]
-    by_doc = doc_index(lib.chunks)
+    by_doc = doc_index(store.all_chunks(a.collection))
     RESULTS.mkdir(exist_ok=True)
     out = RESULTS / f"generation_{a.tag}.jsonl"
     done = {}

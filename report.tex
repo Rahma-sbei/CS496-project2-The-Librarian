@@ -1,0 +1,174 @@
+\documentclass[10pt]{article}
+\usepackage[a4paper,margin=0.7in]{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage[protrusion=true,expansion=false]{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{parskip}
+\setlist{nosep,leftmargin=1.3em}
+\titlespacing*{\section}{0pt}{7pt}{2pt}
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection.}{0.5em}{}
+\setlength{\parskip}{3pt}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.05}
+\pagestyle{empty}
+\hyphenation{Strea-mlit}
+
+\begin{document}
+
+\begin{center}
+  {\large\bfseries Project 2: The Librarian}\\[2pt]
+  CS496 AI Engineering, Mediterranean Institute of Technology, Fall 2026 --- Dr Abdeldjalil Labed\\
+  Nadia Ben Njima, Ahmed Brini, Rahma Sbei, Mariem Lahmer\\
+  Repository: \href{https://github.com/Rahma-sbei/CS496-project2-The-Librarian}{github.com/Rahma-sbei/CS496-project2-The-Librarian}\\
+  Live app: \href{https://the-librarian-6wzd.onrender.com}{the-librarian-6wzd.onrender.com} (may take a minute to wake up)
+\end{center}
+
+\noindent\textbf{Overview.} The Librarian is a retrieval-augmented question answering service over the Streamlit
+documentation, its closed GitHub issues and its release notes (404 pages, 418 issues, 60 releases $\rightarrow$ 3{,}562
+indexed chunks); it answers only from retrieved passages, cites the source behind every claim with \texttt{[n]} markers, and
+replies ``I don't know'' when the passages do not contain the answer. On our 112-question evaluation it answers correctly
+\textbf{89.7\%} of the time with \textbf{98.3\%} of claims supported by a retrieved passage, at \textbf{\$0.00057} and
+\textbf{1.2\,s} per question.
+
+\section{Architecture and model choices}
+
+\textit{Offline (run once):} \texttt{build\_corpus.py} clones the docs and pulls issues and releases through the GitHub API,
+stripping personal data; \texttt{index\_corpus.py} cleans and chunks the text ($\approx$250 words, code blocks never split),
+gives each chunk a dense meaning vector and a sparse BM25 vector, and upserts it into Qdrant.
+\textit{Online (per question):} the question (optionally rewritten by the model) goes to keyword search and vector search
+(50 candidates each); the two lists are fused by reciprocal rank fusion; an optional filter keeps only docs, issues or
+releases; the top \textbf{10} chunks go to the generator, which answers with \texttt{[n]} citations or ``I don't know''.
+A FastAPI service and web page wrap this and log cost and latency; rate limits cap each visitor at 10 questions/minute and
+the service at 300/day.
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}p{2.1cm}p{3.5cm}p{10.6cm}@{}}
+\toprule
+\textbf{Component} & \textbf{Choice} & \textbf{Justification} \\
+\midrule
+Embedding model & \texttt{BAAI/\allowbreak bge-small-\allowbreak en-v1.5} (384-dim, ONNX/fastembed) &
+Strong retrieval quality for its size on the MTEB benchmark while only 384 dimensions, so storage and search stay cheap.
+It runs on CPU with no GPU and no embedding API, which keeps the service free and under the 512\,MB host limit. \\
+\addlinespace
+Vector database & Qdrant Cloud (one collection, named \texttt{dense} + \texttt{bm25} vectors) &
+Stores both vectors per point and computes the BM25 word-rarity (IDF) weights server-side, so hybrid search is a single
+query. Point ids are derived from the document id and chunk number, so adding or replacing a document is one upsert with no
+rebuild --- unlike our first flat-file index, which had to be rebuilt for every new document. Free tier keeps the app small. \\
+\addlinespace
+Generative model & \texttt{gpt-4o-mini}, temperature 0 &
+Follows the strict contract (cite every factual sentence; use nothing outside the passages; reply exactly ``I don't know'')
+reliably at \$0.15/\$0.60 per million input/output tokens. Retrieval, not the generator, is the accuracy ceiling
+(faithfulness is already 98\%+), so a larger model buys little; \texttt{gpt-4.1-mini}/\texttt{nano} were available but did not
+justify the change. \\
+\addlinespace
+Grader (judge) model & \texttt{gpt-4.1-mini}, temperature 0, JSON mode &
+A different and stronger family than the generator, which avoids self-preference bias when an LLM scores LLM answers.
+Re-grading the baseline moved accuracy only 86.2\%$\rightarrow$85.3\%, confirming the headline is not inflated by a model
+grading its own family. It runs only during evaluation ($\approx$\$0.17 per 112-question run), never in the live service. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Optimization}
+
+Almost all per-question cost (85\%) is input tokens, and almost all of the input is the passages; search itself is free
+(embeddings run locally, Qdrant is on a free tier). We measured both directions on the same 112 questions under the
+independent grader. \textbf{Accuracy:} sending 10 passages instead of 5 puts the gold passage in front of the model 87\% of
+the time instead of 77\% and raises accuracy \textbf{+4.4 points} at no latency cost and about \$0.00025 more per question ---
+this is the \textbf{deployed} configuration. A cross-encoder reranker (top 30 $\rightarrow$ best 5) lifts recall but
+\textit{lowers} end-to-end accuracy 1.8 points and triples latency on a CPU, so it is not used.
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+\textbf{Retrieval sent to the model} & \textbf{Accuracy (112)} & \textbf{Gold passage sent} & \textbf{Cost/question} & \textbf{p50 / p95 latency} \\
+\midrule
+5 passages (previous) & 85.3\% & 77\% & \$0.000317 & 1.27\,s / 2.84\,s \\
+\textbf{10 passages (deployed)} & \textbf{89.7\%} (+4.4) & \textbf{87\%} & \$0.000569 & 1.19\,s / 2.45\,s \\
+Rerank top 30 $\rightarrow$ best 5 & 83.5\% ($-$1.8) & 80\% & \$0.000289 & 3.07\,s / 10.35\,s \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Cost (Week 8 target).} The brief asked to cut cost or p95 latency by 50\% within a 2-point accuracy loss.
+Sending only 2 passages cuts cost 53\% (\$0.00015) but, measured on the same set, drops accuracy about 9 points --- well past
+the budget --- so we did not adopt it. Two savings cost nothing: we skip the reranker ($\approx$3.5\,s/question avoided), and
+the service answers repeated questions from an in-memory cache with no search and no model call. Full before/after numbers
+are in \texttt{optimisation.md}.
+
+\section{Evaluation}
+
+Retrieval and generation are measured separately. The set is 100 answerable questions (each with a reference answer and one
+or more exact source passages) and 12 unanswerable questions about features Streamlit does not have. A question counts as
+``found at $k$'' if any of the top $k$ chunks contains one of its passages; the scripts recompute this for whichever
+collection they test.
+
+\noindent\textbf{Retrieval ablation.} Fusing keyword and vector search beats either alone; the reranker helps the top ranks
+but is too slow for an interactive service (times include the round trip to Qdrant Cloud).
+
+\begin{center}
+\footnotesize
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}lccccccc r r@{}}
+\toprule
+\textbf{Search} & \textbf{R@1} & \textbf{R@3} & \textbf{R@5} & \textbf{R@10} & \textbf{R@20} & \textbf{Doc R@5} & \textbf{MRR@10} & \textbf{p50\,ms} & \textbf{p95\,ms} \\
+\midrule
+Keyword only (BM25) & 0.32 & 0.56 & 0.72 & 0.83 & 0.89 & 0.82 & 0.48 & 47 & 52 \\
+Vector only         & 0.47 & 0.67 & 0.70 & 0.82 & 0.85 & 0.79 & 0.58 & 55 & 61 \\
+\textbf{Hybrid (RRF, used)} & 0.44 & 0.66 & 0.77 & \textbf{0.87} & 0.93 & 0.83 & 0.58 & 60 & 68 \\
+Hybrid + reranker   & 0.44 & 0.75 & 0.80 & 0.88 & 0.93 & 0.85 & 0.60 & 3{,}526 & 3{,}625 \\
+\bottomrule
+\end{tabular}}
+\end{center}
+
+\noindent\textbf{Generation (deployed: 10 passages, \texttt{gpt-4o-mini}, judged by \texttt{gpt-4.1-mini}).} The judge splits
+each answer into claims, checks each against the passages and its citation, and grades it against the reference; an
+unanswerable question scores 1 only if the answer is ``I don't know''.
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}p{8.5cm}r@{\hskip 1.0cm}p{4.2cm}r@{}}
+\toprule
+\textbf{Generation metric} & \textbf{Result} & \textbf{Correctness by type} & \textbf{} \\
+\midrule
+Accuracy, all 112 questions (headline) & \textbf{89.7\%} & conceptual ($n$=17) & 94\% \\
+Correctness on the 100 answerable (yes=1, partial=0.5) & 88.5\% & error-message ($n$=13) & 100\% \\
+Faithfulness: claims stated by a retrieved passage & 98.3\% & how-to ($n$=47) & 83\% \\
+Answers in which every claim is supported & 96.9\% & multi-part ($n$=8) & 100\% \\
+Citation accuracy: the cited passage states the claim & 98.8\% & version ($n$=15) & 83\% \\
+Claims that carry a citation & 99.6\% & unanswerable ($n$=12) & 100\% \\
+Answers citing a source number that does not exist & 0.0\% & & \\
+``I don't know'' on the 12 unanswerable (want 100\%) & 100\% & \multicolumn{2}{l}{\footnotesize Gold passage among the} \\
+``I don't know'' on answerable questions (want 0\%) & 4.0\% & \multicolumn{2}{l}{\footnotesize 10 chunks sent: 87\%} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Cost model.} Embeddings run on our CPU and vectors live on Qdrant's free tier, so search is free; the only
+per-question cost is the language model.
+
+\begin{center}
+\footnotesize
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+\textbf{Configuration} & \textbf{Per question} & \textbf{Per 1,000} & \textbf{Per month @100/day} & \textbf{Per month @10,000/day} \\
+\midrule
+10 passages (deployed) & \$0.00057 & \$0.57 & \$1.71 & \$170.82 \\
+2 passages (cost floor) & \$0.00015 & \$0.15 & \$0.45 & \$44.86 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent\textbf{Reading the numbers.} When the right passage reaches the model it rarely strays beyond it (98.3\%
+faithfulness, 98.8\% citation accuracy); the remaining errors are mostly retrieval misses --- the gold passage was among the
+10 sent for 87\% of questions, and most not-fully-correct answers never received it. ``I don't know'' works in both
+directions: 100\% on unanswerable questions, 4\% on answerable ones. Better retrieval would raise accuracy more than a better
+prompt. A full postmortem of 23 problems and fixes is in \texttt{postmortem.md}.
+
+\end{document}

@@ -9,14 +9,15 @@ import numpy as np
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))                  # so `import generate` works when run as eval/<script>.py
 RESULTS = ROOT / "results"
-RERANK_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
+RERANK_MODEL = "Xenova/ms-marco-MiniLM-L-6-v2"   # the MiniLM cross-encoder, run through ONNX like the embeddings
 
+import store
 from generate import cost_usd as cost          # one price table (generate.PRICES) for service and eval
 
 
 def add_common_args(ap):
     ap.add_argument("--data", default=str(ROOT / "data" / "eval_dataset.json"))
-    ap.add_argument("--index", default=str(ROOT / "index"))
+    ap.add_argument("--collection", default=store.COLLECTION, help="Qdrant collection to evaluate")
     ap.add_argument("--split", default="all", choices=["all", "dev", "test"])
     ap.add_argument("--k", type=int, default=5, help="chunks sent to the LLM; also the k used in breakdowns")
     ap.add_argument("--rerank-pool", type=int, default=30, help="hybrid candidates the reranker rescores")
@@ -26,8 +27,8 @@ def add_common_args(ap):
 
 def load_librarian(a):
     from generate import Librarian
-    print("loading index and embedding model...", flush=True)
-    return Librarian(a.index)
+    print("connecting to the vector store and loading the embedding models...", flush=True)
+    return Librarian(a.collection)
 
 
 def load_eval(a):
@@ -53,7 +54,7 @@ def chunk_norm(c):
 
 
 def doc_index(chunks):
-    """doc_id -> [(chunk id, normalised text)], built once per index."""
+    """doc_id -> [(chunk id, normalised text)], built once per collection (chunks from store.all_chunks)."""
     by_doc = {}
     for c in chunks:
         by_doc.setdefault(c["doc_id"], []).append((c["id"], chunk_norm(c)))
@@ -61,7 +62,7 @@ def doc_index(chunks):
 
 
 def gold_chunks(e, by_doc):
-    """Recomputed from the passages, so the eval also works on an index built with other chunk sizes."""
+    """Recomputed from the passages, so the eval also works on a collection built with other chunk sizes."""
     ids = set()
     for g in e.get("gold_passages", []):
         p = norm(g["passage"])
@@ -72,12 +73,12 @@ def gold_chunks(e, by_doc):
 class Reranker:
     """Cross-encoder: reads (question, chunk) together and rescores the hybrid candidates."""
     def __init__(self, model):
-        from sentence_transformers import CrossEncoder
-        from index_corpus import embed_text
-        self.model, self.embed_text = CrossEncoder(model), embed_text
+        from fastembed.rerank.cross_encoder import TextCrossEncoder
+        self.model = TextCrossEncoder(model)
 
     def rerank(self, query, chunks, k):
-        scores = self.model.predict([(query, self.embed_text(c)) for c in chunks])
+        scores = np.array(list(self.model.rerank(query, [store.embed_text(c) for c in chunks],
+                                                 batch_size=4)))   # small batches: long chunks need a lot of memory
         return [dict(chunks[i], rerank_score=float(scores[i])) for i in np.argsort(-scores)[:k]]
 
 

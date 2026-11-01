@@ -6,16 +6,14 @@ Usage:
     python generate.py "..." --min-score 0.6         # say "I don't know" if search is weak
     python generate.py "..." --types issue,release   # only search these source types
 """
-import argparse, json, os, pickle, re, time
-from pathlib import Path
+import argparse, re, time
 
-import numpy as np
 from dotenv import load_dotenv
 from openai import OpenAI
 
-from index_corpus import QUERY_PREFIX, tokenize  
+import store
 
-load_dotenv()                      
+load_dotenv()
 LLM_MODEL = "gpt-4o-mini"
 IDK = "I don't know."
 
@@ -39,24 +37,6 @@ REWRITE_PROMPT = """Rewrite the user's question about Streamlit as one clear, co
 Keep the same meaning. Reply with the query only."""
 
 
-def query_encoder(model_name):
-    """Returns text -> normalised vector, with the same model that built the index.
-    LIBRARIAN_EMBEDDER=fastembed runs it through ONNX instead of PyTorch: about 400 MB less memory, which is what
-    lets the service fit a 512 MB host. Its vectors match PyTorch's (cosine >= 0.99999 on all eval questions)."""
-    if os.getenv("LIBRARIAN_EMBEDDER") == "fastembed":
-        from fastembed import TextEmbedding
-        model = TextEmbedding(model_name)
-        def encode(text):
-            v = np.asarray(next(iter(model.embed([text]))), dtype="float32")
-            return v / np.linalg.norm(v)
-    else:
-        from sentence_transformers import SentenceTransformer
-        model = SentenceTransformer(model_name)
-        def encode(text):
-            return model.encode([text], normalize_embeddings=True)[0]
-    return encode
-
-
 def format_sources(sources):
     """The numbered context the LLM sees (also shown to the judge in eval/generation_eval.py)."""
     return "\n\n".join(f"[{n}] {c['title']} > {c['section']}\n{c['text']}"
@@ -64,17 +44,11 @@ def format_sources(sources):
 
 
 class Librarian:
-    def __init__(self, index_dir="index"):
-        out = Path(index_dir)
-        # 1. load Rahma's index (built once by index_corpus.py)
-        with open(out / "chunks.jsonl", encoding="utf-8") as f:
-            self.chunks = [json.loads(line) for line in f]
-        self.types = np.array([c["type"] for c in self.chunks])   # doc / issue / release, for filtering
-        self.emb = np.load(out / "embeddings.npy")
-        with open(out / "bm25.pkl", "rb") as f:
-            self.bm25 = pickle.load(f)
-        cfg = json.loads((out / "config.json").read_text())
-        self.encode = query_encoder(cfg["model"])
+    def __init__(self, collection=store.COLLECTION):
+        # 1. connect to the Qdrant vector store and load the embedding models once, not on every question
+        self.collection = collection
+        store.ensure_collection(collection)                  # a fresh store starts empty instead of failing
+        store.dense_model(), store.sparse_model()
         self._client = None
 
     @property
@@ -99,27 +73,7 @@ class Librarian:
     def retrieve(self, query, k=5, pool=50, mode="hybrid", types=None):
         """mode: "hybrid", or "vector" / "bm25" alone (used by the ablation in eval/).
         types: only search these source types, e.g. ["issue", "release"] (metadata filter)."""
-        keep = np.isin(self.types, list(types)) if types else None
-
-        def best(scores):                                     # top `pool` chunks that pass the filter
-            order = np.argsort(-scores)
-            return (order[keep[order]] if keep is not None else order)[:pool]
-
-        lists, sims, best_score = [], None, 0.0
-        if mode != "bm25":
-            q = self.encode(QUERY_PREFIX + query)
-            sims = self.emb @ q                               # meaning similarity, one per chunk
-            lists.append(best(sims))                          # best by meaning
-            best_score = float(sims[lists[0][0]]) if len(lists[0]) else 0.0   # how close the best chunk is
-        if mode != "vector":
-            lists.append(best(self.bm25.get_scores(tokenize(query))))   # best by keywords
-        rrf = {}                                              # mix the lists (one list keeps its order)
-        for ranks in lists:
-            for r, i in enumerate(ranks):
-                rrf[int(i)] = rrf.get(int(i), 0) + 1 / (60 + r)
-        top = sorted(rrf, key=rrf.get, reverse=True)[:k]
-        return [dict(self.chunks[i], score=float(sims[i]) if sims is not None else 0.0)
-                for i in top], best_score
+        return store.search(query, k, pool, mode, types, self.collection)
 
     # ---------- step 3: ask the LLM to answer from the chunks ----------
     def answer(self, question, k=5, rewrite=False, min_score=0.0, sources=None, types=None):
@@ -130,7 +84,7 @@ class Librarian:
         if sources is None:
             sources, best = self.retrieve(query, k, types=types)
         else:
-            best = max(s.get("score", 1.0) for s in sources) if sources else 0.0
+            best = max((s.get("score") or 0.0) for s in sources) if sources else 0.0
 
         result = dict(question=question, query=query, sources=sources, best_score=round(best, 3),
                       model=LLM_MODEL)
@@ -161,10 +115,10 @@ if __name__ == "__main__":
     ap.add_argument("--rewrite", action="store_true", help="rewrite the question first")
     ap.add_argument("--min-score", type=float, default=0.0, help="below this, answer I don't know")
     ap.add_argument("--types", help="comma list of source types to search: doc, issue, release")
-    ap.add_argument("--index", default="index")
+    ap.add_argument("--collection", default=store.COLLECTION)
     a = ap.parse_args()
 
-    res = Librarian(a.index).answer(a.question, k=a.k, rewrite=a.rewrite, min_score=a.min_score,
+    res = Librarian(a.collection).answer(a.question, k=a.k, rewrite=a.rewrite, min_score=a.min_score,
                                     types=a.types.split(",") if a.types else None)
 
     print("\n=== ANSWER ===")

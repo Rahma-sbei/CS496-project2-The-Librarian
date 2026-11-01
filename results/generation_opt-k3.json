@@ -16,35 +16,35 @@
     "n_answerable": 100,
     "n_unanswerable": 12,
     "judge_errors": 0,
-    "accuracy_all": 0.8035714285714286,
-    "correctness_answerable": 0.78,
-    "faithfulness": 0.9898148148148148,
-    "fully_faithful": 0.9666666666666667,
-    "citation_accuracy": 0.9905660377358491,
-    "claims_with_citation": 0.8983050847457628,
+    "accuracy_all": 0.78125,
+    "correctness_answerable": 0.755,
+    "faithfulness": 0.9908008658008658,
+    "fully_faithful": 0.9659090909090909,
+    "citation_accuracy": 0.9803921568627451,
+    "claims_with_citation": 0.8831168831168831,
     "answers_with_bad_citation": 0.0,
     "idk_on_unanswerable": 1.0,
-    "idk_on_answerable": 0.1,
-    "idk_precision": 0.5454545454545454,
-    "context_recall": 0.69,
-    "latency_s_p50": 1.185,
-    "latency_s_p95": 2.4193999999999987,
-    "latency_s_mean": 1.3305446428571428,
-    "prompt_tokens_mean": 1037.7142857142858,
-    "completion_tokens_mean": 69.58928571428571,
-    "cost_per_request_usd": 0.00019741071428571426,
-    "cost_per_1k_requests_usd": 0.19741071428571424,
-    "cost_per_day_usd": 0.019741071428571427,
-    "cost_per_day_100x_usd": 1.9741071428571426,
-    "judge_cost_usd": 0.026109149999999998,
+    "idk_on_answerable": 0.12,
+    "idk_precision": 0.5,
+    "context_recall": 0.66,
+    "latency_s_p50": 1.2694999999999999,
+    "latency_s_p95": 4.349899999999999,
+    "latency_s_mean": 1.8026517857142856,
+    "prompt_tokens_mean": 1061.767857142857,
+    "completion_tokens_mean": 72.28571428571429,
+    "cost_per_request_usd": 0.00020263660714285714,
+    "cost_per_1k_requests_usd": 0.20263660714285714,
+    "cost_per_day_usd": 0.020263660714285713,
+    "cost_per_day_100x_usd": 2.0263660714285714,
+    "judge_cost_usd": 0.02644995,
     "by_question_type": {
       "conceptual": {
         "n": 17,
-        "correctness": 0.9117647058823529
+        "correctness": 0.9411764705882353
       },
       "error-message": {
         "n": 13,
-        "correctness": 0.9230769230769231
+        "correctness": 0.8846153846153846
       },
       "how-to": {
         "n": 47,
@@ -52,7 +52,7 @@
       },
       "multi-part": {
         "n": 8,
-        "correctness": 1.0
+        "correctness": 0.875
       },
       "unanswerable": {
         "n": 12,
@@ -60,7 +60,7 @@
       },
       "version": {
         "n": 15,
-        "correctness": 0.5666666666666667
+        "correctness": 0.4666666666666667
       }
     }
   }

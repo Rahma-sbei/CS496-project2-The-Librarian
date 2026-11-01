@@ -1,0 +1,67 @@
+{
+  "config": {
+    "tag": "ind-k5",
+    "model": "gpt-4o-mini",
+    "k": 5,
+    "rewrite": false,
+    "min_score": 0.0,
+    "rerank": false,
+    "judge_model": "gpt-4.1-mini",
+    "split": "all",
+    "limit": null,
+    "daily_requests": 100
+  },
+  "summary": {
+    "n": 112,
+    "n_answerable": 100,
+    "n_unanswerable": 12,
+    "judge_errors": 0,
+    "accuracy_all": 0.8526785714285714,
+    "correctness_answerable": 0.835,
+    "faithfulness": 0.9840425531914894,
+    "fully_faithful": 0.9787234042553191,
+    "citation_accuracy": 0.987603305785124,
+    "claims_with_citation": 0.9918032786885246,
+    "answers_with_bad_citation": 0.0,
+    "idk_on_unanswerable": 1.0,
+    "idk_on_answerable": 0.06,
+    "idk_precision": 0.6666666666666666,
+    "context_recall": 0.77,
+    "latency_s_p50": 1.2734999999999999,
+    "latency_s_p95": 2.843049999999989,
+    "latency_s_mean": 1.4542946428571428,
+    "prompt_tokens_mean": 1797.607142857143,
+    "completion_tokens_mean": 78.41964285714286,
+    "cost_per_request_usd": 0.0003166928571428571,
+    "cost_per_1k_requests_usd": 0.3166928571428571,
+    "cost_per_day_usd": 0.03166928571428571,
+    "cost_per_day_100x_usd": 3.166928571428571,
+    "judge_cost_usd": 0.1061296,
+    "by_question_type": {
+      "conceptual": {
+        "n": 17,
+        "correctness": 0.8529411764705882
+      },
+      "error-message": {
+        "n": 13,
+        "correctness": 1.0
+      },
+      "how-to": {
+        "n": 47,
+        "correctness": 0.7872340425531915
+      },
+      "multi-part": {
+        "n": 8,
+        "correctness": 0.9375
+      },
+      "unanswerable": {
+        "n": 12,
+        "correctness": 1.0
+      },
+      "version": {
+        "n": 15,
+        "correctness": 0.7666666666666667
+      }
+    }
+  }
+}

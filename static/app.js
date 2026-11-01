@@ -50,7 +50,7 @@ function sourceCard(s, turn) {
       <span class="src-title">${esc(s.title)}${where}</span>
       <a class="src-link" href="${esc(s.url)}" target="_blank" rel="noopener">open ↗</a>
     </div>
-    <details><summary>${s.cited ? "Cited" : "Retrieved, not cited"} · similarity ${s.score}${date} · show passage</summary><pre>${esc(s.text)}</pre></details>
+    <details><summary>${s.cited ? "Cited" : "Retrieved, not cited"} · similarity ${s.score ?? "–"}${date} · show passage</summary><pre>${esc(s.text)}</pre></details>
   </div>`;
 }
 
